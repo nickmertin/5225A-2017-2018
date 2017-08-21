@@ -1,0 +1,9 @@
+CONFIGS
+{
+	CONFIG_INIT
+
+	CONFIG(DRIVER(MANUAL_X_Y))
+	{
+		//TODO: Add controls
+	}
+}
