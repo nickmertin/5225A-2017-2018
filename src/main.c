@@ -79,6 +79,7 @@ task autonomous()
 	updateSensorInputs();
 	selectAuto();
 	joystickSetup(1);
+	armSetup(1);
 
 	startTask(autoMotorSensorUpdateTask);
 	startTask(autoSafetyTask);
@@ -97,15 +98,17 @@ task autonomous()
 task usercontrol()
 {
 	joystickSetup(0);
+	armSetup(0);
 
 	clearLCD();
 	S_LOG "Driver Start" E_LOG_INFO
 
 	//startTask(testing);
 
+	sCycleData cycle;
+	initCycle(cycle, 10);
 	while (true)
 	{
-		startCycle();
 		updateSensorInputs();
 		selectAuto();
 		runLCD();
@@ -115,6 +118,6 @@ task usercontrol()
 		updateSensorOutputs();
 		updateSensorsLst();
 		updateMotors();
-		endCycle();
+		endCycle(cycle);
 	}
 }

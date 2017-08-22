@@ -31,6 +31,11 @@ float degToPoti(float deg, short cal)
 	return (deg * DEG_PER_POT) - (CAL_BASE * DEG_PER_POT) + cal;
 }
 
+void currentArmPosition(sArmPos& position)
+{
+	calculatePosition(position, potiToDeg(SensorValue[armPotiA], A_VERTICAL), potiToDeg(SensorValue[armPotiB], B_VERTICAL));
+}
+
 void setArm(sbyte powerA, sbyte powerB)
 {
 	gMotor[armAR].power = gMotor[armAL].power = powerA;
@@ -42,7 +47,7 @@ void setArmF(float powerA, float powerB)
 	setArm((sbyte) powerA, (sbyte) powerB);
 }
 
-bool armToTarget(sArmPos& target, bool safety, bool hold)
+bool armToTarget(bool safety, bool hold)
 {
 	sPID pidA, pidB;
 
@@ -53,14 +58,21 @@ bool armToTarget(sArmPos& target, bool safety, bool hold)
 		float degA = potiToDeg(SensorValue[armPotiA], A_VERTICAL);
 		float degB = potiToDeg(SensorValue[armPotiB], B_VERTICAL);
 
-		float targetA = calculateTargetA(target.x, target.y);
-		float targetB = calculateTargetB(target.x, target.y);
+		float targetA = calculateTargetA(gArmTarget.x, gArmTarget.y);
+		float targetB = calculateTargetB(gArmTarget.x, gArmTarget.y);
 
 		pidCalculate(pidA, targetA, degA);
 		pidCalculate(pidB, targetB, degB);
 
 		setArmF(pidA.output, pidB.output);
 
+		if (!hold && fabs(pidA.error) < 0.5) {
+			return true;
+		}
+
+		HANDLE_STATE_REQUEST(arm, setArm(0, 0);, return fabs(pidA.error) < 0.5;)
+
 		sleep(10);
 	}
+	return false;
 }

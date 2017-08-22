@@ -123,13 +123,15 @@
 
 task autoMotorSensorUpdateTask()
 {
+	sCycleData cycle;
+	initCycle(cycle, 10);
 	while (true)
 	{
 		updateMotors();
 		updateSensorsLst();
 		updateSensorInputs();
 		updateSensorOutputs();
-		sleep(CYCLE_MAX_TIME);
+		endCycle(cycle);
 	}
 }
 
