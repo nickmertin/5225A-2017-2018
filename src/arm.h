@@ -3,8 +3,8 @@
 #define BEAM_R 16
 #define BEAM_S 16
 #define CAL_BASE 180
-#define A_VERTICAL 2668
-#define B_VERTICAL 3051
+#define A_VERTICAL 2711
+#define B_VERTICAL 2898
 
 /* Types */
 typedef struct _sArmPos {
