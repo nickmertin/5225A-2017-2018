@@ -2,6 +2,7 @@
 #define DEG_PER_POT 18.2
 #define BEAM_R 16
 #define BEAM_S 16
+#define BEAM_MAX_SQ ((BEAM_R + BEAM_S) * (BEAM_R + BEAM_S))
 #define CAL_BASE 180
 #define A_VERTICAL 2711
 #define B_VERTICAL 2898

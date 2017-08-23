@@ -12,13 +12,13 @@ void calculatePosition(sArmPos& position, float a, float b)
 float calculateTargetA(float x, float y)
 {
 	float Dsq = (x * x) + (y * y);
-	float D = sqrt(Dsq);
-	return (acos(((BEAM_R * BEAM_R) + Dsq - (BEAM_S * BEAM_S)) / (2 * BEAM_R * D)) * 180 / PI) + 90 + (atan2(y, x) * 180 / PI);
+	return (Dsq > BEAM_MAX_SQ) ? atan2(y, x) * 180 / PI + 90 : ((acos(((BEAM_R * BEAM_R) + Dsq - (BEAM_S * BEAM_S)) / (2 * BEAM_R * sqrt(Dsq))) * 180 / PI) + 90 + (atan2(y, x) * 180 / PI));
 }
 
 float calculateTargetB(float x, float y)
 {
-	return acos(((BEAM_R * BEAM_R) + (BEAM_S * BEAM_S) - (x * x) - (y * y)) / (2 * BEAM_R * BEAM_S)) * 180 / PI;
+	float Dsq = (x * x) + (y * y);
+	return (Dsq > BEAM_MAX_SQ) ? 180 : (acos(((BEAM_R * BEAM_R) + (BEAM_S * BEAM_S) - Dsq) / (2 * BEAM_R * BEAM_S)) * 180 / PI);
 }
 
 float potiToDeg(short poti, short cal)
@@ -57,6 +57,9 @@ bool armToTarget(bool safety, bool hold)
 	while(true) {
 		float degA = potiToDeg(SensorValue[armPotiA], A_VERTICAL);
 		float degB = potiToDeg(SensorValue[armPotiB], B_VERTICAL);
+
+		sArmPos cur;
+		calculatePosition(cur, degA, degB);
 
 		float targetA = calculateTargetA(gArmTarget.x, gArmTarget.y);
 		float targetB = calculateTargetB(gArmTarget.x, gArmTarget.y);
