@@ -51,8 +51,8 @@ bool armToTarget(bool safety, bool hold)
 {
 	sPID pidA, pidB;
 
-	pidInit(pidA, 3, 0, 0, 0, 0, 0, 127);
-	pidInit(pidB, 2.5, 0, 0, 0, 0, 0, 127);
+	pidInit(pidA, 3, 0.01, 0, 0, 0, 0, 127);
+	pidInit(pidB, 2.5, 0.01, 0, 0, 0, 0, 127);
 
 	while(true) {
 		float degA = potiToDeg(SensorValue[armPotiA], A_VERTICAL);
