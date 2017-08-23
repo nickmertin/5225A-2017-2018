@@ -20,6 +20,8 @@
 
 #define NORMAL_RAD(a) (fmod(a + PI, PI * 2) - PI)
 
+#define SGN_OF_DIFF(x, y) ((x > y) - (x < y))
+
 /* Functions */
 float fmod(float x, float y); // Floating point mod operation
 float sq(float x); // Square a value

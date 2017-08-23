@@ -1,5 +1,6 @@
 /* Defines */
 #define DEG_PER_POT 18.2
+#define POT_PER_DEG (1.0 / DEG_PER_POT)
 #define BEAM_R 16
 #define BEAM_S 16
 #define BEAM_MAX_SQ ((BEAM_R + BEAM_S) * (BEAM_R + BEAM_S))
@@ -32,9 +33,11 @@ void currentArmPosition(sArmPos& position);
 void setArm(sbyte powerA, sbyte powerB);
 void setArmF(float powerA, float powerB);
 bool armToTarget(bool safety, bool hold);
+bool armFollowParabola(float a, float b, float c, float targetX, tArmStates nextState);
 
 /* Async Functions */
 NEW_ASYNC_2(bool, armToTarget, bool, safety, bool, hold, return armToTarget(safety, hold););
+NEW_ASYNC_VOID_5(armFollowParabola, float, a, float, b, float, c, float, targetX, tArmStates, nextState, armFollowParabola(a, b, c, targetX, nextState););
 
 /* State Machine */
 MAKE_MACHINE(arm, tArmStates, armMoveHoldToTarget,
