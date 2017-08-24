@@ -134,26 +134,8 @@ bool armFollowParabola(float a, float b, float c, float targetX, tArmStates next
 		float rho = psi - a_3 * pos.y;
 		float eta = sqrt(rho * rho * rho * _1_a6 + phi * phi);
 		float closestX = pow(phi + eta, 1.0 / 3.0) + pow(phi - eta, 1.0 / 3.0) - b_2a;*/
-		float _C = 2 * a * (c - pos.y) + b * b + 1;
 		float sln[3];
-		sln[0] = solveCubic(_A, _B, _C, b * (c - pos.y) - pos.x);
-		float QB = _A * sln[0] + _B;
-		float QC = QB * sln[0] + _C;
-
-		float dscm = QB * QB - 4 * _A * QC;
-		int count = sgn(dscm) + 2;
-
-		if (count == 2)
-		{
-			sln[1] = -QB / (2 * _A);
-		}
-		else if (count == 3)
-		{
-			float sqrt_dscm = sqrt(dscm);
-			float _den = 2 * _A;
-			sln[1] = (sqrt_dscm - QB) / _den;
-			sln[2] = (-sqrt_dscm - QB) / _den;
-		}
+		int count = solveCubic(_A, _B, 2 * a * (c - pos.y) + b * b + 1, b * (c - pos.y) - pos.x, sln);
 
 		EndTimeSlice();
 

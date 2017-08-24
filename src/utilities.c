@@ -51,7 +51,7 @@ float stdDevFilteredMean(float* values, int count, float nStdDev)
 	return total / (float)valid;
 }
 
-float solveCubic(float a, float b, float c, float d)
+int solveCubic(float a, float b, float c, float d, float* sln)
 {
 	float p = -b / (3 * a);
 	float q = p * p * p + (b * c - 3 * a * d) / (6 * a * a);
@@ -60,10 +60,23 @@ float solveCubic(float a, float b, float c, float d)
 	float q2 = q * q;
 	float r_m_p2 = r - p2;
 	float s = sqrt(fabs(q2 + r_m_p2 * r_m_p2 * r_m_p2));
-	float result = pow(fabs(q + s), 1.0 / 3.0) * SGN_OF_DIFF(q, -s);
-	result += pow(fabs(q - s), 1.0 / 3.0) * SGN_OF_DIFF(q, -s);
-	result += p;
-	return result;
+	sln[0] = pow(fabs(q + s), 1.0 / 3.0) * SGN_OF_DIFF(q, -s) + pow(fabs(q - s), 1.0 / 3.0) * SGN_OF_DIFF(q, -s) + p;
+	float b_2 = a * sln[0] + b;
+	float c_2 = b_2 * sln[0] + c;
+	float dscm = b_2 * b_2 - 4 * a * c_2;
+	int count = sgn(dscm) + 2;
+	if (count == 2)
+	{
+		sln[1] = -b_2 / (2 * a);
+	}
+	else if (count == 3)
+	{
+		float sqrt_dscm = sqrt(dscm);
+		float _den = 2 * a;
+		sln[1] = (sqrt_dscm - b_2) / _den;
+		sln[2] = (-sqrt_dscm - b_2) / _den;
+	}
+	return count;
 }
 
 void stopAllButCurrentTasks()
