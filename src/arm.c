@@ -215,11 +215,11 @@ bool armFollowParabola(float a, float b, float c, float targetX, tArmStates next
 		float sinAB = sinDegrees(degAB);
 		float cosAB = cosDegrees(degAB);
 
-		float den = sinA * cosAB - cosA * sinAB;
+		float den = cosA * sinAB - sinA * cosAB;
 		float D = sqrt((BEAM_R * BEAM_R) + (BEAM_S * BEAM_S) - (2 * BEAM_R * BEAM_S * cosDegrees(degB)));
 
-		float wA = (vy * cosAB - vx * sinAB) / (D * den) * ARM_ANG_VEL_SCALAR;
-		float wB = -(vx * sinA - vy * cosA) / (BEAM_S * den) * ARM_ANG_VEL_SCALAR;
+		float wA = (vx * sinAB - vy * cosAB) / (D * den) * ARM_ANG_VEL_SCALAR;
+		float wB = (vx * sinA - vy * cosA) / (BEAM_S * den) * ARM_ANG_VEL_SCALAR;
 
 		S_LOG "A: %.2f B: %.2f", wA, wB E_LOG_DATA
 
@@ -227,25 +227,25 @@ bool armFollowParabola(float a, float b, float c, float targetX, tArmStates next
 
 		EndTimeSlice();
 
-		pidCalculate(pidVelA, wA, gSensor[armPotiA].velocity * DEG_PER_POT * PI / 180.0);
-		pidCalculate(pidVelB, wB, gSensor[armPotiB].velocity * DEG_PER_POT * PI / 180.0);
+		//pidCalculate(pidVelA, wA, gSensor[armPotiA].velocity * DEG_PER_POT * PI / 180.0);
+		//pidCalculate(pidVelB, wB, gSensor[armPotiB].velocity * DEG_PER_POT * PI / 180.0);
 
 		S_LOG "A: %.2f B: %.2f", pidVelA.output, pidVelB.output E_LOG_DATA
 
 		float target = 120 * v2_mag;
 		float outA, outB;
 
-		if (fabs(pidVelA.output) > target || fabs(pidVelB.output) > target)
+		if (fabs(wA) > target || fabs(wB) > target)
 		{
-			if (fabs(pidVelA.output) > fabs(pidVelB.output))
+			if (fabs(wA) > fabs(wB))
 			{
-				outB = target / fabs(pidVelA.output) * pidVelB.output;
-				outA = pidVelA.output > 0 ? target : -target;
+				outB = target / fabs(wA) * wB;
+				outA = wA > 0 ? target : -target;
 			}
 			else
 			{
-				outA = target / fabs(pidVelB.output) * pidVelA.output;
-				outB = pidVelB.output > 0 ? target : -target;
+				outA = target / fabs(wB) * pidVelA.output;
+				outB = wB > 0 ? target : -target;
 			}
 		}
 		else
@@ -267,7 +267,7 @@ bool armFollowParabola(float a, float b, float c, float targetX, tArmStates next
 
 		setArmF(outA, outB);
 
-		HANDLE_STATE_REQUEST(arm, setArm(0, 0);, return false);
+		HANDLE_STATE_REQUEST(arm, setArm(0, 0);, return false;);
 
 		endCycle(cycle);
 	}
