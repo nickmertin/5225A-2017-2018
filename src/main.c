@@ -98,17 +98,32 @@ task autonomous()
 	S_LOG "Auto End - took %d ms", gAutoTime E_LOG_INFO
 }
 
+task testing()
+{
+	updateSensorInputs();
+	setClaw(-75);
+	sleep(250);
+	gArmTarget.x = 19.2;
+	gArmTarget.y = -12.2;
+	armToTarget(false, false);
+	setClaw(70);
+	sleep(250);
+	armFollowParabola(-0.248, 4.034, 1.648, 3.8, armIdle);
+	setClaw(-75);
+}
+
 // This function get's called to handle the user-control period
 task usercontrol()
-{
+{/*
+	updateSensorInputs();
 	joystickSetup(0);
 	armSetup(0);
 	clawSetup(0);
 
 	clearLCD();
-	S_LOG "Driver Start" E_LOG_INFO
+	S_LOG "Driver Start" E_LOG_INFO*/
 
-	//startTask(testing);
+	startTask(testing);
 
 	sCycleData cycle;
 	initCycle(cycle, 10);
@@ -118,7 +133,7 @@ task usercontrol()
 		selectAuto();
 		runLCD();
 
-		handleJoysticks();
+		//handleJoysticks();
 
 		updateSensorOutputs();
 		updateSensorsLst();

@@ -29,4 +29,5 @@ int sq(int x); // Square a value
 float degToRad(float degrees); // Convert degrees to radians
 float radToDeg(float radians); // Convert radians to degrees
 float stdDevFilteredMean(float* values, int count, float nStdDev); // Get the average of the values that are within nStdDev standard deviations
+float solveCubic(float a, float b, float c, float d); // Solve a cubic equation ax^3 + bx^2 + cx + d = 0
 void stopAllButCurrentTasks();

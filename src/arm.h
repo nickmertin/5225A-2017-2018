@@ -1,6 +1,7 @@
 /* Defines */
 #define DEG_PER_POT 18.2
 #define POT_PER_DEG (1.0 / DEG_PER_POT)
+#define ARM_ANG_VEL_SCALAR 10
 #define BEAM_R 16
 #define BEAM_S 16
 #define BEAM_MAX_SQ ((BEAM_R + BEAM_S) * (BEAM_R + BEAM_S))

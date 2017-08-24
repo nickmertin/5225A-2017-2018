@@ -51,6 +51,21 @@ float stdDevFilteredMean(float* values, int count, float nStdDev)
 	return total / (float)valid;
 }
 
+float solveCubic(float a, float b, float c, float d)
+{
+	float p = -b / (3 * a);
+	float q = p * p * p + (b * c - 3 * a * d) / (6 * a * a);
+	float r = c / (3 * a);
+	float p2 = p * p;
+	float q2 = q * q;
+	float r_m_p2 = r - p2;
+	float s = sqrt(fabs(q2 + r_m_p2 * r_m_p2 * r_m_p2));
+	float result = pow(fabs(q + s), 1.0 / 3.0) * SGN_OF_DIFF(q, -s);
+	result += pow(fabs(q - s), 1.0 / 3.0) * SGN_OF_DIFF(q, -s);
+	result += p;
+	return result;
+}
+
 void stopAllButCurrentTasks()
 {
 	for (int i = 1; i < 20; ++i)
