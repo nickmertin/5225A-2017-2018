@@ -5,8 +5,8 @@
 #define BEAM_S 16
 #define BEAM_MAX_SQ ((BEAM_R + BEAM_S) * (BEAM_R + BEAM_S))
 #define CAL_BASE 180
-#define A_VERTICAL 2711
-#define B_VERTICAL 2898
+#define A_VERTICAL 2682
+#define B_VERTICAL 2888
 
 /* Types */
 typedef struct _sArmPos {
