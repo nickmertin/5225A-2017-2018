@@ -26,12 +26,14 @@ typedef struct _sArmPath {
 
 typedef enum _tArmStates {
 	armMoveHoldToTarget,
+	armDoFollowPath,
 	armIdle,
 } tArmStates;
 
 /* Variables */
 sArmPos gArmTarget;
 bool gPreserveArmTarget = false;
+sArmPath gArmPath;
 
 /* Functions */
 void calculatePosition(sArmPos& position, float a, float b);
@@ -53,5 +55,6 @@ NEW_ASYNC_VOID_2(armFollowPath, sArmPath*, path, tArmStates, nextState, armFollo
 MAKE_MACHINE(arm, tArmStates, armMoveHoldToTarget,
 {
 	case armMoveHoldToTarget: if (gPreserveArmTarget) gPreserveArmTarget = false; else currentArmPosition(gArmTarget); armToTargetAsync(false, true); break;
+	case armDoFollowPath: armFollowPathAsync(&gArmPath, armMoveHoldToTarget); break;
 	case armIdle: setArm(0, 0); break;
 })
