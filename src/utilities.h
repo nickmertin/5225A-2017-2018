@@ -28,5 +28,7 @@ float sq(float x); // Square a value
 int sq(int x); // Square a value
 float degToRad(float degrees); // Convert degrees to radians
 float radToDeg(float radians); // Convert radians to degrees
+void rotate(float& x, float& y, float radians); // Rotate a vector by an angle
+void rotateDegrees(float& x, float& y, float degrees); // Rotate a vector by an angle
 float stdDevFilteredMean(float* values, int count, float nStdDev); // Get the average of the values that are within nStdDev standard deviations
 void stopAllButCurrentTasks();

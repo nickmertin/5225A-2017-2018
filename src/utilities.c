@@ -24,6 +24,26 @@ float radToDeg(float radians)
 	return radians * 180 / PI;
 }
 
+void rotate(float& x, float& y, float radians)
+{
+	float c = cos(radians);
+	float s = sin(radians);
+	float _x = x * c - y * s;
+	float _y = x * s + y * c;
+	x = _x;
+	y = _y;
+}
+
+void rotateDegrees(float& x, float& y, float degrees)
+{
+	float c = cosDegrees(degrees);
+	float s = sinDegrees(degrees);
+	float _x = x * c - y * s;
+	float _y = x * s + y * c;
+	x = _x;
+	y = _y;
+}
+
 float stdDevFilteredMean(float* values, int count, float nStdDev)
 {
 	float mean = 0.0;

@@ -14,6 +14,16 @@ typedef struct _sArmPos {
 	float y;
 } sArmPos;
 
+typedef struct _sArmPathPoint {
+	sArmPos pos;
+	float direction;
+} sArmPathPoint;
+
+typedef struct _sArmPath {
+	sArmPathPoint *points;
+	unsigned short pointsCount;
+} sArmPath;
+
 typedef enum _tArmStates {
 	armMoveHoldToTarget,
 	armIdle,
@@ -33,11 +43,11 @@ void currentArmPosition(sArmPos& position);
 void setArm(sbyte powerA, sbyte powerB);
 void setArmF(float powerA, float powerB);
 bool armToTarget(bool safety, bool hold);
-bool armFollowParabola(float a, float b, float c, float targetX, tArmStates nextState);
+bool armFollowPath(sArmPath& path, tArmStates nextState);
 
 /* Async Functions */
 NEW_ASYNC_2(bool, armToTarget, bool, safety, bool, hold, return armToTarget(safety, hold););
-NEW_ASYNC_VOID_5(armFollowParabola, float, a, float, b, float, c, float, targetX, tArmStates, nextState, armFollowParabola(a, b, c, targetX, nextState););
+NEW_ASYNC_VOID_2(armFollowPath, sArmPath*, path, tArmStates, nextState, armFollowPath(*path, nextState););
 
 /* State Machine */
 MAKE_MACHINE(arm, tArmStates, armMoveHoldToTarget,
