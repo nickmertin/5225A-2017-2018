@@ -15,11 +15,13 @@ derivative = func.derive()
 print('sArmPath g%s;' % name.title())
 print('void %sInit()' % name)
 print('{')
-print('  static float data[%d][3] =' % count)
-print('  {')
-print(',\n'.join('    { %f, %f, %f }' % (x, func.map(x), atan(derivative.map(x)) * 180 / pi + (180 if start > end else 0)) for x in
-                 chain(frange(start, end, (end - start) / (count - 1)), [end])))
-print('  };')
-print('  g%s.points = (sArmPath*) data;' % name.title())
+print('  static sArmPathPoint data[%d];' % count)
+data = [(x, func.map(x), atan(derivative.map(x)) * 180 / pi + (180 if start > end else 0)) for x in
+        chain(frange(start, end, (end - start) / (count - 1)), [end])]
+for i in range(count):
+    print('  data[%d].pos.x = %f;' % (i, data[i][0]))
+    print('  data[%d].pos.y = %f;' % (i, data[i][1]))
+    print('  data[%d].direction = %f;' % (i, data[i][2]))
+print('  g%s.points = &data;' % name.title())
 print('  g%s.pointsCount = %d;' % (name.title(), count))
 print('}')
