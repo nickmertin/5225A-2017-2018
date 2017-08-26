@@ -14,5 +14,8 @@ CONFIGS
 
 		RISING(Btn6U, CHANGE_STATE(claw, clawClosed);)
 		RISING(Btn6D, CHANGE_STATE(claw, clawOpen);)
+
+		RISING(Btn5U, gArmPath = &gStack7; CHANGE_STATE(arm, armDoFollowPath);)
+		RISING(Btn5D, CHANGE_STATE(arm, armMoveHoldToTarget);)
 	}
 }

@@ -106,12 +106,16 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		sArmPos pos;
 		calculatePosition(pos, degA, degB);
 
-		float dx = path.points[i].pos.x - pos.x;
-		float dy = path.points[i].pos.y - pos.y;
+		float _x = path.points[i].pos.x;
+		float _y = path.points[i].pos.y;
+		float dx = _x - pos.x;
+		float dy = _y - pos.y;
 		float distSq = dx * dx - dy * dy;
 
-		float dxN = path.points[i + 1].pos.x - pos.x;
-		float dyN = path.points[i + 1].pos.y - pos.y;
+		_x = path.points[i + 1].pos.x;
+		_y = path.points[i + 1].pos.y;
+		float dxN = _x - pos.x;
+		float dyN = _y - pos.y;
 		float distNSq = dxN * dxN - dyN * dyN;
 
 		if (distNSq < distSq)
@@ -183,7 +187,7 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		endCycle(cycle);
 	}
 
-	S_LOG "armFollowParabola cycles: %d average cycle time: %d ms", nPgmTime - startTime, (nPgmTime - startTime) / cycle.count E_LOG_INFO
+	//S_LOG "armFollowParabola cycles: %d average cycle time: %d ms", nPgmTime - startTime, (nPgmTime - startTime) / cycle.count E_LOG_INFO
 
 	setArm(0, 0);
 	ENABLE_TO_STATE(arm, nextState);

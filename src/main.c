@@ -39,6 +39,7 @@
 #include "state.c"
 
 /* Year-dependent */
+#include "paths.h"
 #include "general.h"
 #include "arm.h"
 #include "claw.h"
@@ -47,6 +48,7 @@
 #include "auto.h"
 #include "lcd_control.h"
 
+#include "paths.c"
 #include "general.c"
 #include "arm.c"
 #include "claw.c"
@@ -64,6 +66,9 @@ void startup()
 	bLCDBacklight = true;
 	setupMotors();
 	setupSensors();
+
+	// Initialize paths
+	stack7Init();
 
 	startTask(statusMonitor);
 }
@@ -101,6 +106,7 @@ task autonomous()
 // This function get's called to handle the user-control period
 task usercontrol()
 {
+	updateSensorInputs();
 	joystickSetup(0);
 	armSetup(0);
 	clawSetup(0);
