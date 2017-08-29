@@ -47,6 +47,7 @@ void setArmF(float powerA, float powerB)
 	setArm((sbyte) powerA, (sbyte) powerB);
 }
 
+
 bool armToTarget(bool safety, bool hold)
 {
 	sPID pidA, pidB;
@@ -88,13 +89,18 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 	oldTarget.x = gArmTarget.x;
 	oldTarget.y = gArmTarget.y;
 	gArmTarget = path.points[0].pos;
-	armToTarget(false, false);
+	//armToTarget(false, false);
 
 	sPID pidDist, pidPosOffset, pidVelOffset;
 
 	pidInit(pidDist, 1, 0, 0, 0, 0, 0, 0);
 	pidInit(pidPosOffset, 5, 0, 0, 0, 0, 0, 5);
 	pidInit(pidVelOffset, 5, 0.01, 0, -1, -1, 0, 5);
+
+	sPID pidA, pidB;
+
+	pidInit(pidA, 5, 0.01, 0.02, 2, 35, 0, 127);
+	pidInit(pidB, 4, 0.01, 0.02, 2, 35, 0, 127);
 
 	unsigned long startTime = nPgmTime;
 
@@ -132,75 +138,19 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 				dx = dxN;
 				dy = dyN;
 				distSq = distNSq;
+				pidReset(pidA);
+				pidReset(pidB);
 			}
 			else break;
 		}
 
-		pidCalculate(pidPosOffset, 0, sqrt(distSq) * sin(atan2(dy, dx) - degToRad(path.points[i].direction)));
+		float targetA = calculateTargetA(_x, _y);
+		float targetB = calculateTargetB(_x, _y);
 
-		float targetX = pidPosOffset.output;
-		float targetY = 2.0;
+		pidCalculate(pidA, targetA, degA);
+		pidCalculate(pidB, targetB, degB);
 
-		rotateDegrees(targetX, targetY, path.points[i].direction);
-
-		targetX += pos.x;
-		targetY += pos.y;
-
-		S_LOG "[%.2f,%.2f] (%.2f,%.2f) -> (%.2f,%.2f)", _x, _y, pos.x, pos.y, targetX, targetY E_LOG_DATA
-
-		float targetA = calculateTargetA(targetX, targetY);
-		float targetB = calculateTargetB(targetX, targetY);
-
-		float dA = targetA - degA;
-		float dB = targetB - degB;
-
-		float outA, outB;
-
-		if (dA == 0)
-		{
-			outA = 0;
-			outB = 127.0;
-		}
-		else if (dB == 0)
-		{
-			outA = 127.0;
-			outB = 0;
-		}
-		else
-		{
-			float targetRatio = fabs(dA / dB);
-			float trLog = log(targetRatio);
-
-			float realRatio = (gSensor[armPotiA].velocity == 0 || gSensor[armPotiB].velocity == 0) ? targetRatio : fabs(gSensor[armPotiA].velocity / gSensor[armPotiB].velocity);
-			float rrLog = log(realRatio);
-
-			pidCalculate(pidVelOffset, trLog, rrLog);
-
-			float outputLog = pidVelOffset.output + 0.4;// + trLog;
-
-			S_LOG "%f | %f | %f", trLog, rrLog, outputLog E_LOG_DATA
-
-			switch (sgn(outputLog))
-			{
-				case -1:
-					outA = 127.0 * exp(outputLog);
-					outB = 127.0;
-					break;
-				case 1:
-					outA = 127.0;
-					outB = 127.0 * exp(-outputLog);
-					break;
-				case 0:
-					outA = outB = 127.0;
-					break;
-			}
-		}
-
-		S_LOG "OUT: %d %d", (int)outA, (int)outB E_LOG_DATA
-
-		setArmF(outA * sgn(dA), outB * sgn(dB));
-
-		skip:
+		setArmF(pidA.output, pidB.output);
 
 		HANDLE_STATE_REQUEST(arm, setArm(0, 0);, return false;);
 
