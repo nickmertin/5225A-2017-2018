@@ -68,7 +68,10 @@ void startup()
 	setupSensors();
 
 	// Initialize paths
+	test1Init();
 	stack7Init();
+	stack7_1Init();
+	stack7_2Init();
 
 	startTask(statusMonitor);
 }

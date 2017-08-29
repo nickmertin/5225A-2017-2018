@@ -84,18 +84,24 @@ bool armToTarget(bool safety, bool hold)
 
 bool armFollowPath(sArmPath& path, tArmStates nextState)
 {
+	sArmPos oldTarget;
+	oldTarget.x = gArmTarget.x;
+	oldTarget.y = gArmTarget.y;
+	gArmTarget = path.points[0].pos;
+	armToTarget(false, false);
+
 	sPID pidDist, pidPosOffset, pidVelOffset;
 
 	pidInit(pidDist, 1, 0, 0, 0, 0, 0, 0);
-	pidInit(pidPosOffset, 1, 0, 0, 0, 0, 0, 0);
-	pidInit(pidVelOffset, 1, 0, 0, 0, 0, 0, 0);
+	pidInit(pidPosOffset, 5, 0, 0, 0, 0, 0, 5);
+	pidInit(pidVelOffset, 5, 0.01, 0, -1, -1, 0, 5);
 
 	unsigned long startTime = nPgmTime;
 
 	sCycleData cycle;
 	initCycle(cycle, 50);
 
-	for (int i = 0; i < path.pointsCount;)
+	for (int i = 0; i < path.pointsCount - 1;)
 	{
 		float degA = potiToDeg(*gSensor[armPotiA].value, A_VERTICAL);
 		float degB = potiToDeg(*gSensor[armPotiB].value, B_VERTICAL);
@@ -110,29 +116,37 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		float _y = path.points[i].pos.y;
 		float dx = _x - pos.x;
 		float dy = _y - pos.y;
-		float distSq = dx * dx - dy * dy;
+		float distSq = dx * dx + dy * dy;
 
-		_x = path.points[i + 1].pos.x;
-		_y = path.points[i + 1].pos.y;
-		float dxN = _x - pos.x;
-		float dyN = _y - pos.y;
-		float distNSq = dxN * dxN - dyN * dyN;
-
-		if (distNSq < distSq)
+		while (i < path.pointsCount - 1)
 		{
-			i++;
-			dx = dxN;
-			dy = dyN;
-			distSq = distNSq;
+			_x = path.points[i + 1].pos.x;
+			_y = path.points[i + 1].pos.y;
+			float dxN = _x - pos.x;
+			float dyN = _y - pos.y;
+			float distNSq = dxN * dxN + dyN * dyN;
+
+			if (distNSq < distSq)
+			{
+				i++;
+				dx = dxN;
+				dy = dyN;
+				distSq = distNSq;
+			}
+			else break;
 		}
 
-		float targetX = 2.0;
-		float targetY = sin(atan2(dy, dx) - degToRad(path.points[i].direction));
+		pidCalculate(pidPosOffset, 0, sqrt(distSq) * sin(atan2(dy, dx) - degToRad(path.points[i].direction)));
+
+		float targetX = pidPosOffset.output;
+		float targetY = 2.0;
 
 		rotateDegrees(targetX, targetY, path.points[i].direction);
 
 		targetX += pos.x;
 		targetY += pos.y;
+
+		S_LOG "[%.2f,%.2f] (%.2f,%.2f) -> (%.2f,%.2f)", _x, _y, pos.x, pos.y, targetX, targetY E_LOG_DATA
 
 		float targetA = calculateTargetA(targetX, targetY);
 		float targetB = calculateTargetB(targetX, targetY);
@@ -157,12 +171,14 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 			float targetRatio = fabs(dA / dB);
 			float trLog = log(targetRatio);
 
-			float realRatio = fabs(gSensor[armPotiA].velocity / gSensor[armPotiB].velocity);
+			float realRatio = (gSensor[armPotiA].velocity == 0 || gSensor[armPotiB].velocity == 0) ? targetRatio : fabs(gSensor[armPotiA].velocity / gSensor[armPotiB].velocity);
 			float rrLog = log(realRatio);
 
 			pidCalculate(pidVelOffset, trLog, rrLog);
 
-			float outputLog = pidVelOffset.output + trLog;
+			float outputLog = pidVelOffset.output + 0.4;// + trLog;
+
+			S_LOG "%f | %f | %f", trLog, rrLog, outputLog E_LOG_DATA
 
 			switch (sgn(outputLog))
 			{
@@ -180,16 +196,25 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 			}
 		}
 
+		S_LOG "OUT: %d %d", (int)outA, (int)outB E_LOG_DATA
+
 		setArmF(outA * sgn(dA), outB * sgn(dB));
+
+		skip:
 
 		HANDLE_STATE_REQUEST(arm, setArm(0, 0);, return false;);
 
 		endCycle(cycle);
 	}
 
-	//S_LOG "armFollowParabola cycles: %d average cycle time: %d ms", nPgmTime - startTime, (nPgmTime - startTime) / cycle.count E_LOG_INFO
+	gArmTarget.x = path.points[path.pointsCount - 1].pos.x;
+	gArmTarget.y = path.points[path.pointsCount - 1].pos.y;
+	DISABLE_TO_STATE(arm, armDoFollowPath);
+	bool result = armToTarget(false, false);
+	gArmTarget.x = oldTarget.x;
+	gArmTarget.y = oldTarget.y;
 
 	setArm(0, 0);
 	ENABLE_TO_STATE(arm, nextState);
-	return true;
+	return result;
 }
