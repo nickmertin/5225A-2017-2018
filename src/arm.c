@@ -151,7 +151,7 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		// Run PID on offset from tangent
 		float dir = path.points[i].direction;
 		rotateDegrees(dx, dy, -dir);
-		pidCalculate(pidPosOffset, 0, -dy);
+		pidCalculate(pidPosOffset, 0, dy);
 
 		// Generate target position
 		float targetX = 7;
@@ -178,11 +178,13 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		{
 			outA = 0;
 			outB = 127.0;
+			pidReset(pidVelOffset);
 		}
 		else if (dB == 0)
 		{
 			outA = 127.0;
 			outB = 0;
+			pidReset(pidVelOffset);
 		}
 		else
 		{
