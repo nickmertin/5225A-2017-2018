@@ -92,7 +92,12 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 
 	sPID pidPosOffset, pidVelOffset;
 
+	// Input: distance from the tangent through the current setpoint
+	// Output: target offset perpendicular to the tangent
 	pidInit(pidPosOffset, 0.5, 0, 4, -1, -1, 0, 5);
+
+	// Input: error in logarithm of ratio of angular velocities
+	// Output: logarithm of ratio of motor powers (before bias)
 	pidInit(pidVelOffset, 0.01, 0, 1, -1, -1, 0, 2);
 
 	unsigned long startTime = nPgmTime;
@@ -112,12 +117,15 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		sArmPos pos;
 		calculatePosition(pos, degA, degB);
 
+		// Get offset from current setpoint
+
 		float _x = path.points[i].pos.x;
 		float _y = path.points[i].pos.y;
 		float dx = _x - pos.x;
 		float dy = _y - pos.y;
 		float distSq = dx * dx + dy * dy;
 
+		// Change to closest setpoint
 		for (int j = 0; j < path.pointsCount; j++)
 		{
 			float xN = path.points[j].pos.x;
@@ -136,12 +144,16 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 				distSq = distNSq;
 			}
 		}
+
+		// Quit if closest to last setpoint
 		if (i == path.pointsCount - 1) break;
 
+		// Run PID on offset from tangent
 		float dir = path.points[i].direction;
 		rotateDegrees(dx, dy, -dir);
 		pidCalculate(pidPosOffset, 0, -dy);
 
+		// Generate target position
 		float targetX = 7;
 		float targetY = pidPosOffset.output;
 
@@ -150,6 +162,7 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		targetX += pos.x;
 		targetY += pos.y;
 
+		// Get target joint angles
 		float targetA = calculateTargetA(targetX, targetY);
 		float targetB = calculateTargetB(targetX, targetY);
 
@@ -160,6 +173,7 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 
 		float outA, outB;
 
+		// Generate output power magnitudes
 		if (dA == 0)
 		{
 			outA = 0;
@@ -172,6 +186,7 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		}
 		else
 		{
+			// Use logarithmic scale to create output powers
 			float targetRatio = fabs(dA / dB);
 			float trLog = log(targetRatio);
 
@@ -219,8 +234,8 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 			}
 		}
 
+		// Apply motor power
 		S_LOG "OUT: %d %d", (int)outA * sgn(dA), (int)outB * sgn(dB) E_LOG_DATA
-
 		setArmF(outA * sgn(dA), outB * sgn(dB));
 
 		skip:
