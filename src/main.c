@@ -120,7 +120,7 @@ task usercontrol()
 	//startTask(testing);
 
 	sCycleData cycle;
-	initCycle(cycle, 10);
+	initCycle(cycle, 15);
 	while (true)
 	{
 		updateSensorInputs();

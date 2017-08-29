@@ -6,7 +6,7 @@ void setClaw(sbyte target)
 void clawToTarget()
 {
 	sCycleData cycle;
-	initCycle(cycle, 10);
+	initCycle(cycle, 15);
 	while (true)
 	{
 		setClaw(gClawTarget);
