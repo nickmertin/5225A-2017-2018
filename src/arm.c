@@ -88,20 +88,20 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 	oldTarget.x = gArmTarget.x;
 	oldTarget.y = gArmTarget.y;
 	gArmTarget = path.points[0].pos;
-	armToTarget(false, false);
+	//armToTarget(false, false);
 
-	sPID pidDist, pidPosOffset, pidVelOffset;
+	sPID pidPosOffset, pidVelOffset;
 
-	pidInit(pidDist, 1, 0, 0, 0, 0, 0, 0);
-	pidInit(pidPosOffset, 5, 0, 0, 0, 0, 0, 5);
-	pidInit(pidVelOffset, 5, 0.01, 0, -1, -1, 0, 5);
+	pidInit(pidPosOffset, 0.5, 0, 4, -1, -1, 0, 5);
+	pidInit(pidVelOffset, 0.01, 0, 1, -1, -1, 0, 2);
 
 	unsigned long startTime = nPgmTime;
 
 	sCycleData cycle;
-	initCycle(cycle, 50);
+	initCycle(cycle, 20);
 
-	for (int i = 0; i < path.pointsCount - 1;)
+	int i = 0;
+	while (true)
 	{
 		float degA = potiToDeg(*gSensor[armPotiA].value, A_VERTICAL);
 		float degB = potiToDeg(*gSensor[armPotiB].value, B_VERTICAL);
@@ -118,41 +118,45 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 		float dy = _y - pos.y;
 		float distSq = dx * dx + dy * dy;
 
-		while (i < path.pointsCount - 1)
+		for (int j = 0; j < path.pointsCount; j++)
 		{
-			_x = path.points[i + 1].pos.x;
-			_y = path.points[i + 1].pos.y;
-			float dxN = _x - pos.x;
-			float dyN = _y - pos.y;
+			float xN = path.points[j].pos.x;
+			float yN = path.points[j].pos.y;
+			float dxN = xN - pos.x;
+			float dyN = yN - pos.y;
 			float distNSq = dxN * dxN + dyN * dyN;
 
 			if (distNSq < distSq)
 			{
-				i++;
+				i = j;
+				_x = xN;
+				_y = yN;
 				dx = dxN;
 				dy = dyN;
 				distSq = distNSq;
 			}
-			else break;
 		}
+		if (i == path.pointsCount - 1) break;
 
-		pidCalculate(pidPosOffset, 0, sqrt(distSq) * sin(atan2(dy, dx) - degToRad(path.points[i].direction)));
+		float dir = path.points[i].direction;
+		rotateDegrees(dx, dy, -dir);
+		pidCalculate(pidPosOffset, 0, -dy);
 
-		float targetX = pidPosOffset.output;
-		float targetY = 2.0;
+		float targetX = 7;
+		float targetY = pidPosOffset.output;
 
-		rotateDegrees(targetX, targetY, path.points[i].direction);
+		rotateDegrees(targetX, targetY, dir);
 
 		targetX += pos.x;
 		targetY += pos.y;
-
-		S_LOG "[%.2f,%.2f] (%.2f,%.2f) -> (%.2f,%.2f)", _x, _y, pos.x, pos.y, targetX, targetY E_LOG_DATA
 
 		float targetA = calculateTargetA(targetX, targetY);
 		float targetB = calculateTargetB(targetX, targetY);
 
 		float dA = targetA - degA;
 		float dB = targetB - degB;
+
+		S_LOG "[%.2f,%.2f] (%.2f,%.2f) -> (%.2f,%.2f): %.2f %.2f", _x, _y, pos.x, pos.y, targetX, targetY, dA, dB E_LOG_DATA
 
 		float outA, outB;
 
@@ -171,12 +175,31 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 			float targetRatio = fabs(dA / dB);
 			float trLog = log(targetRatio);
 
-			float realRatio = (gSensor[armPotiA].velocity == 0 || gSensor[armPotiB].velocity == 0) ? targetRatio : fabs(gSensor[armPotiA].velocity / gSensor[armPotiB].velocity);
+			float velA = sgn(gSensor[armPotiA].velocity) == sgn(dA) ? gSensor[armPotiA].velocity : 0.0;
+			float velB = sgn(gSensor[armPotiB].velocity) == sgn(dB) ? gSensor[armPotiB].velocity : 0.0;
+
+			float realRatio;
+			if (!velA && !velB)
+			{
+				realRatio = targetRatio;
+			}
+			else if (!velA)
+			{
+				realRatio = (dB - dA) / dB;
+			}
+			else if (!velB)
+			{
+				realRatio = dA / (dA - dB);
+			}
+			else
+			{
+				realRatio = fabs(velA / velB);
+			}
 			float rrLog = log(realRatio);
 
 			pidCalculate(pidVelOffset, trLog, rrLog);
 
-			float outputLog = pidVelOffset.output + 0.4;// + trLog;
+			float outputLog = pidVelOffset.output + 0.4;
 
 			S_LOG "%f | %f | %f", trLog, rrLog, outputLog E_LOG_DATA
 
@@ -196,7 +219,7 @@ bool armFollowPath(sArmPath& path, tArmStates nextState)
 			}
 		}
 
-		S_LOG "OUT: %d %d", (int)outA, (int)outB E_LOG_DATA
+		S_LOG "OUT: %d %d", (int)outA * sgn(dA), (int)outB * sgn(dB) E_LOG_DATA
 
 		setArmF(outA * sgn(dA), outB * sgn(dB));
 
