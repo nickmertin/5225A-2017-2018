@@ -32,7 +32,6 @@ else \
 /* Types */
 typedef enum _tDriver
 {
-	MANUAL_X_Y,
 	DRIVER_END
 } tDriver;
 
@@ -54,7 +53,7 @@ bool gLiftOnPreset = false;
 CONFIGS;
 
 /* State Machine */
-MAKE_MACHINE(joystick, tDriver, MANUAL_X_Y,
+MAKE_MACHINE(joystick, tDriver, DRIVER_END,
 {
-	case MANUAL_X_Y: break;
+	case DRIVER_END: break;
 })

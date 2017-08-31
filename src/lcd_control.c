@@ -54,12 +54,10 @@ void runLCD()
 	switch (gLCDCurPosition)
 	{
 		case 0:
-			string lcdOut, cArmX, cArmY, cAutoPoti;
-			sArmPos pos;
-			currentArmPosition(pos);
-			sprintf(lcdOut, "%.1f %.1f %s%s",
-				pos.x,
-				pos.y,
+			string lcdOut, cAutoPoti;
+			sprintf(lcdOut, "%s %s %s%s",
+				"    ",
+				"    ",
 				"    ",
 				gError);
 			displayLCDString(0, 0, lcdOut);
