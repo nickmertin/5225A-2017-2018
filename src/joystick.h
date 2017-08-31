@@ -32,6 +32,8 @@ else \
 /* Types */
 typedef enum _tDriver
 {
+	SINGLE_STICK,
+	DUAL_STICK,
 	DRIVER_END
 } tDriver;
 
@@ -43,7 +45,7 @@ int gDeadzone[kNumbOfVexRFIndices];
 int gJoystick[kNumbOfVexRFIndices];
 int gJoystickLast[kNumbOfVexRFIndices];
 unsigned long gJoystickFlags;
-string gDriverNames[3] = { "Single Stick", "Dual Stick", "Debug" };
+const string gDriverNames[2] = { "Single Stick", "Dual Stick" };
 
 bool gThrowLast = false;
 bool gLiftOnPreset = false;
@@ -55,5 +57,6 @@ CONFIGS;
 /* State Machine */
 MAKE_MACHINE(joystick, tDriver, DRIVER_END,
 {
-	case DRIVER_END: break;
+	case SINGLE_STICK: break;
+	case DUAL_STICK: break;
 })
