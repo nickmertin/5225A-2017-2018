@@ -86,6 +86,8 @@ task autonomous()
 	updateSensorInputs();
 	selectAuto();
 	joystickSetup(1);
+	driveSetup(1);
+	liftSetup(1);
 
 	startTask(autoMotorSensorUpdateTask);
 	startTask(autoSafetyTask);
