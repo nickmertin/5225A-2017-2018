@@ -47,6 +47,7 @@
 #include "joystick.h"
 #include "drive.h"
 #include "lift.h"
+#include "mobile.h"
 #include "auto_runs.h"
 #include "auto.h"
 #include "lcd_control.h"
@@ -55,6 +56,7 @@
 #include "joystick.c"
 #include "drive.c"
 #include "lift.c"
+#include "mobile.c"
 #include "auto_runs.c"
 #include "auto.c"
 #include "lcd_control.c"
@@ -88,6 +90,7 @@ task autonomous()
 	joystickSetup(1);
 	driveSetup(1);
 	liftSetup(1);
+	mobileSetup(1);
 
 	startTask(autoMotorSensorUpdateTask);
 	startTask(autoSafetyTask);
@@ -108,6 +111,7 @@ task usercontrol()
 	joystickSetup(0);
 	driveSetup(0);
 	liftSetup(0);
+	mobileSetup(0);
 
 	clearLCD();
 	S_LOG "Driver Start" E_LOG_INFO
@@ -125,6 +129,7 @@ task usercontrol()
 		handleJoysticks();
 		handleDrive();
 		handleLift();
+		handleMobile();
 
 		updateSensorOutputs();
 		updateSensorsLst();
