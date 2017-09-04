@@ -55,7 +55,7 @@ bool gLiftOnPreset = false;
 CONFIGS;
 
 /* State Machine */
-MAKE_MACHINE(joystick, tDriver, DRIVER_END,
+MAKE_MACHINE(joystick, tDriver, SINGLE_STICK,
 {
 	case SINGLE_STICK: break;
 	case DUAL_STICK: break;
