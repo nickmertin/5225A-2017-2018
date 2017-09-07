@@ -30,5 +30,8 @@ CONFIGS
 
 		RISING(Btn6D, CHANGE_STATE(mobile, mobileLowering);)
 		RISING(Btn6U, CHANGE_STATE(mobile, mobileRaising);)
+
+		FALLING(Btn6D, CHANGE_STATE_FROM_STATE(mobile, mobileLowering, mobileIdle);)
+		FALLING(Btn6U, CHANGE_STATE_FROM_STATE(mobile, mobileRaising, mobileIdle);)
 	}
 }
