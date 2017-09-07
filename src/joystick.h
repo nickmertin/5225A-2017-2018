@@ -19,7 +19,7 @@ else \
 // Defines for new joystick system
 #define DRIVER(num) (1 << num)
 #define CONFIGS void handleJoysticks()
-#define CONFIG_INIT { gJoystickFlags = 0; for (TVexJoysticks i = 0; i < kNumbOfVexRFIndices; ++i) gDeadzone[i] = 0; HANDLE_STATE_REQUEST(joystick, , ) }
+#define CONFIG_INIT { gJoystickFlags = 0; for (TVexJoysticks i = (TVexJoysticks)0; i < kNumbOfVexRFIndices; ++i) gDeadzone[i] = 0; HANDLE_STATE_REQUEST(joystick, , ) }
 #define CONFIG(driver) if (DRIVER(joystickData.state) & (driver))
 #define DEADZONE(channel, dz) gDeadzone[channel] = dz;
 #define ANY(channel, code) { _VALUE(channel) code }

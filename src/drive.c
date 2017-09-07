@@ -12,5 +12,5 @@ void handleDrive()
 			setDrive(gJoyThrottle + gJoyTurn, gJoyThrottle - gJoyTurn);
 			break;
 	}
-	HANDLE_STATE_REQUEST(drive, ;, ;);
+	HANDLE_STATE_REQUEST(drive, , );
 }

@@ -16,6 +16,6 @@ void handleLift()
 				if (*gSensor[limTop].value) ENABLE_TO_STATE(lift, liftRaising);
 				break;
 		}
-		HANDLE_STATE_REQUEST(lift, ;, ;)
+		HANDLE_STATE_REQUEST(lift, , )
 	}
 }

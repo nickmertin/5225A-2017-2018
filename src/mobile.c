@@ -14,5 +14,5 @@ void handleMobile()
 			if (*gSensor[mobilePoti].value >= MOBILE_UP_POSITION) CHANGE_STATE(mobile, mobileUp);
 			break;
 	}
-	HANDLE_STATE_REQUEST(mobile, ;, ;);
+	HANDLE_STATE_REQUEST(mobile, , );
 }
