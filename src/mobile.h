@@ -8,7 +8,8 @@
 #define MOBILE_LOWER_POWER -127
 
 /* Types */
-typedef enum _tMobileStates {
+typedef enum _tMobileStates
+{
 	mobileIdle,
 	mobileLowering,
 	mobileRaising,
