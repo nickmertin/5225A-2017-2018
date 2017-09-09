@@ -3,7 +3,6 @@
 #define MOBILE_DOWN_POSITION 500
 #define MOBILE_HOLD_UP_POWER 5
 #define MOBILE_HOLD_DOWN_POWER -5
-#define MOBILE_HOLD_MID_POWER 10
 #define MOBILE_RAISE_POWER 127
 #define MOBILE_LOWER_POWER -127
 
@@ -23,7 +22,7 @@ void handleMobile();
 /* State Machine */
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
 {
-	case mobileIdle: setMobile(MOBILE_HOLD_MID_POWER); break;
+	case mobileIdle: setMobile(0); break;
 	case mobileLowering: setMobile(MOBILE_LOWER_POWER); break;
 	case mobileRaising: setMobile(MOBILE_RAISE_POWER); break;
 	case mobileDown: setMobile(MOBILE_HOLD_DOWN_POWER); break;
