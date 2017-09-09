@@ -27,7 +27,7 @@ void holdMobileToTarget(int target);
 NEW_ASYNC_VOID_1(holdMobileToTarget, int, target, holdMobileToTarget(target););
 
 /* State Machine */
-MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
+MAKE_MACHINE(mobile, tMobileStates, mobileUp,
 {
 	case mobileIdle: setMobile(0); break;
 	case mobileLowering: setMobile(MOBILE_LOWER_POWER); break;
