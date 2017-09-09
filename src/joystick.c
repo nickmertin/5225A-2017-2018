@@ -28,7 +28,7 @@ CONFIGS
 		FALLING(Btn5D, CHANGE_STATE_FROM_STATE(lift, liftLowering, liftHolding);)
 		FALLING(Btn5U, CHANGE_STATE_FROM_STATE(lift, liftRaising, liftHolding);)
 
-		RISING(Btn6D, CHANGE_STATE(mobile, mobileLowering);)
+		RISING(Btn6D, CHANGE_STATE_FROM_STATE(mobile, mobileIdle, mobileLowering); CHANGE_STATE_FROM_STATE(mobile, mobileToHalfway, mobileLowering); CHANGE_STATE_FROM_STATE(mobile, mobileUp, mobileToHalfway); CHANGE_STATE_FROM_STATE(mobile, mobileRaising, mobileLowering);)
 		RISING(Btn6U, CHANGE_STATE(mobile, mobileRaising);)
 	}
 }
