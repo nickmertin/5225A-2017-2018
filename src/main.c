@@ -2,6 +2,7 @@
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  limBottom,      sensorTouch)
 #pragma config(Sensor, dgtl2,  limTop,         sensorTouch)
+#pragma config(Motor,  port1,           intake,        tmotorVex269_HBridge, openLoop)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port3,           mobileL,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           driveL1,       tmotorVex393TurboSpeed_MC29, openLoop)
@@ -48,6 +49,7 @@
 #include "drive.h"
 #include "lift.h"
 #include "mobile.h"
+#include "intake.h"
 #include "auto_runs.h"
 #include "auto.h"
 #include "lcd_control.h"
@@ -57,6 +59,7 @@
 #include "drive.c"
 #include "lift.c"
 #include "mobile.c"
+#include "intake.c"
 #include "auto_runs.c"
 #include "auto.c"
 #include "lcd_control.c"
@@ -91,6 +94,7 @@ task autonomous()
 	driveSetup(1);
 	liftSetup(1);
 	mobileSetup(1);
+	intakeSetup(1);
 
 	startTask(autoMotorSensorUpdateTask);
 	startTask(autoSafetyTask);
@@ -112,6 +116,7 @@ task usercontrol()
 	driveSetup(0);
 	liftSetup(0);
 	mobileSetup(0);
+	intakeSetup(0);
 
 	clearLCD();
 	S_LOG "Driver Start" E_LOG_INFO
@@ -130,6 +135,7 @@ task usercontrol()
 		handleDrive();
 		handleLift();
 		handleMobile();
+		handleIntake();
 
 		updateSensorOutputs();
 		updateSensorsLst();

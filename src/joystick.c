@@ -30,5 +30,11 @@ CONFIGS
 
 		RISING(Btn6D, CHANGE_STATE_FROM_STATE(mobile, mobileIdle, mobileLowering); CHANGE_STATE_FROM_STATE(mobile, mobileToHalfway, mobileLowering); CHANGE_STATE_FROM_STATE(mobile, mobileUp, mobileToHalfway); CHANGE_STATE_FROM_STATE(mobile, mobileRaising, mobileLowering);)
 		RISING(Btn6U, CHANGE_STATE(mobile, mobileRaising);)
+
+		RISING(Btn8R, CHANGE_STATE(intake, intakeIn);)
+		RISING(Btn8D, CHANGE_STATE(intake, intakeOut);)
+
+		FALLING(Btn8R, CHANGE_STATE_FROM_STATE(intake, intakeIn, intakeIdle);)
+		FALLING(Btn8D, CHANGE_STATE_FROM_STATE(intake, intakeOut, intakeIdle);)
 	}
 }
