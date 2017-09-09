@@ -6,21 +6,21 @@ CONFIGS
 	{
 		DEADZONE(Ch4, 10)
 
-		ANY(Ch4, gJoyTurn = value)
+		ANY(Ch4, gJoyTurn = value;)
 	}
 
 	CONFIG(DUAL_STICK)
 	{
 		DEADZONE(Ch1, 10)
 
-		ANY(Ch1, gJoyTurn = value)
+		ANY(Ch1, gJoyTurn = value;)
 	}
 
 	CONFIG(SINGLE_STICK | DUAL_STICK)
 	{
 		DEADZONE(Ch3, 10)
 
-		ANY(Ch3, gJoyThrottle = value)
+		ANY(Ch3, gJoyThrottle = value;)
 
 		RISING(Btn5D, CHANGE_STATE(lift, liftLowering);)
 		RISING(Btn5U, CHANGE_STATE(lift, liftRaising);)
@@ -30,5 +30,8 @@ CONFIGS
 
 		RISING(Btn6D, CHANGE_STATE(mobile, mobileLowering);)
 		RISING(Btn6U, CHANGE_STATE(mobile, mobileRaising);)
+
+		FALLING(Btn6D, CHANGE_STATE_FROM_STATE(mobile, mobileLowering, mobileIdle);)
+		FALLING(Btn6U, CHANGE_STATE_FROM_STATE(mobile, mobileRaising, mobileIdle);)
 	}
 }

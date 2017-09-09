@@ -29,7 +29,7 @@ void runLCD()
 				if (joystickData.state < DRIVER_END - 1)
 					CHANGE_STATE(joystick, joystickData.state + 1)
 				else
-					CHANGE_STATE(joystick, 0)
+					CHANGE_STATE(joystick, (tDriver)0)
 				break;
 		}
 	}
