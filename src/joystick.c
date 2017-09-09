@@ -6,21 +6,21 @@ CONFIGS
 	{
 		DEADZONE(Ch4, 10)
 
-		ANY(Ch4, gJoyTurn = value;)
+		ANY(Ch4, gJoyTurn = MAP_DRIVE_INPUT(value);)
 	}
 
 	CONFIG(DUAL_STICK)
 	{
 		DEADZONE(Ch1, 10)
 
-		ANY(Ch1, gJoyTurn = value;)
+		ANY(Ch1, gJoyTurn = MAP_DRIVE_INPUT(value);)
 	}
 
 	CONFIG(SINGLE_STICK | DUAL_STICK)
 	{
 		DEADZONE(Ch3, 10)
 
-		ANY(Ch3, gJoyThrottle = value;)
+		ANY(Ch3, gJoyThrottle = MAP_DRIVE_INPUT(value);)
 
 		RISING(Btn5D, CHANGE_STATE(lift, liftLowering);)
 		RISING(Btn5U, CHANGE_STATE(lift, liftRaising);)
