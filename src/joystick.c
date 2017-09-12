@@ -5,8 +5,10 @@ CONFIGS
 	CONFIG(DRIVER(SINGLE_STICK))
 	{
 		DEADZONE(Ch4, 10)
+		DEADZONE(Ch1, 10)
 
 		ANY(Ch4, gJoyTurn = MAP_DRIVE_INPUT(value);)
+		ANY(Ch2, setArm(value);)
 	}
 
 	CONFIG(DRIVER(DUAL_STICK))
