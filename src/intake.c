@@ -1,4 +1,4 @@
-void setIntake(sbyte power)
+void setIntake(word power)
 {
 	gMotor[intake].power = power;
 }

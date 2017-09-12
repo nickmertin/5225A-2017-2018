@@ -1,4 +1,4 @@
-void setMobile(sbyte value)
+void setMobile(word value)
 {
 	gMotor[mobileL].power = gMotor[mobileR].power = value;
 }

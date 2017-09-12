@@ -13,7 +13,7 @@ typedef enum _tLiftStates
 } tLiftStates;
 
 /* Functions */
-void setLift(sbyte power);
+void setLift(word power);
 void handleLift();
 
 /* State Machine */

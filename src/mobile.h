@@ -19,7 +19,7 @@ typedef enum _tMobileStates
 } tMobileStates;
 
 /* Functions */
-void setMobile(sbyte value);
+void setMobile(word value);
 void handleMobile();
 void holdMobileToTarget(int target);
 

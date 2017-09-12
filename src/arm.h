@@ -1,3 +1,2 @@
 /* Functions */
-
-void setArm(sbyte power);
+void setArm(word power);

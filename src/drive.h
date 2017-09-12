@@ -1,5 +1,5 @@
 /* Defines */
-#define MAP_DRIVE_INPUT(value) ((sbyte) (10.0 * pow(1.02, (float) abs(value))) * sgn(value))
+#define MAP_DRIVE_INPUT(value) ((word) round(10.0 * pow(1.02, (float) abs(value))) * sgn(value))
 
 /* Types */
 typedef enum _tDriveStates
@@ -9,7 +9,7 @@ typedef enum _tDriveStates
 } tDriveStates;
 
 /* Functions */
-void setDrive(sbyte left, sbyte right);
+void setDrive(word left, word right);
 void handleDrive();
 
 /* State Machine */

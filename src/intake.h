@@ -11,7 +11,7 @@ typedef enum _tIntakeStates
 } tIntakeStates;
 
 /* Functions */
-void setIntake(sbyte power);
+void setIntake(word power);
 void handleIntake();
 
 /* State Machine */

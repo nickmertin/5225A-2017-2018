@@ -1,4 +1,4 @@
-void setLift(sbyte power)
+void setLift(word power)
 {
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
