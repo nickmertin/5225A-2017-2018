@@ -1,6 +1,6 @@
 /* Defines */
-#define INTAKE_IN_POWER -50
-#define INTAKE_OUT_POWER 127
+#define INTAKE_IN_POWER 127
+#define INTAKE_OUT_POWER -127
 
 /* Types */
 typedef enum _tIntakeStates

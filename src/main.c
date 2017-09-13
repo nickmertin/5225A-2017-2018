@@ -2,7 +2,7 @@
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  limBottom,      sensorTouch)
 #pragma config(Sensor, dgtl2,  limTop,         sensorTouch)
-#pragma config(Motor,  port1,           intake,        tmotorVex269_HBridge, openLoop)
+#pragma config(Motor,  port1,           intake,        tmotorVex269_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port3,           mobileL,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           driveL1,       tmotorVex393TurboSpeed_MC29, openLoop)
