@@ -13,7 +13,7 @@ void handleLift()
 				if (*gSensor[limBottom].value) ENABLE_TO_STATE(lift, liftHolding);
 				break;
 			case liftRaising:
-				if (*gSensor[limTop].value) ENABLE_TO_STATE(lift, liftRaising);
+				if (*gSensor[limTop].value) ENABLE_TO_STATE(lift, liftRaising); //Aarish: State should change to liftHolding
 				break;
 		}
 		HANDLE_STATE_REQUEST(lift, , )
