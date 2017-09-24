@@ -35,6 +35,8 @@
 #include "utilities.c"
 
 
+sCycleData gMainCycle;
+
 /* Drive */
 #define TCHN Ch4
 #define PCHN Ch3
@@ -182,7 +184,7 @@ sArmStates gArmState = armIdle;
 
 void setArm(word power)
 {
-	if (power != gMotor[arm].power) writeDebugStreamLine("%d %d", gCycleCount, power);
+	if (power != gMotor[arm].power) writeDebugStreamLine("%d %d", gMainCycle.count, power);
 	gMotor[arm].power = power;
 }
 
@@ -310,10 +312,10 @@ task autonomous()
 task usercontrol()
 {
 	startSensors(); // Initilize the sensors
+	initCycle(gMainCycle, 10);
 
 	while (true)
 	{
-		startCycle();
 		updateSensorInputs();
 		updateJoysticks();
 
@@ -324,6 +326,6 @@ task usercontrol()
 
 		updateSensorOutputs();
 		updateMotors();
-		endCycle();
+		endCycle(gMainCycle);
 	}
 }
