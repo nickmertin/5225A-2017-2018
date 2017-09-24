@@ -282,6 +282,31 @@ void handleIntake()
 }
 
 
+/* Mobile Goal */
+
+#define MOBILE_TOP 2610
+#define MOBILE_BOTTOM 1100
+
+#define MOBILE_UP_POWER 127
+#define MOBILE_DOWN_POWER -127
+#define MOBILE_UP_HOLD_POWER 6
+#define MOBILE_DOWN_HOLD_POWER -6
+
+void setMobile(word power)
+{
+	gMotor[mobileL].power = gMotor[mobileR].power = power;
+}
+
+void handleMobile()
+{
+	if (RISING(Btn8U)) setMobile(MOBILE_UP_POWER);
+	else if (RISING(Btn8D)) setMobile(MOBILE_DOWN_POWER);
+
+	if (gMotor[mobileL].power == MOBILE_UP_POWER && gSensor[mobilePoti].value >= MOBILE_TOP) setMobile(MOBILE_UP_HOLD_POWER);
+	if (gMotor[mobileL].power == MOBILE_DOWN_POWER && gSensor[mobilePoti].value <= MOBILE_BOTTOM) setMobile(MOBILE_DOWN_HOLD_POWER);
+}
+
+
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
 {
@@ -323,6 +348,7 @@ task usercontrol()
 		handleLift();
 		handleArm();
 		handleIntake();
+		handleMobile();
 
 		updateSensorOutputs();
 		updateMotors();
