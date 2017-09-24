@@ -91,6 +91,7 @@ void handleLift()
 	{
 		gLiftTarget = LIFT_TOP;
 		gLiftState = liftRaise;
+		writeDebugStreamLine("Lift start up %d", gMainCycle.count);
 	}
 	else if (FALLING(Btn5U))
 	{
@@ -100,6 +101,7 @@ void handleLift()
 	{
 		gLiftTarget = LIFT_BOTTOM;
 		gLiftState = liftLower;
+		writeDebugStreamLine("Lift start down %d", gMainCycle.count);
 	}
 
 	switch (gLiftState)
@@ -124,7 +126,11 @@ void handleLift()
 		case liftRaiseBrk:
 		{
 			velocityCheck(liftPoti);
-			if (gSensor[liftPoti].velGood && gSensor[liftPoti].velocity <= 0) gLiftState = liftHold;
+			if (gSensor[liftPoti].velGood && gSensor[liftPoti].velocity <= 0)
+			{
+				gLiftState = liftHold;
+				writeDebugStreamLine("Lift end up %d", gMainCycle.count);
+			}
 			break;
 		}
 		case liftLower:
@@ -147,7 +153,11 @@ void handleLift()
 		case liftLowerBrk:
 		{
 			velocityCheck(liftPoti);
-			if (gSensor[liftPoti].velGood && gSensor[liftPoti].velocity >= 0) gLiftState = liftHold;
+			if (gSensor[liftPoti].velGood && gSensor[liftPoti].velocity >= 0)
+			{
+				gLiftState = liftHold;
+				writeDebugStreamLine("Lift end down %d", gMainCycle.count);
+			}
 			break;
 		}
 		case liftHold:
