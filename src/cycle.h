@@ -1,11 +1,11 @@
-/* Types */
-typedef struct _sCycleData {
-	unsigned long period; // The target length of a cycle
-	unsigned long startTime; // The program time that the cycle started
-	unsigned long count; // The number of cycles that have finished
-	unsigned long time; // The length of time the last cycle took
-} sCycleData;
+/* Defines */
+#define CYCLE_MAX_TIME 10
 
 /* Functions */
-void initCycle(sCycleData& data, unsigned long period); // Do any operations required to start a cycle
-void endCycle(sCycleData& data); // Do any operations required to end a cycle
+void startCycle(); // Do any operations required to start a cycle
+void endCycle(); // Do any operations required to end a cycle
+
+/* Variables */
+unsigned long gCycleStartTime = 0; // The program time that the cycle started
+unsigned long gCycleCount = 0; // The number of cycles that have finished
+unsigned long gCycleTime = 0; // The length of time the last cycle took

@@ -24,35 +24,28 @@ float radToDeg(float radians)
 	return radians * 180 / PI;
 }
 
-float stdDevFilteredMean(float* values, int count, float nStdDev)
-{
-	float mean = 0.0;
-	for (int i = 0; i < count; ++i)
-		mean += values[i];
-	mean /= (float)count;
-	float variance = 0;
-	for (int i = 0; i < count; ++i)
-	{
-		float tmp = values[i] - mean;
-		variance += tmp * tmp;
-	}
-	float limit = sqrt(variance / (float)count) * nStdDev;
-	float total = 0.0;
-	int valid = 0;
-	for (int i = 0; i < count; ++i)
-	{
-		float v = values[i];
-		if (fabs(v - mean) <= limit)
-		{
-			total += v;
-			++valid;
-		}
-	}
-	return total / (float)valid;
-}
-
 void stopAllButCurrentTasks()
 {
-	for (int i = 1; i < 20; ++i)
-		if (i != nCurrentTask) stopTask(i);
+	hogCPU();
+	STOP_TASK_NOT_CUR(1);
+	STOP_TASK_NOT_CUR(2);
+	STOP_TASK_NOT_CUR(3);
+	STOP_TASK_NOT_CUR(4);
+	STOP_TASK_NOT_CUR(5);
+	STOP_TASK_NOT_CUR(6);
+	STOP_TASK_NOT_CUR(7);
+	STOP_TASK_NOT_CUR(8);
+	STOP_TASK_NOT_CUR(9);
+	STOP_TASK_NOT_CUR(10);
+	STOP_TASK_NOT_CUR(11);
+	STOP_TASK_NOT_CUR(12);
+	STOP_TASK_NOT_CUR(13);
+	STOP_TASK_NOT_CUR(14);
+	STOP_TASK_NOT_CUR(15);
+	STOP_TASK_NOT_CUR(16);
+	STOP_TASK_NOT_CUR(17);
+	STOP_TASK_NOT_CUR(18);
+	STOP_TASK_NOT_CUR(19);
+	STOP_TASK_NOT_CUR(20);
+	releaseCPU();
 }

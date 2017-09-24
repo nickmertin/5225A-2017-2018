@@ -1,22 +1,17 @@
 /* Functions */
-void initCycle(sCycleData& data, unsigned long period)
+void startCycle()
 {
-	data.period = period;
-	data.startTime = nPgmTime;
-	data.count = 0;
-	data.time = 0;
+	gCycleStartTime = nPgmTime;
 }
 
-void endCycle(sCycleData& data)
+void endCycle()
 {
-	++data.count; // Increment the cycle count
+	++gCycleCount; // Increment the cycle count
 
 	// Make sure the cycle hasn't taken more than the max time and sleep so it takes exactly that time
-	unsigned long now = nPgmTime;
-	data.time = now - data.startTime;
-	if (data.time > data.period)
-		S_LOG "Cycle took %dms, max should be %d", data.time, data.period E_LOG_WARN
+	gCycleTime = nPgmTime - gCycleStartTime;
+	if (gCycleTime > CYCLE_MAX_TIME)
+		writeDebugStreamLine("Cycle took %dms, max should be %d", gCycleTime, CYCLE_MAX_TIME);
 	else
-		sleep(data.period - data.time);
-	data.startTime = now;
+		sleep(CYCLE_MAX_TIME - gCycleTime);
 }

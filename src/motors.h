@@ -6,11 +6,10 @@ typedef struct _sMotor
 	float powerScale;
 } sMotor; // Represent a single motor
 
-/* Variables */
-sMotor gMotor[kNumbOfTotalMotors]; // The global motor array
-
 /* Functions */
-void setupMotors(); // Initilize all the motor poitners
+void setupMotors(); // Initilize all the motors
 void updateMotors(); // Update the motor outputs
 void updateMotor(tMotor mot); // Update a motor output
-void stopAllMotors(); // Update all motor outputs to 0
+
+/* Variables */
+sMotor gMotor[kNumbOfTotalMotors]; // The global motor array
