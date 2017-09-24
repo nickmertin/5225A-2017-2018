@@ -152,10 +152,10 @@ void handleLift()
 		}
 		case liftHold:
 		{
-			if (!gSensor[limBottom].value)
-				setLift(12);
-			else
+			if (gSensor[limBottom].value)
 				setLift(0);
+			else
+				setLift(12);
 			break;
 		}
 	}
@@ -276,9 +276,9 @@ void setIntake(word power)
 
 void handleIntake()
 {
-	if (gJoy[Btn7U].cur) setIntake(127);
-	else if (gJoy[Btn7D].cur) setIntake(-127);
-	else setIntake(0);
+	if (RISING(Btn7U)) setIntake(127);
+	if (RISING(Btn7D)) setIntake(-127);
+	if (FALLING(Btn7U) || FALLING(Btn7D)) setIntake(0);
 }
 
 
@@ -312,23 +312,26 @@ void setMobile(word power)
 
 void handleMobile()
 {
-	if (RISING(Btn8U))
+	if (gSensor[liftPoti].value > 2200)
 	{
-		gMobileTarget = MOBILE_TOP;
-		gMobileState = mobileRaise;
-		setMobile(MOBILE_UP_POWER);
-	}
-	if (RISING(Btn8D))
-	{
-		gMobileTarget = MOBILE_BOTTOM;
-		gMobileState = mobileLower;
-		setMobile(MOBILE_DOWN_POWER);
-	}
-	if (RISING(Btn8R))
-	{
-		gMobileTarget = MOBILE_BOTTOM;
-		gMobileState = mobileLowerSlow;
-		setMobile(MOBILE_DOWN_POWER);
+		if (RISING(Btn8U))
+		{
+			gMobileTarget = MOBILE_TOP;
+			gMobileState = mobileRaise;
+			setMobile(MOBILE_UP_POWER);
+		}
+		if (RISING(Btn8D))
+		{
+			gMobileTarget = MOBILE_BOTTOM;
+			gMobileState = mobileLower;
+			setMobile(MOBILE_DOWN_POWER);
+		}
+		if (RISING(Btn8R))
+		{
+			gMobileTarget = MOBILE_BOTTOM;
+			gMobileState = mobileLowerSlow;
+			setMobile(MOBILE_DOWN_POWER);
+		}
 	}
 
 	switch (gMobileState)

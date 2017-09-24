@@ -26,6 +26,7 @@ float radToDeg(float radians)
 
 void stopAllButCurrentTasks()
 {
+	// DO NOT MAKE A FOR LOOP, WILL NOT WORK
 	hogCPU();
 	STOP_TASK_NOT_CUR(1);
 	STOP_TASK_NOT_CUR(2);
