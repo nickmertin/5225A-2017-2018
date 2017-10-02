@@ -83,6 +83,7 @@ typedef enum _sLiftStates {
 
 short gLiftTarget;
 sLiftStates gLiftState = liftIdle;
+unsigned long liftStart;
 
 void setLift(word power)
 {
@@ -96,7 +97,7 @@ void handleLift()
 		stopTask(stackAsync);
 		gLiftTarget = LIFT_TOP;
 		gLiftState = liftRaise;
-		writeDebugStreamLine("Lift start up %d", gMainCycle.count);
+		liftStart = nPgmTime;
 	}
 	else if (FALLING(Btn5U))
 	{
@@ -108,7 +109,7 @@ void handleLift()
 		stopTask(stackAsync);
 		gLiftTarget = LIFT_BOTTOM;
 		gLiftState = liftLower;
-		writeDebugStreamLine("Lift start down %d", gMainCycle.count);
+		liftStart = nPgmTime;
 	}
 	if (RISING(Btn8L))
 	{
@@ -140,7 +141,7 @@ void handleLift()
 			if (gSensor[liftPoti].velGood && gSensor[liftPoti].velocity <= 0)
 			{
 				gLiftState = liftHold;
-				writeDebugStreamLine("Lift end up %d", gMainCycle.count);
+				writeDebugStreamLine("Lift up %d", nPgmTime - liftStart);
 			}
 			break;
 		}
@@ -167,7 +168,7 @@ void handleLift()
 			if (gSensor[liftPoti].velGood && gSensor[liftPoti].velocity >= 0)
 			{
 				gLiftState = liftHold;
-				writeDebugStreamLine("Lift end down %d", gMainCycle.count);
+				writeDebugStreamLine("Lift down %d", nPgmTime - liftStart);
 			}
 			break;
 		}
