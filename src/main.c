@@ -39,6 +39,8 @@
 
 sCycleData gMainCycle;
 
+//#define MOBILE_LIFT_SAFETY
+
 /* Drive */
 #define TCHN Ch4
 #define PCHN Ch3
@@ -317,8 +319,8 @@ typedef enum _sMobileStates {
 	mobileHold
 } sMobileStates;
 
-#define MOBILE_TOP 2610
-#define MOBILE_BOTTOM 560
+#define MOBILE_TOP 2350
+#define MOBILE_BOTTOM 200
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
@@ -336,8 +338,10 @@ void setMobile(word power)
 
 void handleMobile()
 {
+#ifdef MOBILE_LIFT_SAFETY
 	if (gSensor[liftPoti].value > 2200)
 	{
+#endif
 		if (RISING(Btn8U))
 		{
 			gMobileTarget = MOBILE_TOP;
@@ -356,7 +360,9 @@ void handleMobile()
 			gMobileState = mobileLowerSlow;
 			setMobile(MOBILE_DOWN_POWER);
 		}
+#ifdef MOBILE_LIFT_SAFETY
 	}
+#endif
 
 	switch (gMobileState)
 	{
