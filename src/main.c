@@ -435,6 +435,17 @@ task stackAsync()
 	stack();
 }
 
+/* LCD */
+
+void handleLcd()
+{
+	string line;
+	sprintf(line, "%4d %4d", gSensor[driveEncL].value, gSensor[driveEncR].value);
+
+	clearLCDLine(0);
+	displayLCDString(0, 0, line);
+}
+
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
 {
@@ -477,6 +488,8 @@ task usercontrol()
 		handleArm();
 		handleClaw();
 		handleMobile();
+
+		handleLcd();
 
 		updateSensorOutputs();
 		updateMotors();
