@@ -320,8 +320,8 @@ typedef enum _sMobileStates {
 	mobileHold
 } sMobileStates;
 
-#define MOBILE_TOP 2350
-#define MOBILE_BOTTOM 200
+#define MOBILE_TOP 2950
+#define MOBILE_BOTTOM 600
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
