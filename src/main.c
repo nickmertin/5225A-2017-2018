@@ -313,6 +313,24 @@ void handleArm()
 
 /* Claw */
 
+typedef enum _sClawStates {
+	clawIdle,
+	clawOpening,
+	clawClosing,
+	clawOpened,
+	clawClosed
+} sClawStates;
+
+#define CLAW_CLOSE_POWER 127
+#define CLAW_OPEN_POWER -127
+#define CLAW_CLOSE_HOLD_POWER 5
+#define CLAW_OPEN_HOLD_POWER 5
+
+#define CLAW_OPEN 3000
+#define CLAW_CLOSE 400
+
+sClawStates gClawState = clawIdle;
+
 void setClaw(word power)
 {
 	gMotor[claw].power = power;
@@ -320,10 +338,35 @@ void setClaw(word power)
 
 void handleClaw()
 {
-	if (RISING(Btn7U)) setClaw(127);
-	if (RISING(Btn7D)) setClaw(-127);
-	if (FALLING(Btn7U)) setClaw(5);
-	if (FALLING(Btn7D)) setClaw(-5);
+	if (RISING(Btn7U))
+	{
+		gClawState = clawClosing;
+		setClaw(CLAW_CLOSE_POWER);
+	}
+	if (RISING(Btn7D))
+	{
+		gClawState = clawOpening;
+		setClaw(CLAW_OPEN_POWER);
+	}
+
+	switch (gClawState)
+	{
+		case clawIdle:
+		{
+			setClaw(0);
+			break;
+		}
+		case clawOpening:
+		{
+			if (gSensor[clawPoti].value >= CLAW_OPEN) gClawState = clawOpened;
+			break;
+		}
+		case clawClosing:
+		{
+			if (gSensor[clawPoti].value <= CLAW_CLOSE) gClawState = clawClosed;
+			break;
+		}
+	}
 }
 
 
