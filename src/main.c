@@ -255,6 +255,20 @@ void handleArm()
 			gArmStart = nPgmTime;
 		}
 	}
+	if (RISING(Btn7R))
+	{
+		if (gArmPosition == 0)
+		{
+			gArmTarget = gArmPositions[gArmPosition = 2];
+			gArmState = armRaise;
+		}
+		else
+		{
+			gArmTarget = gArmPositions[gArmPosition = 0];
+			gArmState = armLower;
+		}
+		gArmStart = nPgmTime;
+	}
 
 	switch (gArmState)
 	{
