@@ -226,10 +226,10 @@ word gArmHoldPower[] = { -10, 12, 10 };
 short gArmPosition = 2;
 short gArmTarget;
 sArmStates gArmState = armIdle;
+unsigned long gArmStart;
 
 void setArm(word power)
 {
-	if (power != gMotor[arm].power) writeDebugStreamLine("%d %d", gMainCycle.count, power);
 	gMotor[arm].power = power;
 }
 
@@ -242,6 +242,7 @@ void handleArm()
 		{
 			gArmTarget = gArmPositions[++gArmPosition];
 			gArmState = armRaise;
+			gArmStart = nPgmTime;
 		}
 	}
 	if (RISING(Btn6D))
@@ -251,6 +252,7 @@ void handleArm()
 		{
 			gArmTarget = gArmPositions[--gArmPosition];
 			gArmState = armLower;
+			gArmStart = nPgmTime;
 		}
 	}
 
@@ -264,6 +266,7 @@ void handleArm()
 				velocityClear(armPoti);
 				setArm(-8);
 				gArmState = armRaiseBrk;
+				writeDebugStreamLine("Arm up: %d", nPgmTime - gArmStart);
 			}
 			else
 			{
@@ -287,6 +290,7 @@ void handleArm()
 				velocityClear(armPoti);
 				setArm(8);
 				gArmState = armLowerBrk;
+				writeDebugStreamLine("Arm down: %d", nPgmTime - gArmStart);
 			}
 			else
 			{
