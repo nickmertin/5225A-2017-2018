@@ -536,6 +536,82 @@ task stackAsync()
 	nSchedulePriority = 0;
 }
 
+void stackFromLoader(bool callHandlers)
+{
+	gClawState = clawOpening;
+	setClaw(CLAW_OPEN_POWER);
+	gArmTarget = gArmPositions[gArmPosition = 1];
+	gArmState = armPlainPID;
+	pidReset(gArmPID);
+	do
+	{
+		if (callHandlers)
+		{
+			handleArm();
+			handleClaw();
+		}
+		sleep(10);
+	} while (abs(gArmPID.error) > 20);
+	if (callHandlers)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			handleArm();
+			sleep(10);
+		}
+	}
+	else sleep(100);
+	gClawState = clawClosing;
+	setClaw(CLAW_CLOSE_POWER);
+	while (gClawState != clawClosed)
+	{
+		if (callHandlers)
+		{
+			handleClaw();
+			handleArm();
+		}
+		sleep(10);
+	}
+	if (callHandlers)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			handleArm();
+			sleep(10);
+		}
+	}
+	else sleep(100);
+	gArmTarget = gArmPositions[gArmPosition = 2];
+	gArmState = armRaise;
+	while (gArmState != armHold)
+	{
+		if (callHandlers) handleArm();
+		sleep(10);
+	}
+	if (callHandlers)
+	{
+		for (int i = 0; i < 50; i++)
+		{
+			handleArm();
+			sleep(10);
+		}
+	}
+	else sleep(500);
+	gClawState = clawOpening;
+	setClaw(CLAW_OPEN_POWER);
+	while (gClawState != clawOpened)
+	{
+		if (callHandlers) handleClaw();
+		sleep(10);
+	}
+}
+
+task stackFromLoaderAsync()
+{
+	stackFromLoader(false);
+	nSchedulePriority = 0;
+}
+
 #define OFFSET_20_ZONE_P1 700
 #define OFFSET_20_ZONE_P2 850
 
@@ -602,6 +678,15 @@ void handleMacros()
 			setTaskPriority(stackAsync, 0);
 		}
 		else startTask(stackAsync);
+	}
+	if (RISING(Btn7D))
+	{
+		if (getTaskPriority(stackFromLoaderAsync))
+		{
+			stopTask(stackFromLoaderAsync);
+			setTaskPriority(stackFromLoaderAsync, 0);
+		}
+		else startTask(stackFromLoaderAsync);
 	}
 }
 
