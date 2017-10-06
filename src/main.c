@@ -308,7 +308,8 @@ void handleClaw()
 {
 	if (RISING(Btn7U)) setClaw(127);
 	if (RISING(Btn7D)) setClaw(-127);
-	if (FALLING(Btn7U) || FALLING(Btn7D)) setClaw(0);
+	if (FALLING(Btn7U)) setClaw(5);
+	if (FALLING(Btn7D)) setClaw(-5);
 }
 
 
