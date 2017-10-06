@@ -524,6 +524,20 @@ task alignAndScore20Async()
 	alignAndScore20(false);
 }
 
+void handleMacros()
+{
+	if (RISING(Btn8R))
+	{
+		if (getTaskPriority(alignAndScore20Async)) stopTask(alignAndScore20Async);
+		else startTask(alignAndScore20Async);
+	}
+	if (RISING(Btn7L))
+	{
+		if (getTaskPriority(stackAsync)) stopTask(stackAsync);
+		else startTask(stackAsync);
+	}
+}
+
 
 /* LCD */
 
@@ -581,6 +595,7 @@ task usercontrol()
 		handleArm();
 		handleClaw();
 		handleMobile();
+		handleMacros();
 
 		handleLcd();
 
