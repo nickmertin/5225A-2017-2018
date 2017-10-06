@@ -209,6 +209,7 @@ void handleLift()
 /* Arm */
 typedef enum _sArmStates {
 	armIdle,
+	armPlainPID,
 	armRaise,
 	armLower,
 	armRaiseBrk,
@@ -227,6 +228,7 @@ short gArmPosition = 2;
 short gArmTarget;
 sArmStates gArmState = armIdle;
 unsigned long gArmStart;
+sPID gArmPID;
 
 void setArm(word power)
 {
@@ -272,6 +274,12 @@ void handleArm()
 
 	switch (gArmState)
 	{
+		case armPlainPID:
+		{
+			pidCalculate(gArmPID, (float)gArmTarget, (float)gSensor[armPoti].value);
+			setArm((word)gArmPID.output);
+			break;
+		}
 		case armRaise:
 		{
 			short error = gArmTarget - gSensor[armPoti].value;
@@ -602,6 +610,8 @@ void startup()
 	gJoy[PCHN].deadzone = PDZ;
 	gJoy[LCHN].deadzone = LDZ;
 	gJoy[ACHN].deadzone = ADZ;
+
+	pidInit(gArmPID, 0.2, 0.001, 0.0, 20, 150, 5, 127);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
