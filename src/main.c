@@ -319,21 +319,20 @@ typedef enum _sMobileStates {
 	mobileIdle,
 	mobileRaise,
 	mobileLower,
-	mobileLowerSlow,
-	mobileLowerDecel,
 	mobileHold
 } sMobileStates;
 
 #define MOBILE_TOP 2950
 #define MOBILE_BOTTOM 600
+#define MOBILE_20 1000
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
 #define MOBILE_UP_HOLD_POWER 10
 #define MOBILE_DOWN_HOLD_POWER -10
-#define MOBILE_DOWN_DECEL_POWER 4
 
 short gMobileTarget;
+word gMobileHoldPower;
 sMobileStates gMobileState = mobileIdle;
 
 void setMobile(word power)
@@ -351,18 +350,14 @@ void handleMobile()
 		{
 			gMobileTarget = MOBILE_TOP;
 			gMobileState = mobileRaise;
+			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 			setMobile(MOBILE_UP_POWER);
 		}
 		if (RISING(Btn8D))
 		{
 			gMobileTarget = MOBILE_BOTTOM;
 			gMobileState = mobileLower;
-			setMobile(MOBILE_DOWN_POWER);
-		}
-		if (RISING(Btn8R))
-		{
-			gMobileTarget = MOBILE_BOTTOM;
-			gMobileState = mobileLowerSlow;
+			gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
 			setMobile(MOBILE_DOWN_POWER);
 		}
 #ifdef MOBILE_LIFT_SAFETY
@@ -381,30 +376,14 @@ void handleMobile()
 			if (gSensor[mobilePoti].value <= gMobileTarget) gMobileState = mobileHold;
 			break;
 		}
-		case mobileLowerSlow:
-		{
-			if (gSensor[mobilePoti].value <= gMobileTarget + 1400)
-			{
-				gMobileState = mobileLowerDecel;
-				setMobile(MOBILE_DOWN_DECEL_POWER);
-				velocityClear(mobilePoti);
-			}
-			break;
-		}
-		case mobileLowerDecel:
-		{
-			velocityCheck(mobilePoti);
-			if ((gSensor[mobilePoti].velGood && gSensor[mobilePoti].velocity >= 0) || gSensor[mobilePoti].value <= gMobileTarget) gMobileState = mobileHold;
-			break;
-		}
 		case mobileHold:
 		{
-			if (gMobileTarget == MOBILE_TOP)
-				setMobile(MOBILE_UP_HOLD_POWER);
-			else if (gMobileTarget == MOBILE_BOTTOM)
-				setMobile(MOBILE_DOWN_HOLD_POWER);
-			else
-				setMobile(0);
+			setMobile(gMobileHoldPower);
+			break;
+		}
+		case mobileIdle:
+		{
+			setMobile(0);
 			break;
 		}
 	}
