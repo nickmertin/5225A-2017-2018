@@ -349,11 +349,11 @@ typedef enum _sClawStates {
 
 #define CLAW_CLOSE_POWER 127
 #define CLAW_OPEN_POWER -127
-#define CLAW_CLOSE_HOLD_POWER 5
-#define CLAW_OPEN_HOLD_POWER 5
+#define CLAW_CLOSE_HOLD_POWER 8
+#define CLAW_OPEN_HOLD_POWER -5
 
-#define CLAW_OPEN 3000
-#define CLAW_CLOSE 400
+#define CLAW_OPEN 1100
+#define CLAW_CLOSE 700
 
 sClawStates gClawState = clawIdle;
 
@@ -366,13 +366,16 @@ void handleClaw()
 {
 	if (RISING(Btn7U))
 	{
-		gClawState = clawClosing;
-		setClaw(CLAW_CLOSE_POWER);
-	}
-	if (RISING(Btn7D))
-	{
-		gClawState = clawOpening;
-		setClaw(CLAW_OPEN_POWER);
+		if (gClawState == clawClosed || gClawState == clawClosing)
+		{
+			gClawState = clawOpening;
+			setClaw(CLAW_OPEN_POWER);
+		}
+		else
+		{
+			gClawState = clawClosing;
+			setClaw(CLAW_CLOSE_POWER);
+		}
 	}
 
 	switch (gClawState)
@@ -390,6 +393,16 @@ void handleClaw()
 		case clawClosing:
 		{
 			if (gSensor[clawPoti].value <= CLAW_CLOSE) gClawState = clawClosed;
+			break;
+		}
+		case clawOpened:
+		{
+			setClaw(CLAW_OPEN_HOLD_POWER);
+			break;
+		}
+		case clawClosed:
+		{
+			setClaw(CLAW_CLOSE_HOLD_POWER);
 			break;
 		}
 	}
