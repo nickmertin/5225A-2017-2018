@@ -218,11 +218,12 @@ typedef enum _sArmStates {
 } sArmStates;
 
 #define ARM_UP_KP 0.15
-#define ARM_DOWN_KP 0.08
+#define ARM_DOWN_KP 0.18
 #define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
-short gArmPositions[] = { 950, 1650, 2400 };
-short gArmPosition = 0;
+short gArmPositions[] = { 300, 1250, 2350 };
+word gArmHoldPower[] = { -10, 12, 10 };
+short gArmPosition = 2;
 short gArmTarget;
 sArmStates gArmState = armIdle;
 
@@ -258,7 +259,7 @@ void handleArm()
 		case armRaise:
 		{
 			short error = gArmTarget - gSensor[armPoti].value;
-			if (error <= 100)
+			if (error <= 0)
 			{
 				velocityClear(armPoti);
 				setArm(-8);
@@ -281,10 +282,10 @@ void handleArm()
 		case armLower:
 		{
 			short error = gArmTarget - gSensor[armPoti].value;
-			if (error >= -100)
+			if (error >= 0)
 			{
 				velocityClear(armPoti);
-				setArm(15);
+				setArm(8);
 				gArmState = armLowerBrk;
 			}
 			else
@@ -303,10 +304,7 @@ void handleArm()
 		}
 		case armHold:
 		{
-			if (gArmPosition == ARM_POSITIONS)
-				setArm(10);
-			else
-				setArm(12);
+			setArm(gArmHoldPower[gArmPosition]);
 			break;
 		}
 	}
