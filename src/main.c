@@ -437,6 +437,9 @@ void startup()
 	setupSensors();
 	setupJoysticks();
 
+	setupDgtIn(leftLine);
+	setupDgtIn(rightLine);
+
 	gJoy[TCHN].deadzone = TDZ;
 	gJoy[PCHN].deadzone = PDZ;
 	gJoy[LCHN].deadzone = LDZ;
