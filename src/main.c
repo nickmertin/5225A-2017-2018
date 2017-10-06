@@ -567,18 +567,27 @@ void alignAndScore20(bool callHandlers)
 task alignAndScore20Async()
 {
 	alignAndScore20(false);
+	nSchedulePriority = 0;
 }
 
 void handleMacros()
 {
 	if (RISING(Btn8R))
 	{
-		if (getTaskPriority(alignAndScore20Async)) stopTask(alignAndScore20Async);
+		if (getTaskPriority(alignAndScore20Async))
+		{
+			stopTask(alignAndScore20Async);
+			setTaskPriority(alignAndScore20Async, 0);
+		}
 		else startTask(alignAndScore20Async);
 	}
 	if (RISING(Btn7L))
 	{
-		if (getTaskPriority(stackAsync)) stopTask(stackAsync);
+		if (getTaskPriority(stackAsync))
+		{
+			stopTask(stackAsync);
+			setTaskPriority(stackAsync, 0);
+		}
 		else startTask(stackAsync);
 	}
 }
