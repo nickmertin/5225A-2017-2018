@@ -34,12 +34,14 @@
 #include "joysticks.h"
 #include "cycle.h"
 #include "utilities.h"
+#include "pid.h"
 
 #include "motors.c"
 #include "sensors.c"
 #include "joysticks.c"
 #include "cycle.c"
 #include "utilities.c"
+#include "pid.c"
 
 sCycleData gMainCycle;
 
