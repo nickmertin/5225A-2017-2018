@@ -352,8 +352,8 @@ typedef enum _sClawStates {
 #define CLAW_CLOSE_HOLD_POWER 8
 #define CLAW_OPEN_HOLD_POWER -5
 
-#define CLAW_OPEN 1100
-#define CLAW_CLOSE 700
+#define CLAW_OPEN 2700
+#define CLAW_CLOSE 2000
 
 sClawStates gClawState = clawIdle;
 
