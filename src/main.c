@@ -83,7 +83,7 @@ void handleDrive()
 	setDrive(left, right);
 }
 
-void stack();
+void stack(bool callHandlers);
 task stackAsync();
 
 /* Lift */
@@ -456,28 +456,47 @@ const int gStackPos[11] = { 0, 0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760 }
 
 void stack()
 {
+void stack(bool callHandlers)
+{
 	gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
 	gLiftState = liftRaise;
-	while (gLiftTarget - gSensor[liftPoti].value > 100) sleep(10);
-	gArmTarget = gArmPositions[ARM_POSITIONS];
+	while (gLiftTarget - gSensor[liftPoti].value > 100)
+	{
+		if (callHandlers) handleLift();
+		sleep(10);
+	}
+	gArmTarget = gArmPositions[gArmPosition = 2];
 	gArmState = armRaise;
-	while (gArmTarget - gSensor[armPoti].value > 100) sleep(10);
+	while (gArmTarget - gSensor[armPoti].value > 100)
+	{
+		if (callHandlers) handleArm();
+		sleep(10);
+	}
 	sleep(200);
 	setClaw(-127);
 	sleep(500);
 	if (gNumCones < 11) ++gNumCones;
 	setClaw(0);
-	gArmTarget = gArmPositions[1];
+	gArmTarget = gArmPositions[gArmPosition = 1];
 	gArmState = armLower;
-	while (gArmTarget - gSensor[armPoti].value < -400) sleep(10);
+	while (gArmTarget - gSensor[armPoti].value < -400)
+	{
+		if (callHandlers) handleArm();
+		sleep(10);
+	}
 	gLiftTarget = LIFT_BOTTOM;
 	gLiftState = liftLower;
-	while (gLiftTarget - gSensor[liftPoti].value < -100) sleep(10);
+	while (gLiftTarget - gSensor[liftPoti].value < -100)
+	{
+		if (callHandlers) handleLift();
+		sleep(10);
+	}
 }
 
 task stackAsync()
 {
-	stack();
+	stack(false);
+	nSchedulePriority = 0;
 }
 
 #define OFFSET_20_ZONE_P1 700
