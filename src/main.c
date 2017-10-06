@@ -446,6 +446,9 @@ void handleMobile()
 	}
 }
 
+
+/* Macros */
+
 int gNumCones = 0;
 const int gStackPos[11] = { 0, 0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760 };
 
@@ -474,6 +477,53 @@ task stackAsync()
 {
 	stack();
 }
+
+#define OFFSET_20_ZONE_P1 700
+#define OFFSET_20_ZONE_P2 850
+
+void alignAndScore20(bool callHandlers)
+{
+	while (gMotor[driveL1].power > 0 || gMotor[driveR1].power > 0)
+	{
+		setDrive(gSensor[leftLine].value ? -10 : 50, gSensor[rightLine].value ? -10 : 50);
+		sleep(10);
+	}
+	setDrive(127, 127);
+	int initial = gSensor[driveEncL].value;
+	while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P1) sleep(10);
+	gMobileTarget = MOBILE_20;
+	gMobileState = mobileLower;
+	gMobileHoldPower = 10;
+	setMobile(MOBILE_DOWN_POWER);
+	while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P2)
+	{
+		if (callHandlers) handleMobile();
+		sleep(10);
+	}
+	setDrive(-10, -10);
+	while (gMobileState == mobileLower)
+	{
+		if (callHandlers) handleMobile();
+		sleep(10);
+	}
+	sleep(200);
+	setDrive(-127, -127);
+	gMobileTarget = MOBILE_BOTTOM;
+	gMobileState = mobileLower;
+	gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
+	setMobile(MOBILE_DOWN_POWER);
+	while (gSensor[driveEncL].value > initial)
+	{
+		if (callHandlers) handleMobile();
+		sleep(10);
+	}
+}
+
+task alignAndScore20Async()
+{
+	alignAndScore20(false);
+}
+
 
 /* LCD */
 
