@@ -64,7 +64,21 @@ void setDrive(word left, word right)
 
 void handleDrive()
 {
-	setDrive(gJoy[PCHN].cur + gJoy[TCHN].cur, gJoy[PCHN].cur - gJoy[TCHN].cur);
+	word left = gJoy[PCHN].cur + gJoy[TCHN].cur;
+	word right = gJoy[PCHN].cur - gJoy[TCHN].cur;
+	velocityCheck(driveEncL);
+	if (gSensor[driveEncL].velGood)
+	{
+		if (left > 10 && gSensor[driveEncL].velocity < 0) left = 10;
+		else if (left < -10 && gSensor[driveEncL].velocity > 0) left = -10;
+	}
+	velocityCheck(driveEncR);
+	if (gSensor[driveEncR].velGood)
+	{
+		if (right > 10 && gSensor[driveEncR].velocity < 0) right = 10;
+		else if (right < -10 && gSensor[driveEncR].velocity > 0) right = -10;
+	}
+	setDrive(left, right);
 }
 
 void stack();
