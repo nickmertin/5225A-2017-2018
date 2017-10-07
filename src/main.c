@@ -490,9 +490,56 @@ void handleMobile()
 
 int gNumCones = 0;
 const int gStackPos[11] = { 0, 0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760 };
+const int gScanPos[11] = {0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760, 2070 };
 
-void stack()
+void scanStack(bool callHandlers)
 {
+	gArmTarget = gArmPositions[gArmPosition = 1];
+	gArmState = armPlainPID;
+	pidReset(gArmPID);
+	do
+	{
+		if (callHandlers) handleArm();
+		sleep(10);
+	} while (abs(gArmPID.error) > 20);
+	setLift(80);
+	int acc = 0;
+	while (acc < 10 && !gSensor[limTop].value)
+	{
+		if (callHandlers) handleArm();
+		if (gSensor[armSonic].value) acc = 0;
+		else ++acc;
+		sleep(10);
+	}
+	int pos = gSensor[liftPoti].value - LIFT_BOTTOM;
+	for (int i = 0; i < ARR_LEN(gScanPos); i++)
+	{
+		if (gScanPos[i] >= pos)
+		{
+			gNumCones = i - 1;
+			goto done;
+		}
+	}
+	gNumCones = 11;
+	done:
+	gLiftTarget = LIFT_BOTTOM;
+	gLiftState = liftLower;
+	while (gLiftState != liftHold)
+	{
+		if (callHandlers)
+		{
+			handleArm();
+			handleLift();
+		}
+		sleep(10);
+	}
+}
+
+task scanStackAsync()
+{
+	scanStack(false);
+}
+
 void stack(bool callHandlers)
 {
 	gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
@@ -661,6 +708,10 @@ task alignAndScore20Async()
 
 void handleMacros()
 {
+	if (RISING(Btn8L))
+	{
+		startTask(scanStackAsync);
+	}
 	if (RISING(Btn8R))
 	{
 		if (getTaskPriority(alignAndScore20Async))
