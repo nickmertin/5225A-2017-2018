@@ -491,8 +491,6 @@ void handleMobile()
 int gNumCones = 0;
 const int gStackPos[11] = { 0, 0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760 };
 
-void stack()
-{
 void stack(bool callHandlers)
 {
 	gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
