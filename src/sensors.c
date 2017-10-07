@@ -1,7 +1,8 @@
 /* Functions */
 bool correctBtnIn(tSensors sen)
 {
-	return SensorValue[sen] <= 150;
+	int value = SensorValue[sen];
+	return value >= gSensor[sen].dgtMin && value <= gSensor[sen].dgtMax;
 }
 
 void updateSensorOutput(tSensors sen)
@@ -47,9 +48,11 @@ tSensorClass checkSenClass(tSensors sen)
 		return snclsInput;
 }
 
-void setupDgtIn(tSensors sen)
+void setupDgtIn(tSensors sen, int min, int max)
 {
 	gSensor[sen].mode = snmdDgtIn;
+	gSensor[sen].dgtMin = min;
+	gSensor[sen].dgtMax = max;
 }
 
 void resetQuadratureEncoder(tSensors sen)
