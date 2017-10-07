@@ -601,6 +601,7 @@ void stackFromLoader(bool callHandlers)
 		}
 		sleep(10);
 	}
+	writeDebugStreamLine("Arm at horizontal %d %d", nPgmTime, gSensor[armPoti].value);
 	if (callHandlers)
 	{
 		for (int i = 0; i < 10; i++)
@@ -623,6 +624,7 @@ void stackFromLoader(bool callHandlers)
 		sleep(10);
 	}
 	setClaw(CLAW_CLOSE_HOLD_POWER);
+	writeDebugStreamLine("Grabbed cone %d", nPgmTime);
 	if (callHandlers)
 	{
 		for (int i = 0; i < 10; i++)
@@ -639,6 +641,7 @@ void stackFromLoader(bool callHandlers)
 		if (callHandlers) handleArm();
 		sleep(10);
 	}
+	writeDebugStreamLine("Raised %d %d", nPgmTime, gSensor[armPoti].value);
 	if (callHandlers)
 	{
 		for (int i = 0; i < 50; i++)
@@ -655,6 +658,7 @@ void stackFromLoader(bool callHandlers)
 		if (callHandlers) handleClaw();
 		sleep(10);
 	}
+	writeDebugStreamLine("Done %d", nPgmTime);
 }
 
 task stackFromLoaderAsync()
