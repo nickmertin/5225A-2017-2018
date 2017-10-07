@@ -705,6 +705,8 @@ void handleLcd()
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
 {
+	clearDebugStream();
+
 	// Setup and initilize the necessary libraries
 	setupMotors();
 	setupSensors();
@@ -712,6 +714,7 @@ void startup()
 
 	setupDgtIn(leftLine, 0, 150);
 	setupDgtIn(rightLine, 0, 150);
+	setupDgtIn(armSonic, 20, 200);
 
 	gJoy[TCHN].deadzone = TDZ;
 	gJoy[PCHN].deadzone = PDZ;
@@ -724,7 +727,7 @@ void startup()
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
 void disabled()
 {
-
+	handleLcd();
 }
 
 // This task gets started at the begining of the autonomous period
