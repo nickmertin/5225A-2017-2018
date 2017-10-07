@@ -592,7 +592,7 @@ void stackFromLoader(bool callHandlers)
 	gArmTarget = gArmPositions[gArmPosition = 1];
 	gArmState = armPlainPID;
 	pidReset(gArmPID);
-	do
+	while (abs(gSensor[armPoti].value - gArmTarget) > 20)
 	{
 		if (callHandlers)
 		{
@@ -600,7 +600,7 @@ void stackFromLoader(bool callHandlers)
 			handleClaw();
 		}
 		sleep(10);
-	} while (abs(gArmPID.error) > 20);
+	}
 	if (callHandlers)
 	{
 		for (int i = 0; i < 10; i++)
