@@ -356,6 +356,7 @@ typedef enum _sClawStates {
 #define CLAW_CLOSE 3300
 
 sClawStates gClawState = clawIdle;
+unsigned long gClawStart;
 
 void setClaw(word power)
 {
@@ -375,6 +376,7 @@ void handleClaw()
 		{
 			gClawState = clawClosing;
 			setClaw(CLAW_CLOSE_POWER);
+			gClawStart = nPgmTime;
 		}
 	}
 
@@ -392,7 +394,7 @@ void handleClaw()
 		}
 		case clawClosing:
 		{
-			if (gSensor[clawPoti].value <= CLAW_CLOSE) gClawState = clawClosed;
+			if (nPgmTime - gClawStart >= 600) gClawState = clawClosed;
 			break;
 		}
 		case clawOpened:
@@ -610,6 +612,7 @@ void stackFromLoader(bool callHandlers)
 	else sleep(100);
 	gClawState = clawClosing;
 	setClaw(CLAW_CLOSE_POWER);
+	gClawStart = nPgmTime;
 	while (gClawState != clawClosed)
 	{
 		if (callHandlers)
@@ -619,6 +622,7 @@ void stackFromLoader(bool callHandlers)
 		}
 		sleep(10);
 	}
+	setClaw(CLAW_CLOSE_HOLD_POWER);
 	if (callHandlers)
 	{
 		for (int i = 0; i < 10; i++)
