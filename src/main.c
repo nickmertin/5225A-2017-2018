@@ -224,7 +224,7 @@ typedef enum _sArmStates {
 #define ARM_DOWN_KP 0.25
 #define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
-short gArmPositions[] = { 650, 1850, 2800 };
+short gArmPositions[] = { 600, 1850, 2850 };
 word gArmHoldPower[] = { -12, 12, 10 };
 short gArmPosition = 2;
 short gArmTarget;
@@ -245,7 +245,7 @@ void handleArm()
 		if (gArmPosition < ARM_POSITIONS)
 		{
 			gArmTarget = gArmPositions[++gArmPosition];
-			gArmState = armRaise;
+			gArmState = armPlainPID;
 			gArmStart = nPgmTime;
 		}
 	}
@@ -255,22 +255,14 @@ void handleArm()
 		if (gArmPosition > 0)
 		{
 			gArmTarget = gArmPositions[--gArmPosition];
-			gArmState = armLower;
+			gArmState = armPlainPID;
 			gArmStart = nPgmTime;
 		}
 	}
 	if (RISING(Btn7R))
 	{
-		if (gArmPosition == 0)
-		{
-			gArmTarget = gArmPositions[gArmPosition = 2];
-			gArmState = armRaise;
-		}
-		else
-		{
-			gArmTarget = gArmPositions[gArmPosition = 0];
-			gArmState = armLower;
-		}
+		gArmTarget = gArmPositions[gArmPosition ? (gArmPosition = 0) : (gArmPosition = 2)];
+		gArmState = armPlainPID;
 		gArmStart = nPgmTime;
 	}
 
@@ -784,7 +776,7 @@ void startup()
 	gJoy[LCHN].deadzone = LDZ;
 	gJoy[ACHN].deadzone = ADZ;
 
-	pidInit(gArmPID, 0.2, 0.001, 0.0, 20, 150, 5, 127);
+	pidInit(gArmPID, 0.2, 0.001, 0.0, 70, 150, 5, 127);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
