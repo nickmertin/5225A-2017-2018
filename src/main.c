@@ -751,10 +751,17 @@ void handleMacros()
 void handleLcd()
 {
 	string line;
-	sprintf(line, "%4d %4d", gSensor[driveEncL].value, gSensor[driveEncR].value);
 
+	sprintf(line, "%4d %4d", gSensor[driveEncL].value, gSensor[driveEncR].value);
 	clearLCDLine(0);
 	displayLCDString(0, 0, line);
+
+	velocityCheck(driveEncL);
+	velocityCheck(driveEncR);
+
+	sprintf(line, "%2.1f %2.1f", gSensor[driveEncL].velocity, gSensor[driveEncR].velocity);
+	clearLCDLine(1);
+	displayLCDString(1, 0, line);
 }
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
@@ -770,6 +777,9 @@ void startup()
 	setupDgtIn(leftLine, 0, 150);
 	setupDgtIn(rightLine, 0, 150);
 	setupDgtIn(armSonic, 20, 200);
+
+	velocityClear(driveEncL);
+	velocityClear(driveEncR);
 
 	gJoy[TCHN].deadzone = TDZ;
 	gJoy[PCHN].deadzone = PDZ;
