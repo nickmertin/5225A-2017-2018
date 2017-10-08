@@ -365,7 +365,7 @@ void setClaw(word power)
 
 void handleClaw()
 {
-	if (RISING(Btn7U))
+	if (RISING(Btn7D))
 	{
 		if (gClawState == clawClosed || gClawState == clawClosing)
 		{
@@ -716,7 +716,7 @@ task alignAndScore20Async()
 
 void handleMacros()
 {
-	if (RISING(Btn8L))
+	/*if (RISING(Btn8L))
 	{
 		startTask(scanStackAsync);
 	}
@@ -737,8 +737,8 @@ void handleMacros()
 			setTaskPriority(stackAsync, 0);
 		}
 		else startTask(stackAsync);
-	}
-	if (RISING(Btn7D))
+	}*/
+	if (RISING(Btn7U))
 	{
 		if (getTaskPriority(stackFromLoaderAsync))
 		{
