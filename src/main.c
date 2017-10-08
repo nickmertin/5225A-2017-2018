@@ -88,6 +88,7 @@ task stackAsync();
 
 /* Lift */
 typedef enum _sLiftStates {
+	liftManaged,
 	liftIdle,
 	liftRaise,
 	liftLower,
@@ -208,6 +209,7 @@ void handleLift()
 
 /* Arm */
 typedef enum _sArmStates {
+	armManaged,
 	armIdle,
 	armPlainPID,
 	armRaise,
@@ -340,6 +342,7 @@ void handleArm()
 /* Claw */
 
 typedef enum _sClawStates {
+	clawManaged,
 	clawIdle,
 	clawOpening,
 	clawClosing,
@@ -414,6 +417,7 @@ void handleClaw()
 /* Mobile Goal */
 
 typedef enum _sMobileStates {
+	mobileManaged,
 	mobileIdle,
 	mobileRaise,
 	mobileLower,
