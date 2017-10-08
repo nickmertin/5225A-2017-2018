@@ -13,7 +13,7 @@
 #pragma config(Sensor, dgtl7,  driveEncR,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl9,  latEnc,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl11, frontSonic,     sensorSONAR_mm)
-#pragma config(Motor,  port1,           arm,           tmotorVex393_HBridge, openLoop, reversed)
+#pragma config(Motor,  port1,           arm,           tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           liftL1,        tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           driveL1,       tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port4,           driveL2,       tmotorVex393HighSpeed_MC29, openLoop, reversed)
