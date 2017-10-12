@@ -83,7 +83,7 @@ void handleDrive()
 	setDrive(left, right);
 }
 
-void stack(bool callHandlers);
+void stack();
 task stackAsync();
 
 /* Lift */
@@ -350,6 +350,8 @@ typedef enum _sClawStates {
 #define CLAW_OPEN 3000
 #define CLAW_CLOSE 3300
 
+#define CLAW_CLOSE_TIME 600
+
 sClawStates gClawState = clawIdle;
 unsigned long gClawStart;
 
@@ -486,228 +488,164 @@ void handleMobile()
 
 /* Macros */
 
+task armPID()
+{
+	while (true)
+	{
+		pidCalculate(gArmPID, (float)gArmPositions[1], (float)gSensor[armPoti].value);
+		setArm((word)gArmPID.output);
+		sleep(10);
+	}
+}
+
 int gNumCones = 0;
 const int gStackPos[11] = { 0, 0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760 };
 const int gScanPos[11] = {0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760, 2070 };
 
-void scanStack(bool callHandlers)
+bool gMacros[20] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+
+void scanStack()
 {
-	gArmTarget = gArmPositions[gArmPosition = 1];
-	gArmState = armPlainPID;
+	gLiftState = liftManaged;
+	gArmState = armManaged;
+	gArmPosition = gArmPositions[gArmPosition = 1];
 	pidReset(gArmPID);
-	do
-	{
-		if (callHandlers) handleArm();
-		sleep(10);
-	} while (abs(gArmPID.error) > 20);
-	setLift(80);
+	startTask(armPID);
+	while (abs(gSensor[armPoti].value - gArmTarget) > 20) sleep(10);
+	setLift(-80);
 	int acc = 0;
 	while (acc < 10 && !gSensor[limTop].value)
 	{
-		if (callHandlers) handleArm();
+		if (gSensor[liftPoti].value <= LIFT_BOTTOM)
+		{
+			gNumCones = 0;
+			goto end;
+		}
 		if (gSensor[armSonic].value) acc = 0;
 		else ++acc;
 		sleep(10);
 	}
 	int pos = gSensor[liftPoti].value - LIFT_BOTTOM;
+	gNumCones = 11;
 	for (int i = 0; i < ARR_LEN(gScanPos); i++)
 	{
 		if (gScanPos[i] >= pos)
 		{
 			gNumCones = i - 1;
-			goto done;
+			break;
 		}
 	}
-	gNumCones = 11;
-	done:
-	gLiftTarget = LIFT_BOTTOM;
-	gLiftState = liftLower;
-	while (gLiftState != liftHold)
-	{
-		if (callHandlers)
-		{
-			handleArm();
-			handleLift();
-		}
-		sleep(10);
-	}
+	setLift(-127);
+	while (gSensor[liftPoti].value > LIFT_BOTTOM) sleep(10);
+	end:
+	stopTask(armPID);
+	gLiftState = liftHold;
+	gArmState = armHold;
 }
 
 task scanStackAsync()
 {
-	scanStack(false);
+	gMacros[scanStackAsync] = true;
+	scanStack();
+	gMacros[scanStackAsync] = false;
 }
 
-void stack(bool callHandlers)
+void stack()
 {
-	gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
-	gLiftState = liftRaise;
-	while (gLiftTarget - gSensor[liftPoti].value > 100)
-	{
-		if (callHandlers) handleLift();
-		sleep(10);
-	}
+	gArmState = armManaged;
+	gClawState = clawManaged;
+	//TODO: take into account number of cones, raise appropriately
 	gArmTarget = gArmPositions[gArmPosition = 2];
-	gArmState = armRaise;
-	while (gArmTarget - gSensor[armPoti].value > 100)
-	{
-		if (callHandlers) handleArm();
-		sleep(10);
-	}
-	sleep(200);
-	setClaw(-127);
+	startTask(armPID);
+	while (gSensor[armPoti].value < gArmTarget) sleep(10);
+	writeDebugStreamLine("Raised %d %d", nPgmTime, gSensor[armPoti].value);
 	sleep(500);
-	if (gNumCones < 11) ++gNumCones;
-	setClaw(0);
-	gArmTarget = gArmPositions[gArmPosition = 1];
-	gArmState = armLower;
-	while (gArmTarget - gSensor[armPoti].value < -400)
-	{
-		if (callHandlers) handleArm();
-		sleep(10);
-	}
-	gLiftTarget = LIFT_BOTTOM;
-	gLiftState = liftLower;
-	while (gLiftTarget - gSensor[liftPoti].value < -100)
-	{
-		if (callHandlers) handleLift();
-		sleep(10);
-	}
+	setClaw(CLAW_OPEN_POWER);
+	while (gSensor[clawPoti].value > CLAW_CLOSE) sleep(10);
+	writeDebugStreamLine("Done %d", nPgmTime);
+	++gNumCones;
+	stopTask(armPID);
+	gArmState = armHold;
+	gClawState = clawOpened;
 }
 
 task stackAsync()
 {
-	stack(false);
-	nSchedulePriority = 0;
+	gMacros[stackAsync] = true;
+	stack();
+	gMacros[stackAsync] = false;
 }
 
-void stackFromLoader(bool callHandlers)
+void stackFromLoader()
 {
-	gClawState = clawOpening;
-	setClaw(CLAW_OPEN_POWER);
+	gArmState = armManaged;
+	gClawState = clawManaged;
 	gArmTarget = gArmPositions[gArmPosition = 1];
-	gArmState = armPlainPID;
 	pidReset(gArmPID);
-	while (abs(gSensor[armPoti].value - gArmTarget) > 20)
-	{
-		if (callHandlers)
-		{
-			handleArm();
-			handleClaw();
-		}
-		sleep(10);
-	}
+	startTask(armPID);
+	setClaw(CLAW_OPEN_POWER);
+	while (abs(gSensor[armPoti].value - gArmTarget) > 20) sleep(10);
 	writeDebugStreamLine("Arm at horizontal %d %d", nPgmTime, gSensor[armPoti].value);
-	if (callHandlers)
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			handleArm();
-			sleep(10);
-		}
-	}
-	else sleep(100);
-	gClawState = clawClosing;
+	sleep(100);
 	setClaw(CLAW_CLOSE_POWER);
-	gClawStart = nPgmTime;
-	while (gClawState != clawClosed)
-	{
-		if (callHandlers)
-		{
-			handleClaw();
-			handleArm();
-		}
-		sleep(10);
-	}
+	sleep(CLAW_CLOSE_TIME);
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	writeDebugStreamLine("Grabbed cone %d", nPgmTime);
-	if (callHandlers)
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			handleArm();
-			sleep(10);
-		}
-	}
-	else sleep(100);
-	gArmTarget = gArmPositions[gArmPosition = 2];
-	gArmState = armRaise;
-	while (gArmState != armHold)
-	{
-		if (callHandlers) handleArm();
-		sleep(10);
-	}
-	writeDebugStreamLine("Raised %d %d", nPgmTime, gSensor[armPoti].value);
-	if (callHandlers)
-	{
-		for (int i = 0; i < 50; i++)
-		{
-			handleArm();
-			sleep(10);
-		}
-	}
-	else sleep(500);
-	gClawState = clawOpening;
-	setClaw(CLAW_OPEN_POWER);
-	while (gClawState != clawOpened)
-	{
-		if (callHandlers) handleClaw();
-		sleep(10);
-	}
-	writeDebugStreamLine("Done %d", nPgmTime);
+	sleep(100);
+	stack();
 }
 
 task stackFromLoaderAsync()
 {
-	stackFromLoader(false);
-	nSchedulePriority = 0;
+	gMacros[stackFromLoaderAsync] = true;
+	stackFromLoader();
+	gMacros[stackFromLoaderAsync] = false;
 }
 
 #define OFFSET_20_ZONE_P1 700
 #define OFFSET_20_ZONE_P2 850
 
-void alignAndScore20(bool callHandlers)
+void alignAndScore20()
 {
+	//TODO: Raise lift and arm above stack
 	while (gMotor[driveL1].power > 0 || gMotor[driveR1].power > 0)
 	{
 		setDrive(gSensor[leftLine].value ? -10 : 50, gSensor[rightLine].value ? -10 : 50);
 		sleep(10);
 	}
+	sleep(100);
 	setDrive(127, 127);
 	int initial = gSensor[driveEncL].value;
 	while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P1) sleep(10);
-	gMobileTarget = MOBILE_20;
-	gMobileState = mobileLower;
-	gMobileHoldPower = 10;
+	gMobileState = mobileManaged;
 	setMobile(MOBILE_DOWN_POWER);
 	while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P2)
 	{
-		if (callHandlers) handleMobile();
+		if (gSensor[mobilePoti].value < MOBILE_20) setMobile(12);
 		sleep(10);
 	}
 	setDrive(-10, -10);
-	while (gMobileState == mobileLower)
-	{
-		if (callHandlers) handleMobile();
-		sleep(10);
-	}
+	while (gSensor[mobilePoti].value >= MOBILE_20) sleep(10);
+	setMobile(12);
 	sleep(200);
 	setDrive(-127, -127);
-	gMobileTarget = MOBILE_BOTTOM;
-	gMobileState = mobileLower;
-	gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
 	setMobile(MOBILE_DOWN_POWER);
 	while (gSensor[driveEncL].value > initial)
 	{
-		if (callHandlers) handleMobile();
+		if (gSensor[mobilePoti].value <= gMobileTarget) setMobile(MOBILE_DOWN_HOLD_POWER);
 		sleep(10);
 	}
+	setDrive(0, 0);
+	while (gSensor[mobilePoti].value > gMobileTarget) sleep(10);
+	setMobile(gMobileHoldPower = MOBILE_DOWN_HOLD_POWER);
+	gMobileState = mobileHold;
 }
 
 task alignAndScore20Async()
 {
-	alignAndScore20(false);
-	nSchedulePriority = 0;
+	gMacros[alignAndScore20Async] = true;
+	alignAndScore20();
+	gMacros[alignAndScore20Async] = false;
 }
 
 void handleMacros()
@@ -718,28 +656,28 @@ void handleMacros()
 	}
 	if (RISING(Btn8R))
 	{
-		if (getTaskPriority(alignAndScore20Async))
+		if (gMacros[alignAndScore20Async])
 		{
 			stopTask(alignAndScore20Async);
-			setTaskPriority(alignAndScore20Async, 0);
+			gMotors[alignAndScore20Async] = false;
 		}
 		else startTask(alignAndScore20Async);
 	}
 	if (RISING(Btn7L))
 	{
-		if (getTaskPriority(stackAsync))
+		if (gMacros[stackAsync])
 		{
 			stopTask(stackAsync);
-			setTaskPriority(stackAsync, 0);
+			gMotors[stackAsync] = false;
 		}
 		else startTask(stackAsync);
 	}*/
 	if (RISING(Btn7U))
 	{
-		if (getTaskPriority(stackFromLoaderAsync))
+		if (gMacros[stackFromLoaderAsync])
 		{
 			stopTask(stackFromLoaderAsync);
-			setTaskPriority(stackFromLoaderAsync, 0);
+			gMacros[stackFromLoaderAsync] = false;
 		}
 		else startTask(stackFromLoaderAsync);
 	}
