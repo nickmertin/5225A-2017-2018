@@ -43,21 +43,13 @@
 #include "utilities.c"
 #include "pid.c"
 
+#include "controls.h"
+
 sCycleData gMainCycle;
 
 //#define MOBILE_LIFT_SAFETY
 
 /* Drive */
-#define TCHN Ch4
-#define PCHN Ch3
-#define LCHN Ch2
-#define ACHN Ch1
-
-#define TDZ 10
-#define PDZ 10
-#define LDZ 25
-#define ADZ 25
-
 void setDrive(word left, word right)
 {
 	gMotor[driveL1].power = gMotor[driveL2].power = left;
@@ -66,8 +58,8 @@ void setDrive(word left, word right)
 
 void handleDrive()
 {
-	word left = gJoy[PCHN].cur + gJoy[TCHN].cur;
-	word right = gJoy[PCHN].cur - gJoy[TCHN].cur;
+	word left = gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur;
+	word right = gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur;
 	velocityCheck(driveEncL);
 	if (gSensor[driveEncL].velGood)
 	{
@@ -115,28 +107,24 @@ void setLift(word power)
 
 void handleLift()
 {
-	if (RISING(Btn5U))
+	if (RISING(BTN_LIFT_UP))
 	{
 		stopTask(stackAsync);
 		gLiftTarget = LIFT_TOP;
 		gLiftState = liftRaise;
 		gLiftStart = nPgmTime;
 	}
-	else if (FALLING(Btn5U))
+	else if (FALLING(BTN_LIFT_UP))
 	{
 		stopTask(stackAsync);
 		gLiftTarget = gSensor[liftPoti].value;
 	}
-	if (RISING(Btn5D))
+	if (RISING(BTN_LIFT_DOWN))
 	{
 		stopTask(stackAsync);
 		gLiftTarget = LIFT_BOTTOM;
 		gLiftState = liftLower;
 		gLiftStart = nPgmTime;
-	}
-	if (RISING(Btn8L))
-	{
-		startTask(stackAsync);
 	}
 
 	switch (gLiftState)
@@ -238,7 +226,7 @@ void setArm(word power)
 
 void handleArm()
 {
-	if (RISING(Btn6U))
+	if (RISING(BTN_ARM_UP))
 	{
 		stopTask(stackAsync);
 		if (gArmPosition < ARM_POSITIONS)
@@ -249,7 +237,7 @@ void handleArm()
 			pidReset(gArmPID);
 		}
 	}
-	if (RISING(Btn6D))
+	if (RISING(BTN_ARM_DOWN))
 	{
 		stopTask(stackAsync);
 		if (gArmPosition > 0)
@@ -260,7 +248,7 @@ void handleArm()
 			pidReset(gArmPID);
 		}
 	}
-	if (RISING(Btn7R))
+	if (RISING(BTN_ARM_TOGGLE))
 	{
 		gArmTarget = gArmPositions[gArmPosition ? (gArmPosition = 0) : (gArmPosition = 2)];
 		gArmState = armPlainPID;
@@ -345,7 +333,7 @@ void setClaw(word power)
 
 void handleClaw()
 {
-	if (RISING(Btn7D))
+	if (RISING(BTN_CLAW))
 	{
 		if (gClawState == clawClosed || gClawState == clawClosing)
 		{
@@ -425,14 +413,14 @@ void handleMobile()
 	if (gSensor[liftPoti].value > 2200)
 	{
 #endif
-		if (RISING(Btn8U))
+		if (RISING(BTN_MOBILE_UP))
 		{
 			gMobileTarget = MOBILE_TOP;
 			gMobileState = mobileRaise;
 			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 			setMobile(MOBILE_UP_POWER);
 		}
-		if (RISING(Btn8D))
+		if (RISING(BTN_MOBILE_DOWN))
 		{
 			gMobileTarget = MOBILE_BOTTOM;
 			gMobileState = mobileLower;
@@ -633,11 +621,11 @@ task alignAndScore20Async()
 
 void handleMacros()
 {
-	/*if (RISING(Btn8L))
+	/*if (RISING(BTN_MACRO_SCAN))
 	{
 		startTask(scanStackAsync);
 	}
-	if (RISING(Btn8R))
+	if (RISING(BTN_MACRO_20))
 	{
 		if (gMacros[alignAndScore20Async])
 		{
@@ -646,7 +634,7 @@ void handleMacros()
 		}
 		else startTask(alignAndScore20Async);
 	}
-	if (RISING(Btn7L))
+	if (RISING(BTN_MACRO_STACK))
 	{
 		if (gMacros[stackAsync])
 		{
@@ -655,7 +643,7 @@ void handleMacros()
 		}
 		else startTask(stackAsync);
 	}*/
-	if (RISING(Btn7U))
+	if (RISING(BTN_MACRO_LOADER))
 	{
 		if (gMacros[stackFromLoaderAsync])
 		{
@@ -702,10 +690,8 @@ void startup()
 	velocityClear(driveEncL);
 	velocityClear(driveEncR);
 
-	gJoy[TCHN].deadzone = TDZ;
-	gJoy[PCHN].deadzone = PDZ;
-	gJoy[LCHN].deadzone = LDZ;
-	gJoy[ACHN].deadzone = ADZ;
+	gJoy[JOY_TURN].deadzone = DZ_TURN;
+	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
 
 	pidInit(gArmPID, 0.2, 0.001, 0.0, 70, 150, 5, 127);
 }
