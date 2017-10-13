@@ -212,20 +212,19 @@ typedef enum _sArmStates {
 	armManaged,
 	armIdle,
 	armPlainPID,
-	armRaise,
-	armLower,
-	armRaiseBrk,
-	armLowerBrk,
 	armHold,
-	armAuto
+	armHorizontal
 } sArmStates;
 
 #define ARM_UP_KP 0.25
 #define ARM_DOWN_KP 0.25
 #define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
-short gArmPositions[] = { 164, 1400, 2350 };
-word gArmHoldPower[] = { -12, 12, 10 };
+#define ARM_TOP 2700
+#define ARM_BOTTOM 650
+
+short gArmPositions[] = { 630, 1250, 2900 };
+word gArmHoldPower[] = { -12, 0, 5 };
 short gArmPosition = 2;
 short gArmTarget;
 sArmStates gArmState = armIdle;
@@ -245,8 +244,9 @@ void handleArm()
 		if (gArmPosition < ARM_POSITIONS)
 		{
 			gArmTarget = gArmPositions[++gArmPosition];
-			gArmState = armPlainPID;
+			gArmState = gArmPosition == 1 ? armHorizontal : armPlainPID;
 			gArmStart = nPgmTime;
+			pidReset(gArmPID);
 		}
 	}
 	if (RISING(Btn6D))
@@ -255,8 +255,9 @@ void handleArm()
 		if (gArmPosition > 0)
 		{
 			gArmTarget = gArmPositions[--gArmPosition];
-			gArmState = armPlainPID;
+			gArmState = gArmPosition == 1 ? armHorizontal : armPlainPID;
 			gArmStart = nPgmTime;
+			pidReset(gArmPID);
 		}
 	}
 	if (RISING(Btn7R))
@@ -270,61 +271,43 @@ void handleArm()
 	{
 		case armPlainPID:
 		{
-			pidCalculate(gArmPID, (float)gArmTarget, (float)gSensor[armPoti].value);
-			setArm((word)gArmPID.output);
-			break;
-		}
-		case armRaise:
-		{
-			short error = gArmTarget - gSensor[armPoti].value;
-			if (error <= 0)
+			int value = gSensor[armPoti].value;
+			if (gArmTarget >= ARM_TOP && value >= ARM_TOP)
 			{
-				velocityClear(armPoti);
-				setArm(-8);
-				gArmState = armRaiseBrk;
-				writeDebugStreamLine("Arm up: %d", nPgmTime - gArmStart);
+				writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
+				gArmState = armHold;
+			}
+			else if (gArmTarget <= ARM_BOTTOM && value <= ARM_BOTTOM)
+			{
+				writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
+				gArmState = armHold;
 			}
 			else
 			{
-				float output = error * ARM_UP_KP;
-				if (output < 50) output = 50;
-				setArm((word)output);
+				pidCalculate(gArmPID, (float)gArmTarget, (float)value);
+				setArm((word)gArmPID.output);
 			}
-			break;
-		}
-		case armRaiseBrk:
-		{
-			velocityCheck(armPoti);
-			if (gSensor[armPoti].velGood && gSensor[armPoti].velocity <= 0) gArmState = armHold;
-			break;
-		}
-		case armLower:
-		{
-			short error = gArmTarget - gSensor[armPoti].value;
-			if (error >= 0)
-			{
-				velocityClear(armPoti);
-				setArm(8);
-				gArmState = armLowerBrk;
-				writeDebugStreamLine("Arm down: %d", nPgmTime - gArmStart);
-			}
-			else
-			{
-				float output = error * ARM_DOWN_KP;
-				if (output > -30) output = -30;
-				setArm((word)output);
-			}
-			break;
-		}
-		case armLowerBrk:
-		{
-			velocityCheck(armPoti);
-			if (gSensor[armPoti].velGood && gSensor[armPoti].velocity >= 0) gArmState = armHold;
 			break;
 		}
 		case armHold:
 		{
 			setArm(gArmHoldPower[gArmPosition]);
+			break;
+		}
+		case armHorizontal:
+		{
+			int value = gSensor[armPoti].value;
+			if (abs(gArmTarget - value) < 400)
+			{
+				velocityCheck(armPoti);
+				if (gSensor[armPoti].velGood)
+				{
+					int power = 10 - gSensor[armPoti].velocity / 2;
+					setArm(LIM_TO_VAL(power, 15));
+				}
+			}
+			else if (value > gArmTarget) setArm(-127);
+			else setArm(127);
 			break;
 		}
 	}
