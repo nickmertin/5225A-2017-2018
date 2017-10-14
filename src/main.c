@@ -639,7 +639,7 @@ void handleMacros()
 		if (gMacros[stackAsync])
 		{
 			stopTask(stackAsync);
-			gMotors[stackAsync] = false;
+			gMacros[stackAsync] = false;
 		}
 		else startTask(stackAsync);
 	}/*
