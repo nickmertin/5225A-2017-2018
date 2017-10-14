@@ -459,6 +459,24 @@ void handleMobile()
 
 /* Macros */
 
+bool gLiftAsyncDone;
+
+task liftDownAsync()
+{
+	gLiftAsyncDone = false;
+	while (gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value) sleep(10);
+	setLift(gLiftTarget > 10 ? 20 : -10);
+	gLiftAsyncDone = true;
+}
+
+task liftUpAsync()
+{
+	gLiftAsyncDone = false;
+	while (gSensor[liftPoti].value < gLiftTarget && !gSensor[limTop].value) sleep(10);
+	setLift(gLiftTarget < 3900 ? -20 : 15);
+	gLiftAsyncDone = true;
+}
+
 task armPID()
 {
 	while (true)
@@ -469,9 +487,26 @@ task armPID()
 	}
 }
 
+int gMaxLiftHeight;
+
+task trackLift()
+{
+	gMaxLiftHeight = 0;
+	while (true)
+	{
+		int value = gSensor[liftPoti].value;
+		if (value > gMaxLiftHeight) gMaxLiftHeight = value;
+		sleep(10);
+	}
+}
+
 int gNumCones = 0;
-const int gStackPos[11] = { 0, 0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760 };
-const int gScanPos[11] = {0, 0, 150, 320, 510, 720, 950, 1200, 1470, 1760, 2070 };
+const int gStackPos[11] = { 0, 0, 0, 20, 220, 780, 1400, 1800, 2300, 3000, 3900 };
+const int gStackDownPos[11] = { 0, 0, 0, 0, 10, 450, 850, 1400, 1900, 2500, 3200 };
+const int gStackBackPos[11] = { 0, 0, 0, 20, 50, 550, 950, 1530, 2200, 2800, 0 };
+const int gStackDelayPos[11] = { 0, 0, 0, 0, 200, 550, 800, 1100, 1700, 2300, 3500 };
+const int gStackHoldPower[11] = {0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 20 };
+const int gScanPos[11] = {0, 0, 150, 320, 590, 780, 950, 1200, 1470, 1760, 2070 };
 
 bool gMacros[20] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 
@@ -523,21 +558,115 @@ task scanStackAsync()
 
 void stack()
 {
+	gLiftState = liftManaged;
 	gArmState = armManaged;
 	gClawState = clawManaged;
-	//TODO: take into account number of cones, raise appropriately
-	gArmTarget = gArmPositions[gArmPosition = 2];
-	startTask(armPID);
-	while (gSensor[armPoti].value < gArmTarget) sleep(10);
-	writeDebugStreamLine("Raised %d %d", nPgmTime, gSensor[armPoti].value);
-	sleep(500);
-	setClaw(CLAW_OPEN_POWER);
+	startTask(trackLift);
+	gArmTarget = gArmPositions[gArmPosition = 0];
+	setArm(-127);
+	while (gSensor[armPoti].value > gArmTarget) sleep(10);
+	setArm(-15);
+	setClaw(CLAW_CLOSE_POWER);
 	while (gSensor[clawPoti].value > CLAW_CLOSE) sleep(10);
-	writeDebugStreamLine("Done %d", nPgmTime);
-	++gNumCones;
-	stopTask(armPID);
-	gArmState = armHold;
+	sleep(100);
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+	writeDebugStreamLine("Grabbed %d", nPgmTime);
+	setArm(127);
+	while (gSensor[armPoti].value < 850) sleep(10);
+	if (gNumCones >= 2)
+	{
+		gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
+		gLiftAsyncDone = false;
+		setLift(gNumCones == 2 ? 60 : 127);
+		startTask(liftUpAsync);
+		if (gNumCones >= 5)
+		{
+			setArm(10);
+			while (gSensor[liftPoti].value < LIFT_BOTTOM + gStackDelayPos[gNumCones]) sleep(10);
+			setArm(127);
+		}
+	}
+	gArmTarget = gArmPositions[gArmPosition = 2];
+	if (gNumCones < 3)
+	{
+		while (gSensor[armPoti].value < 2100) sleep(10);
+		writeDebugStreamLine("Braking %d", nPgmTime);
+		setArm(-7);
+		sleep(100);
+		setArm(10);
+		setClaw(60);
+	}
+	else
+	{
+		while (gSensor[armPoti].value < 1700) sleep(10);
+		writeDebugStreamLine("Gripping %d", nPgmTime);
+		setArm(15);
+		sleep(75);
+		setClaw(60);
+	}
+	while (gSensor[armPoti].value < gArmTarget) sleep(10);
+	setArm(15);
+	if (gNumCones >= 2) while (!gLiftAsyncDone) sleep(10);
+	writeDebugStreamLine("Raised %d %d", nPgmTime, gSensor[armPoti].value);
+	if (gNumCones < 3)
+	{
+		sleep(100);
+		setClaw(20); // NOTE: it should only be at 60 for ~120ms, this is 100 + however long it takes to reach the position from the end of the braking period
+		sleep(300);
+	}
+	else
+	{
+		gLiftTarget = LIFT_BOTTOM + gStackDownPos[gNumCones];
+		gLiftAsyncDone = false;
+		setLift(-127);
+		startTask(liftDownAsync);
+		sleep(70);
+		writeDebugStreamLine("Loosening %d", nPgmTime);
+		setClaw(20);
+		while (!gLiftAsyncDone) sleep(10);
+		setLift(gStackHoldPower[gNumCones]);
+		sleep(150);
+		writeDebugStreamLine("Settled %d", nPgmTime);
+	}
+	if (gNumCones == 10)
+	{
+		gNumCones = 11
+		setLift(-15);
+		sleep(500);
+		gClawState = clawClosed;
+	}
+	else
+	{
+		setClaw(CLAW_OPEN_POWER);
+		while (gSensor[clawPoti].value < CLAW_OPEN) sleep(10);
+		writeDebugStreamLine("Released %d", nPgmTime);
+		setClaw(CLAW_OPEN_HOLD_POWER);
+		if (gNumCones < 3) sleep(300);
+		else
+		{
+			sleep(100);
+			setLift(127);
+			while (gSensor[liftPoti].value < LIFT_BOTTOM + gStackBackPos[gNumCones]) sleep(10);
+			setLift(0);
+		}
+		++gNumCones;
+		gArmTarget = gArmPositions[gArmPosition = 0];
+		setArm(-127);
+		while (gSensor[armPoti].value > 1800) sleep(10);
+		gLiftTarget = LIFT_BOTTOM;
+		gLiftAsyncDone = false;
+		setLift(-127);
+		startTask(liftDownAsync);
+		while (gSensor[armPoti].value > gArmTarget + 400) sleep(10);
+		setArm(-15);
+		while (!gLiftAsyncDone) sleep(10);
+		setLift(-10);
+		writeDebugStreamLine("Done %d %d", nPgmTime, gMaxLiftHeight);
+		stopTask(trackLift);
 	gClawState = clawOpened;
+	}
+	gLiftState = liftHold;
+	gArmState = armHold;
 }
 
 task stackAsync()
