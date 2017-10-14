@@ -46,6 +46,7 @@
 #include "controls.h"
 
 sCycleData gMainCycle;
+int gNumCones = 0;
 
 //#define MOBILE_LIFT_SAFETY
 
@@ -440,7 +441,11 @@ void handleMobile()
 		}
 		case mobileLower:
 		{
-			if (gSensor[mobilePoti].value <= gMobileTarget) gMobileState = mobileHold;
+			if (gSensor[mobilePoti].value <= gMobileTarget)
+			{
+				gMobileState = mobileHold;
+				gNumCones = 0;
+			}
 			break;
 		}
 		case mobileHold:
@@ -500,7 +505,6 @@ task trackLift()
 	}
 }
 
-int gNumCones = 0;
 const int gStackPos[11] = { 0, 0, 0, 20, 220, 780, 1400, 1800, 2300, 3000, 3900 };
 const int gStackDownPos[11] = { 0, 0, 0, 0, 10, 450, 850, 1400, 1900, 2500, 3200 };
 const int gStackBackPos[11] = { 0, 0, 0, 20, 50, 550, 950, 1530, 2200, 2800, 0 };
@@ -764,7 +768,7 @@ void handleMacros()
 		}
 		else startTask(alignAndScore20Async);
 	}*/
-	if (RISING(BTN_MACRO_STACK))
+	if (RISING(BTN_MACRO_STACK) && gNumCones < 11)
 	{
 		if (gMacros[stackAsync])
 		{
