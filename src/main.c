@@ -623,7 +623,8 @@ void handleMacros()
 {
 	if (RISING(BTN_MACRO_SCAN))
 	{
-		startTask(scanStackAsync);
+		//startTask(scanStackAsync);
+		gNumCones = 0;
 	}
 	/*if (RISING(BTN_MACRO_20))
 	{
