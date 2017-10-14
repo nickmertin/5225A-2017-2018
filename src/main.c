@@ -621,11 +621,11 @@ task alignAndScore20Async()
 
 void handleMacros()
 {
-	/*if (RISING(BTN_MACRO_SCAN))
+	if (RISING(BTN_MACRO_SCAN))
 	{
 		startTask(scanStackAsync);
 	}
-	if (RISING(BTN_MACRO_20))
+	/*if (RISING(BTN_MACRO_20))
 	{
 		if (gMacros[alignAndScore20Async])
 		{
@@ -633,7 +633,7 @@ void handleMacros()
 			gMotors[alignAndScore20Async] = false;
 		}
 		else startTask(alignAndScore20Async);
-	}
+	}*/
 	if (RISING(BTN_MACRO_STACK))
 	{
 		if (gMacros[stackAsync])
@@ -642,7 +642,7 @@ void handleMacros()
 			gMotors[stackAsync] = false;
 		}
 		else startTask(stackAsync);
-	}*/
+	}/*
 	if (RISING(BTN_MACRO_LOADER))
 	{
 		if (gMacros[stackFromLoaderAsync])
@@ -651,7 +651,7 @@ void handleMacros()
 			gMacros[stackFromLoaderAsync] = false;
 		}
 		else startTask(stackFromLoaderAsync);
-	}
+	}*/
 }
 
 
