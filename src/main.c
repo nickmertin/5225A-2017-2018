@@ -185,7 +185,7 @@ void handleLift()
 		}
 		case liftHold:
 		{
-			if (gSensor[limBottom].value)
+			if (gSensor[liftPoti] < 10)
 				setLift(-10);
 			else
 				setLift(12);
