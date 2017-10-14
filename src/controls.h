@@ -25,3 +25,5 @@
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn8L
 #define BTN_MACRO_20 Btn8R
+#define JOY_ADJUST Ch2
+#define DZ_ADJUST 100

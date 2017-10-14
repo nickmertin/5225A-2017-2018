@@ -782,6 +782,11 @@ void handleMacros()
 		}
 		else startTask(stackFromLoaderAsync);
 	}*/
+	if (RISING(JOY_ADJUST))
+	{
+		if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
+		else if (gJoy[JOY_ADJUST].cur < 0 && gNumCones > 0) --gNumCones;
+	}
 }
 
 
@@ -791,7 +796,7 @@ void handleLcd()
 {
 	string line;
 
-	sprintf(line, "%4d %4d", gSensor[driveEncL].value, gSensor[driveEncR].value);
+	sprintf(line, "%4d %4d %2d", gSensor[driveEncL].value, gSensor[driveEncR].value, gNumCones);
 	clearLCDLine(0);
 	displayLCDString(0, 0, line);
 
@@ -822,6 +827,7 @@ void startup()
 
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
+	gJoy[JOY_ADJUST].deadzone = DZ_ADJUST;
 
 	pidInit(gArmPID, 0.2, 0.001, 0.0, 70, 150, 5, 127);
 }
