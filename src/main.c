@@ -181,7 +181,10 @@ void handleLift()
 		//}
 		case liftManual:
 		{
-			setLift(gJoy[JOY_LIFT].cur);
+			word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
+			if (gSensor[limBottom].value && value < -10) value = -10;
+			if (gSensor[limTop].value && value > 10) value = 10;
+			setLift(value);
 			break;
 		}
 		case liftHold:
@@ -200,8 +203,7 @@ void handleLift()
 typedef enum _sArmStates {
 	armManaged,
 	armIdle,
-	armRaise,
-	armLower,
+	armManual,
 	armPlainPID,
 	armHold,
 	armHorizontal
@@ -214,7 +216,7 @@ typedef enum _sArmStates {
 #define ARM_TOP 2700
 #define ARM_BOTTOM 650
 
-short gArmPositions[] = { 630, 1250, 2700 };
+short gArmPositions[] = { 630, 1300, 2700 };
 word gArmHoldPower[] = { -12, 0, 5 };
 short gArmPosition = 2;
 short gArmTarget;
@@ -229,21 +231,16 @@ void setArm(word power)
 
 void handleArm()
 {
-	if (RISING(BTN_ARM_UP))
+	if (RISING(JOY_ARM))
 	{
-		gArmState = armRaise;
-		setArm(127);
+		gArmState = armManual;
 	}
-	if (RISING(BTN_ARM_DOWN))
+	if (FALLING(JOY_ARM) && gArmState == armManual)
 	{
-		gArmState = armLower;
-		setArm(-127);
-	}
-	if ((FALLING(BTN_ARM_UP) && gArmState == armRaise) || (FALLING(BTN_ARM_DOWN) && gArmState == armLower))
-	{
-		gArmPosition = 1;
-		gArmTarget = gSensor[armPoti].value;
-		gArmState = armPlainPID;
+		if (gSensor[armPoti].value <= ARM_BOTTOM) gArmPosition = 0;
+		else if (gSensor[armPoti].value >= ARM_TOP) gArmPosition = 2;
+		else gArmPosition = 1;
+		gArmState = armHold;
 	}
 	if (RISING(BTN_ARM_TOGGLE))
 	{
@@ -254,22 +251,12 @@ void handleArm()
 
 	switch (gArmState)
 	{
-		case armRaise:
+		case armManual:
 		{
-			if (gSensor[armPoti].value <= gArmPositions[0] + 100)
-			{
-				gArmTarget = gArmPositions[gArmPosition = 0];
-				gArmState = armHold;
-			}
-			break;
-		}
-		case armLower:
-		{
-			if (gSensor[armPoti].value >= gArmPositions[ARM_POSITIONS] - 100)
-			{
-				gArmTarget = gArmPositions[gArmPosition = ARM_POSITIONS];
-				gArmState = armHold;
-			}
+			word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
+			if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
+			if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
+			setArm(value);
 			break;
 		}
 		case armPlainPID:
@@ -294,7 +281,7 @@ void handleArm()
 		}
 		case armHold:
 		{
-			setArm(gArmHoldPower[gArmPosition]);
+			setArm(gArmPosition == 1 ? gSensor[armPoti].value < 1700 ? 15 : 9 : gArmHoldPower[gArmPosition]);
 			break;
 		}
 		case armHorizontal:

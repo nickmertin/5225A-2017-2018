@@ -6,11 +6,11 @@
 
 /* Lift */
 #define JOY_LIFT Ch2
-#define DZ_LIFT 15
+#define DZ_LIFT 70
 
 /* Arm */
-#define BTN_ARM_UP Btn5U
-#define BTN_ARM_DOWN Btn5D
+#define JOY_ARM Ch1
+#define DZ_ARM 70
 #define BTN_ARM_TOGGLE Btn7R
 
 /* Claw */
