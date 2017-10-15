@@ -5,16 +5,16 @@
 #define DZ_THROTTLE 10
 
 /* Lift */
-#define BTN_LIFT_UP Btn5U
-#define BTN_LIFT_DOWN Btn5D
+#define JOY_LIFT Ch2
+#define DZ_LIFT 15
 
 /* Arm */
-#define BTN_ARM_UP Btn7U
-#define BTN_ARM_DOWN Btn7L
+#define BTN_ARM_UP Btn5U
+#define BTN_ARM_DOWN Btn5D
 #define BTN_ARM_TOGGLE Btn7R
 
 /* Claw */
-#define BTN_CLAW Btn7D
+#define BTN_CLAW Btn8L
 
 /* Mobile */
 #define BTN_MOBILE_UP Btn6U
@@ -23,7 +23,7 @@
 /* Macros */
 #define BTN_MACRO_SCAN Btn8U
 #define BTN_MACRO_STACK Btn8D
-#define BTN_MACRO_LOADER Btn8L
+#define BTN_MACRO_LOADER Btn7D
 #define BTN_MACRO_20 Btn8R
-#define JOY_ADJUST Ch2
-#define DZ_ADJUST 100
+#define BTN_MACRO_ADD Btn7U
+#define BTN_MACRO_SUB Btn7L
