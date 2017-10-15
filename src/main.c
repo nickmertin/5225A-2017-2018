@@ -59,7 +59,7 @@ void setDrive(word left, word right)
 
 void handleDrive()
 {
-	setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur);
+	setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur / 2, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur / 2);
 }
 
 void stack();
