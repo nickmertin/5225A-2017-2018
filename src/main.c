@@ -782,8 +782,13 @@ void handleMacros()
 		{
 			stopTask(stackAsync);
 			gMacros[stackAsync] = false;
+			writeDebugStreamLine("Stack cancelled");
 		}
-		else startTask(stackAsync);
+		else
+		{
+			startTask(stackAsync);
+			writeDebugStreamLine("Stacking");
+		}
 	}/*
 	if (RISING(BTN_MACRO_LOADER))
 	{
