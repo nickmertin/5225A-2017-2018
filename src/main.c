@@ -48,8 +48,6 @@
 sCycleData gMainCycle;
 int gNumCones = 0;
 
-//#define MOBILE_LIFT_SAFETY
-
 /* Drive */
 void setDrive(word left, word right)
 {
@@ -409,27 +407,20 @@ void setMobile(word power)
 
 void handleMobile()
 {
-#ifdef MOBILE_LIFT_SAFETY
-	if (gSensor[liftPoti].value > 2200)
+	if (RISING(BTN_MOBILE_UP))
 	{
-#endif
-		if (RISING(BTN_MOBILE_UP))
-		{
-			gMobileTarget = MOBILE_TOP;
-			gMobileState = mobileRaise;
-			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
-			setMobile(MOBILE_UP_POWER);
-		}
-		if (RISING(BTN_MOBILE_DOWN))
-		{
-			gMobileTarget = MOBILE_BOTTOM;
-			gMobileState = mobileLower;
-			gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
-			setMobile(MOBILE_DOWN_POWER);
-		}
-#ifdef MOBILE_LIFT_SAFETY
+		gMobileTarget = MOBILE_TOP;
+		gMobileState = mobileRaise;
+		gMobileHoldPower = MOBILE_UP_HOLD_POWER;
+		setMobile(MOBILE_UP_POWER);
 	}
-#endif
+	if (RISING(BTN_MOBILE_DOWN))
+	{
+		gMobileTarget = MOBILE_BOTTOM;
+		gMobileState = mobileLower;
+		gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
+		setMobile(MOBILE_DOWN_POWER);
+	}
 
 	switch (gMobileState)
 	{
