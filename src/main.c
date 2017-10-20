@@ -342,7 +342,9 @@ typedef enum _sClawStates {
 #define CLAW_OPEN_HOLD_POWER -5
 
 #define CLAW_OPEN 1100
-#define CLAW_CLOSE 800
+#define CLAW_CLOSE 850
+
+#define CLAW_TIMEOUT 1000
 
 sClawStates gClawState = clawIdle;
 unsigned long gClawStart;
@@ -378,12 +380,12 @@ void handleClaw()
 		}
 		case clawOpening:
 		{
-			if (gSensor[clawPoti].value >= CLAW_OPEN || nPgmTime - gClawStart > 1000) gClawState = clawOpened;
+			if (gSensor[clawPoti].value >= CLAW_OPEN && nPgmTime - gClawStart < CLAW_TIMEOUT) gClawState = clawOpened;
 			break;
 		}
 		case clawClosing:
 		{
-			if (gSensor[clawPoti].value <= CLAW_CLOSE || nPgmTime - gClawStart > 1000) gClawState = clawClosed;
+			if (gSensor[clawPoti].value <= CLAW_CLOSE && nPgmTime - gClawStart < CLAW_TIMEOUT) gClawState = clawClosed;
 			break;
 		}
 		case clawOpened:
@@ -586,7 +588,8 @@ void stack()
 	sleep(300);
 	setArm(-15);
 	setClaw(CLAW_CLOSE_POWER);
-	while (gSensor[clawPoti].value > CLAW_CLOSE) sleep(10);
+	time = nPgmTime;
+	while (gSensor[clawPoti].value > CLAW_CLOSE && nPgmTime - time < CLAW_TIMEOUT) sleep(10);
 	sleep(100);
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	writeDebugStreamLine("Grabbed %d", nPgmTime);
@@ -646,7 +649,8 @@ void stack()
 	else
 	{
 		setClaw(CLAW_OPEN_POWER);
-		while (gSensor[clawPoti].value < CLAW_OPEN) sleep(10);
+		time = nPgmTime;
+		while (gSensor[clawPoti].value < CLAW_OPEN && nPgmTime - time < CLAW_TIMEOUT) sleep(10);
 		writeDebugStreamLine("Released %d", nPgmTime);
 		setClaw(CLAW_OPEN_HOLD_POWER);
 		if (gNumCones < 3) sleep(200); // 300
