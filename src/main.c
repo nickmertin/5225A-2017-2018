@@ -203,6 +203,8 @@ typedef enum _sArmStates {
 	armIdle,
 	armManual,
 	armPlainPID,
+	armRaise,
+	armLower,
 	armHold,
 	armHorizontal
 } sArmStates;
@@ -214,7 +216,7 @@ typedef enum _sArmStates {
 #define ARM_TOP 2700
 #define ARM_BOTTOM 650
 
-short gArmPositions[] = { 630, 1300, 2700 };
+short gArmPositions[] = { 680, 1300, 2700 };
 word gArmHoldPower[] = { -12, 0, 5 };
 short gArmPosition = 2;
 short gArmTarget;
@@ -224,6 +226,7 @@ sPID gArmPID;
 
 void setArm(word power)
 {
+	writeDebugStreamLine("Arm %d %d", nPgmTime, power);
 	gMotor[arm].power = power;
 }
 
@@ -242,8 +245,8 @@ void handleArm()
 	}
 	if (RISING(BTN_ARM_TOGGLE))
 	{
+		gArmState = gArmTarget > gArmPositions[1] ? armLower : armRaise;
 		gArmTarget = gArmPositions[gArmTarget > gArmPositions[1] ? (gArmPosition = 0) : (gArmPosition = 2)];
-		gArmState = armPlainPID;
 		gArmStart = nPgmTime;
 	}
 
@@ -275,6 +278,26 @@ void handleArm()
 				pidCalculate(gArmPID, (float)gArmTarget, (float)value);
 				setArm((word)gArmPID.output);
 			}
+			break;
+		}
+		case armRaise:
+		{
+			if (gSensor[armPoti].value >= gArmTarget)
+			{
+				writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
+				gArmState = armHold;
+			}
+			else setArm(127);
+			break;
+		}
+		case armLower:
+		{
+			if (gSensor[armPoti].value <= gArmTarget)
+			{
+				writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
+				gArmState = armHold;
+			}
+			else setArm(-127);
 			break;
 		}
 		case armHold:
@@ -558,7 +581,9 @@ void stack()
 	startTask(trackLift);
 	gArmTarget = gArmPositions[gArmPosition = 0];
 	setArm(-127);
-	while (gSensor[armPoti].value > gArmTarget) sleep(10);
+	unsigned long time = nPgmTime;
+	while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
+	sleep(300);
 	setArm(-15);
 	setClaw(CLAW_CLOSE_POWER);
 	while (gSensor[clawPoti].value > CLAW_CLOSE) sleep(10);
@@ -640,6 +665,7 @@ void stack()
 		setLift(-127);
 		startTask(liftDownAsync);
 		while (gSensor[armPoti].value > gArmTarget + 400) sleep(10);
+		sleep(300);
 		setArm(-15);
 		while (!gLiftAsyncDone) sleep(10);
 		setLift(-10);
