@@ -13,12 +13,12 @@
 #pragma config(Sensor, dgtl7,  driveEncR,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl9,  latEnc,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl11, frontSonic,     sensorSONAR_mm)
-#pragma config(Motor,  port1,           arm,           tmotorVex393_HBridge, openLoop)
-#pragma config(Motor,  port2,           liftL1,        tmotorVex393HighSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port1,           mobile,        tmotorVex393HighSpeed_HBridge, openLoop)
+#pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           driveL1,       tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port4,           driveL2,       tmotorVex393HighSpeed_MC29, openLoop, reversed)
-#pragma config(Motor,  port5,           liftL2,        tmotorVex393HighSpeed_MC29, openLoop, reversed)
-#pragma config(Motor,  port6,           mobile,        tmotorVex393HighSpeed_MC29, openLoop)
+#pragma config(Motor,  port5,           claw,          tmotorVex393HighSpeed_MC29, openLoop)
+#pragma config(Motor,  port6,           arm,           tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port7,           driveR1,       tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           driveR2,       tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port9,           liftR,         tmotorVex393HighSpeed_MC29, openLoop)
@@ -88,7 +88,7 @@ unsigned long gLiftStart;
 
 void setLift(word power)
 {
-	gMotor[liftL1].power = gMotor[liftL2].power = gMotor[liftR].power = power;
+	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
 void handleLift()
