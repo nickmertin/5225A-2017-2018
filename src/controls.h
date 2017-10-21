@@ -19,6 +19,7 @@
 /* Mobile */
 #define BTN_MOBILE_UP Btn6U
 #define BTN_MOBILE_DOWN Btn6D
+#define BTN_MOBILE_20 Btn5D
 
 /* Macros */
 #define BTN_MACRO_SCAN Btn8U

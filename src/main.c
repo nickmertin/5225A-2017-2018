@@ -409,12 +409,13 @@ typedef enum _sMobileStates {
 	mobileIdle,
 	mobileRaise,
 	mobileLower,
-	mobileHold
+	mobileHold,
+	mobile20
 } sMobileStates;
 
 #define MOBILE_TOP 2950
 #define MOBILE_BOTTOM 600
-#define MOBILE_20 1000
+#define MOBILE_20 2200
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
@@ -424,6 +425,8 @@ typedef enum _sMobileStates {
 short gMobileTarget;
 word gMobileHoldPower;
 sMobileStates gMobileState = mobileIdle;
+sMobileStates gMobileNextState;
+unsigned long gMobileStart;
 
 void setMobile(word power)
 {
@@ -436,6 +439,7 @@ void handleMobile()
 	{
 		gMobileTarget = MOBILE_TOP;
 		gMobileState = mobileRaise;
+		gMobileNextState = mobileHold;
 		gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 		setMobile(MOBILE_UP_POWER);
 	}
@@ -443,7 +447,15 @@ void handleMobile()
 	{
 		gMobileTarget = MOBILE_BOTTOM;
 		gMobileState = mobileLower;
+		gMobileNextState = mobileHold;
 		gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
+		setMobile(MOBILE_DOWN_POWER);
+	}
+	if (RISING(BTN_MOBILE_20))
+	{
+		gMobileTarget = MOBILE_20;
+		gMobileState = mobileLower;
+		gMobileNextState = mobile20
 		setMobile(MOBILE_DOWN_POWER);
 	}
 
@@ -451,14 +463,19 @@ void handleMobile()
 	{
 		case mobileRaise:
 		{
-			if (gSensor[mobilePoti].value >= gMobileTarget) gMobileState = mobileHold;
+			if (gSensor[mobilePoti].value >= gMobileTarget)
+			{
+				gMobileState = gMobileNextState;
+				gMobileStart = nPgmTime;
+			}
 			break;
 		}
 		case mobileLower:
 		{
 			if (gSensor[mobilePoti].value <= gMobileTarget)
 			{
-				gMobileState = mobileHold;
+				gMobileState = gMobileNextState;
+				gMobileStart = nPgmTime;
 				gNumCones = 0;
 			}
 			break;
@@ -466,6 +483,11 @@ void handleMobile()
 		case mobileHold:
 		{
 			setMobile(gMobileHoldPower);
+			break;
+		}
+		case mobile20:
+		{
+			setMobile(nPgmTime - gMobileStart > 300 ? 10 : -5);
 			break;
 		}
 		case mobileIdle:
