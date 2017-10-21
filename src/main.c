@@ -218,10 +218,10 @@ typedef enum _sArmStates {
 #define ARM_DOWN_KP 0.25
 #define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
-#define ARM_TOP 2700
-#define ARM_BOTTOM 650
+#define ARM_TOP 2200
+#define ARM_BOTTOM 100
 
-short gArmPositions[] = { 680, 1300, 2700 };
+short gArmPositions[] = { 130, 750, 2050 };
 word gArmHoldPower[] = { -12, 0, 5 };
 short gArmPosition = 2;
 short gArmTarget;
@@ -549,8 +549,8 @@ task trackLift()
 }
 
 const int gStackPos[11] = { 0, 0, 0, -50, 200, 750, 1200, 1600, 2100, 2700, 3900 };
-const int gStackDownPos[11] = { 0, 0, 0, -70, 0, 400, 800, 1300, 1700, 2400, 3200 };
-const int gStackBackPos[11] = { 0, 0, 0, -50, 20, 500, 850, 1400, 1900, 2600, 0 };
+const int gStackDownPos[11] = { 0, 0, 0, -50, 20, 450, 850, 1350, 1750, 2450, 3400 };
+const int gStackBackPos[11] = { 0, 0, 0, -20, 40, 500, 900, 1450, 1900, 2600, 0 };
 const int gStackDelayPos[11] = { 0, 0, 0, 0, 50, 400, 550, 800, 1000, 1300, 2300 };
 const int gStackHoldPower[11] = {0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 20 };
 const int gScanPos[11] = {0, 0, 150, 320, 590, 780, 950, 1200, 1470, 1760, 2070 };
