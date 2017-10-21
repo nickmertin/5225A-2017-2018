@@ -342,7 +342,7 @@ typedef enum _sClawStates {
 #define CLAW_OPEN_HOLD_POWER -5
 
 #define CLAW_OPEN 1100
-#define CLAW_CLOSE 850
+#define CLAW_CLOSE 950
 
 #define CLAW_TIMEOUT 1000
 
