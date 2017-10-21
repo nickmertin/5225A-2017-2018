@@ -223,6 +223,7 @@ short gArmTarget;
 sArmStates gArmState = armIdle;
 unsigned long gArmStart;
 sPID gArmPID;
+sPID* gArmPIDInUse = &gArmPID;
 
 void setArm(word power)
 {
@@ -523,8 +524,8 @@ task armPID()
 {
 	while (true)
 	{
-		pidCalculate(gArmPID, (float)gArmPositions[1], (float)gSensor[armPoti].value);
-		setArm((word)gArmPID.output);
+		pidCalculate(*gArmPIDInUse, (float)gArmPositions[1], (float)gSensor[armPoti].value);
+		setArm((word)gArmPIDInUse->output + 10);
 		sleep(10);
 	}
 }
@@ -871,7 +872,7 @@ void startup()
 	gJoy[JOY_LIFT].deadzone = DZ_LIFT;
 	gJoy[JOY_ARM].deadzone = DZ_ARM;
 
-	pidInit(gArmPID, 0.2, 0.001, 0.0, 70, 150, 5, 127);
+	pidInit(gArmPID, 0.2, 0.001, 0.0, 50, 150, 5, 127);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
