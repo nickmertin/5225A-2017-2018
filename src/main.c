@@ -598,20 +598,10 @@ task scanStackAsync()
 	gMacros[scanStackAsync] = false;
 }
 
-void stack()
+void stackInternal()
 {
-	gLiftState = liftManaged;
-	gArmState = armManaged;
-	gClawState = clawManaged;
-	startTask(trackLift);
-	gArmTarget = gArmPositions[gArmPosition = 0];
-	setArm(-127);
-	unsigned long time = nPgmTime;
-	while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
-	sleep(300);
-	setArm(-15);
 	setClaw(CLAW_CLOSE_POWER);
-	time = nPgmTime;
+	unsigned long time = nPgmTime;
 	while (gSensor[clawPoti].value > CLAW_CLOSE && nPgmTime - time < CLAW_TIMEOUT) sleep(10);
 	sleep(100);
 	setClaw(CLAW_CLOSE_HOLD_POWER);
@@ -692,7 +682,7 @@ void stack()
 		setLift(-127);
 		startTask(liftDownAsync);
 		while (gSensor[armPoti].value > gArmTarget + 400) sleep(10);
-		sleep(300);
+		if (gNumCones <= 3) sleep(300);
 		setArm(-15);
 		while (!gLiftAsyncDone) sleep(10);
 		setLift(-10);
@@ -702,6 +692,20 @@ void stack()
 	}
 	gLiftState = liftHold;
 	gArmState = armHold;
+}
+
+void stack()
+{
+	gLiftState = liftManaged;
+	gArmState = armManaged;
+	gClawState = clawManaged;
+	startTask(trackLift);
+	gArmTarget = gArmPositions[gArmPosition = 0];
+	setArm(-127);
+	unsigned long time = nPgmTime;
+	while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
+	setArm(-15);
+	stackInternal();
 }
 
 task stackAsync()
@@ -715,19 +719,32 @@ void stackFromLoader()
 {
 	gArmState = armManaged;
 	gClawState = clawManaged;
-	gArmTarget = gArmPositions[gArmPosition = 1];
-	pidReset(gArmPID);
+
+	sPID pid;
+	pidInit(pid, 0.2, 0, 0.001, -1, -1, 5, 25);
+
+	setClaw(CLAW_OPEN_HOLD_POWER);
+	gArmTarget = 1950;
+	if (gSensor[armPoti].value > gArmTarget)
+	{
+		setArm(-60);
+		while (gSensor[armPoti].value > gArmTarget + 40) sleep(10);
+	}
+	else
+	{
+		setArm(60);
+		while (gSensor[armPoti].value < gArmTarget - 40) sleep(10);
+	}
+	gArmPIDInUse = &pid;
 	startTask(armPID);
-	setClaw(CLAW_OPEN_POWER);
-	while (abs(gSensor[armPoti].value - gArmTarget) > 20) sleep(10);
 	writeDebugStreamLine("Arm at horizontal %d %d", nPgmTime, gSensor[armPoti].value);
-	sleep(100);
-	setClaw(CLAW_CLOSE_POWER);
-	while (gSensor[clawPoti].value > CLAW_CLOSE) sleep(10);
-	setClaw(CLAW_CLOSE_HOLD_POWER);
-	writeDebugStreamLine("Grabbed cone %d", nPgmTime);
-	sleep(100);
-	stack();
+	sleep(20000);
+	//stackInternal();
+
+	stopTask(armPID);
+	gArmPIDInUse = &gArmPID;
+	pidReset(gArmPID);
+	gArmState = armPlainPID;
 }
 
 task stackFromLoaderAsync()
@@ -811,8 +828,9 @@ void handleMacros()
 		{
 			startTask(stackAsync);
 			writeDebugStreamLine("Stacking");
+			playSound(soundUpwardTones);
 		}
-	}/*
+	}
 	if (RISING(BTN_MACRO_LOADER))
 	{
 		if (gMacros[stackFromLoaderAsync])
@@ -821,7 +839,7 @@ void handleMacros()
 			gMacros[stackFromLoaderAsync] = false;
 		}
 		else startTask(stackFromLoaderAsync);
-	}*/
+	}
 	//if (RISING(JOY_ADJUST))
 	//{
 	//	if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
