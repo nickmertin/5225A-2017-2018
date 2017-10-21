@@ -193,6 +193,11 @@ void handleLift()
 				setLift(12);
 			break;
 		}
+		case liftIdle:
+		{
+			setLift(0);
+			break;
+		}
 	}
 }
 
