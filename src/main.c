@@ -232,7 +232,7 @@ sPID* gArmPIDInUse = &gArmPID;
 
 void setArm(word power)
 {
-	writeDebugStreamLine("Arm %d %d", nPgmTime, power);
+	//writeDebugStreamLine("Arm %d %d", nPgmTime, power);
 	gMotor[arm].power = power;
 }
 
@@ -557,6 +557,8 @@ const int gScanPos[11] = {0, 0, 150, 320, 590, 780, 950, 1200, 1470, 1760, 2070 
 
 bool gMacros[20] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 
+bool gLoaderReady = false;
+
 void scanStack()
 {
 	gLiftState = liftManaged;
@@ -603,7 +605,7 @@ task scanStackAsync()
 	gMacros[scanStackAsync] = false;
 }
 
-void stackInternal()
+void stackInternal(bool loader)
 {
 	setClaw(CLAW_CLOSE_POWER);
 	unsigned long time = nPgmTime;
@@ -612,12 +614,12 @@ void stackInternal()
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	writeDebugStreamLine("Grabbed %d", nPgmTime);
 	setArm(127);
-	while (gSensor[armPoti].value < 850) sleep(10);
+	while (gSensor[armPoti].value < 300) sleep(10);
 	if (gNumCones >= 2)
 	{
 		gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
 		gLiftAsyncDone = false;
-		setLift(gNumCones == 2 ? 60 : 127);
+		setLift(gNumCones == 2 ? 90 : 127);
 		startTask(liftUpAsync);
 		if (gNumCones >= 5)
 		{
@@ -629,7 +631,7 @@ void stackInternal()
 	gArmTarget = gArmPositions[gArmPosition = 2];
 	if (gNumCones < 3)
 	{
-		while (gSensor[armPoti].value < 2100) sleep(10);
+		while (gSensor[armPoti].value < 1550) sleep(10);
 		writeDebugStreamLine("Braking %d", nPgmTime);
 		setArm(-7);
 		sleep(100);
@@ -681,22 +683,24 @@ void stackInternal()
 		++gNumCones;
 		gArmTarget = gArmPositions[gArmPosition = 0];
 		setArm(-127);
-		while (gSensor[armPoti].value > 1800) sleep(10);
+		while (gSensor[armPoti].value > 1100) sleep(10);
+		if (loader) setArm(10);
 		gLiftTarget = LIFT_BOTTOM;
 		gLiftAsyncDone = false;
 		setLift(-127);
 		startTask(liftDownAsync);
-		while (gSensor[armPoti].value > gArmTarget + 400) sleep(10);
-		if (gNumCones <= 3) sleep(300);
-		setArm(-15);
+		if (!loader)
+		{
+			while (gSensor[armPoti].value > gArmTarget + 400) sleep(10);
+			if (gNumCones <= 3) sleep(300);
+			setArm(-15);
+		}
 		while (!gLiftAsyncDone) sleep(10);
-		setLift(-10);
+		if (loader) gLoaderReady = true;
+		else setLift(-10);
 		writeDebugStreamLine("Done %d %d", nPgmTime, gMaxLiftHeight);
 		stopTask(trackLift);
-		gClawState = clawOpened;
 	}
-	gLiftState = liftHold;
-	gArmState = armHold;
 }
 
 void stack()
@@ -710,7 +714,10 @@ void stack()
 	unsigned long time = nPgmTime;
 	while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
 	setArm(-15);
-	stackInternal();
+	stackInternal(false);
+	gLiftState = liftHold;
+	gArmState = armHold;
+	if (gClawState == clawManaged) gClawState = clawOpened;
 }
 
 task stackAsync()
@@ -720,36 +727,58 @@ task stackAsync()
 	gMacros[stackAsync] = false;
 }
 
+bool gContinueLoader = false;
+
 void stackFromLoader()
 {
+	gLiftState = liftManaged;
 	gArmState = armManaged;
 	gClawState = clawManaged;
-
-	sPID pid;
-	pidInit(pid, 0.2, 0, 0.001, -1, -1, 5, 25);
-
+	setLift(-10);
+	setClaw(CLAW_OPEN_POWER);
+	while (gSensor[clawPoti].value < CLAW_OPEN) sleep(10);
 	setClaw(CLAW_OPEN_HOLD_POWER);
-	gArmTarget = 1950;
-	if (gSensor[armPoti].value > gArmTarget)
+	if (!gLoaderReady)
 	{
-		setArm(-60);
-		while (gSensor[armPoti].value > gArmTarget + 40) sleep(10);
+		gArmTarget = 1950;
+		setArm(127);
+		while (gSensor[armPoti].value < gArmTarget) sleep(10);
+		setArm(10);
+		while (!gContinueLoader) sleep(10);
+		gContinueLoader = false;
+		setArm(-80);
 	}
 	else
 	{
-		setArm(60);
-		while (gSensor[armPoti].value < gArmTarget - 40) sleep(10);
+		gLoaderReady = false;
+		setArm(-50);
 	}
-	gArmPIDInUse = &pid;
-	startTask(armPID);
-	writeDebugStreamLine("Arm at horizontal %d %d", nPgmTime, gSensor[armPoti].value);
-	sleep(20000);
-	//stackInternal();
-
-	stopTask(armPID);
-	gArmPIDInUse = &gArmPID;
-	pidReset(gArmPID);
-	gArmState = armPlainPID;
+	//sleep(20000);
+	while (gNumCones < 11)
+	{
+		//while (true)
+		//{
+		//	velocityCheck(armPoti);
+		//	if (gSensor[armPoti].velGood && gSensor[armPoti].velocity >= -0.05) break;
+		//	sleep(10);
+		//}
+		while (gSensor[armPoti].value > 1340) sleep(10);
+		sleep(10);
+		//setArm(-15);
+		//sleep(150);
+		//setClaw(CLAW_CLOSE_POWER);
+		//sleep(500);
+		//setClaw(CLAW_CLOSE_HOLD_POWER);
+		//goto end;
+		stackInternal(true);
+		setLift(-10);
+		setArm(-50);
+	}
+	setArm(0);
+	end:
+	gLiftState = liftHold;
+	gArmState = armHold;
+	if (gClawState == clawManaged) gClawState = clawOpened;
 }
 
 task stackFromLoaderAsync()
@@ -827,6 +856,9 @@ void handleMacros()
 		{
 			stopTask(stackAsync);
 			gMacros[stackAsync] = false;
+			gLiftState = liftIdle;
+			gArmState = armIdle;
+			gClawState = clawIdle;
 			writeDebugStreamLine("Stack cancelled");
 		}
 		else
@@ -838,13 +870,18 @@ void handleMacros()
 	}
 	if (RISING(BTN_MACRO_LOADER))
 	{
+		gContinueLoader = false;
 		if (gMacros[stackFromLoaderAsync])
 		{
 			stopTask(stackFromLoaderAsync);
 			gMacros[stackFromLoaderAsync] = false;
+			gLiftState = liftIdle;
+			gArmState = armIdle;
+			gClawState = clawIdle;
 		}
 		else startTask(stackFromLoaderAsync);
 	}
+	if (FALLING(BTN_MACRO_LOADER)) gContinueLoader = true;
 	//if (RISING(JOY_ADJUST))
 	//{
 	//	if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
