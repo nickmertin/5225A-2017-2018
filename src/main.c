@@ -740,12 +740,15 @@ void stack()
 	gClawState = clawManaged;
 	startTask(trackLift);
 	setLift(-10);
-	gArmPosition = 0;
-	gArmTarget = gArmPositions[gArmPosition];
-	setArm(-127);
-	unsigned long time = nPgmTime;
-	while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
-	setArm(-15);
+	if (gSensor[armPoti].value < gArmPositions[1])
+	{
+		gArmPosition = 0;
+		gArmTarget = gArmPositions[gArmPosition];
+		setArm(-127);
+		unsigned long time = nPgmTime;
+		while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
+		setArm(-15);
+	}
 	stackInternal(false);
 	gLiftState = liftHold;
 	gArmState = armHold;
