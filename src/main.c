@@ -353,7 +353,7 @@ typedef enum _sClawStates {
 #define CLAW_CLOSE_HOLD_POWER 15
 #define CLAW_OPEN_HOLD_POWER -5
 
-#define CLAW_OPEN 1100
+#define CLAW_OPEN 1200
 #define CLAW_CLOSE 900
 
 #define CLAW_TIMEOUT 1000
@@ -568,7 +568,7 @@ task trackLift()
 	}
 }
 
-const int gStackPos[11] = { 0, 0, 0, -100, 200, 750, 1200, 1600, 2100, 2700, 3900 };
+const int gStackPos[11] = { 0, 0, 0, -100, 200, 750, 1200, 1700, 2100, 2700, 3900 };
 const int gStackDownPos[11] = { 0, 0, 0, -100, 20, 450, 850, 1350, 1750, 2450, 3400 };
 const int gStackBackPos[11] = { 0, 0, 0, -100, 40, 500, 900, 1450, 1900, 2600, 0 };
 const int gStackDelayPos[11] = { 0, 0, 0, 0, 50, 400, 550, 800, 1000, 1300, 2300 };
