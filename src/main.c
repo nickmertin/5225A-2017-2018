@@ -56,6 +56,7 @@ void setDrive(word left, word right)
 
 void handleDrive()
 {
+	gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, 10);
 	setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur / 2, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur / 2);
 }
 
