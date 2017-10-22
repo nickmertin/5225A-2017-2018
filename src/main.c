@@ -641,10 +641,11 @@ void stackInternal(bool loader)
 	gArmTarget = gArmPositions[gArmPosition];
 	if (gNumCones < 3)
 	{
-		while (gSensor[armPoti].value < 1550) sleep(10);
+		while (gSensor[armPoti].value < 1300) sleep(10);
 		writeDebugStreamLine("Braking %d", nPgmTime);
-		setArm(-7);
-		sleep(100);
+		setArm(-5);
+		sleep(150);
+		writeDebugStreamLine("Done braking %d %d", nPgmTime, gSensor[armPoti].value);
 		setArm(20);
 	}
 	//else
@@ -696,7 +697,7 @@ void stackInternal(bool loader)
 		setArm(-127);
 		while (gSensor[armPoti].value > 1100) sleep(10);
 		if (loader) setArm(10);
-		gLiftTarget = LIFT_BOTTOM;
+		gLiftTarget = 0;
 		gLiftAsyncDone = false;
 		setLift(-127);
 		startTask(liftDownAsync);
@@ -720,6 +721,7 @@ void stack()
 	gArmState = armManaged;
 	gClawState = clawManaged;
 	startTask(trackLift);
+	setLift(-10);
 	gArmPosition = 0;
 	gArmTarget = gArmPositions[gArmPosition];
 	setArm(-127);
