@@ -421,12 +421,14 @@ typedef enum _sMobileStates {
 	mobileRaise,
 	mobileLower,
 	mobileHold,
-	mobile20
+	mobile20,
+	mobile10
 } sMobileStates;
 
 #define MOBILE_TOP 2950
 #define MOBILE_BOTTOM 600
 #define MOBILE_20 2200
+#define MOBILE_10 1200
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
@@ -469,6 +471,13 @@ void handleMobile()
 		gMobileNextState = mobile20;
 		setMobile(MOBILE_DOWN_POWER);
 	}
+	if (RISING(BTN_MOBILE_10))
+	{
+		gMobileTarget = MOBILE_10;
+		gMobileState = mobileRaise;
+		gMobileNextState = mobile10;
+		setMobile(MOBILE_UP_POWER);
+	}
 
 	switch (gMobileState)
 	{
@@ -499,6 +508,11 @@ void handleMobile()
 		case mobile20:
 		{
 			setMobile(nPgmTime - gMobileStart > 300 ? 10 : -5);
+			break;
+		}
+		case mobile10:
+		{
+			setMobile(15);
 			break;
 		}
 		case mobileIdle:
