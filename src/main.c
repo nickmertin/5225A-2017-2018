@@ -836,31 +836,33 @@ void alignAndScore20()
 	}
 	sleep(100);
 	setDrive(127, 127);
-	int initial = gSensor[driveEncL].value;
-	while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P1) sleep(10);
-	gMobileState = mobileManaged;
-	setMobile(MOBILE_DOWN_POWER);
-	while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P2)
-	{
-		if (gSensor[mobilePoti].value < MOBILE_20) setMobile(12);
-		sleep(10);
-	}
+	//int initial = gSensor[driveEncL].value;
+	//while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P1) sleep(10);
+	//gMobileState = mobileManaged;
+	//setMobile(MOBILE_DOWN_POWER);
+	//while (gSensor[driveEncL].value < initial + OFFSET_20_ZONE_P2)
+	//{
+	//	if (gSensor[mobilePoti].value < MOBILE_20) setMobile(12);
+	//	sleep(10);
+	//}
+	sleep(500);
 	setDrive(-10, -10);
-	while (gSensor[mobilePoti].value >= MOBILE_20) sleep(10);
-	setMobile(12);
+	//while (gSensor[mobilePoti].value >= MOBILE_20) sleep(10);
+	//setMobile(12);
 	sleep(200);
 	setDrive(-127, -127);
-	setMobile(MOBILE_DOWN_POWER);
-	while (gSensor[driveEncL].value > initial)
-	{
-		if (gSensor[mobilePoti].value <= gMobileTarget) setMobile(MOBILE_DOWN_HOLD_POWER);
-		sleep(10);
-	}
+	//setMobile(MOBILE_DOWN_POWER);
+	//while (gSensor[driveEncL].value > initial)
+	//{
+	//	if (gSensor[mobilePoti].value <= gMobileTarget) setMobile(MOBILE_DOWN_HOLD_POWER);
+	//	sleep(10);
+	//}
+	sleep(500);
 	setDrive(0, 0);
-	while (gSensor[mobilePoti].value > gMobileTarget) sleep(10);
-	gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
-	setMobile(gMobileHoldPower);
-	gMobileState = mobileHold;
+	//while (gSensor[mobilePoti].value > gMobileTarget) sleep(10);
+	//gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
+	//setMobile(gMobileHoldPower);
+	//gMobileState = mobileHold;
 }
 
 task alignAndScore20Async()
