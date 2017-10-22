@@ -252,7 +252,13 @@ void handleArm()
 	if (RISING(BTN_ARM_TOGGLE))
 	{
 		gArmState = gArmTarget > gArmPositions[1] ? armLower : armRaise;
-		gArmTarget = gArmPositions[gArmTarget > gArmPositions[1] ? (gArmPosition = 0) : (gArmPosition = 2)];
+
+    if( gArmTarget > gArmPositions[1] )
+		  gArmPosition = 0;
+			else
+			gArmPosition = 2;
+
+		gArmTarget = gArmPositions[gArmPosition];
 		gArmStart = nPgmTime;
 	}
 
@@ -461,7 +467,7 @@ void handleMobile()
 	{
 		gMobileTarget = MOBILE_20;
 		gMobileState = mobileLower;
-		gMobileNextState = mobile20
+		gMobileNextState = mobile20;
 		setMobile(MOBILE_DOWN_POWER);
 	}
 
@@ -563,7 +569,8 @@ void scanStack()
 {
 	gLiftState = liftManaged;
 	gArmState = armManaged;
-	gArmPosition = gArmPositions[gArmPosition = 1];
+	gArmPosition = 1;
+	gArmPosition = gArmPositions[gArmPosition];
 	pidReset(gArmPID);
 	startTask(armPID);
 	while (abs(gSensor[armPoti].value - gArmTarget) > 20) sleep(10);
@@ -628,7 +635,8 @@ void stackInternal(bool loader)
 			setArm(127);
 		}
 	}
-	gArmTarget = gArmPositions[gArmPosition = 2];
+	gArmPosition = 2;
+	gArmTarget = gArmPositions[gArmPosition];
 	if (gNumCones < 3)
 	{
 		while (gSensor[armPoti].value < 1550) sleep(10);
@@ -661,7 +669,7 @@ void stackInternal(bool loader)
 	}
 	if (gNumCones == 10)
 	{
-		gNumCones = 11
+		gNumCones = 11;
 		setLift(-15);
 		sleep(500);
 		gClawState = clawClosed;
@@ -681,7 +689,8 @@ void stackInternal(bool loader)
 			setLift(0);
 		}
 		++gNumCones;
-		gArmTarget = gArmPositions[gArmPosition = 0];
+		gArmPosition = 0;
+		gArmTarget = gArmPositions[gArmPosition];
 		setArm(-127);
 		while (gSensor[armPoti].value > 1100) sleep(10);
 		if (loader) setArm(10);
@@ -709,7 +718,8 @@ void stack()
 	gArmState = armManaged;
 	gClawState = clawManaged;
 	startTask(trackLift);
-	gArmTarget = gArmPositions[gArmPosition = 0];
+	gArmPosition = 0;
+	gArmTarget = gArmPositions[gArmPosition];
 	setArm(-127);
 	unsigned long time = nPgmTime;
 	while (gSensor[armPoti].value > gArmTarget && nPgmTime - time < 1000) sleep(10);
@@ -823,7 +833,8 @@ void alignAndScore20()
 	}
 	setDrive(0, 0);
 	while (gSensor[mobilePoti].value > gMobileTarget) sleep(10);
-	setMobile(gMobileHoldPower = MOBILE_DOWN_HOLD_POWER);
+	gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
+	setMobile(gMobileHoldPower);
 	gMobileState = mobileHold;
 }
 
