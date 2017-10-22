@@ -334,6 +334,11 @@ void handleArm()
 			else setArm(127);
 			break;
 		}
+		case armIdle:
+		{
+			setArm(0);
+			break;
+		}
 	}
 }
 
