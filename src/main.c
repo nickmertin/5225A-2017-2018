@@ -895,23 +895,20 @@ void handleMacros()
 		}
 		else startTask(alignAndScore20Async);
 	}*/
-	if (RISING(BTN_MACRO_STACK) && gNumCones < 11)
+	if (RISING(BTN_MACRO_STACK) && gNumCones < 11 && !gMacros[stackAsync])
 	{
-		if (gMacros[stackAsync])
-		{
-			stopTask(stackAsync);
-			gMacros[stackAsync] = false;
-			gLiftState = liftIdle;
-			gArmState = armIdle;
-			gClawState = clawIdle;
-			writeDebugStreamLine("Stack cancelled");
-		}
-		else
-		{
-			startTask(stackAsync);
-			writeDebugStreamLine("Stacking");
-			playSound(soundUpwardTones);
-		}
+		startTask(stackAsync);
+		writeDebugStreamLine("Stacking");
+		playSound(soundUpwardTones);
+	}
+	if (RISING(BTN_MACRO_STACK_CANCEL) && gMacros[stackAsync])
+	{
+		stopTask(stackAsync);
+		gMacros[stackAsync] = false;
+		gLiftState = liftIdle;
+		gArmState = armIdle;
+		gClawState = clawIdle;
+		writeDebugStreamLine("Stack cancelled");
 	}
 	if (RISING(BTN_MACRO_LOADER))
 	{

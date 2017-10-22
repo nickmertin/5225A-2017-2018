@@ -26,6 +26,7 @@
 #define BTN_MACRO_SCAN Btn8U
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
-#define BTN_MACRO_20 Btn8R
+//#define BTN_MACRO_20 Btn8R
+#define BTN_MACRO_STACK_CANCEL Btn8R
 #define BTN_MACRO_ADD Btn7U
 #define BTN_MACRO_SUB Btn7L
