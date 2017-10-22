@@ -574,10 +574,10 @@ task trackLift()
 	}
 }
 
-const int gStackPos[11] = { 0, 0, 0, -100, 200, 750, 1200, 1700, 2100, 2700, 3900 };
+const int gStackPos[11] = { 0, 0, 0, -100, 200, 750, 1300, 1700, 2100, 2900, 3900 };
 const int gStackDownPos[11] = { 0, 0, 0, -100, 20, 450, 850, 1350, 1750, 2450, 3400 };
 const int gStackBackPos[11] = { 0, 0, 0, -100, 40, 500, 900, 1450, 1900, 2600, 0 };
-const int gStackDelayPos[11] = { 0, 0, 0, 0, 50, 400, 550, 800, 1000, 1300, 2300 };
+const int gStackDelayPos[11] = { 0, 0, 0, 0, 50, 400, 600, 800, 1000, 1500, 2300 };
 const int gStackHoldPower[11] = {0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 20 };
 const int gScanPos[11] = {0, 0, 150, 320, 590, 780, 950, 1200, 1470, 1760, 2070 };
 
