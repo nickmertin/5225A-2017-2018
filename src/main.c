@@ -222,7 +222,7 @@ typedef enum _sArmStates {
 #define ARM_BOTTOM 100
 
 short gArmPositions[] = { 130, 750, 2050 };
-word gArmHoldPower[] = { -12, 0, 5 };
+word gArmHoldPower[] = { -12, 0, 10 };
 short gArmPosition = 2;
 short gArmTarget;
 sArmStates gArmState = armIdle;
@@ -354,7 +354,7 @@ typedef enum _sClawStates {
 #define CLAW_OPEN_HOLD_POWER -5
 
 #define CLAW_OPEN 1100
-#define CLAW_CLOSE 950
+#define CLAW_CLOSE 900
 
 #define CLAW_TIMEOUT 1000
 
