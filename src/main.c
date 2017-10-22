@@ -669,7 +669,8 @@ void stackInternal(bool loader)
 		setLift(gNumCones == 2 ? -20 : -127);
 		while (gSensor[liftPoti].value > LIFT_BOTTOM + gStackDownPos[gNumCones]) sleep(10);
 		setLift(gStackHoldPower[gNumCones]);
-		if (gNumCones == 3) sleep(150);
+		if (gNumCones == 2) sleep(300);
+		else if (gNumCones == 3) sleep(150);
 		writeDebugStreamLine("Settled %d", nPgmTime);
 	}
 	if (gNumCones == 10)
