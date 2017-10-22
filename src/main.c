@@ -718,9 +718,9 @@ void stackInternal(bool loader)
 		++gNumCones;
 		gArmPosition = 0;
 		gArmTarget = gArmPositions[gArmPosition];
-		setArm(-127);
-		while (gSensor[armPoti].value > 1100) sleep(10);
-		if (loader) setArm(10);
+		setArm(loader ? -70 : -127);
+		while (gSensor[armPoti].value > 1300) sleep(10);
+		if (loader) setArm(15);
 		gLiftTarget = 0;
 		gLiftAsyncDone = false;
 		setLift(-127);
@@ -803,8 +803,9 @@ void stackFromLoader()
 		//	if (gSensor[armPoti].velGood && gSensor[armPoti].velocity >= -0.05) break;
 		//	sleep(10);
 		//}
+		writeDebugStreamLine("Arm down for loader %d", nPgmTime);
 		while (gSensor[armPoti].value > 1340) sleep(10);
-		sleep(10);
+		writeDebugStreamLine("Ready for loader %d", nPgmTime);
 		//setArm(-15);
 		//sleep(150);
 		//setClaw(CLAW_CLOSE_POWER);
@@ -922,10 +923,15 @@ void handleMacros()
 			gLiftState = liftIdle;
 			gArmState = armIdle;
 			gClawState = clawIdle;
+			writeDebugStreamLine("Stack from loader cancelled");
 		}
-		else startTask(stackFromLoaderAsync);
+		else
+		{
+			startTask(stackFromLoaderAsync);
+			writeDebugStreamLine("Stacking from loader");
+		}
 	}
-	if (FALLING(BTN_MACRO_LOADER)) gContinueLoader = true;
+	if (FALLING(BTN_MACRO_LOADER) && gMacros[stackFromLoaderAsync]) gContinueLoader = true;
 	//if (RISING(JOY_ADJUST))
 	//{
 	//	if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
