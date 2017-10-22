@@ -561,9 +561,7 @@ const int gStackDelayPos[11] = { 0, 0, 0, 0, 50, 400, 550, 800, 1000, 1300, 2300
 const int gStackHoldPower[11] = {0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 20 };
 const int gScanPos[11] = {0, 0, 150, 320, 590, 780, 950, 1200, 1470, 1760, 2070 };
 
-bool gMacros[20] = { false, false, false, false, false, false, false,
-	                   false, false, false, false, false, false, false,
-	                   false, false, false, false, false, false };
+bool gMacros[20] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 
 bool gLoaderReady = false;
 
@@ -624,7 +622,7 @@ void stackInternal(bool loader)
 	writeDebugStreamLine("Grabbed %d", nPgmTime);
 	setArm(127);
 	while (gSensor[armPoti].value < 300) sleep(10);
-	if (gNumCones >= 3)
+	if (gNumCones >= 2)
 	{
 		gLiftTarget = LIFT_BOTTOM + gStackPos[gNumCones];
 		gLiftAsyncDone = false;
@@ -656,7 +654,7 @@ void stackInternal(bool loader)
 	//}
 	while (gSensor[armPoti].value < gArmTarget) sleep(10);
 	setArm(15);
-	if (gNumCones >= 3) while (!gLiftAsyncDone) sleep(10);
+	if (gNumCones >= 2) while (!gLiftAsyncDone) sleep(10);
 	writeDebugStreamLine("Raised %d %d", nPgmTime, gSensor[armPoti].value);
 	if (gNumCones < 3)
 	{
