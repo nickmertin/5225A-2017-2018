@@ -1,28 +1,13 @@
 /* Functions */
-void setupSensors()
+bool correctBtnIn(tSensors sen)
 {
-	// Clear both sensor arrays
-	memset(_sensorValue, 0, sizeof(_sensorValue));
-	memset(_sensorLstValue, 0, sizeof(_sensorLstValue));
-
-	// Setup the pointers for the sensor values and set the base type
-	for (ubyte i = 0; i < kNumbOfTotalSensors; ++i)
-	{
-		gSensor[i].cls = checkSenClass(i);
-		gSensor[i].value = &_sensorValue[i];
-		gSensor[i].lstValue = &_sensorLstValue[i];
-		gSensor[i].port = (tSensors)i;
-
-		gSensor[i].velocityLst = 0;
-		gSensor[i].velocity = 0;
-		gSensor[i].valueVelLst = 0;
-		gSensor[i].timeVelCheck = 0;
-	}
+	int value = SensorValue[sen];
+	return value >= gSensor[sen].dgtMin && value <= gSensor[sen].dgtMax;
 }
 
 void updateSensorOutput(tSensors sen)
 {
-	SensorValue[sen] = *gSensor[sen].value;
+	SensorValue[sen] = gSensor[sen].lstValue = gSensor[sen].value;
 }
 
 void updateSensorOutputs()
@@ -36,18 +21,12 @@ void updateSensorOutputs()
 
 void updateSensorInput(tSensors sen)
 {
-	switch (gSensor[sen].mode)
-	{
-		case snmdNormal:
-			*gSensor[sen].value = SensorValue[sen];
-			break;
-		case snmdDgtIn:
-			*gSensor[sen].value = correctBtnIn(sen);
-			break;
-		case snmdFiltered:
-			*gSensor[sen].value = round(filterSensor(sen));
-			break;
-	}
+	gSensor[sen].lstValue = gSensor[sen].value;
+
+	if (gSensor[sen].mode == snmdDgtIn)
+		gSensor[sen].value = correctBtnIn(sen);
+	else
+		gSensor[sen].value = SensorValue[sen];
 }
 
 void updateSensorInputs()
@@ -57,16 +36,6 @@ void updateSensorInputs()
 		if (gSensor[i].cls == snclsInput)
 			updateSensorInput(i);
 	}
-}
-
-void updateSensorLst(tSensors sen)
-{
-	*gSensor[sen].lstValue = *gSensor[sen].value;
-}
-
-void updateSensorsLst()
-{
-	memcpy(_sensorLstValue, _sensorValue, sizeof(_sensorLstValue));
 }
 
 tSensorClass checkSenClass(tSensors sen)
@@ -79,74 +48,50 @@ tSensorClass checkSenClass(tSensors sen)
 		return snclsInput;
 }
 
-bool correctBtnIn(tSensors sen)
-{
-	return SensorValue[sen] <= 150;
-}
-
-float filterSensor(tSensors sen)
-{
-	float values[11];
-	sSensor& s = gSensor[sen];
-	for (int i = 0; i < 10; ++i)
-	{
-		values[i] = s.rawData[i];
-		if (i)
-			s.rawData[i] = s.rawData[i - 1];
-	}
-	values[10] = (float)(s.rawData[0] = SensorValue[sen]);
-	return stdDevFilteredMean(values, 11, s.filterLeniency);
-}
-
-void setupDgtIn(tSensors sen)
+void setupDgtIn(tSensors sen, int min, int max)
 {
 	gSensor[sen].mode = snmdDgtIn;
-}
-
-void setupFilteredSensor(tSensors sen, float leniency)
-{
-	gSensor[sen].mode = snmdFiltered;
-	gSensor[sen].filterLeniency = leniency;
-
-	for (int i = 0; i < 10; ++i)
-		gSensor[sen].rawData[i] = 0;
+	gSensor[sen].dgtMin = min;
+	gSensor[sen].dgtMax = max;
 }
 
 void resetQuadratureEncoder(tSensors sen)
 {
-	gSensor[sen].valueVelLst -= *gSensor[sen].value;
-	*gSensor[sen].value = 0;
+	gSensor[sen].value = 0;
 	SensorValue[sen] = 0;
 }
 
 bool safetyCheck(tSensors sen, unsigned long failedTime, float failedVal, unsigned long safetyMovingTime)
 {
 	unsigned long curTime = nPgmTime;
-	if (curTime - gSensor[sen].failedCheckTime == 0) return gSensor[sen].failed && nPgmTime - gSensor[sen].failedStartTime >= failedTime;
-	int senVal = *gSensor[sen].value;
-	float val = abs((float)(senVal - gSensor[sen].safetyVal) / (float)(curTime - gSensor[sen].failedCheckTime));
-	gSensor[sen].failedCheckTime = curTime;
-	if (val < failedVal && curTime - gSensor[sen].safetyStartTime > safetyMovingTime)
+	hogCPU();
+	if (curTime - gSensor[sen].failedCheckTime > 0)
 	{
-		if (!gSensor[sen].failed)
+		if (curTime - gSensor[sen].failedCheckTime == 0) return gSensor[sen].failed && curTime - gSensor[sen].failedStartTime >= failedTime;
+		int senVal = gSensor[sen].value;
+		float val = abs((float)(senVal - gSensor[sen].safetyVal) / (float)(curTime - gSensor[sen].failedCheckTime));
+		gSensor[sen].failedCheckTime = nPgmTime;
+		if (val < failedVal && curTime - gSensor[sen].safetyStartTime > safetyMovingTime)
 		{
-			gSensor[sen].failed = true;
-			gSensor[sen].failedStartTime = curTime;
+			if (!gSensor[sen].failed)
+			{
+				gSensor[sen].failed = true;
+				gSensor[sen].failedStartTime = curTime;
+			}
 		}
+		else
+			gSensor[sen].failed = false;
+		gSensor[sen].safetyVal = senVal;
 	}
-	else
-		gSensor[sen].failed = false;
-	gSensor[sen].safetyVal = senVal;
-	return gSensor[sen].failed && nPgmTime - gSensor[sen].failedStartTime >= failedTime;
+	releaseCPU();
+	return gSensor[sen].failed && curTime - gSensor[sen].failedStartTime >= failedTime;
 }
 
 void safetyClear(tSensors sen)
 {
 	gSensor[sen].failed = false;
-	gSensor[sen].safetyVal = *gSensor[sen].value;
-	unsigned long time = nPgmTime;
-	gSensor[sen].failedCheckTime = time;
-	gSensor[sen].safetyStartTime = time;
+	gSensor[sen].failedCheckTime = nPgmTime;
+	gSensor[sen].safetyStartTime = nPgmTime;
 }
 
 void safetySet(tSensors sen)
@@ -162,19 +107,51 @@ void safetySet(tSensors sen)
 void velocityCheck(tSensors sen)
 {
 	unsigned long time = nPgmTime;
-	if (time - gSensor[sen].timeVelCheck >= 40)
+	if (time - gSensor[sen].timeVelCheck >= 20)
 	{
-		int sensor = *gSensor[sen].value;
-		gSensor[sen].velocityLst = gSensor[sen].velocity;
+		int sensor = gSensor[sen].value;
+		gSensor[sen].lstVelocity = gSensor[sen].velocity;
 		gSensor[sen].velocity = (float)(sensor - gSensor[sen].valueVelLst) / (float)(time - gSensor[sen].timeVelCheck);
 		gSensor[sen].valueVelLst = sensor;
 		gSensor[sen].timeVelCheck = time;
+		gSensor[sen].velGood = true;
 	}
 }
 
 void velocityClear(tSensors sen)
 {
 	gSensor[sen].timeVelCheck = nPgmTime;
-	gSensor[sen].valueVelLst = *gSensor[sen].value;
-	gSensor[sen].velocity = gSensor[sen].velocityLst = 0;
+	gSensor[sen].valueVelLst = gSensor[sen].value;
+	gSensor[sen].velocity = gSensor[sen].lstVelocity = 0;
+	gSensor[sen].velGood = false;
+}
+
+void startSensor(tSensors sen)
+{
+	if (gSensor[sen].cls == snclsInput)
+		gSensor[sen].value = gSensor[sen].lstValue = SensorValue[sen];
+}
+
+void startSensors()
+{
+	for (ubyte i = 0; i < kNumbOfTotalSensors; ++i)
+		startSensor(i);
+}
+
+void setupSensors()
+{
+	// Setup the pointers for the sensor values and set the base type
+	for (ubyte i = 0; i < kNumbOfTotalSensors; ++i)
+	{
+		gSensor[i].cls = checkSenClass(i);
+		gSensor[i].port = (tSensors)i;
+
+		gSensor[i].lstVelocity = 0;
+		gSensor[i].velocity = 0;
+		gSensor[i].valueVelLst = 0;
+		gSensor[i].timeVelCheck = 0;
+		gSensor[i].velGood = false;
+
+		startSensor(i);
+	}
 }

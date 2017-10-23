@@ -38,7 +38,10 @@ bool pidCalculate(sPID& PID, float target, float input)
 		PID.output = PID.error * PID.kP + PID.integral * PID.kI - derivative * PID.kD; // Calculate the output
 	}
 	else
-		PID.output = (PID.error = (target - input)) * PID.kP;
+	{
+		PID.error = target - input;
+		PID.output = PID.error * PID.kP;
+	}
 
 	if (PID.minOutput >= 0 && abs(PID.output) < PID.minOutput)
 		PID.output = PID.minOutput * sgn(PID.output);

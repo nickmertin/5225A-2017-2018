@@ -38,6 +38,7 @@ task autonomous();
 task usercontrol();
 
 bool bStopTasksBetweenModes = true;
+word gMainTask = 255;
 
 task main()
 {
@@ -48,11 +49,9 @@ task main()
 	displayNextLCDString("Startup");
 	wait1Msec(2000);
 
-
 	startup();
 
 	//wait1Msec(500);
-
 
 	while (true)
 	{
