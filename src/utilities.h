@@ -29,3 +29,4 @@ int sq(int x); // Square a value
 float degToRad(float degrees); // Convert degrees to radians
 float radToDeg(float radians); // Convert radians to degrees
 void stopAllButCurrentTasks();
+void stopTaskID(word id); // Stop a task using a given ID
