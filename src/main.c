@@ -939,6 +939,13 @@ void handleMacros()
 }
 
 
+/* Autonomous */
+
+#include "auto.h"
+
+#include "auto.c"
+
+
 /* LCD */
 
 void handleLcd()

@@ -1,0 +1,555 @@
+/* Functions */
+void trackPosition(int left, int right, int back, sPos& position)
+{
+	static float spinToIn = (WHEEL_DIAMETER_IN * PI) / TICKS_PER_ROTATION; // Convert ticks to inches
+	float L = (left - position.leftLst) * spinToIn; // The amount the left side of the robot moved
+	float R = (right - position.rightLst) * spinToIn; // The amount the right side of the robot moved
+	float S = (back - position.backLst) * spinToIn; // The amount the back side of the robot moved
+
+	// Update the last values
+	position.leftLst = left;
+	position.rightLst = right;
+	position.backLst = back;
+
+	float h; // The hypotenuse of the triangle formed by the middle of the robot on the starting position and ending position and the middle of the circle it travels around
+	float i; // Half on the angle that I've traveled
+	float h2; // The same as h but using the back instead of the side wheels
+	float a = (L - R) / (L_DISTANCE_IN + R_DISTANCE_IN); // The angle that I've traveled
+	if (a)
+	{
+		float r = R / a; // The radius of the circle the robot travel's around with the right side of the robot
+		i = a / 2.0;
+		float sinI = sin(i);
+		h = ((r + R_DISTANCE_IN) * sinI) * 2.0;
+
+		float r2 = S / a; // The radius of the circle the robot travel's around with the back of the robot
+		h2 = ((r2 + S_DISTANCE_IN) * sinI) * 2.0;
+	}
+	else
+	{
+		h = R;
+		i = 0;
+
+		h2 = S;
+	}
+	float p = i + position.a; // The global ending angle of the robot
+	float cosP = cos(p);
+	float sinP = sin(p);
+
+	// Update the global position
+	position.y += h * cosP;
+	position.x += h * sinP;
+
+	position.y += h2 * -sinP; // -sin(x) = sin(-x)
+	position.x += h2 * cosP; // cos(x) = cos(-x)
+
+	position.a += a;
+}
+
+void resetPosition(sPos& position)
+{
+	position.leftLst = position.rightLst = position.backLst = 0;
+	position.y = position.x = position.a = 0;
+}
+
+void trackVelocity(sPos position, sVel& velocity)
+{
+	unsigned long curTime = nPgmTime;
+	long passed = curTime - velocity.lstChecked;
+	if (passed > 50)
+	{
+		float posA = position.a;
+		float posY = position.y;
+		float posX = position.x;
+		velocity.a = ((posA - velocity.lstPosA) * 1000.0) / passed;
+		velocity.y = ((posY - velocity.lstPosY) * 1000.0) / passed;
+		velocity.x = ((posX - velocity.lstPosX) * 1000.0) / passed;
+
+		velocity.lstPosA = posA;
+		velocity.lstPosY = posY;
+		velocity.lstPosX = posX;
+		velocity.lstChecked = curTime;
+	}
+}
+
+void vectorToPolar(sVector& vector, sPolar& polar)
+{
+	if (vector.x || vector.y)
+	{
+		polar.magnitude = sqrt(vector.x * vector.x + vector.y * vector.y);
+		polar.angle = atan2(vector.y, vector.x);
+	}
+	else
+		polar.magnitude = polar.angle = 0;
+}
+
+void polarToVector(sPolar& polar, sVector& vector)
+{
+	if (polar.magnitude)
+	{
+		vector.x = polar.magnitude * cos(polar.angle);
+		vector.y = polar.magnitude * sin(polar.angle);
+	}
+	else
+		vector.x = vector.y = 0;
+}
+
+void transformVelocityToLocal(sVel& global, sVector& local, float angle)
+{
+	sVector vel;
+	vel.x = global.x;
+	vel.y = global.y;
+	sPolar polar;
+	vectorToPolar(vel, polar);
+	polar.angle += angle;
+	polarToVector(polar, local);
+}
+
+void transformVelocityToGlobal(sVel& local, sVector& global, float angle)
+{
+	sVector vel;
+	vel.x = global.x;
+	vel.y = global.y;
+	sPolar polar;
+	vectorToPolar(vel, polar);
+	polar.angle -= angle;
+	polarToVector(polar, global);
+}
+
+float getAngleOfLine(sLine line)
+{
+	return (PI / 2) - atan2(line.p2.y - line.p1.y, line.p2.x - line.p1.x);
+}
+
+task trackPositionTask()
+{
+	while (true)
+	{
+		updateSensorInput(driveEncL);
+		updateSensorInput(driveEncR);
+		updateSensorInput(latEnc);
+		trackPosition(gSensor[driveEncL].value, gSensor[driveEncR].value, gSensor[latEnc].value, gPosition);
+		trackVelocity(gPosition, gVelocity);
+		EndTimeSlice();
+	}
+}
+
+task autoMotorSensorUpdateTask()
+{
+	while (true)
+	{
+		updateMotors();
+		updateSensorInputs();
+		updateSensorOutputs();
+		EndTimeSlice();
+	}
+}
+
+task autoSafetyTask()
+{
+	int bad = 0;
+	int lastL = gSensor[driveEncL].value;
+	int lastR = gSensor[driveEncR].value;
+	int lastB = gSensor[latEnc].value;
+	sCycleData cycle;
+	initCycle(cycle, 10);
+	while (true)
+	{
+		if (gAutoSafety)
+		{
+			int motors = abs(gMotor[driveL1].power) + abs(gMotor[driveL2].power) + abs(gMotor[driveR1].power) + abs(gMotor[driveR2].power);
+			int sensors = abs(gSensor[driveEncL].value - lastL) + abs(gSensor[driveEncR].value - lastR) + abs(gSensor[latEnc].value - lastB);
+			lastL = gSensor[driveEncL].value;
+			lastR = gSensor[driveEncR].value;
+			lastB = gSensor[latEnc].value;
+
+			// If the motors are moving fast and the encoders arn't moving
+			if (motors > 100 && sensors < 6)
+				++bad; // Remember that this is a bad cycle
+			else
+				bad = 0; // Reset the bad counter
+			if (bad >= 100) // If 100 cycles have been bad stop auto
+			{
+				stopAllButCurrentTasks();
+				for (tMotor i = port1; i <= port10; ++i)
+					gMotor[i].power = 0;
+				updateMotors();
+				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
+				return;
+			}
+		}
+		endCycle(cycle);
+	}
+}
+
+void applyHarshStop()
+{
+	sVector vel;
+	vel.x = gVelocity.x;
+	vel.y = gVelocity.y;
+	sPolar polarVel;
+	vectorToPolar(vel, polarVel);
+	polarVel.angle += gPosition.a;
+	polarToVector(polarVel, vel);
+	float yPow = vel.y, aPow = gVelocity.a;
+	yPow *= -0.7;
+	aPow *= -12;
+
+	LIM_TO_VAL_SET(yPow, 127);
+	LIM_TO_VAL_SET(aPow, 127);
+
+	word left = yPow + aPow;
+	word right = yPow - aPow;
+	writeDebugStreamLine("Applying harsh stop: %f %f", left, right);
+	setDrive(left, right);
+	updateMotors();
+	sleep(150);
+	setDrive(0, 0);
+	updateMotors();
+}
+
+void resetPositionFull(sPos& position, float y, float x, float a) { resetPositionFullRad(position, y, x, degToRad(a)); }
+
+void resetPositionFullRad(sPos& position, float y, float x, float a)
+{
+	writeDebugStreamLine("Resetting position (%f %f) %f degrees)", position.x, position.y, degToRad(position.a));
+	stopTask(trackPositionTask);
+	resetPosition(position);
+
+	resetQuadratureEncoder(driveEncL);
+	resetQuadratureEncoder(driveEncR);
+	resetQuadratureEncoder(latEnc);
+
+	position.y = y;
+	position.x = x;
+	position.a = a;
+	startTask(trackPositionTask);
+}
+
+void moveToTarget(float y, float x, float ys, float xs, byte power, bool harshStop, bool slow, bool *end)
+{
+	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
+	sPID pidY, pidX;
+	pidInit(pidY, 8, 0.0, 0.0, -1, -1, 30, abs(power));
+	pidInit(pidX, 400.0, 0.0, 0.0, -1, -1, -1, -1);
+	float d = 6;
+
+	// Create the line to follow
+	sLine followLine;
+
+	// Start points
+	followLine.p1.y = ys;
+	followLine.p1.x = xs;
+
+	// End points
+	followLine.p2.y = y;
+	followLine.p2.x = x;
+
+	float lineAngle = getAngleOfLine(followLine); // Get the angle of the line that we're following relative to the vertical
+	float pidAngle = lineAngle - (power < 0 ? PI : 0);
+	pidAngle = round((gPosition.a - pidAngle) / (2 * PI)) * (2 * PI) + pidAngle; // Transform the line angle so it's close to the robot's angle
+	writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
+
+	// The distance left to travel in polar and coordinate form
+	sPolar pDisp;
+	sVector vDisp;
+
+	sPolar pRel;
+	sVector vRel;
+
+	do
+	{
+		// Setup our current displacement
+		vDisp.y =  followLine.p2.y - gPosition.y;
+		vDisp.x = followLine.p2.x - gPosition.x;
+
+		// Rotate our displacement vector by the angle of the line (the vectors represent their angle from the horozontal)
+		vectorToPolar(vDisp, pDisp);
+		pRel.angle = lineAngle + pDisp.angle;
+		pRel.magnitude = pDisp.magnitude;
+		polarToVector(pRel, vRel);
+
+		int basePower;
+		if (slow)
+		{
+			pidCalculate(pidY, 0, vRel.y);
+			basePower = abs(round(pidY.output));
+		}
+		else
+			basePower = abs(power);
+
+		pidCalculate(pidX, atan2(vRel.x, d) + pidAngle, gPosition.a);
+
+		int left = basePower + pidX.output, right = basePower - pidX.output;
+		if (left > 127)
+		{
+			right -= left - 127;
+			left = 127;
+		}
+		else if (right > 127)
+		{
+			left -= right - 127;
+			right = 127;
+		}
+
+		if (left < 0) left = 0;
+		if (right < 0) right = 0;
+
+		if (power > 0)
+			setDrive(left, right);
+		else
+			setDrive(-right, -left);
+
+	} while (vRel.y > 3.0 && (end == NULL ? true : *end));
+
+	if (harshStop)
+		applyHarshStop();
+	else
+		setDrive(0, 0);
+
+	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
+
+void moveToTarget(float y, float x, byte power, bool harshStop, bool slow, bool *end) { moveToTarget(y, x, gPosition.y, gPosition.x, power, harshStop, slow, end); }
+
+void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
+{
+	writeDebugStreamLine("Turning to %f", radToDeg(a));
+	sPID pidA;
+	pidInit(pidA, 70.0, 0.0, 0.0, -1, -1, 46, -1);
+	left = abs(left);
+	right = abs(right);
+
+	if (turnDir == ch)
+		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+
+	if (slow)
+	{
+		switch (turnDir)
+		{
+			case cw:
+				while (gPosition.a < a - (gVelocity.a * 0.090))
+				{
+					pidCalculate(pidA, a, gPosition.a);
+					int power = round(abs(pidA.output));
+					LIM_TO_VAL_SET(power, 127);
+					setDrive(power > left ? left : power, power > right ? -right : -power);
+					sleep(1);
+				}
+				break;
+			case ccw:
+				while (gPosition.a > a - (gVelocity.a * 0.090))
+				{
+					pidCalculate(pidA, a, gPosition.a);
+					int power = round(abs(pidA.output));
+					LIM_TO_VAL_SET(power, 127);
+					setDrive(power > left ? -left : -power, power > right ? right : power);
+					sleep(1);
+				}
+				break;
+		}
+	}
+	else
+	{
+		switch (turnDir)
+		{
+			case cw:
+				setDrive(left, -right);
+				while (gPosition.a < a - (gVelocity.a * 0.13)) sleep(1);
+				break;
+			case ccw:
+				setDrive(-left, right);
+				while (gPosition.a > a - (gVelocity.a * 0.13)) sleep(1);
+				break;
+		}
+	}
+
+	if (harshStop)
+		applyHarshStop();
+
+	setDrive(0, 0);
+
+	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
+
+void turnToAngle(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
+{
+	turnToAngleRad(degToRad(a), turnDir, left, right, harshStop, slow);
+}
+
+void turnToTarget(float y, float x, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow, float offset)
+{
+	turnToTarget(y, x, gPosition.y, gPosition.x, turnDir, left, right, harshStop, slow, offset);
+}
+
+void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow, float offset)
+{
+	writeDebugStreamLine("Turning to %f %f from %f %f", y, x, ys, xs);
+
+	offset = degToRad(offset);
+
+	sPID pidA;
+	pidInit(pidA, 70.0, 0.0, 0.0, -1, -1, 46, -1);
+	left = abs(left);
+	right = abs(right);
+
+	float aOffset = 0;
+	float orA = gPosition.a;
+	float a = getTargetAngle(y, x, ys, xs) + offset;
+	a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
+	if (turnDir == cw)
+		while (a + aOffset < orA) aOffset += PI * 2;
+	else if (turnDir == ccw)
+		while (a + aOffset > orA) aOffset -= PI * 2;
+	else
+		if (a < orA) turnDir = ccw; else turnDir = cw;
+	a += aOffset;
+
+	writeDebugStreamLine("Turn angle | Angle: %f | %f", radToDeg(a), radToDeg(orA));
+
+	if (slow)
+	{
+		switch (turnDir)
+		{
+			case cw:
+				while (gPosition.a < a - (gVelocity.a * 0.090))
+				{
+					a = getTargetAngle(y, x, ys, xs) + offset;
+					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
+					a += aOffset;
+					pidCalculate(pidA, a, gPosition.a);
+					int power = round(abs(pidA.output));
+					LIM_TO_VAL_SET(power, 127);
+					setDrive(power > left ? left : power, power > right ? -right : -power);
+					sleep(1);
+				}
+				break;
+			case ccw:
+				while (gPosition.a > a - (gVelocity.a * 0.090))
+				{
+					a = getTargetAngle(y, x, ys, xs) + offset;
+					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
+					a += aOffset;
+					pidCalculate(pidA, a, gPosition.a);
+					int power = round(abs(pidA.output));
+					LIM_TO_VAL_SET(power, 127);
+					setDrive(power > left ? -left : -power, power > right ? right : power);
+					sleep(1);
+				}
+				break;
+		}
+	}
+	else
+	{
+		switch (turnDir)
+		{
+			case cw:
+				setDrive(left, -right);
+				while (gPosition.a < a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(1); }
+				break;
+			case ccw:
+				setDrive(-left, right);
+				while (gPosition.a > a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(1); }
+				break;
+		}
+	}
+
+	if (harshStop)
+		applyHarshStop();
+
+	setDrive(0, 0);
+
+	writeDebugStreamLine("Turned to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
+
+float getTargetAngle(float y, float x, float ys, float xs)
+{
+	sLine line;
+	line.p1.y = ys;
+	line.p1.x = xs;
+	line.p2.y = y;
+	line.p2.x = x;
+	return getAngleOfLine(line);
+}
+
+task autoHitWallTask()
+{
+	unsigned long timeStart = nPgmTime;
+	//while (_autoNotHitWall = (!*gSensor[fenceLimitLeft].value && !*gSensor[fenceLimitRight].value)) sleep(1);
+}
+
+void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool harshStop, bool slow)
+{/*
+	_autoNotHitWall = true;
+	startTask(autoHitWallTask);
+	moveToTarget(y, x, ys, xs, power, harshStop, slow, &_autoNotHitWall);
+
+	gAutoSafety = false;
+	unsigned long time, timeEnd, timeStart = nPgmTime;
+	int lstState = -1;
+	while (nPgmTime - timeStart < 1500)
+	{
+		time = nPgmTime;
+		int state = (*gSensor[fenceLimitLeft].value << 1) | *gSensor[fenceLimitRight].value;
+		if (state != lstState) S_LOG "%d -> %d", lstState, state E_LOG_DATA
+		switch (state)
+		{
+			case 0:
+				setDrive(-55);
+				break;
+			case 1:
+				setDrive(-58, -32);
+				break;
+			case 2:
+				setDrive(-32, -58);
+				break;
+			case 3:
+				setDrive(-60);
+				if (state != lstState) timeEnd = time + 200;
+				if (time > timeEnd) goto end;
+				break;
+		}
+		lstState = state;
+		sleep(10);
+	}
+end:
+	setDrive(-24);
+	gAutoSafety = true;*/
+}
+
+void moveToTargetOrWall(float y, float x, byte power, bool harshStop, bool slow)
+{
+	moveToTargetOrWall(y, x, gPosition.y, gPosition.x, power, harshStop, slow);
+}
+
+float getDistanceFromPoint(sVector point)
+{
+	return sqrt(sq(gPosition.x - point.x) + sq(gPosition.y - point.y));
+}
+
+void moveToCheckpoint(float y, float x, float ys, float xs, byte power, float distance, bool harshStop, bool slow)
+{
+	_notReachedTarget = true;
+	_distanceTarget.y = y;
+	_distanceTarget.x = x;
+	_distanceFromTarget = distance;
+	//startTask(monitorDistanceTask);
+	moveToTarget(y, x, ys, xs, power, harshStop, slow, &_notReachedTarget);
+}
+
+void moveToCheckpoint(float y, float x, byte power, float distance, bool harshStop, bool slow)
+{
+	moveToCheckpoint(y, x, gPosition.y, gPosition.x, power, distance, harshStop, slow);
+}
+
+task stopAutoAt15()
+{
+	unsigned long startTime = nPgmTime;
+	while (nPgmTime - startTime < 14500) sleep(1);
+	stopAllButCurrentTasks();
+	startTask(autoMotorSensorUpdateTask);
+	startTask(autoSafetyTask);
+	for (tMotor i = port1; i <= port10; ++i)
+		gMotor[i].power = 0;
+	updateMotors();
+}
