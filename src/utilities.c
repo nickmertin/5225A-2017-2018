@@ -50,3 +50,67 @@ void stopAllButCurrentTasks()
 	STOP_TASK_NOT_CUR(20);
 	releaseCPU();
 }
+
+#define STS(id) case id: startTask(id); break;
+void startTaskID(word id)
+{
+	switch (id)
+	{
+		case 0:
+			writeDebugStreamLine("WARNING, MAIN TASK BEING STARTED AGAIN, ABORTING");
+			break;
+		STS(1)
+		STS(2)
+		STS(3)
+		STS(4)
+		STS(5)
+		STS(6)
+		STS(7)
+		STS(8)
+		STS(9)
+		STS(10)
+		STS(11)
+		STS(12)
+		STS(13)
+		STS(14)
+		STS(15)
+		STS(16)
+		STS(17)
+		STS(18)
+		STS(19)
+		STS(20)
+	}
+}
+#undef STS
+
+#define STS(id) case id: stopTask(id); break;
+void stopTaskID(word id)
+{
+	switch (id)
+	{
+		case 0:
+			writeDebugStreamLine("WARNING, MAIN TASK BEING STOPPED, ABORTING");
+			break;
+		STS(1)
+		STS(2)
+		STS(3)
+		STS(4)
+		STS(5)
+		STS(6)
+		STS(7)
+		STS(8)
+		STS(9)
+		STS(10)
+		STS(11)
+		STS(12)
+		STS(13)
+		STS(14)
+		STS(15)
+		STS(16)
+		STS(17)
+		STS(18)
+		STS(19)
+		STS(20)
+	}
+}
+#undef STS
