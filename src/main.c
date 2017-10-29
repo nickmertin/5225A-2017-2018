@@ -459,7 +459,7 @@ void handleMobile()
 			{
 				gMobileState = gMobileNextState;
 				gMobileStart = nPgmTime;
-				gNumCones = 4;
+				gNumCones = 0;
 			}
 			break;
 		}
@@ -868,6 +868,7 @@ void handleMacros()
 	//}
 	if (RISING(BTN_MACRO_ADD) && gNumCones < 11) ++gNumCones;
 	if (RISING(BTN_MACRO_SUB) && gNumCones > 0) --gNumCones;
+	if (RISING(BTN_MACRO_SCAN)) gNumCones = 0;
 }
 
 
