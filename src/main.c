@@ -882,8 +882,10 @@ void handleMacros()
 /* Autonomous */
 
 #include "auto.h"
+#include "auto_runs.h"
 
 #include "auto.c"
+#include "auto_runs.c"
 
 
 /* LCD */
@@ -939,9 +941,23 @@ void disabled()
 // This task gets started at the begining of the autonomous period
 task autonomous()
 {
+	gAutoTime = nPgmTime;
+
 	startSensors(); // Initilize the sensors
 
 	gKillDriveOnTimeout = true;
+
+	resetPosition(gPosition);
+	resetQuadratureEncoder(driveEncL);
+	resetQuadratureEncoder(driveEncR);
+	resetQuadratureEncoder(latEnc);
+
+	tStart(autoMotorSensorUpdateTask);
+	tStart(trackPositionTask);
+
+	runAuto();
+
+	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
 	return_t;
 }
