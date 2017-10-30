@@ -552,3 +552,16 @@ task stopAutoAt15()
 		gMotor[i].power = 0;
 	updateMotors();
 }
+
+void grabPreload()
+{
+	setArm(-127);
+	unsigned long timeout = nPgmTime + 1000;
+	while (gSensor[armPoti].value > gArmPositions[2] && !TimedOut(timeout)) sleep(10);
+	setArm(10);
+	sleep(200);
+	setClaw(CLAW_CLOSE_POWER);
+	timeout = nPgmTime + 800;
+	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(timeout)) sleep(10);
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+}

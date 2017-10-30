@@ -90,6 +90,7 @@ void moveToTargetOrWall(float y, float x, byte power, bool harshStop = true, boo
 float getDistanceFromPoint(sVector point);
 void moveToCheckpoint(float y, float x, float ys, float xs, byte power, float distance, bool harshStop = true, bool slow = true);
 void moveToCheckpoint(float y, float x, byte power, float distance, bool harshStop = true, bool slow = true);
+void grabPreload();
 
 /* Async Functions */
 NEW_ASYNC_VOID_8(moveToTarget, float, float, float, float, byte, bool, bool, bool*)
