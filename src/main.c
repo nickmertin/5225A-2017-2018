@@ -29,6 +29,7 @@
 // Year-independent libraries
 
 #include "task.h"
+#include "async.h"
 #include "motors.h"
 #include "sensors.h"
 #include "joysticks.h"
@@ -37,6 +38,7 @@
 #include "pid.h"
 
 #include "task.c"
+#include "async.c"
 #include "motors.c"
 #include "sensors.c"
 #include "joysticks.c"

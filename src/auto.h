@@ -86,6 +86,13 @@ float getDistanceFromPoint(sVector point);
 void moveToCheckpoint(float y, float x, float ys, float xs, byte power, float distance, bool harshStop = true, bool slow = true);
 void moveToCheckpoint(float y, float x, byte power, float distance, bool harshStop = true, bool slow = true);
 
+/* Async Functions */
+NEW_ASYNC_VOID_8(moveToTarget, float, float, float, float, byte, bool, bool, bool*)
+NEW_ASYNC_VOID_6(turnToAngle, float, tTurnDir, byte, byte, bool, bool)
+NEW_ASYNC_VOID_10(turnToTarget, float, float, float, float, tTurnDir, byte, byte, bool, bool, float)
+NEW_ASYNC_VOID_7(moveToTargetOrWall, float, float, float, float, byte, bool, bool)
+NEW_ASYNC_VOID_8(moveToCheckpoint, float, float, float, float, byte, float, bool, bool)
+
 /* Internal Variables */
 bool _autoNotHitWall = true;
 bool _notReachedTarget = true;
