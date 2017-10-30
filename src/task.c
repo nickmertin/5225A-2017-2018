@@ -45,7 +45,11 @@ void tStopAll(word id)
 		else tStop(tEls[id].child);
 	}
 	tStop(id);
-	if (stopCur) stopTaskID(nCurrentTask);
+	if (stopCur)
+	{
+		releaseCPU();
+		stopTaskID(nCurrentTask);
+	}
 	releaseCPU();
 }
 

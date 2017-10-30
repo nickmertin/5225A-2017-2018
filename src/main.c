@@ -504,11 +504,16 @@ task stackAsync();
 task LiftTaskUp();
 task dropArm();
 
+bool gKillDriveOnTimeout = false;
+
 bool TimedOut( unsigned long timeOut )
 {
 	if( nPgmTime > timeOut )
 	{
+		hogCPU();
 		gMotor[arm].power =	gMotor[claw].power = gMotor[liftL].power =  gMotor[liftR].power = 0;
+		if (gKillDriveOnTimeout) setDrive(0, 0);
+		updateMotors();
 		writeDebugStreamLine ("%06d EXCEEDED TIME %d", nPgmTime-gOverAllTime,timeOut-gOverAllTime);
 		gArmState= armHold;
 		gLiftState = liftHold;
@@ -934,6 +939,8 @@ task autonomous()
 {
 	startSensors(); // Initilize the sensors
 
+	gKillDriveOnTimeout = true;
+
 	return_t;
 }
 
@@ -942,6 +949,8 @@ task usercontrol()
 {
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 10);
+
+	gKillDriveOnTimeout = false;
 
 	while (true)
 	{
