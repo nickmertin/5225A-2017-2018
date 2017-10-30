@@ -910,6 +910,7 @@ void handleLcd()
 void startup()
 {
 	clearDebugStream();
+	writeDebugStreamLine("Code start");
 
 	// Setup and initilize the necessary libraries
 	setupMotors();
@@ -942,6 +943,7 @@ void disabled()
 task autonomous()
 {
 	gAutoTime = nPgmTime;
+	writeDebugStreamLine("Auto start");
 
 	startSensors(); // Initilize the sensors
 

@@ -72,6 +72,7 @@ void polarToVector(sPolar& polar, sVector& vector); // Convert a polar vector to
 void transformVelocityToLocal(sVel& global, sVector& local, float angle); // Transform velocity from global to local with a given orientation
 void transformVelocityToGlobal(sVel& local, sVector& global, float angle); // Transform velocity from local to global with a given orientation
 float getAngleOfLine(sLine line);
+task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 task autoSafetyTask(); // Autonomous drive safety task
 task autoHitWallTask();
