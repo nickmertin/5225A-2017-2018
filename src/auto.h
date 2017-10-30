@@ -1,14 +1,19 @@
 /* Defines */
 // The diameter of the tracking wheels in inches
-#define WHEEL_DIAMETER_IN 2.75
+#define WHEEL_DIAMETER_IN_LR 1
+#define WHEEL_DIAMETER_IN_S 2.75
 
 // The distance between the tracking wheels and the centre of the robot in inches
-#define L_DISTANCE_IN 5.975
-#define R_DISTANCE_IN 5.975
-#define S_DISTANCE_IN 0.7
+#define L_DISTANCE_IN 6.875
+#define R_DISTANCE_IN 6.875
+#define S_DISTANCE_IN -8
 
 // The number of tick per rotation of the tracking wheel
 #define TICKS_PER_ROTATION 360.0
+
+// Used internally by trackPosition
+#define SPIN_TO_IN_LR (WHEEL_DIAMETER_IN_LR * PI / TICKS_PER_ROTATION)
+#define SPIN_TO_IN_S (WHEEL_DIAMETER_IN_S * PI / TICKS_PER_ROTATION)
 
 /* Enumerations */
 typedef enum _turnDir

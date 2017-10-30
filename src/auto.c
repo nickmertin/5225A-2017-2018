@@ -1,10 +1,9 @@
 /* Functions */
 void trackPosition(int left, int right, int back, sPos& position)
 {
-	static float spinToIn = (WHEEL_DIAMETER_IN * PI) / TICKS_PER_ROTATION; // Convert ticks to inches
-	float L = (left - position.leftLst) * spinToIn; // The amount the left side of the robot moved
-	float R = (right - position.rightLst) * spinToIn; // The amount the right side of the robot moved
-	float S = (back - position.backLst) * spinToIn; // The amount the back side of the robot moved
+	float L = (left - position.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
+	float R = (right - position.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
+	float S = (back - position.backLst) * SPIN_TO_IN_S; // The amount the back side of the robot moved
 
 	// Update the last values
 	position.leftLst = left;
