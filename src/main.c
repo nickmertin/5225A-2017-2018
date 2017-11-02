@@ -60,7 +60,7 @@ void setDrive(word left, word right)
 void handleDrive()
 {
 	//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
-	setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur / 2, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur / 2);
+	setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur);
 	if (RISING(JOY_TURN)) playSound(soundShortBlip);
 }
 
@@ -187,14 +187,11 @@ void handleArm()
 		else gArmPosition = 1;
 		gArmState = armHold;
 	}
-	if (RISING(BTN_ARM_TOGGLE))
+	if (RISING(BTN_ARM_DOWN))
 	{
-		gArmState = gArmTarget > gArmPositions[1] ? armLower : armRaise;
+		gArmState = armLower;
 
-		if( gArmTarget > gArmPositions[1] )
-			gArmPosition = 0;
-		else
-			gArmPosition = 2;
+		gArmPosition = 0;
 
 		gArmTarget = gArmPositions[gArmPosition];
 		gArmStart = nPgmTime;
@@ -326,18 +323,17 @@ void setClaw(word power, bool debug=false )
 
 void handleClaw()
 {
-	if (RISING(BTN_CLAW))
+	if (RISING(BTN_CLAW_CLOSE))
 	{
-		if (gClawState == clawClosed || gClawState == clawClosing)
-		{
-			gClawState = clawOpening;
-			setClaw(CLAW_OPEN_POWER);
-		}
-		else
-		{
-			gClawState = clawClosing;
-			setClaw(CLAW_CLOSE_POWER);
-		}
+		gClawState = clawClosing;
+		setClaw(CLAW_CLOSE_POWER);
+		gClawStart = nPgmTime;
+	}
+
+	if (RISING(BTN_CLAW_OPEN))
+	{
+		gClawState = clawOpening;
+		setClaw(CLAW_OPEN_POWER);
 		gClawStart = nPgmTime;
 	}
 
@@ -382,14 +378,14 @@ typedef enum _sMobileStates {
 	mobileRaise,
 	mobileLower,
 	mobileHold,
-	mobile20,
-	mobile10
+	mobileUpToMiddle,
+	mobileDownToMiddle
 } sMobileStates;
 
 #define MOBILE_TOP 2950
 #define MOBILE_BOTTOM 600
-#define MOBILE_20 2200
-#define MOBILE_10 1200
+#define MOBILE_MIDDLE_UP 1200
+#define MOBILE_MIDDLE_DOWN 2200
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
@@ -409,35 +405,40 @@ void setMobile(word power)
 
 void handleMobile()
 {
-	if (RISING(BTN_MOBILE_UP))
+	if (RISING(BTN_MOBILE_TOGGLE))
 	{
-		gMobileTarget = MOBILE_TOP;
-		gMobileState = mobileRaise;
+		if (gMobileState == mobileLower || gMobileState == mobileHold && gMobileTarget == MOBILE_BOTTOM)
+		{
+			gMobileTarget = MOBILE_TOP;
+			gMobileState = mobileRaise;
+			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
+			setMobile(MOBILE_UP_POWER);
+		}
+		else
+		{
+			gMobileTarget = MOBILE_BOTTOM;
+			gMobileState = mobileLower;
+			gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
+			setMobile(MOBILE_DOWN_POWER);
+		}
 		gMobileNextState = mobileHold;
-		gMobileHoldPower = MOBILE_UP_HOLD_POWER;
-		setMobile(MOBILE_UP_POWER);
 	}
-	if (RISING(BTN_MOBILE_DOWN))
+	if (RISING(BTN_MOBILE_MIDDLE))
 	{
-		gMobileTarget = MOBILE_BOTTOM;
-		gMobileState = mobileLower;
-		gMobileNextState = mobileHold;
-		gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
-		setMobile(MOBILE_DOWN_POWER);
-	}
-	if (RISING(BTN_MOBILE_20))
-	{
-		gMobileTarget = MOBILE_20;
-		gMobileState = mobileLower;
-		gMobileNextState = mobile20;
-		setMobile(MOBILE_DOWN_POWER);
-	}
-	if (RISING(BTN_MOBILE_10))
-	{
-		gMobileTarget = MOBILE_10;
-		gMobileState = mobileRaise;
-		gMobileNextState = mobile10;
-		setMobile(MOBILE_UP_POWER);
+		if (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN)
+		{
+			gMobileTarget = MOBILE_MIDDLE_DOWN;
+			gMobileState = mobileLower;
+			gMobileNextState = mobileDownToMiddle;
+			setMobile(MOBILE_DOWN_POWER);
+		}
+		else
+		{
+			gMobileTarget = MOBILE_MIDDLE_UP;
+			gMobileState = mobileRaise;
+			gMobileNextState = mobileUpToMiddle;
+			setMobile(MOBILE_UP_POWER);
+		}
 	}
 
 	if( gMobileState==mobileManaged ) return;
@@ -468,16 +469,16 @@ void handleMobile()
 			setMobile(gMobileHoldPower);
 			break;
 		}
-	case mobile20:
+	case mobileDownToMiddle:
 		{
-			if( nPgmTime - gMobileStart > 300 )	//		setMobile(nPgmTime - gMobileStart > 300 ? 10 : -5);
+			if( nPgmTime - gMobileStart > 300 )
 				setMobile( 10 );
 			else
 				setMobile( -5 );
 
 			break;
 		}
-	case mobile10:
+	case mobileUpToMiddle:
 		{
 			setMobile(15);
 			break;
@@ -866,8 +867,8 @@ void handleMacros()
 	//	if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
 	//	else if (gJoy[JOY_ADJUST].cur < 0 && gNumCones > 0) --gNumCones;
 	//}
-	if (RISING(BTN_MACRO_ADD) && gNumCones < 11) ++gNumCones;
-	if (RISING(BTN_MACRO_SUB) && gNumCones > 0) --gNumCones;
+	if (RISING(BTN_MACRO_INC) && gNumCones < 11) ++gNumCones;
+	if (RISING(BTN_MACRO_DEC) && gNumCones > 0) --gNumCones;
 	if (RISING(BTN_MACRO_SCAN)) gNumCones = 0;
 }
 
