@@ -24,6 +24,11 @@ float radToDeg(float radians)
 	return radians * 180 / PI;
 }
 
+float nearAngle(float angle, float reference)
+{
+	return round((reference - angle) / (2 * PI)) * (2 * PI) + angle;
+}
+
 void stopAllButCurrentTasks()
 {
 	// DO NOT MAKE A FOR LOOP, WILL NOT WORK

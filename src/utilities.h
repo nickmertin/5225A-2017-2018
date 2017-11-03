@@ -28,6 +28,7 @@ float sq(float x); // Square a value
 int sq(int x); // Square a value
 float degToRad(float degrees); // Convert degrees to radians
 float radToDeg(float radians); // Convert radians to degrees
+float nearAngle(float angle, float reference); // Get an equivalent angle close to reference
 void stopAllButCurrentTasks();
 void startTaskID(word id); // Start a task using a given ID
 void stopTaskID(word id); // Stop a task using a given ID

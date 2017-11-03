@@ -16,7 +16,8 @@ void selectAuto()
 
 void runAuto()
 {
-	autoStationaryBlueLeft();
+	//autoStationaryBlueLeft();
+	autoTest();
 	return;
 	if (gAlliance == allianceBlue)
 	{
@@ -48,7 +49,7 @@ void autoStationaryCore()
 	gPosition.a = PI / 4;
 	releaseCPU();
 	grabPreload();
-	moveToTargetAsync(32.5, 32.5, 23, 23, 127, false, true, NULL);
+	moveToTargetAsync(32.5, 32.5, 23, 23, 127, 6, 1, false, true);
 	unsigned long driveTimeout = nPgmTime + 1000;
 	gLiftTarget = 1500;
 	tStart(LiftTaskUp);
@@ -76,7 +77,7 @@ void autoStationaryCore()
 void autoStationaryBlueLeft()
 {
 	autoStationaryCore();
-	moveToTargetAsync(24, 30, 32.5, 32.5, -127, true, true, NULL);
+	moveToTargetAsync(24, 30, 32.5, 32.5, -127, 6, 3, true, true);
 	unsigned long driveTimeout = nPgmTime + 1500;
 	sleep(300);
 	setLift(-80);
@@ -88,9 +89,17 @@ void autoStationaryBlueLeft()
 	driveTimeout = nPgmTime + 2000;
 	tStart(dropArm);
 	//turnToTargetAwait(driveTimeout);
-	moveToTarget(72, 24, 24, 30, 127, false, true, NULL);
+	moveToTarget(72, 24, 24, 30, 127, 6, 1, false, true);
 	setClaw(CLAW_CLOSE_POWER);
 	coneTimeout = nPgmTime + 500;
 	while (gSensor[clawPoti].value < CLAW_CLOSE && !TimedOut(coneTimeout)) sleep(10);
 	setClaw(CLAW_CLOSE_HOLD_POWER);
+}
+
+void autoTest()
+{
+	gPosition.x = gPosition.y = gPosition.a = 0;
+	moveToTarget(15, 0, 0, 0, 127, 6, 2, false, true);
+	moveToTarget(25, 10, 15, 0, 127, 6, 2, false, true);
+	moveToTarget(60, -20, 25, 5, 127, 6, 1, true, true);
 }

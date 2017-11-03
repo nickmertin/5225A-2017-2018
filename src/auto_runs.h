@@ -11,6 +11,7 @@ void runAuto();
 void autoSkills();
 void autoStationaryCore();
 void autoStationaryBlueLeft();
+void autoTest();
 
 /* Variables */
 int gCurAuto = 0;

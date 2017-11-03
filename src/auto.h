@@ -6,7 +6,7 @@
 // The distance between the tracking wheels and the centre of the robot in inches
 #define L_DISTANCE_IN 6.875
 #define R_DISTANCE_IN 6.875
-#define S_DISTANCE_IN -8
+#define S_DISTANCE_IN 13.5
 
 // The number of tick per rotation of the tracking wheel
 #define TICKS_PER_ROTATION 360.0
@@ -72,6 +72,7 @@ void polarToVector(sPolar& polar, sVector& vector); // Convert a polar vector to
 void transformVelocityToLocal(sVel& global, sVector& local, float angle); // Transform velocity from global to local with a given orientation
 void transformVelocityToGlobal(sVel& local, sVector& global, float angle); // Transform velocity from local to global with a given orientation
 float getAngleOfLine(sLine line);
+float getLengthOfLine(sLine line);
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 task autoSafetyTask(); // Autonomous drive safety task
@@ -79,8 +80,8 @@ task autoHitWallTask();
 void applyHarshStop();
 void resetPositionFullRad(sPos& position, float y, float x, float a);
 void resetPositionFull(sPos& position, float y, float x, float a); // Reset the position to a desired value and starts tracking
-void moveToTarget(float y, float x, byte power, bool harshStop = true, bool slow = true, bool *end = NULL);
-void moveToTarget(float y, float x, float ys, float xs, byte power, bool harshStop = true, bool slow = true, bool *end = NULL);
+void moveToTarget(float y, float x, byte power, float delta, float epsilon = 1.5, bool harshStop = true, bool slow = true);
+void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float epsilon = 1.5, bool harshStop = true, bool slow = true);
 void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true);
 void turnToAngle(float a, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true);
 void turnToTarget(float y, float x, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true, float offset = 0);
@@ -89,16 +90,13 @@ float getTargetAngle(float y, float x, float ys, float xs);
 void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool harshStop = true, bool slow = true);
 void moveToTargetOrWall(float y, float x, byte power, bool harshStop = true, bool slow = true);
 float getDistanceFromPoint(sVector point);
-void moveToCheckpoint(float y, float x, float ys, float xs, byte power, float distance, bool harshStop = true, bool slow = true);
-void moveToCheckpoint(float y, float x, byte power, float distance, bool harshStop = true, bool slow = true);
 void grabPreload();
 
 /* Async Functions */
-NEW_ASYNC_VOID_8(moveToTarget, float, float, float, float, byte, bool, bool, bool*)
+NEW_ASYNC_VOID_9(moveToTarget, float, float, float, float, byte, float, float, bool, bool)
 NEW_ASYNC_VOID_6(turnToAngle, float, tTurnDir, byte, byte, bool, bool)
 NEW_ASYNC_VOID_10(turnToTarget, float, float, float, float, tTurnDir, byte, byte, bool, bool, float)
 NEW_ASYNC_VOID_7(moveToTargetOrWall, float, float, float, float, byte, bool, bool)
-NEW_ASYNC_VOID_8(moveToCheckpoint, float, float, float, float, byte, float, bool, bool)
 
 /* Internal Variables */
 bool _autoNotHitWall = true;

@@ -117,7 +117,14 @@ void transformVelocityToGlobal(sVel& local, sVector& global, float angle)
 
 float getAngleOfLine(sLine line)
 {
-	return (PI / 2) - atan2(line.p2.y - line.p1.y, line.p2.x - line.p1.x);
+	return atan2(line.p2.x - line.p1.x, line.p2.y - line.p1.y);
+}
+
+float getLengthOfLine(sLine line)
+{
+	float x = line.p2.x - line.p1.x;
+	float y = line.p2.y - line.p1.y;
+	return sqrt(x * x + y * y);
 }
 
 task trackPositionTask()
@@ -225,13 +232,14 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	startTask(trackPositionTask);
 }
 
-void moveToTarget(float y, float x, float ys, float xs, byte power, bool harshStop, bool slow, bool *end)
+float kP = 0.8, kI = 0.01, kD = 4, kIInner = PI / 8, kIOuter = PI;
+
+void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float epsilon, bool harshStop, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
-	sPID pidY, pidX;
-	pidInit(pidY, 8, 0.0, 0.0, -1, -1, 30, abs(power));
-	pidInit(pidX, 400.0, 0.0, 0.0, -1, -1, -1, -1);
-	float d = 6;
+	sPID pidA, pidY;
+	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
+	pidInit(pidY, 0.3, 0.0, 0.0, -1, -1, -1, 1.0);
 
 	// Create the line to follow
 	sLine followLine;
@@ -244,62 +252,64 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, bool harshSt
 	followLine.p2.y = y;
 	followLine.p2.x = x;
 
+	float lineLength = getLengthOfLine(followLine);
 	float lineAngle = getAngleOfLine(followLine); // Get the angle of the line that we're following relative to the vertical
-	float pidAngle = lineAngle - (power < 0 ? PI : 0);
-	pidAngle = round((gPosition.a - pidAngle) / (2 * PI)) * (2 * PI) + pidAngle; // Transform the line angle so it's close to the robot's angle
+	float pidAngle = nearAngle(lineAngle - (power < 0 ? PI : 0), gPosition.a);
 	writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
 
-	// The distance left to travel in polar and coordinate form
-	sPolar pDisp;
-	sVector vDisp;
+	// The position relative to the line
+	sVector localPos;
+	sPolar polar;
 
-	sPolar pRel;
-	sVector vRel;
+	epsilon *= epsilon;
 
+	sCycleData cycle;
+	initCycle(cycle, 50);
 	do
 	{
 		// Setup our current displacement
-		vDisp.y =  followLine.p2.y - gPosition.y;
-		vDisp.x = followLine.p2.x - gPosition.x;
+		localPos.x = gPosition.x - xs;
+		localPos.y = gPosition.y - ys;
 
-		// Rotate our displacement vector by the angle of the line (the vectors represent their angle from the horozontal)
-		vectorToPolar(vDisp, pDisp);
-		pRel.angle = lineAngle + pDisp.angle;
-		pRel.magnitude = pDisp.magnitude;
-		polarToVector(pRel, vRel);
+		vectorToPolar(localPos, polar);
+		polar.angle += lineAngle;
+		polarToVector(polar, localPos);
 
-		int basePower;
+		float currentDelta;
+		if (localPos.y < -delta) currentDelta = -localPos.y;
+		else if (localPos.y > lineLength - delta) currentDelta = lineLength - localPos.y;
+		else currentDelta = delta;
+		float target = lineAngle - atan2(localPos.x, currentDelta);
+
+		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
+		pidCalculate(pidA, target, gPosition.a);
+
+		float basePower;
 		if (slow)
 		{
-			pidCalculate(pidY, 0, vRel.y);
-			basePower = abs(round(pidY.output));
+			pidCalculate(pidY, lineLength, localPos.y);
+			basePower = fabs(pidY.output * power);
 		}
-		else
-			basePower = abs(power);
+		//else
+			basePower = fabs((float) power);
 
-		pidCalculate(pidX, atan2(vRel.x, d) + pidAngle, gPosition.a);
+		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
 
-		int left = basePower + pidX.output, right = basePower - pidX.output;
-		if (left > 127)
-		{
-			right -= left - 127;
-			left = 127;
-		}
-		else if (right > 127)
-		{
-			left -= right - 127;
-			right = 127;
-		}
+		float scalar = basePower / (1 + fabs(weight));
 
-		if (left < 0) left = 0;
-		if (right < 0) right = 0;
+		word left = (word)(scalar * (sgn(power) + weight));
+		word right = (word)(scalar * (sgn(power) - weight));
 
-		if (power > 0)
-			setDrive(left, right);
-		else
-			setDrive(-right, -left);
+		writeDebugStreamLine("Global %.2f %.2f %.2f | %.2f %.2f Local %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, radToDeg(gPosition.a), gVelocity.y, gVelocity.x, localPos.y, localPos.x, radToDeg(target - pidA.error), radToDeg(target), weight, left, right);
 
-	} while (vRel.y > 3.0 && (end == NULL ? true : *end));
+		setDrive(left, right);
+
+		// Get distance from target position
+
+		localPos.y -= lineLength;
+
+		endCycle(cycle);
+	} while (localPos.x * localPos.x + localPos.y * localPos.y > epsilon);
 
 	if (harshStop)
 		applyHarshStop();
@@ -309,7 +319,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, bool harshSt
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTarget(float y, float x, byte power, bool harshStop, bool slow, bool *end) { moveToTarget(y, x, gPosition.y, gPosition.x, power, harshStop, slow, end); }
+void moveToTarget(float y, float x, byte power, float delta, float epsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, epsilon, harshStop, slow); }
 
 void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
 {
@@ -524,21 +534,6 @@ void moveToTargetOrWall(float y, float x, byte power, bool harshStop, bool slow)
 float getDistanceFromPoint(sVector point)
 {
 	return sqrt(sq(gPosition.x - point.x) + sq(gPosition.y - point.y));
-}
-
-void moveToCheckpoint(float y, float x, float ys, float xs, byte power, float distance, bool harshStop, bool slow)
-{
-	_notReachedTarget = true;
-	_distanceTarget.y = y;
-	_distanceTarget.x = x;
-	_distanceFromTarget = distance;
-	//startTask(monitorDistanceTask);
-	moveToTarget(y, x, ys, xs, power, harshStop, slow, &_notReachedTarget);
-}
-
-void moveToCheckpoint(float y, float x, byte power, float distance, bool harshStop, bool slow)
-{
-	moveToCheckpoint(y, x, gPosition.y, gPosition.x, power, distance, harshStop, slow);
 }
 
 task stopAutoAt15()
