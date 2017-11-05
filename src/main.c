@@ -83,8 +83,8 @@ typedef enum _sLiftStates {
 #define LIFT_UP_KP 2
 #define LIFT_DOWN_KP 1.5
 
-#define LIFT_BOTTOM 110
-#define LIFT_TOP 4094
+#define LIFT_BOTTOM 960
+#define LIFT_TOP 3560
 
 int gLiftTarget;
 sLiftStates gLiftState = liftIdle;
@@ -156,7 +156,7 @@ typedef enum _sArmStates {
 #define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
 #define ARM_TOP 2060
-#define ARM_BOTTOM 115
+#define ARM_BOTTOM  95
 
 short gArmPositions[] = { 130, 750, 2050 };
 word gArmHoldPower[] = { -12, 0, 10 };
@@ -259,7 +259,9 @@ void handleArm()
 					setArm(9);
 			}
 			else
+			{
 				setArm(gArmHoldPower[gArmPosition]);
+			}
 
 
 			//setArm(gArmPosition == 1 ? gSensor[armPoti].value < 1700 ? 15 : 9 : gArmHoldPower[gArmPosition]);
@@ -307,7 +309,7 @@ typedef enum _sClawStates {
 #define CLAW_OPEN_HOLD_POWER -12
 
 #define CLAW_OPEN 1630
-#define CLAW_CLOSE 610
+#define CLAW_CLOSE 660
 
 #define CLAW_TIMEOUT 1000
 
@@ -405,6 +407,7 @@ void setMobile(word power)
 
 void handleMobile()
 {
+
 	if (RISING(BTN_MOBILE_TOGGLE))
 	{
 		if (gMobileState == mobileLower || gMobileState == mobileHold && gMobileTarget == MOBILE_BOTTOM)
@@ -413,9 +416,18 @@ void handleMobile()
 			gMobileState = mobileRaise;
 			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 			setMobile(MOBILE_UP_POWER);
+
+			gClawState = clawOpening;
+			setClaw(CLAW_OPEN_POWER);
+			gClawStart = nPgmTime;
+
 		}
 		else
 		{
+			gClawState = clawOpening;
+			setClaw(CLAW_OPEN_POWER);
+			gClawStart = nPgmTime;
+
 			gMobileTarget = MOBILE_BOTTOM;
 			gMobileState = mobileLower;
 			gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
@@ -528,15 +540,15 @@ task LiftTaskUp()
 	writeDebugStreamLine("%d LiftTask started %d", nPgmTime-gOverAllTime, gLiftTarget);
 	gLiftTargetReached = false;
 	unsigned long gLiftTopTime = 0;
-	int minPower =35;
-	if( gLiftTarget == 4095) minPower = 60;
-	if( gLiftTarget <200 ) 	minPower = 35;
+	int minPower =45;
+	if( gLiftTarget == LIFT_TOP-LIFT_BOTTOM) minPower = 60;
+	if( gLiftTarget <180 ) 	minPower = 45;
 	writeDebugStreamLine("target=%d current=%d",gLiftTarget,gSensor[liftPoti].value);
 	while (!gLiftTargetReached )
 	{
 		float err = gLiftTarget - gSensor[liftPoti].value;
 		bool limTopVal = (bool)gSensor[limTop].value;
-		if ( (err < 20 && gLiftTarget != 4095) || limTopVal )
+		if ( (err <10 && gLiftTarget != LIFT_TOP-LIFT_BOTTOM) || limTopVal )
 		{
 			writeDebugStreamLine("Limit: %d", limTopVal);
 			gLiftTargetReached = true;
@@ -564,19 +576,24 @@ task dropArm()
 	unsigned long armTimeOut;
 	gArmDown = false;
 	setArm(-127,true);
-	armTimeOut = nPgmTime + 500;
+	armTimeOut = nPgmTime + 700;
 	while( gSensor[armPoti].value > ARM_BOTTOM  + 700 && !TimedOut(armTimeOut) ) sleep(10);
 	setArm(30,true);
 	sleep(60);
 	setArm(-90,true);
-	sleep(60);
+	sleep(100);
 	setArm(-15,true);
+	sleep(120);
 	gArmDown = true;
+	gArmState = armHold;
+  gArmPosition = 0;
 
 	return_t;
 }
 
-int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
+//int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
+int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  850, 1140, 1560, 1950, LIFT_TOP-LIFT_BOTTOM };
+//////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
 
 void stack()
 {
@@ -596,13 +613,14 @@ void stack()
 		setClaw(128, true);
 		while( SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut) )  sleep(10);
 		setArm(128, true);
-		clawTimeOut = nPgmTime + 300;
+		clawTimeOut = nPgmTime + 500;
+		armTimeOut = nPgmTime +600;
 		while( SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut) )  sleep(10);
 
 		//claw holding power while lifting
 		setClaw (20, true) ;
-		clawTimeOut = nPgmTime +600;
-		while( SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(clawTimeOut)) sleep(10);
+
+		while( SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut)) sleep(10);
 		//squeeze claw as it approaches the top of the arm swing
 		setClaw ( 40, true );
 		armTimeOut = nPgmTime +350;
@@ -629,12 +647,12 @@ void stack()
 
 		gOverAllTime = nPgmTime;
 		writeDebugStreamLine(" STACKING on %d", gNumCones );
-		clawTimeOut = nPgmTime + 300;
+		clawTimeOut = nPgmTime + 400;
 		setClaw(128,true);
 		while( SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut) )  sleep(10);
 
 		setArm(128,true);
-		armTimeOut = nPgmTime + 600;
+		armTimeOut = nPgmTime + 700;
 		while( SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut) )  sleep(10);
 
 		setClaw (20,true) ;
@@ -689,7 +707,7 @@ void stack()
 		sleep(150);
 		setClaw(-128,true);
 
-		while ( SensorValue[liftPoti] > gLiftTarget-200  && !SensorValue[limBottom] ) sleep(10);
+		while ( SensorValue[liftPoti] > gLiftTarget-160  && !SensorValue[limBottom] ) sleep(10); //200
 		setLift(15,true);
 
 		writeDebugStreamLine("%d sleep(100)", nPgmTime-gOverAllTime);
@@ -724,7 +742,7 @@ void stack()
 		// if the claw is open then make sure the arm is down close the claw
 		if( gSensor[clawPoti].value > CLAW_CLOSE+100 )
 		{
-			setArm(-50,true);
+			setArm(-127,true);
 			armTimeOut = nPgmTime + 500;
 			while( gSensor[armPoti].value > ARM_BOTTOM && !TimedOut(armTimeOut) ) sleep(10);
 		}
@@ -773,7 +791,7 @@ void stack()
 			setClaw(CLAW_OPEN_POWER,true);
 			sleep(150);
 			// dont lift as high as the original stack target
-			gLiftTarget = gLiftTarget-60;
+			gLiftTarget = gLiftTarget-30;//60
 			tStart(LiftTaskUp);
 			while( gSensor[clawPoti].value< CLAW_OPEN ) sleep(10);
 			setClaw(CLAW_OPEN_HOLD_POWER,true);
@@ -795,13 +813,13 @@ void stack()
 			sleep(200);
 			setLift(-50,true);
 			liftTimeOut = nPgmTime + 700;
-			gLiftTarget = 3100;
+			gLiftTarget = 2900; //JOHN
 			while( gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value && !TimedOut(liftTimeOut) ) sleep(10);
 			setLift(15, true);
 			setClaw(10,true);
 		}
 
-		writeDebugStreamLine( " STACKTIME = %d ms", nPgmTime- gOverAllTime);
+		writeDebugStreamLine( "------ STACK %d cones in %d ms -----", gNumCones, nPgmTime-gOverAllTime);
 	}
 }
 
@@ -867,9 +885,25 @@ void handleMacros()
 	//	if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
 	//	else if (gJoy[JOY_ADJUST].cur < 0 && gNumCones > 0) --gNumCones;
 	//}
-	if (RISING(BTN_MACRO_INC) && gNumCones < 11) ++gNumCones;
-	if (RISING(BTN_MACRO_DEC) && gNumCones > 0) --gNumCones;
-	if (RISING(BTN_MACRO_SCAN)) gNumCones = 0;
+
+	if (FALLING(BTN_MACRO_INC))
+		writeDebugStreamLine("%06d MAcro_INC Released",nPgmTime,gNumCones);
+	if (RISING(BTN_MACRO_INC) && gNumCones < 11) {
+		++gNumCones;
+		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+	}
+
+	if (RISING(BTN_MACRO_DEC) && gNumCones > 0) {
+		--gNumCones;
+		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+	}
+		if (FALLING(BTN_MACRO_SCAN))	writeDebugStreamLine("%06d MACRO_SCAN Released",nPgmTime,gNumCones);
+
+	if (RISING(BTN_MACRO_SCAN)) {
+
+		gNumCones = 0;
+		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+	}
 }
 
 
