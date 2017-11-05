@@ -290,7 +290,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 			pidCalculate(pidY, lineLength, localPos.y);
 			basePower = fabs(pidY.output * power);
 		}
-		//else
+		else
 			basePower = fabs((float) power);
 
 		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
