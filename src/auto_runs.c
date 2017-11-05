@@ -49,7 +49,7 @@ void autoStationaryCore()
 	gPosition.a = PI / 4;
 	releaseCPU();
 	grabPreload();
-	moveToTargetAsync(32.5, 32.5, 23, 23, 127, 6, 1, false, true);
+	moveToTargetAsync(32.5, 32.5, 23, 23, 127, 6, 1, 1.5, false, true);
 	unsigned long driveTimeout = nPgmTime + 1000;
 	gLiftTarget = 1500;
 	tStart(LiftTaskUp);
@@ -77,7 +77,7 @@ void autoStationaryCore()
 void autoStationaryBlueLeft()
 {
 	autoStationaryCore();
-	moveToTargetAsync(24, 30, 32.5, 32.5, -127, 6, 3, true, true);
+	moveToTargetAsync(24, 30, 32.5, 32.5, -127, 6, 1, 3, true, true);
 	unsigned long driveTimeout = nPgmTime + 1500;
 	sleep(300);
 	setLift(-80);

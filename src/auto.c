@@ -234,12 +234,14 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 
 float kP = 0.8, kI = 0.01, kD = 4, kIInner = PI / 8, kIOuter = PI;
 
-void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float epsilon, bool harshStop, bool slow)
+void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
 	sPID pidA, pidY;
 	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
 	pidInit(pidY, 0.3, 0.0, 0.0, -1, -1, -1, 1.0);
+
+	lineEpsilon = MIN(lineEpsilon, targetEpsilon - 0.5);
 
 	// Create the line to follow
 	sLine followLine;
@@ -261,7 +263,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 	sVector localPos;
 	sPolar polar;
 
-	epsilon *= epsilon;
+	targetEpsilon *= targetEpsilon;
 
 	sCycleData cycle;
 	initCycle(cycle, 50);
@@ -279,7 +281,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		if (localPos.y < -delta) currentDelta = -localPos.y;
 		else if (localPos.y > lineLength - delta) currentDelta = lineLength - localPos.y;
 		else currentDelta = delta;
-		float target = lineAngle - atan2(localPos.x, currentDelta);
+		float target = fabs(localPos.x) > lineEpsilon ? lineAngle - atan2(localPos.x, currentDelta) : lineAngle;
 
 		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
 		pidCalculate(pidA, target, gPosition.a);
@@ -294,6 +296,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 			basePower = fabs((float) power);
 
 		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
+		if (fabs(localPos.x) <= lineEpsilon) weight *= 0.5;
 
 		float scalar = basePower / (1 + fabs(weight));
 
@@ -309,7 +312,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		localPos.y -= lineLength;
 
 		endCycle(cycle);
-	} while (localPos.x * localPos.x + localPos.y * localPos.y > epsilon);
+	} while (localPos.x * localPos.x + localPos.y * localPos.y > targetEpsilon);
 
 	if (harshStop)
 		applyHarshStop();
@@ -319,7 +322,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTarget(float y, float x, byte power, float delta, float epsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, epsilon, harshStop, slow); }
+void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, lineEpsilon, targetEpsilon, harshStop, slow); }
 
 void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
 {
