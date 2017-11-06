@@ -232,7 +232,7 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	startTask(trackPositionTask);
 }
 
-float kP = 0.8, kI = 0.01, kD = 4, kIInner = PI / 8, kIOuter = PI;
+float kP = 2.0, kI = 0.0, kD = 2.0, kIInner = PI / 6, kIOuter = PI;
 
 void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
 {
@@ -241,7 +241,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
 	pidInit(pidY, 0.3, 0.0, 0.0, -1, -1, -1, 1.0);
 
-	lineEpsilon = MIN(lineEpsilon, targetEpsilon - 0.5);
+	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
 
 	// Create the line to follow
 	sLine followLine;
@@ -255,6 +255,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 	followLine.p2.x = x;
 
 	float lineLength = getLengthOfLine(followLine);
+	writeDebugStreamLine("Line length: %.2f", lineLength);
 	float lineAngle = getAngleOfLine(followLine); // Get the angle of the line that we're following relative to the vertical
 	float pidAngle = nearAngle(lineAngle - (power < 0 ? PI : 0), gPosition.a);
 	writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
@@ -277,11 +278,13 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		polar.angle += lineAngle;
 		polarToVector(polar, localPos);
 
+		bool closeToLine = fabs(localPos.x) > lineEpsilon && localPos.y < lineLength - MAX(lineEpsilon, delta);
+
 		float currentDelta;
 		if (localPos.y < -delta) currentDelta = -localPos.y;
 		else if (localPos.y > lineLength - delta) currentDelta = lineLength - localPos.y;
 		else currentDelta = delta;
-		float target = fabs(localPos.x) > lineEpsilon ? lineAngle - atan2(localPos.x, currentDelta) : lineAngle;
+		float target = closeToLine ? pidAngle - atan2(localPos.x, currentDelta) : pidAngle;
 
 		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
 		pidCalculate(pidA, target, gPosition.a);
@@ -296,7 +299,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 			basePower = fabs((float) power);
 
 		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
-		if (fabs(localPos.x) <= lineEpsilon) weight *= 0.5;
+		//if (closeToLine) weight *= 0.5;
 
 		float scalar = basePower / (1 + fabs(weight));
 
@@ -312,7 +315,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		localPos.y -= lineLength;
 
 		endCycle(cycle);
-	} while (localPos.x * localPos.x + localPos.y * localPos.y > targetEpsilon);
+	} while (localPos.y < 0 && localPos.x * localPos.x + localPos.y * localPos.y > targetEpsilon);
 
 	if (harshStop)
 		applyHarshStop();
