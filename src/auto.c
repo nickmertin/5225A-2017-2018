@@ -199,10 +199,10 @@ void applyHarshStop()
 	polarToVector(polarVel, vel);
 	float yPow = vel.y, aPow = gVelocity.a;
 	yPow *= -0.7;
-	aPow *= -12;
+	aPow *= -8;
 
-	LIM_TO_VAL_SET(yPow, 127);
-	LIM_TO_VAL_SET(aPow, 127);
+	LIM_TO_VAL_SET(yPow, 50);
+	LIM_TO_VAL_SET(aPow, 50);
 
 	word left = yPow + aPow;
 	word right = yPow - aPow;
