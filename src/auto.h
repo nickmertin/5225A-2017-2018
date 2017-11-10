@@ -6,7 +6,7 @@
 // The distance between the tracking wheels and the centre of the robot in inches
 #define L_DISTANCE_IN 6.875
 #define R_DISTANCE_IN 6.875
-#define S_DISTANCE_IN 13.5
+#define S_DISTANCE_IN 10
 
 // The number of tick per rotation of the tracking wheel
 #define TICKS_PER_ROTATION 360.0
