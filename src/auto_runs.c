@@ -41,62 +41,83 @@ void autoSkills()
 {
 }
 
-void autoStationaryCore()
+void autoStationaryCore(bool setup, int liftUp, int liftDown, tTurnDir turnDir)
 {
-	hogCPU();
-	gPosition.x = 33.6;
-	gPosition.y = 33.6;
-	gPosition.a = PI / 4;
-	releaseCPU();
-	grabPreload();
-	moveToTargetAsync(43, 43, 33.6, 33.6, 127, 6, 1, 1.5, false, true);
-	unsigned long driveTimeout = nPgmTime + 1000;
-	gLiftTarget = 1800;
+	unsigned long driveTimeout, coneTimeout;
+	if (setup)
+	{
+		hogCPU();
+		gPosition.x = 30;
+		gPosition.y = 30;
+		gPosition.a = PI / 4;
+		releaseCPU();
+		//grabPreload();
+	}
+	else
+	{
+		turnToTargetAsync(48, 48, gPosition.y, gPosition.x, turnDir, 60, 60, true, true, 0);
+		driveTimeout = nPgmTime + 1500;
+		coneTimeout = nPgmTime + 1000;
+		setArm(127);
+		while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "sg core 1")) sleep(10);
+		setArm(10);
+		turnToTargetAwait(driveTimeout);
+	}
+	moveToTargetAsync(48, 48, gPosition.y, gPosition.x, 60, 4, 1, 11.5, true, true);
+	driveTimeout = nPgmTime + 3000;
+	gLiftTarget = liftUp;
 	tStart(LiftTaskUp);
-	unsigned long coneTimeout = nPgmTime + 1000;
-	while (!gLiftTargetReached && !TimedOut(coneTimeout)) sleep(10);
+	coneTimeout = nPgmTime + 1000;
+	while (!gLiftTargetReached && !TimedOut(coneTimeout, "sg core 2")) sleep(10);
 	setLift(-15);
 	moveToTargetAwait(driveTimeout);
-	setArm(-70);
+	setArm(-90);
 	coneTimeout = nPgmTime + 500;
-	while (gSensor[armPoti].value > 1750 && !TimedOut(coneTimeout)) sleep(10);
+	while (gSensor[armPoti].value > 1750 && !TimedOut(coneTimeout, "sg core 3")) sleep(10);
 	setArm(10);
 	setLift(-50);
 	coneTimeout = nPgmTime + 800;
-	while (gSensor[liftPoti].value > 1800 && !TimedOut(coneTimeout)) sleep(10);
-	setLift(10);
+	while (gSensor[liftPoti].value > liftDown && !TimedOut(coneTimeout, "sg core 4")) sleep(10);
+	setLift(0);
 	setClaw(CLAW_OPEN_POWER);
 	coneTimeout = nPgmTime + 500;
-	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout)) sleep(10);
-	setClaw(CLAW_OPEN_HOLD_POWER);
+	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "sg core 5")) sleep(10);
+	setClaw(-15);
 	setArm(127);
 	coneTimeout = nPgmTime + 500;
-	while (gSensor[armPoti].value < ARM_TOP - 100 && !TimedOut(coneTimeout)) sleep(10);
+	while (gSensor[armPoti].value < ARM_TOP - 100 && !TimedOut(coneTimeout, "sg core 6")) sleep(10);
 	setArm(10);
-	sleep(500);
+	sleep(200);
 }
 
 void autoStationaryBlueLeft()
 {
-	autoStationaryCore();
-	setClaw(-15);
-	moveToTargetAsync(36, 38, 43, 43, -60, 6, 4, 4, false, true);
+	autoStationaryCore(true, 1850, 1600, cw);
+	moveToTargetAsync(33, 35, 38.5, 38.5, -60, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
 	moveToTargetAwait(driveTimeout);
-	sleep(300);
-	moveToTargetAsync(70, 18, 36, 36, 127, 6, 2, 8, false, true);
+	turnToTargetAsync(63, 23, gPosition.y, gPosition.x, ccw, 60, 60, true, true, 0);
+	driveTimeout = nPgmTime + 1500;
+	turnToTargetAwait(driveTimeout);
+	moveToTargetAsync(63, 23, gPosition.y, gPosition.x, 60, 4, 1, 8, false, true);
 	driveTimeout = nPgmTime + 3000;
 	tStart(dropArm);
 	setLift(-80);
-	unsigned long coneTimeout = nPgmTime + 2000;
-	while (!gSensor[limBottom].value && !TimedOut(coneTimeout)) sleep(10);
+	unsigned long coneTimeout = nPgmTime + 1000;
+	while (!gSensor[limBottom].value && !TimedOut(coneTimeout, "sg lb 1")) sleep(10);
 	setLift(-10);
 	moveToTargetAwait(driveTimeout);
-	moveToTargetAsync(70, 18, 36, 36, 50, 4, 1, 1, true, true);
+	moveToTargetAsync(63, 23, 33, 35, 40, 4, 1, 1, false, true);
+	driveTimeout = nPgmTime + 1000;
+	sleep(200);
 	setClaw(CLAW_CLOSE_POWER);
-	coneTimeout = nPgmTime + 500;
-	while (gSensor[clawPoti].value < CLAW_CLOSE && !TimedOut(coneTimeout)) sleep(10);
+	coneTimeout = nPgmTime + 1000;
+	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(coneTimeout, "sg lb 2")) sleep(10);
 	setClaw(CLAW_CLOSE_HOLD_POWER);
+	sleep(300);
+	moveToTargetAwait(driveTimeout);
+	autoStationaryCore(false, 2250, 2100, cw);
+	moveToTarget(61, 35, 48, 48, -50, 6, 3, 3, false, true);
 }
 
 void autoTest()

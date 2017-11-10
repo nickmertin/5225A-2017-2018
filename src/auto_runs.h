@@ -9,7 +9,7 @@ typedef enum _tAlliance
 void selectAuto();
 void runAuto();
 void autoSkills();
-void autoStationaryCore();
+void autoStationaryCore(bool setup, int liftPos);
 void autoStationaryBlueLeft();
 void autoTest();
 
