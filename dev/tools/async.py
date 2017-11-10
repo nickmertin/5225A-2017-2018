@@ -20,7 +20,7 @@ for i in range(max + 1):
     print('  tStart(asyncTask_##func); \\')
     print('} \\')
     print('void func##Await(unsigned long timeout) { \\')
-    print('  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \\')
+    print('  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, "await - " #func)) sleep(10); \\')
     print('} \\')
     print('void func##Kill() { \\')
     print('  tStopAll(asyncTask_##func); \\')
