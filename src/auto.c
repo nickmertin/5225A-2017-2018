@@ -158,7 +158,7 @@ task autoSafetyTask()
 	int lastR = gSensor[driveEncR].value;
 	int lastB = gSensor[latEnc].value;
 	sCycleData cycle;
-	initCycle(cycle, 10);
+	initCycle(cycle, 10, "auto safety");
 	while (true)
 	{
 		if (gAutoSafety)
@@ -267,7 +267,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 	targetEpsilon *= targetEpsilon;
 
 	sCycleData cycle;
-	initCycle(cycle, 50);
+	initCycle(cycle, 50, "moveToTarget");
 	do
 	{
 		// Setup our current displacement

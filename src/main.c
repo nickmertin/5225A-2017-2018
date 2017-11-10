@@ -1003,7 +1003,7 @@ task autonomous()
 task usercontrol()
 {
 	startSensors(); // Initilize the sensors
-	initCycle(gMainCycle, 10);
+	initCycle(gMainCycle, 10, "main");
 
 	gKillDriveOnTimeout = false;
 
