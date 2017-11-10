@@ -142,12 +142,14 @@ task trackPositionTask()
 
 task autoMotorSensorUpdateTask()
 {
+	sCycleData cycle;
+	initCycle(cycle, 10, "auto motor/sensor");
 	while (true)
 	{
 		updateMotors();
 		updateSensorInputs();
 		updateSensorOutputs();
-		EndTimeSlice();
+		endCycle(cycle);
 	}
 }
 
