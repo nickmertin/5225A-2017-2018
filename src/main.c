@@ -521,15 +521,15 @@ task dropArm();
 
 bool gKillDriveOnTimeout = false;
 
-bool TimedOut( unsigned long timeOut )
+bool TimedOut(unsigned long timeOut, const string description)
 {
-	if( nPgmTime > timeOut )
+	if (nPgmTime > timeOut)
 	{
 		hogCPU();
 		gMotor[arm].power =	gMotor[claw].power = gMotor[liftL].power =  gMotor[liftR].power = 0;
 		if (gKillDriveOnTimeout) setDrive(0, 0);
 		updateMotors();
-		writeDebugStreamLine ("%06d EXCEEDED TIME %d", nPgmTime-gOverAllTime,timeOut-gOverAllTime);
+		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
 		gArmState= armHold;
 		gLiftState = liftHold;
 		gClawState = clawIdle;
@@ -584,7 +584,7 @@ task dropArm()
 	gArmDown = false;
 	setArm(-127,true);
 	armTimeOut = nPgmTime + 700;
-	while( gSensor[armPoti].value > ARM_BOTTOM  + 700 && !TimedOut(armTimeOut) ) sleep(10);
+	while (gSensor[armPoti].value > ARM_BOTTOM  + 700 && !TimedOut(armTimeOut, "dropArm")) sleep(10);
 	setArm(30,true);
 	sleep(60);
 	setArm(-90,true);
@@ -618,20 +618,20 @@ void stack()
 
 		clawTimeOut = nPgmTime + 300;
 		setClaw(128, true);
-		while( SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut) )  sleep(10);
+		while (SensorValue[clawPoti] > CLAW_CLOSE + 200 && !TimedOut(clawTimeOut, "stack 1")) sleep(10);
 		setArm(128, true);
 		clawTimeOut = nPgmTime + 500;
 		armTimeOut = nPgmTime +600;
-		while( SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut) )  sleep(10);
+		while (SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 2")) sleep(10);
 
 		//claw holding power while lifting
 		setClaw (20, true) ;
 
-		while( SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut)) sleep(10);
+		while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 3")) sleep(10);
 		//squeeze claw as it approaches the top of the arm swing
 		setClaw ( 40, true );
 		armTimeOut = nPgmTime +350;
-		while( SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut) )  sleep(10);
+		while (SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut, "stack 4")) sleep(10);
 		setArm(15, true);
 		setClaw(25, true);
 		sleep(450);
@@ -656,20 +656,20 @@ void stack()
 		writeDebugStreamLine(" STACKING on %d", gNumCones );
 		clawTimeOut = nPgmTime + 400;
 		setClaw(128,true);
-		while( SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut) )  sleep(10);
+		while (SensorValue[clawPoti] > CLAW_CLOSE + 200 && !TimedOut(clawTimeOut, "stack 5")) sleep(10);
 
 		setArm(128,true);
 		armTimeOut = nPgmTime + 700;
-		while( SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut) )  sleep(10);
+		while (SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 6")) sleep(10);
 
 		setClaw (20,true) ;
 		gLiftTarget = LIFT_BOTTOM +  gliftTargetA[gNumCones];
 		tStart( LiftTaskUp );
 
-		while( SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut)) sleep(10);
+		while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 7")) sleep(10);
 
 		setClaw (40);
-		while( SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut))  sleep(10);
+		while (SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut, "stack 8")) sleep(10);
 
 		setArm(20);
 		setClaw(15);
@@ -694,19 +694,19 @@ void stack()
 		writeDebugStreamLine(" -------------STACKING on %d", gNumCones );
 		clawTimeOut = nPgmTime + 300;
 		setClaw(128,true);
-		while( SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut) )  sleep(10);
+		while (SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut, "stack 9")) sleep(10);
 
 		setArm(128,true);
 		armTimeOut = nPgmTime + 600;
-		while( SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut) )  sleep(10);
+		while (SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 10")) sleep(10);
 
 		setClaw (20,true) ;
 		gLiftTarget = LIFT_BOTTOM +  gliftTargetA[gNumCones];
 		tStart( LiftTaskUp );
-		while( SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut)) sleep(10);
+		while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 11")) sleep(10);
 
 		setClaw (40,true);
-		while( SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut))  sleep(10);
+		while (SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut, "stack 12")) sleep(10);
 
 		setArm (15,true);
 		setClaw (15,true);
@@ -731,7 +731,7 @@ void stack()
 		armTimeOut = nPgmTime + 600;
 		gArmDown= false;
 		tStart( dropArm );
-		while( SensorValue[armPoti] > ARM_TOP-600  && !TimedOut(armTimeOut))  sleep(10);
+		while (SensorValue[armPoti] > ARM_TOP-600  && !TimedOut(armTimeOut, "stack 13")) sleep(10);
 		setLift(-30,true);
 		while ( !SensorValue[limBottom] ) sleep(10);
 		setLift(-10,true);
@@ -751,24 +751,24 @@ void stack()
 		{
 			setArm(-127,true);
 			armTimeOut = nPgmTime + 500;
-			while( gSensor[armPoti].value > ARM_BOTTOM && !TimedOut(armTimeOut) ) sleep(10);
+			while (gSensor[armPoti].value > ARM_BOTTOM && !TimedOut(armTimeOut, "stack 14")) sleep(10);
 		}
 
 		gOverAllTime = nPgmTime;
 		setArm(-15,true);
 		setClaw(CLAW_CLOSE_POWER,true);
 		clawTimeOut = nPgmTime + 300;
-		while( gSensor[clawPoti].value > CLAW_CLOSE+300 && !TimedOut(clawTimeOut) ) sleep(10);
+		while (gSensor[clawPoti].value > CLAW_CLOSE+300 && !TimedOut(clawTimeOut, "stack 15")) sleep(10);
 
 		// raise the arm while closing the claw along the way.
 		setArm(127,true);
 		armTimeOut = nPgmTime + 500;
 		clawTimeOut = nPgmTime + 300;
-		while( gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(clawTimeOut) ) sleep(10);
+		while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 16")) sleep(10);
 		setClaw(CLAW_CLOSE_HOLD_POWER,true);
 
 		//wait for the arm to pull the cone away from the base before raising the lift
-		while( gSensor[armPoti].value < ARM_BOTTOM+100 && !TimedOut(armTimeOut)) sleep(10);//200
+		while (gSensor[armPoti].value < ARM_BOTTOM+100 && !TimedOut(armTimeOut, "stack 17")) sleep(10);//200
 
 		setArm(25,true);
 		tStart( LiftTaskUp );
@@ -779,11 +779,11 @@ void stack()
 		setArm(127,true);
 
 		// tighten the claw just before hitting the top
-		while( gSensor[armPoti].value < ARM_TOP-600 && !TimedOut(armTimeOut) ) sleep(10);
+		while (gSensor[armPoti].value < ARM_TOP-600 && !TimedOut(armTimeOut, "stack 18")) sleep(10);
 		setClaw(40,true);
 
 		//arm reached the top
-		while( gSensor[armPoti].value < ARM_TOP && !TimedOut(armTimeOut) ) sleep(10);
+		while (gSensor[armPoti].value < ARM_TOP && !TimedOut(armTimeOut, "stack 19")) sleep(10);
 		setArm(25,true);
 		setClaw(CLAW_CLOSE_HOLD_POWER,true);
 
@@ -792,7 +792,7 @@ void stack()
 		{
 			setLift(-80,true);
 			liftTimeOut = nPgmTime+400;
-			while( gSensor[liftPoti].value > gLiftTarget-60 && !gSensor[limBottom].value && !TimedOut(liftTimeOut) ) sleep(10);
+			while (gSensor[liftPoti].value > gLiftTarget-60 && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 20")) sleep(10);
 			setLift(15,true);
 
 			setClaw(CLAW_OPEN_POWER,true);
@@ -821,7 +821,7 @@ void stack()
 			setLift(-50,true);
 			liftTimeOut = nPgmTime + 700;
 			gLiftTarget = 2900; //JOHN
-			while( gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value && !TimedOut(liftTimeOut) ) sleep(10);
+			while (gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 21")) sleep(10);
 			setLift(15, true);
 			setClaw(10,true);
 		}

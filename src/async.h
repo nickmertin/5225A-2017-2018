@@ -7,7 +7,7 @@ void func##Async() { \
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -27,7 +27,7 @@ void func##Async(type0 arg0) { \
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -49,7 +49,7 @@ void func##Async(type0 arg0, type1 arg1) { \
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -73,7 +73,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2) { \
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -99,7 +99,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -127,7 +127,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -157,7 +157,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -189,7 +189,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -223,7 +223,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -259,7 +259,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
@@ -297,7 +297,7 @@ void func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   tStart(asyncTask_##func); \
 } \
 void func##Await(unsigned long timeout) { \
-  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout)) sleep(10); \
+  while (tEls[asyncTask_##func].parent != -1 && !TimedOut(timeout, #func "Await")) sleep(10); \
 } \
 void func##Kill() { \
   tStopAll(asyncTask_##func); \
