@@ -27,6 +27,15 @@ void updateSensorInput(tSensors sen)
 		gSensor[sen].value = correctBtnIn(sen);
 	else
 		gSensor[sen].value = SensorValue[sen];
+
+	if (SensorType[sen] == sensorPotentiometer && abs(gSensor[sen].value - gSensor[sen].lstValue) > 300 && ++gSensor[sen].filterAcc < 10)
+	{
+		if (gSensor[sen].filterAcc == 1)
+			writeDebugStreamLine("%d port %d jumped from %d to %d", nPgmTime, sen - port1 + 1, gSensor[sen].lstValue, gSensor[sen].value);
+		gSensor[sen].value = gSensor[sen].lstValue;
+	}
+	else
+		gSensor[sen].filterAcc = 0;
 }
 
 void updateSensorInputs()
@@ -151,6 +160,7 @@ void setupSensors()
 		gSensor[i].valueVelLst = 0;
 		gSensor[i].timeVelCheck = 0;
 		gSensor[i].velGood = false;
+		gSensor[i].filterAcc = 0;
 
 		startSensor(i);
 	}
