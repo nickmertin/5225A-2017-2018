@@ -155,8 +155,8 @@ typedef enum _sArmStates {
 #define ARM_DOWN_KP 0.25
 #define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
-#define ARM_TOP 2060
-#define ARM_BOTTOM  95
+#define ARM_TOP 1900
+#define ARM_BOTTOM  115
 
 short gArmPositions[] = { 130, 750, 2050 };
 word gArmHoldPower[] = { -12, 0, 10 };
