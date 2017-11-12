@@ -384,8 +384,8 @@ typedef enum _sMobileStates {
 	mobileDownToMiddle
 } sMobileStates;
 
-#define MOBILE_TOP 2950
-#define MOBILE_BOTTOM 600
+#define MOBILE_TOP 3000
+#define MOBILE_BOTTOM 800
 #define MOBILE_MIDDLE_UP 1200
 #define MOBILE_MIDDLE_DOWN 2200
 
