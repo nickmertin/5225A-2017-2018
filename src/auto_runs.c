@@ -41,17 +41,25 @@ void autoSkills()
 {
 }
 
-void autoStationaryCore(bool setup, int liftUp, int liftDown, tTurnDir turnDir)
+void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 {
 	unsigned long driveTimeout, coneTimeout;
-	if (setup)
+	if (first)
 	{
 		hogCPU();
-		gPosition.x = 30;
-		gPosition.y = 30;
+		gPosition.x = 30.5;
+		gPosition.y = 30.5;
 		gPosition.a = PI / 4;
 		releaseCPU();
 		//grabPreload();
+		setClaw(CLAW_CLOSE_HOLD_POWER);
+		sleep(200);
+		setArm(-80);
+		coneTimeout = nPgmTime + 1500;
+		while (gSensor[armPoti].value > 1800 && !TimedOut(coneTimeout, "preload")) sleep(10);
+		setArm(80);
+		sleep(300);
+		setArm(10);
 	}
 	else
 	{
@@ -60,21 +68,23 @@ void autoStationaryCore(bool setup, int liftUp, int liftDown, tTurnDir turnDir)
 		coneTimeout = nPgmTime + 1000;
 		setArm(127);
 		while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "sg core 1")) sleep(10);
-		setArm(10);
+		setArm(15);
 		turnToTargetAwait(driveTimeout);
 	}
-	moveToTargetAsync(48, 48, gPosition.y, gPosition.x, 60, 4, 1, 11.5, true, true);
+	moveToTargetAsync(48, 48, gPosition.y, gPosition.x, 40, 4, 1, 12, true, true);
 	driveTimeout = nPgmTime + 3000;
 	gLiftTarget = liftUp;
 	tStart(LiftTaskUp);
 	coneTimeout = nPgmTime + 1000;
 	while (!gLiftTargetReached && !TimedOut(coneTimeout, "sg core 2")) sleep(10);
-	setLift(-15);
+	setLift(-10);
 	moveToTargetAwait(driveTimeout);
+	sleep(500);
 	setArm(-90);
 	coneTimeout = nPgmTime + 500;
-	while (gSensor[armPoti].value > 1750 && !TimedOut(coneTimeout, "sg core 3")) sleep(10);
+	while (gSensor[armPoti].value > (first ? 1850 : 1750) && !TimedOut(coneTimeout, "sg core 3")) sleep(10);
 	setArm(10);
+	sleep(500);
 	setLift(-50);
 	coneTimeout = nPgmTime + 800;
 	while (gSensor[liftPoti].value > liftDown && !TimedOut(coneTimeout, "sg core 4")) sleep(10);
@@ -92,13 +102,15 @@ void autoStationaryCore(bool setup, int liftUp, int liftDown, tTurnDir turnDir)
 
 void autoStationaryBlueLeft()
 {
-	autoStationaryCore(true, 1850, 1600, cw);
-	moveToTargetAsync(33, 35, 38.5, 38.5, -60, 6, 4, 4, false, true);
+	autoStationaryCore(true, 2200, 1600, cw);
+	moveToTargetAsync(33, 35, 38.5, 38.5, -40, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
 	moveToTargetAwait(driveTimeout);
+	sleep(200);
 	turnToTargetAsync(63, 23, gPosition.y, gPosition.x, ccw, 60, 60, true, true, 0);
 	driveTimeout = nPgmTime + 1500;
 	turnToTargetAwait(driveTimeout);
+	sleep(200);
 	moveToTargetAsync(63, 23, gPosition.y, gPosition.x, 60, 4, 1, 8, false, true);
 	driveTimeout = nPgmTime + 3000;
 	tStart(dropArm);
@@ -116,8 +128,44 @@ void autoStationaryBlueLeft()
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	sleep(300);
 	moveToTargetAwait(driveTimeout);
+	gPosition.x += 1;
 	autoStationaryCore(false, 2250, 2100, cw);
 	moveToTarget(61, 35, 48, 48, -50, 6, 3, 3, false, true);
+}
+
+void autoStationaryRedRight()
+{
+	autoStationaryCore(true, 2150, 1600, ccw);
+	moveToTargetAsync(35, 33, 38.5, 38.5, -40, 6, 4, 4, false, true);
+	unsigned long driveTimeout = nPgmTime + 2000;
+	moveToTargetAwait(driveTimeout);
+	sleep(200);
+	turnToTargetAsync(25, 58, gPosition.y, gPosition.x, cw, 60, 60, true, true, 0);
+	driveTimeout = nPgmTime + 1500;
+	turnToTargetAwait(driveTimeout);
+	sleep(200);
+	moveToTargetAsync(25, 58, gPosition.y, gPosition.x, 60, 4, 1, 8, false, true);
+	driveTimeout = nPgmTime + 3000;
+	tStart(dropArm);
+	setLift(-80);
+	unsigned long coneTimeout = nPgmTime + 1000;
+	while (!gSensor[limBottom].value && !TimedOut(coneTimeout, "sg lb 1")) sleep(10);
+	setLift(-10);
+	moveToTargetAwait(driveTimeout);
+	moveToTargetAsync(25, 58, 35, 33, 40, 4, 1, 1, false, true);
+	driveTimeout = nPgmTime + 1000;
+	sleep(200);
+	setClaw(CLAW_CLOSE_POWER);
+	coneTimeout = nPgmTime + 1000;
+	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(coneTimeout, "sg lb 2")) sleep(10);
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+	sleep(300);
+	moveToTargetAwait(driveTimeout);
+	sleep(100);
+	gPosition.x += 2.5;
+	gPosition.y += 4.5;
+	autoStationaryCore(false, 2250, 2100, ccw);
+	moveToTarget(35, 61, 48, 48, -50, 6, 3, 3, false, true);
 }
 
 void autoTest()

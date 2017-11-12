@@ -160,7 +160,7 @@ typedef enum _sArmStates {
 #define ARM_TOP 1900
 #define ARM_BOTTOM  115
 
-short gArmPositions[] = { 130, 750, 2050 };
+short gArmPositions[] = { 130, 750, 1950 };
 word gArmHoldPower[] = { -12, 0, 10 };
 short gArmPosition = 2;
 short gArmTarget;
@@ -310,7 +310,7 @@ typedef enum _sClawStates {
 #define CLAW_CLOSE_HOLD_POWER 15
 #define CLAW_OPEN_HOLD_POWER -12
 
-#define CLAW_OPEN 1630
+#define CLAW_OPEN 1600
 #define CLAW_CLOSE 660
 
 #define CLAW_TIMEOUT 1000
@@ -1003,7 +1003,7 @@ task autonomous()
 task usercontrol()
 {
 	startSensors(); // Initilize the sensors
-	initCycle(gMainCycle, 10, "main");
+	initCycle(gMainCycle, 20, "main");
 
 	gKillDriveOnTimeout = false;
 

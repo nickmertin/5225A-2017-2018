@@ -136,7 +136,7 @@ task trackPositionTask()
 		updateSensorInput(latEnc);
 		trackPosition(gSensor[driveEncL].value, gSensor[driveEncR].value, gSensor[latEnc].value, gPosition);
 		trackVelocity(gPosition, gVelocity);
-		EndTimeSlice();
+		sleep(1);
 	}
 }
 
@@ -280,6 +280,8 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		polar.angle += lineAngle;
 		polarToVector(polar, localPos);
 
+		EndTimeSlice();
+
 		bool closeToLine = fabs(localPos.x) > lineEpsilon && localPos.y < lineLength - MAX(lineEpsilon, delta);
 
 		float currentDelta;
@@ -288,8 +290,12 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		else currentDelta = delta;
 		float target = closeToLine ? pidAngle - atan2(localPos.x, currentDelta) : pidAngle;
 
+		EndTimeSlice();
+
 		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
 		pidCalculate(pidA, target, gPosition.a);
+
+		EndTimeSlice();
 
 		float basePower;
 		if (slow)
@@ -300,6 +306,8 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		else
 			basePower = fabs((float) power);
 
+		EndTimeSlice();
+
 		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
 		//if (closeToLine) weight *= 0.5;
 
@@ -307,6 +315,8 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 
 		word left = (word)(scalar * (sgn(power) + weight));
 		word right = (word)(scalar * (sgn(power) - weight));
+
+		EndTimeSlice();
 
 		writeDebugStreamLine("Global %.2f %.2f %.2f | %.2f %.2f Local %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, radToDeg(gPosition.a), gVelocity.y, gVelocity.x, localPos.y, localPos.x, radToDeg(target - pidA.error), radToDeg(target), weight, left, right);
 
@@ -426,6 +436,8 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 
 	if (slow)
 	{
+		sCycleData cycle;
+		initCycle(cycle, 10, "moveToTarget");
 		switch (turnDir)
 		{
 			case cw:
@@ -438,7 +450,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 					int power = round(abs(pidA.output));
 					LIM_TO_VAL_SET(power, 127);
 					setDrive(power > left ? left : power, power > right ? -right : -power);
-					sleep(1);
+					endCycle(cycle);
 				}
 				break;
 			case ccw:
@@ -451,7 +463,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 					int power = round(abs(pidA.output));
 					LIM_TO_VAL_SET(power, 127);
 					setDrive(power > left ? -left : -power, power > right ? right : power);
-					sleep(1);
+					endCycle(cycle);
 				}
 				break;
 		}
@@ -462,11 +474,11 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 		{
 			case cw:
 				setDrive(left, -right);
-				while (gPosition.a < a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(1); }
+				while (gPosition.a < a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(10); }
 				break;
 			case ccw:
 				setDrive(-left, right);
-				while (gPosition.a > a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(1); }
+				while (gPosition.a > a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(10); }
 				break;
 		}
 	}
@@ -558,13 +570,19 @@ task stopAutoAt15()
 
 void grabPreload()
 {
-	setArm(-127);
+	setArm(-80);
 	unsigned long timeout = nPgmTime + 1000;
-	while (gSensor[armPoti].value > gArmPositions[2] && !TimedOut(timeout, "preload 1")) sleep(10);
-	setArm(10);
+	while (gSensor[armPoti].value > 2700 && !TimedOut(timeout, "preload 1")) sleep(10);
+	setArm(-10);
 	sleep(200);
 	setClaw(CLAW_CLOSE_POWER);
 	timeout = nPgmTime + 800;
 	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(timeout, "preload 2")) sleep(10);
 	setClaw(CLAW_CLOSE_HOLD_POWER);
+	sleep(200);
+	setArm(-80);
+	timeout = nPgmTime + 500;
+	while (gSensor[clawPoti].value > 1200 && !TimedOut(timeout, "preload 3")) sleep(10);
+	setArm(10);
+	sleep(200);
 }

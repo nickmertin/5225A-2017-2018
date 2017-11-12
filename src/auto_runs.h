@@ -11,6 +11,7 @@ void runAuto();
 void autoSkills();
 void autoStationaryCore(bool setup, int liftPos);
 void autoStationaryBlueLeft();
+void autoStationaryRedRight();
 void autoTest();
 
 /* Variables */
