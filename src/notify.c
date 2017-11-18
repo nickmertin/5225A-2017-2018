@@ -5,14 +5,14 @@ byte waitOn(sNotifier& notifier, unsigned long timeout)
 	notifier.waitee = -1;
 	while (!notifier.set && nPgmTime < timeout)
 	{
-		sleep(10);
 		if (notifier.semaphore)
 		{
 			semaphoreLock(*notifier.semaphore, MIN(timeout - nPgmTime, 0x7FFF));
 			semaphoreUnlock(*notifier.semaphore);
 		}
+		else sleep(10);
 	}
-	return notifier.waitee;
+	return notifier.set ? notifier.waitee : -1;
 }
 
 bool lock(sNotifier& notifier, TSemaphore *semaphore)
