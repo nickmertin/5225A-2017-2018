@@ -36,6 +36,7 @@
 #include "cycle.h"
 #include "utilities.h"
 #include "pid.h"
+#include "notify.h"
 
 #include "task.c"
 #include "async.c"
@@ -45,6 +46,7 @@
 #include "cycle.c"
 #include "utilities.c"
 #include "pid.c"
+#include "notify.c"
 
 #include "controls.h"
 
