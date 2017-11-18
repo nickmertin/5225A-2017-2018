@@ -602,7 +602,7 @@ task dropArm()
 int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  850, 1140, 1560, 1950, LIFT_TOP-LIFT_BOTTOM };
 //////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
 
-void stack()
+void stack(bool downAfter)
 {
 	gArmState = armManaged;
 	gClawState = clawManaged;
@@ -638,13 +638,19 @@ void stack()
 		setClaw(-128, true);
 		while( SensorValue[clawPoti] < CLAW_OPEN-500 )  sleep(10);
 		gArmDown= false;
-		writeDebugStreamLine("%06d starting Task dropArm", nPgmTime-gOverAllTime);
-		tStart( dropArm );
+		if (downAfter)
+		{
+			writeDebugStreamLine("%06d starting Task dropArm", nPgmTime-gOverAllTime);
+			tStart(dropArm);
+		}
 
 		while( SensorValue[clawPoti] < CLAW_OPEN )  sleep(10);
 		setClaw(-10);
 		gNumCones++;
-		while( !gArmDown) sleep(10);
+		if (downAfter)
+		{
+			while( !gArmDown) sleep(10);
+		}
 		setArm(-15,true);
 		writeDebugStreamLine("stack time %dms",nPgmTime- gOverAllTime );
 
@@ -682,10 +688,16 @@ void stack()
 		setLift(-30);
 		sleep(50);
 		gArmDown= false;
-		tStart( dropArm );
+		if (downAfter)
+		{
+			tStart(dropArm);
+		}
 		setClaw(-10);
 		setLift(-12);
-		while( !gArmDown) sleep(10);
+		if (downAfter)
+		{
+			while( !gArmDown) sleep(10);
+		}
 		writeDebugStreamLine( " STACKTIME = %d ms", nPgmTime- gOverAllTime);
 	}
 	else if (gNumCones == 3)
@@ -728,14 +740,17 @@ void stack()
 		setClaw(-10,true);
 		while( !gLiftTargetReached) sleep(10);
 
-		armTimeOut = nPgmTime + 600;
 		gArmDown= false;
-		tStart( dropArm );
-		while (SensorValue[armPoti] > ARM_TOP-600  && !TimedOut(armTimeOut, "stack 13")) sleep(10);
-		setLift(-30,true);
-		while ( !SensorValue[limBottom] ) sleep(10);
-		setLift(-10,true);
-		while( !gArmDown ) sleep(10);
+		if (downAfter)
+		{
+			armTimeOut = nPgmTime + 600;
+			tStart( dropArm );
+			while (SensorValue[armPoti] > ARM_TOP-600  && !TimedOut(armTimeOut, "stack 13")) sleep(10);
+			setLift(-30,true);
+			while ( !SensorValue[limBottom] ) sleep(10);
+			setLift(-10,true);
+			while( !gArmDown ) sleep(10);
+		}
 
 		writeDebugStreamLine( " STACKTIME = %d ms", nPgmTime- gOverAllTime);
 
@@ -806,12 +821,15 @@ void stack()
 			while( !gLiftTargetReached ) sleep(10);
 
 			gArmDown = false;
-			tStart( dropArm );
-			while( gSensor[armPoti].value > ARM_TOP-400 )  sleep(10);
-			setLift(-127);
-			while ( !gSensor[limBottom].value ) sleep(10);
-			setLift(-10);
-			while( !gArmDown) sleep(10);
+			if (downAfter)
+			{
+				tStart( dropArm );
+				while( gSensor[armPoti].value > ARM_TOP-400 )  sleep(10);
+				setLift(-127);
+				while ( !gSensor[limBottom].value ) sleep(10);
+				setLift(-10);
+				while( !gArmDown) sleep(10);
+			}
 		}
 		else
 		{
@@ -836,7 +854,7 @@ task stackAsync()
 {
 	gMacros[stackAsync] = true;
 	gLiftTarget =LIFT_BOTTOM + gliftTargetA[gNumCones];
-	stack();
+	stack(true);
 	gMacros[stackAsync] = false;
 	return_t;
 }
