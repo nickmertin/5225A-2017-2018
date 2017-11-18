@@ -13,6 +13,7 @@ void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir);
 void autoStationaryBlueLeft();
 void autoStationaryRedRight();
 void autoSideMobileLeft();
+void autoSideMobileRight();
 void autoTest();
 
 /* Variables */
