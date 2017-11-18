@@ -24,6 +24,11 @@ float radToDeg(float radians)
 	return radians * 180 / PI;
 }
 
+float nearAngle(float angle, float reference)
+{
+	return round((reference - angle) / (2 * PI)) * (2 * PI) + angle;
+}
+
 void stopAllButCurrentTasks()
 {
 	// DO NOT MAKE A FOR LOOP, WILL NOT WORK
@@ -56,7 +61,9 @@ void startTaskID(word id)
 {
 	switch (id)
 	{
-		STS(0)
+		case 0:
+			writeDebugStreamLine("WARNING, MAIN TASK BEING STARTED AGAIN, ABORTING");
+			break;
 		STS(1)
 		STS(2)
 		STS(3)
@@ -86,7 +93,9 @@ void stopTaskID(word id)
 {
 	switch (id)
 	{
-		STS(0)
+		case 0:
+			writeDebugStreamLine("WARNING, MAIN TASK BEING STOPPED, ABORTING");
+			break;
 		STS(1)
 		STS(2)
 		STS(3)

@@ -11,22 +11,20 @@
 /* Arm */
 #define JOY_ARM Ch1
 #define DZ_ARM 70
-#define BTN_ARM_TOGGLE Btn7R
+#define BTN_ARM_DOWN Btn7R
 
 /* Claw */
-#define BTN_CLAW Btn8L
+#define BTN_CLAW_CLOSE Btn5U
+#define BTN_CLAW_OPEN Btn5D
 
 /* Mobile */
-#define BTN_MOBILE_UP Btn6U
-#define BTN_MOBILE_DOWN Btn6D
-#define BTN_MOBILE_20 Btn5D
-#define BTN_MOBILE_10 Btn5U
+#define BTN_MOBILE_MIDDLE Btn6U
+#define BTN_MOBILE_TOGGLE Btn6D
 
 /* Macros */
 #define BTN_MACRO_SCAN Btn8U
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
-//#define BTN_MACRO_20 Btn8R
 #define BTN_MACRO_STACK_CANCEL Btn8R
-#define BTN_MACRO_ADD Btn7U
-#define BTN_MACRO_SUB Btn7L
+#define BTN_MACRO_INC Btn7U
+#define BTN_MACRO_DEC Btn7L

@@ -33,6 +33,7 @@ typedef struct _sSensor
 	int dgtMin;
 	int dgtMax;
 	bool velGood;
+	ubyte filterAcc;
 } sSensor; // Represent a single sensor
 
 /* Functions */
