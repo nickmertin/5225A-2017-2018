@@ -978,7 +978,7 @@ void disabled()
 task autonomous()
 {
 	gAutoTime = nPgmTime;
-	writeDebugStreamLine("Auto start");
+	writeDebugStreamLine("Auto start %d", gAutoTime);
 
 	startSensors(); // Initilize the sensors
 
