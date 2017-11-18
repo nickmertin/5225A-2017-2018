@@ -510,12 +510,11 @@ void handleMobile()
 
 bool gLiftAsyncDone;
 bool gContinueLoader = false;
-bool gMacros[20] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 bool gLiftTargetReached;
 
 
 
-task stackAsync();
+void stackAsync(bool arg0);
 task LiftTaskUp();
 task dropArm();
 
@@ -533,8 +532,14 @@ bool TimedOut(unsigned long timeOut, const string description)
 		gArmState= armHold;
 		gLiftState = liftHold;
 		gClawState = clawIdle;
-		gMacros[stackAsync] = false;
-		tStopRoot();
+		int current = nCurrentTask;
+		while (true)
+		{
+			int next = tEls[current].parent;
+			if (next == -1 || next == usercontrol) break;
+			current = next;
+		}
+		tStopAll(current);
 		return true;
 	}
 	else
@@ -610,6 +615,8 @@ void stack(bool downAfter)
 	unsigned long armTimeOut;
 	unsigned long clawTimeOut;
 	unsigned long liftTimeOut;
+
+	gLiftTarget =LIFT_BOTTOM + gliftTargetA[gNumCones];
 
 	if( gNumCones< 2 )
 	{
@@ -848,23 +855,28 @@ void stack(bool downAfter)
 	}
 }
 
+NEW_ASYNC_VOID_1(stack, bool);
 
-
-task stackAsync()
+void stackFromLoader(int count)
 {
-	gMacros[stackAsync] = true;
-	gLiftTarget =LIFT_BOTTOM + gliftTargetA[gNumCones];
-	stack(true);
-	gMacros[stackAsync] = false;
-	return_t;
+
 }
 
+NEW_ASYNC_VOID_1(stackFromLoader, int);
 
-task stackFromLoaderAsync()
+bool cancel()
 {
-
-
-	return_t;
+	if (tEls[asyncTask_stack].parent != -1)
+		stackKill();
+	else if (tEls[asyncTask_stackFromLoader].parent != -1)
+		stackFromLoaderKill();
+	else
+		return false;
+	gLiftState = liftIdle;
+	gArmState = armIdle;
+	gClawState = clawIdle;
+	writeDebugStreamLine("Stack cancelled");
+	return true;
 }
 
 void handleMacros()
@@ -872,44 +884,25 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_STACK) && gNumCones < 11 )
 	{
-		writeDebugStreamLine("Stacking");
-		tStart(stackAsync, true);
-		playSound(soundUpwardTones);
+		if (!cancel())
+		{
+			writeDebugStreamLine("Stacking");
+			stackAsync(true);
+			playSound(soundUpwardTones);
+		}
 	}
 
-	if (RISING(BTN_MACRO_STACK_CANCEL) && gMacros[stackAsync])
-	{
-		tStopAll(stackAsync);
-		gMacros[stackAsync] = false;
-		gLiftState = liftIdle;
-		gArmState = armIdle;
-		gClawState = clawIdle;
-		writeDebugStreamLine("Stack cancelled");
-	}
 	if (RISING(BTN_MACRO_LOADER))
 	{
-		gContinueLoader = false;
-		if (gMacros[stackFromLoaderAsync])
+		if (!cancel())
 		{
-			tStopAll(stackFromLoaderAsync);
-			gMacros[stackFromLoaderAsync] = false;
-			gLiftState = liftIdle;
-			gArmState = armIdle;
-			gClawState = clawIdle;
-			writeDebugStreamLine("Stack from loader cancelled");
-		}
-		else
-		{
-			tStart(stackFromLoaderAsync);
 			writeDebugStreamLine("Stacking from loader");
+			stackFromLoaderAsync(11 - gNumCones);
+			playSound(soundUpwardTones);
 		}
 	}
-	if (FALLING(BTN_MACRO_LOADER) && gMacros[stackFromLoaderAsync]) gContinueLoader = true;
-	//if (RISING(JOY_ADJUST))
-	//{
-	//	if (gJoy[JOY_ADJUST].cur > 0 && gNumCones < 11) ++gNumCones;
-	//	else if (gJoy[JOY_ADJUST].cur < 0 && gNumCones > 0) --gNumCones;
-	//}
+
+	if (FALLING(BTN_MACRO_LOADER) || RISING(BTN_MACRO_STACK_CANCEL)) cancel();
 
 	if (FALLING(BTN_MACRO_INC))
 		writeDebugStreamLine("%06d MAcro_INC Released",nPgmTime,gNumCones);
