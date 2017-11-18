@@ -506,7 +506,7 @@ void handleMobile()
 }
 
 
-/* Macros */
+/* Macros + Autonomous */
 
 bool gLiftAsyncDone;
 bool gContinueLoader = false;
@@ -545,6 +545,9 @@ bool TimedOut(unsigned long timeOut, const string description)
 	else
 		return false;
 }
+
+#include "auto.h"
+#include "auto_runs.h"
 
 task LiftTaskUp()
 {
@@ -857,8 +860,13 @@ void stack(bool downAfter)
 
 NEW_ASYNC_VOID_1(stack, bool);
 
+float gLoaderOffset[12] = { 5, 4.5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
+
 void stackFromLoader(int count)
 {
+	if (count > 11) count = 11;
+	resetPositionFull(gPosition, gLoaderOffset[gNumCones], 0, 0);
+	moveToTarget(0, 0, -60, 3, 0.5, 0.5, true, false);
 
 }
 
@@ -923,12 +931,6 @@ void handleMacros()
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
 	}
 }
-
-
-/* Autonomous */
-
-#include "auto.h"
-#include "auto_runs.h"
 
 #include "auto.c"
 #include "auto_runs.c"
