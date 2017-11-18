@@ -17,7 +17,6 @@ void selectAuto()
 void runAuto()
 {
 	autoSideMobileLeft();
-	//autoTest();
 	return;
 	if (gAlliance == allianceBlue)
 	{
@@ -174,7 +173,7 @@ void autoSideMobileLeft()
 	gPosition.x = 13.5;
 	gPosition.a = 0;
 	setClaw(CLAW_CLOSE_HOLD_POWER);
-	moveToTargetAsync(96, 13.5, 51, 13.5, 60, 4, 1.5, 1.5, false, true);
+	moveToTargetAsync(96, 13.5, 50, 13.5, 60, 4, 1.5, 1.5, false, true);
 	unsigned long driveTimeout = nPgmTime + 5000;
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long mobileTimeout = nPgmTime + 2000;
@@ -185,15 +184,15 @@ void autoSideMobileLeft()
 	scoreFirstExternal(0);
 	setMobile(MOBILE_UP_POWER);
 	mobileTimeout = nPgmTime + 3000;
-	while (gSensor[mobilePoti].value < 1600 && !TimedOut(mobileTimeout, "sm L 5")) sleep(10);
+	while (gSensor[mobilePoti].value < 1600 && !TimedOut(mobileTimeout, "sm L 2")) sleep(10);
 	gArmDown = false;
 	startTask(dropArm);
-	coneTimeout = nPgmTime + 1500;
-	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(mobileTimeout, "sm L 6")) sleep(10);
+	unsigned long coneTimeout = nPgmTime + 1500;
+	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(mobileTimeout, "sm L 3")) sleep(10);
 	setMobile(MOBILE_UP_HOLD_POWER);
 	while (!gArmDown && !TimedOut(coneTimeout, "sm L 7")) sleep(10);
 	moveToTarget(107, 15, 60, 2, 1.5, 1.5, false, false);
-	gNumCones = 1;
+	sleep(100);
 	stack(false);
 	sleep(200);
 	moveToTarget(72, 15, -127, 6, 1.5, 3, false, false);
@@ -203,14 +202,14 @@ void autoSideMobileLeft()
 	turnToTarget(0, 0, ccw, 60, 60, true, true, 0);
 	setMobile(MOBILE_DOWN_POWER);
 	mobileTimeout = nPgmTime + 1000;
-	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(mobileTimeout, "sm L 8")) sleep(10);
+	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(mobileTimeout, "sm L 4")) sleep(10);
 	setMobile(15);
-	setDrive(127, 127);
+	setDrive(100, 100);
 	sleep(1000);
 	setDrive(-127, -127);
 	driveTimeout = nPgmTime + 1000;
 	sleep(300);
-	while (gSensor[leftLine].value > 1600 && gSensor[rightLine].value > 1600 && !TimedOut(driveTimeout, "sm L 9")) sleep(10);
+	while (gSensor[leftLine].value > 1600 && gSensor[rightLine].value > 1600 && !TimedOut(driveTimeout, "sm L 5")) sleep(10);
 	setDrive(0, 0);
 }
 
