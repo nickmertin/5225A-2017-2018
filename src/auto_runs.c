@@ -182,22 +182,7 @@ void autoSideMobileLeft()
 	setMobile(MOBILE_DOWN_HOLD_POWER);
 	moveToTargetAwait(driveTimeout);
 	sleep(300);
-	moveToTarget(gPosition.y - 1, gPosition.x, -40, 3, 0.5, 0.5, true, true);
-	sleep(200);
-	setArm(-80);
-	unsigned long coneTimeout = nPgmTime + 2000;
-	while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "sm L 2")) sleep(10); // Increase time
-	setArm(10);
-	setClaw(CLAW_OPEN_POWER);
-	coneTimeout = nPgmTime + 800;
-	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "sm L 3")) sleep(10);
-	setClaw(CLAW_OPEN_HOLD_POWER);
-	sleep(200);
-	setArm(80);
-	coneTimeout = nPgmTime + 800;
-	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "sm L 4")) sleep(10);
-	setArm(10);
-	moveToTarget(gPosition.y + 2, gPosition.x, 60, 3, 1, 1, false, false);
+	scoreFirstExternal(0);
 	setMobile(MOBILE_UP_POWER);
 	mobileTimeout = nPgmTime + 3000;
 	while (gSensor[mobilePoti].value < 1600 && !TimedOut(mobileTimeout, "sm L 5")) sleep(10);

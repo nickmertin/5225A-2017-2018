@@ -91,6 +91,7 @@ void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool h
 void moveToTargetOrWall(float y, float x, byte power, bool harshStop = true, bool slow = true);
 float getDistanceFromPoint(sVector point);
 void grabPreload();
+void scoreFirstExternal(float dir);
 
 /* Async Functions */
 NEW_ASYNC_VOID_10(moveToTarget, float, float, float, float, byte, float, float, float, bool, bool)

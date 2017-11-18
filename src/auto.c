@@ -586,3 +586,29 @@ void grabPreload()
 	setArm(10);
 	sleep(200);
 }
+
+void scoreFirstExternal(float dir)
+{
+	sPolar offsetP;
+	offsetP.angle = dir;
+	offsetP.magnitude = 1;
+	sVector offsetV;
+	polarToVector(offsetP, offsetV);
+	moveToTarget(gPosition.y - offsetV.x, gPosition.x - offsetV.y, -40, 3, 0.5, 0.5, true, true);
+	sleep(200);
+	setArm(-80);
+	unsigned long coneTimeout = nPgmTime + 2000;
+	while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "extern 1")) sleep(10); // Increase time
+	setArm(10);
+	setClaw(CLAW_OPEN_POWER);
+	coneTimeout = nPgmTime + 800;
+	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern 2")) sleep(10);
+	setClaw(CLAW_OPEN_HOLD_POWER);
+	sleep(200);
+	gNumCones = 1;
+	setArm(80);
+	coneTimeout = nPgmTime + 800;
+	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "extern 3")) sleep(10);
+	setArm(10);
+	moveToTarget(gPosition.y + 2 * offsetV.x, gPosition.x + 2 * offsetV.y, 60, 3, 1, 1, false, false);
+}
