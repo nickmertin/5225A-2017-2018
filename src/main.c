@@ -955,7 +955,7 @@ void stackExternal()
 	tStart(trackPositionTask);
 	EndTimeSlice();
 	writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
-	moveToTargetAsync(-1.5, 0, 0, 0, -50, 4, 0.5, 0.5, true, true);
+	moveToTargetAsync(-0.8, 0, 0, 0, -50, 4, 0.5, 0.5, true, true);
 	unsigned long driveTimeout = nPgmTime + 1000;
 	sleep(200);
 	setArm(-90);
