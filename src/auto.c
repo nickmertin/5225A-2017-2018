@@ -248,7 +248,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
 	sPID pidA, pidY;
 	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
-	pidInit(pidY, 0.3, 0.01, 0.0, -1, -1, -1, 1.0);
+	pidInit(pidY, 0.3, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
 
 	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
 
