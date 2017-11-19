@@ -16,14 +16,13 @@ void selectAuto()
 
 void runAuto()
 {
-	autoSideMobileLeft();
-	return;
 	if (gAlliance == allianceBlue)
 	{
 		switch (gCurAuto)
 		{
 			case 0: autoSkills(); break;
 			case 1: autoStationaryBlueLeft(); break;
+			case 2: autoSideMobileLeft(); break;
 		}
 	}
 	else
@@ -31,7 +30,8 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: break;
-			default: break;
+			case 1: autoStationaryRedRight(); break;
+			case 2: autoSideMobileRight(); break;
 		}
 	}
 }

@@ -1079,7 +1079,7 @@ void handleLcd()
 	velocityCheck(driveEncL);
 	velocityCheck(driveEncR);
 
-	sprintf(line, "%2.1f %2.1f", gSensor[driveEncL].velocity, gSensor[driveEncR].velocity);
+	sprintf(line, "%2.1f %2.1f %s%c", gSensor[driveEncL].velocity, gSensor[driveEncR].velocity, gAlliance == allianceRed ? "Red  " : "Blue ", '0' + gCurAuto);
 	clearLCDLine(1);
 	displayLCDString(1, 0, line);
 }
@@ -1114,6 +1114,7 @@ void startup()
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
 void disabled()
 {
+	selectAuto();
 	handleLcd();
 }
 
@@ -1155,6 +1156,8 @@ task usercontrol()
 	{
 		updateSensorInputs();
 		updateJoysticks();
+
+		selectAuto();
 
 		handleDrive();
 		handleLift();
