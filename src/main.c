@@ -646,7 +646,7 @@ void stack(bool downAfter)
 		setArm(15, true);
 		setClaw(25, true);
 		sleep(450);
-		if (gMobileState != mobileHold || gMobileTarget != MOBILE_TOP)
+		if (!AUTONOMOUS && (gMobileState != mobileHold || gMobileTarget != MOBILE_TOP))
 		{
 			gLiftState = liftIdle;
 			gArmState = armIdle;
