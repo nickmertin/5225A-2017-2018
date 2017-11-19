@@ -1114,6 +1114,7 @@ void startup()
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
 void disabled()
 {
+	updateSensorInput(autoPoti);
 	selectAuto();
 	handleLcd();
 }
