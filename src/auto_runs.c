@@ -101,7 +101,7 @@ void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 
 void autoStationaryBlueLeft()
 {
-	autoStationaryCore(true, 2200, 1600, cw);
+	autoStationaryCore(true, 2000, 1600, cw);
 	moveToTargetAsync(33, 35, 38.5, 38.5, -40, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
 	moveToTargetAwait(driveTimeout);
@@ -134,7 +134,7 @@ void autoStationaryBlueLeft()
 
 void autoStationaryRedRight()
 {
-	autoStationaryCore(true, 2150, 1600, ccw);
+	autoStationaryCore(true, 2000, 1600, ccw);
 	moveToTargetAsync(35, 33, 38.5, 38.5, -40, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
 	moveToTargetAwait(driveTimeout);
