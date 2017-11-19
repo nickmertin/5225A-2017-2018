@@ -869,17 +869,75 @@ void stack(bool downAfter)
 
 NEW_ASYNC_VOID_1(stack, bool);
 
-float gLoaderOffset[12] = { 5, 4.5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
+float gLoaderOffset[12] = { 5.5, 4.5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
+sNotifier gStackFromLoaderNotifier;
 
-void stackFromLoader(int count)
+void stackFromLoader(int max, bool wait, bool onMobile)
 {
-	if (count > 11) count = 11;
-	resetPositionFull(gPosition, gLoaderOffset[gNumCones], 0, 0);
-	moveToTarget(0, 0, -60, 3, 0.5, 0.5, true, false);
-
+	if (max > 7) max = 7;
+	gLiftState = liftManaged;
+	gArmState = armManaged;
+	gClawStart = clawManaged;
+	gDriveManual = false;
+	EndTimeSlice();
+	float sy = onMobile ? gLoaderOffset[gNumCones] : 2;
+	resetPositionFull(gPosition, sy, 0, 0);
+	tStart(trackPositionTask);
+	moveToTargetAsync(0.5, 0, sy, 0, -25, 3, 0.5, 0.5, true, false);
+	unsigned long driveTimeout = nPgmTime + 2000;
+	setClaw(CLAW_OPEN_POWER);
+	unsigned long coneTimeout = nPgmTime + 1000;
+	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "loader 1")) sleep(10);
+	setClaw(CLAW_OPEN_HOLD_POWER);
+	moveToTargetAwait(driveTimeout);
+	tStopAll(trackPositionTask);
+	gDriveManual = true;
+	if (wait && waitOn(gStackFromLoaderNotifier, nPgmTime + 60_000) == -1) goto end;
+	while (gNumCones < max)
+	{
+		gLiftState = liftManaged;
+		gArmState = armManaged;
+		gClawStart = clawManaged;
+		if (gSensor[armPoti].value < 1400)
+		{
+			setArm(60);
+			while (gSensor[armPoti].value < 1400) sleep(10);
+			setArm(-7);
+		}
+		else if (gSensor[armPoti].value > 1500)
+		{
+			if (gSensor[armPoti].value > 1700)
+			{
+				setArm(-80);
+				while (gSensor[armPoti].value > 1700) sleep(10);
+				setArm(-50);
+			}
+			while (gSensor[armPoti].value > 1500) sleep(10);
+			setArm(5);
+		}
+		else setArm(-10);
+		setLift(-80);
+		coneTimeout = nPgmTime + 1000;
+		while (gSensor[liftPoti].value > LIFT_BOTTOM + 500 && !TimedOut(coneTimeout, "loader 2")) sleep(10);
+		setLift(-60);
+		while (!gSensor[limBottom].value && !TimedOut(coneTimeout, "loader 3")) sleep(10);
+		setLift(-10);
+		sleep(200);
+		setArm(-60);
+		coneTimeout = nPgmTime + 500;
+		while (gSensor[armPoti].value > 1500 && !TimedOut(coneTimeout, "loader 4")) sleep(10);
+		setArm(-10);
+		sleep(300);
+		stack(false);
+	}
+	end:
+	gLiftState = liftIdle;
+	gArmState = armIdle;
+	gClawState = clawIdle;
+	writeDebugStreamLine("Done stacking from loader");
 }
 
-NEW_ASYNC_VOID_1(stackFromLoader, int);
+NEW_ASYNC_VOID_3(stackFromLoader, int, bool, bool);
 
 bool cancel()
 {
@@ -914,12 +972,14 @@ void handleMacros()
 		if (!cancel())
 		{
 			writeDebugStreamLine("Stacking from loader");
-			stackFromLoaderAsync(11 - gNumCones);
+			stackFromLoaderAsync(11, true, gMobileState == mobileHold && gMobileTarget == MOBILE_TOP);
 			playSound(soundUpwardTones);
 		}
 	}
 
-	if (FALLING(BTN_MACRO_LOADER) || RISING(BTN_MACRO_STACK_CANCEL)) cancel();
+	if (FALLING(BTN_MACRO_LOADER)) notify(gStackFromLoaderNotifier);
+
+	if (RISING(BTN_MACRO_STACK_CANCEL)) cancel();
 
 	if (FALLING(BTN_MACRO_INC))
 		writeDebugStreamLine("%06d MAcro_INC Released",nPgmTime,gNumCones);
