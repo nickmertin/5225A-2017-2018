@@ -200,14 +200,21 @@ void applyHarshStop()
 	polarVel.angle += gPosition.a;
 	polarToVector(polarVel, vel);
 	float yPow = vel.y, aPow = gVelocity.a;
-	yPow *= -0.7;
-	aPow *= -8;
 
-	LIM_TO_VAL_SET(yPow, 50);
-	LIM_TO_VAL_SET(aPow, 50);
+	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
+
+	yPow *= -0.7;
+	aPow *= -3;
 
 	word left = yPow + aPow;
 	word right = yPow - aPow;
+
+	left = sgn(left) * MAX(fabs(left), 10);
+	right = sgn(right) * MAX(fabs(right), 10);
+
+	LIM_TO_VAL_SET(left, 50);
+	LIM_TO_VAL_SET(right, 50);
+
 	writeDebugStreamLine("Applying harsh stop: %f %f", left, right);
 	setDrive(left, right);
 	updateMotors();
