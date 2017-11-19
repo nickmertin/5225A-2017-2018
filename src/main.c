@@ -423,11 +423,6 @@ void handleMobile()
 			gMobileState = mobileRaise;
 			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 			setMobile(MOBILE_UP_POWER);
-
-			gClawState = clawOpening;
-			setClaw(CLAW_OPEN_POWER);
-			gClawStart = nPgmTime;
-
 		}
 		else
 		{
@@ -651,6 +646,13 @@ void stack(bool downAfter)
 		setArm(15, true);
 		setClaw(25, true);
 		sleep(450);
+		if (gMobileState != mobileHold || gMobileTarget != MOBILE_TOP)
+		{
+			gLiftState = liftIdle;
+			gArmState = armIdle;
+			gClawState = clawClosed;
+			return;
+		}
 		setClaw(-128, true);
 		while( SensorValue[clawPoti] < CLAW_OPEN-500 )  sleep(10);
 		gArmDown= false;
@@ -864,6 +866,9 @@ void stack(bool downAfter)
 		}
 
 		writeDebugStreamLine( "------ STACK %d cones in %d ms -----", gNumCones, nPgmTime-gOverAllTime);
+		gLiftState = liftIdle;
+		gArmState = armIdle;
+		gClawState = clawIdle;
 	}
 }
 
