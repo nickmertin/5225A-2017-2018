@@ -12,7 +12,10 @@ byte waitOn(sNotifier& notifier, unsigned long timeout)
 		}
 		else sleep(10);
 	}
-	return notifier.set ? notifier.waitee : -1;
+	if (notifier.set)
+		return notifier.waitee;
+	writeDebugStreamLine("Notifier on task %d timed out", nCurrentTask);
+	return -1;
 }
 
 bool lock(sNotifier& notifier, TSemaphore *semaphore)
