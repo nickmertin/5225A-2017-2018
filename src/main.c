@@ -890,9 +890,9 @@ void stackFromLoader(int max, bool wait, bool onMobile)
 	tStart(trackPositionTask);
 	moveToTargetAsync(0.5, 0, sy, 0, -25, 3, 0.5, 0.5, true, false);
 	unsigned long driveTimeout = nPgmTime + 2000;
-	setClaw(CLAW_OPEN_POWER);
+	//setClaw(CLAW_OPEN_POWER, true);
 	unsigned long coneTimeout = nPgmTime + 1000;
-	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "loader 1")) sleep(10);
+	//while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "loader 1")) sleep(10);
 	setClaw(CLAW_OPEN_HOLD_POWER);
 	moveToTargetAwait(driveTimeout);
 	tStopAll(trackPositionTask);
