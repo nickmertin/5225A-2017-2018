@@ -54,6 +54,8 @@ unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
 
+bool gDriveManual;
+
 /* Drive */
 void setDrive(word left, word right)
 {
@@ -63,9 +65,12 @@ void setDrive(word left, word right)
 
 void handleDrive()
 {
-	//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
-	setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur);
-	if (RISING(JOY_TURN)) playSound(soundShortBlip);
+	if (gDriveManual)
+	{
+		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
+		setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur);
+		if (RISING(JOY_TURN)) playSound(soundShortBlip);
+	}
 }
 
 
@@ -534,6 +539,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		gArmState= armHold;
 		gLiftState = liftHold;
 		gClawState = clawIdle;
+		gDriveManual = true;
 		int current = nCurrentTask;
 		while (true)
 		{
@@ -885,6 +891,7 @@ bool cancel()
 	gLiftState = liftIdle;
 	gArmState = armIdle;
 	gClawState = clawIdle;
+	gDriveManual = true;
 	writeDebugStreamLine("Stack cancelled");
 	return true;
 }
@@ -1021,6 +1028,7 @@ task usercontrol()
 	initCycle(gMainCycle, 20, "main");
 
 	gKillDriveOnTimeout = false;
+	gDriveManual = true;
 
 	while (true)
 	{
