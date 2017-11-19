@@ -1052,9 +1052,10 @@ void handleMacros()
 		--gNumCones;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
 	}
-		if (FALLING(BTN_MACRO_SCAN))	writeDebugStreamLine("%06d MACRO_SCAN Released",nPgmTime,gNumCones);
 
-	if (RISING(BTN_MACRO_SCAN)) {
+	if (FALLING(BTN_MACRO_ZERO))	writeDebugStreamLine("%06d MACRO_ZERO Released",nPgmTime,gNumCones);
+
+	if (RISING(BTN_MACRO_ZERO)) {
 
 		gNumCones = 0;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);

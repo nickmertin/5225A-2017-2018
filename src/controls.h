@@ -22,7 +22,7 @@
 #define BTN_MOBILE_TOGGLE Btn6D
 
 /* Macros */
-#define BTN_MACRO_SCAN Btn8U
+#define BTN_MACRO_ZERO Btn8U
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
 #define BTN_MACRO_EXTERNAL Btn8L
