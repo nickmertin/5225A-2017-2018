@@ -74,8 +74,6 @@ void handleDrive()
 }
 
 
-
-
 /* Lift */
 typedef enum _sLiftStates {
 	liftManaged,
@@ -615,7 +613,7 @@ task dropArm()
 }
 
 //int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
-int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  850, 1140, 1560, 1950, LIFT_TOP-LIFT_BOTTOM };
+int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
 //////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
 
 void stack(bool downAfter)
@@ -634,7 +632,7 @@ void stack(bool downAfter)
 		gOverAllTime = nPgmTime;
 		writeDebugStreamLine(" STACKING on %d", gNumCones );
 
-		clawTimeOut = nPgmTime + 300;
+		clawTimeOut = nPgmTime + 800;
 		setClaw(128, true);
 		while (SensorValue[clawPoti] > CLAW_CLOSE + 200 && !TimedOut(clawTimeOut, "stack 1")) sleep(10);
 		setArm(128, true);
@@ -678,7 +676,7 @@ void stack(bool downAfter)
 
 		gOverAllTime = nPgmTime;
 		writeDebugStreamLine(" STACKING on %d", gNumCones );
-		clawTimeOut = nPgmTime + 400;
+		clawTimeOut = nPgmTime + 800;
 		setClaw(128,true);
 		while (SensorValue[clawPoti] > CLAW_CLOSE + 200 && !TimedOut(clawTimeOut, "stack 5")) sleep(10);
 
@@ -722,7 +720,7 @@ void stack(bool downAfter)
 	{
 		gOverAllTime = nPgmTime;
 		writeDebugStreamLine(" -------------STACKING on %d", gNumCones );
-		clawTimeOut = nPgmTime + 300;
+		clawTimeOut = nPgmTime + 800;
 		setClaw(128,true);
 		while (SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut, "stack 9")) sleep(10);
 
@@ -780,34 +778,37 @@ void stack(bool downAfter)
 		writeDebugStreamLine(" -------------STACKING on %d", gNumCones );
 
 		// if the claw is open then make sure the arm is down close the claw
-		if( gSensor[clawPoti].value > CLAW_CLOSE+100 )
+		/*if( gSensor[clawPoti].value > CLAW_CLOSE+100 )
 		{
 			setArm(-127,true);
 			armTimeOut = nPgmTime + 500;
 			while (gSensor[armPoti].value > ARM_BOTTOM && !TimedOut(armTimeOut, "stack 14")) sleep(10);
-		}
+		}*/
 
 		gOverAllTime = nPgmTime;
 		setArm(-15,true);
 		setClaw(CLAW_CLOSE_POWER,true);
-		clawTimeOut = nPgmTime + 300;
+		clawTimeOut = nPgmTime + 800;
 		while (gSensor[clawPoti].value > CLAW_CLOSE+300 && !TimedOut(clawTimeOut, "stack 15")) sleep(10);
 
 		// raise the arm while closing the claw along the way.
-		setArm(127,true);
-		armTimeOut = nPgmTime + 500;
-		clawTimeOut = nPgmTime + 300;
-		while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 16")) sleep(10);
-		setClaw(CLAW_CLOSE_HOLD_POWER,true);
+		if (gSensor[armPoti].value < ARM_BOTTOM + 100)
+		{
+			setArm(127,true);
+			armTimeOut = nPgmTime + 500;
+			clawTimeOut = nPgmTime + 300;
+			while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 16")) sleep(10);
+			setClaw(CLAW_CLOSE_HOLD_POWER,true);
 
-		//wait for the arm to pull the cone away from the base before raising the lift
-		while (gSensor[armPoti].value < ARM_BOTTOM+100 && !TimedOut(armTimeOut, "stack 17")) sleep(10);//200
+			//wait for the arm to pull the cone away from the base before raising the lift
+			while (gSensor[armPoti].value < ARM_BOTTOM+100 && !TimedOut(armTimeOut, "stack 17")) sleep(10);//200
+		}
 
 		setArm(25,true);
 		tStart( LiftTaskUp );
 
 		//slow the arm down otherwise it will hit the stack on the way up
-		while ( gSensor[liftPoti].value < gLiftTarget - 600 ) sleep(10);
+		while ( gSensor[liftPoti].value < gLiftTarget - 400 ) sleep(10);
 		armTimeOut = nPgmTime + 650;
 		setArm(127,true);
 
@@ -898,7 +899,6 @@ bool cancel()
 
 void handleMacros()
 {
-
 	if (RISING(BTN_MACRO_STACK) && gNumCones < 11 )
 	{
 		if (!cancel())
