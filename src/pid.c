@@ -19,11 +19,11 @@ bool pidCalculate(sPID& PID, float target, float input)
 	{
 		unsigned long time = nPgmTime;
 		unsigned long deltaTime = time - PID.lstRunTime; // Calculate the time since PID last ran
-		if (deltaTime < 1) // If it hasn't been 1ms or more since PID last ran, don't run
+		if (!PID.firstRun && deltaTime < 1) // If it hasn't been 1ms or more since PID last ran, don't run
 			return false;
 		PID.lstRunTime = time;
 
-		float derivative = (float)(input - PID.lstInput) / (float)(deltaTime); // Calculate the derivative, taking time into account
+		float derivative = PID.firstRun ? 0 : (float)(input - PID.lstInput) / (float)(deltaTime); // Calculate the derivative, taking time into account
 		PID.lstError = PID.error;
 		PID.error = target - input; // Calculate error (the distance from the target)
 
@@ -49,6 +49,8 @@ bool pidCalculate(sPID& PID, float target, float input)
 	if (PID.maxOutput >= 0 && abs(PID.output) > PID.maxOutput)
 		PID.output = PID.maxOutput * sgn(PID.output);
 
+	PID.firstRun = false;
+
 	return true;
 }
 
@@ -66,4 +68,5 @@ void pidReset(sPID& PID)
 	PID.integral = 0; // Reset the integral for a new set of PID values
 	PID.lstInput = 0; // Reset the last input for a new set of PID values
 	PID.lstRunTime = nPgmTime;
+	PID.firstRun = true;
 }

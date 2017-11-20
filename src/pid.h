@@ -15,6 +15,7 @@ typedef struct _sPID
 	float output; // The output of this PID function
 	float minOutput; // The minimum output PID will provide
 	float maxOutput; // The maximum output PID will provide
+	bool firstRun; // True if lst- values are meaningless
 } sPID; // A structure used to store data about an instance of a PID function
 
 /* Functions */
