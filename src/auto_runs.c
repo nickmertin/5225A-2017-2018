@@ -36,8 +36,64 @@ void runAuto()
 	}
 }
 
+void skillsRaiseMobile()
+{
+	setMobile(MOBILE_UP_POWER);
+	unsigned long timeout = nPgmTime + 1500;
+	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "skills/mobile")) sleep(10);
+	setMobile(15);
+}
+
 void autoSkills()
 {
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+	resetPositionFull(gPosition, 19.5, 44.5, 45);
+	setMobile(MOBILE_DOWN_POWER);
+	unsigned long coneTimeout = nPgmTime + 2500;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1")) sleep(10);
+	moveToTargetAsync(36, 61, 19.5, 44.5, 127, 6, 2, 2, false, false);
+	unsigned long driveTimeout = nPgmTime + 4000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 2")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	moveToTargetAwait(driveTimeout);
+	sleep(500);
+	scoreFirstExternal(gPosition.a);
+	skillsRaiseMobile();
+	moveToTarget(24, 52, 38, 63, -127, 6, 2, 2, true, true);
+	sleep(200);
+	turnToAngle(235, cw, 60, 60, true, true);
+	sleep(200);
+	setDrive(127, 127);
+	sleep(400);
+	setDrive(0, 0);
+	sleep(100);
+	setMobile(MOBILE_DOWN_POWER);
+	coneTimeout = nPgmTime + 1000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 3")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	setDrive(-80, -80);
+	sleep(300);
+	applyHarshStop();
+	//turnToTarget(44, 76, cw, 60, 60, true, true, 180);
+	//sleep(200);
+	moveToTarget(44, 78, -127, 4, 2, 2, true, true);
+	sleep(200);
+	turnToTarget(74, 46, cw, 60, 60, true, true, 0);
+	sleep(200);
+	moveToTarget(74, 46, 127, 6, 3, 3, false, false);
+	sleep(500);
+	skillsRaiseMobile();
+	turnToAngle(235, ccw, 60, 60, true, true);
+	sleep(200);
+	moveToTarget(50, 22, 74, 46, 127, 6, 3, 3, false, true);
+	sleep(400);
+	setDrive(0, 0);
+	sleep(100);
+	setMobile(MOBILE_DOWN_POWER);
+	coneTimeout = nPgmTime + 1000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 4")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	moveToTarget(60, 32, -127, 4, 2, 2, true, true);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
