@@ -289,7 +289,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 
 		EndTimeSlice();
 
-		bool closeToLine = false;// fabs(localPos.x) < lineEpsilon || localPos.y > lineLength - MAX(lineEpsilon, delta);
+		bool closeToLine = fabs(localPos.x) < lineEpsilon || localPos.y > lineLength - MAX(lineEpsilon, delta);
 
 		float currentDelta;
 		if (localPos.y < -delta) currentDelta = -localPos.y;

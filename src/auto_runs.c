@@ -103,9 +103,9 @@ void autoSkills()
 	sleep(200);
 	moveToTarget(34, 74, -80, 4, 2, 3, true, true);
 	sleep(200);
-	turnToTarget(70, 48, cw, 60, 60, true, true, 0);
+	turnToTarget(72, 52, cw, 60, 60, true, true, 0);
 	sleep(200);
-	moveToTarget(70, 48, 60, 6, 1, 1, false, false);
+	moveToTarget(72, 52, 60, 6, 1, 1, false, false);
 	skillsRaiseMobile();
 	turnToTarget(43, 24, ccw, 60, 60, true, true);
 	sleep(200);
@@ -113,7 +113,7 @@ void autoSkills()
 	sleep(300);
 	lowerMobile();
 	//backupToLine();
-	moveToTarget(60, 30, -80, 6, 2, 3, true, true);
+	moveToTarget(53, 28, -80, 6, 2, 3, true, true);
 	sleep(200);
 	turnToAngle(90, ccw, 60, 60, true, true);
 	sleep(200);
@@ -122,14 +122,28 @@ void autoSkills()
 	setDrive(0, 0);
 	sleep(200);
 	resetPositionFull(gPosition, gPosition.y, 11.5, 90);
-	moveToTarget(66, 46, 80, 4, 2, 2, true, true);
+	//moveToTarget(66, 46, 80, 4, 2, 2, true, true);
+	//sleep(200);
+	//turnToTarget(91, 70, ccw, 60, 60, true, true, 0);
+	//sleep(200);
+	//moveToTarget(91, 70, 80, 6, 1, 2, false, false);
+	//sleep(400);
+	//skillsRaiseMobile();
+	moveToTarget(58, 15, 60, 4, 2, 2, true, true);
 	sleep(200);
-	turnToTarget(91, 70, ccw, 60, 60, true, true, 0);
+	turnToAngle(0, ccw, 60, 60, true, true);
 	sleep(200);
-	moveToTarget(91, 70, 80, 6, 1, 2, false, false);
-	sleep(400);
+	moveToTarget(96, 10, 60, 6, 2, 2, false, false);
+	sleep(500);
 	skillsRaiseMobile();
+	turnToAngle(270, ccw, 60, 60, true, true);
+	sleep(200);
+	moveToTarget(116, 84, -60, 16, 3, 3, true, true);
+	sleep(200);
+	turnToTarget(120, 100, cw, 60, 60, true, true);
+	sleep(200);
 	moveToTarget(120, 100, 80, 6, 2, 2, false, true);
+	sleep(200);
 	lowerMobile();
 	moveToTarget(117, 97, -60, 4, 2, 2, true, false);
 	sleep(200);
@@ -144,10 +158,10 @@ void autoSkills()
 	setDrive(0, 0);
 	sleep(200);
 	resetPositionFull(gPosition, 11.5, 54, 0);
-	moveToTarget(13, 54, 40, 4, 2, 2, true, true);
-	sleep(200);
-	turnToAngle(90, cw, 40, 40, true, true);
-	autoSideMobileRight(false);
+	//moveToTarget(13, 54, 40, 4, 2, 2, true, true);
+	//sleep(200);
+	//turnToAngle(90, cw, 40, 40, true, true);
+	//autoSideMobileRight(false);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
