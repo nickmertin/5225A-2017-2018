@@ -1099,6 +1099,8 @@ void startup()
 	setupDgtIn(leftLine, 0, 150);
 	setupDgtIn(rightLine, 0, 150);
 	setupDgtIn(armSonic, 20, 200);
+	setupDgtIn(leftLine, 0, 1000);
+	setupDgtIn(rightLine, 0, 1000);
 
 	velocityClear(driveEncL);
 	velocityClear(driveEncR);

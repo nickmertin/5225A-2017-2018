@@ -265,7 +265,7 @@ void autoSideMobileLeft()
 	setDrive(-127, -127);
 	driveTimeout = nPgmTime + 1000;
 	sleep(300);
-	while (gSensor[leftLine].value > 1600 && gSensor[rightLine].value > 1600 && !TimedOut(driveTimeout, "sm L 5")) sleep(10);
+	while (!gSensor[leftLine].value && !gSensor[rightLine].value && !TimedOut(driveTimeout, "sm L 5")) sleep(10);
 	setDrive(0, 0);
 }
 
@@ -311,7 +311,7 @@ void autoSideMobileRight()
 	setDrive(-127, -127);
 	driveTimeout = nPgmTime + 1000;
 	sleep(300);
-	while (gSensor[leftLine].value > 1600 && gSensor[rightLine].value > 1600 && !TimedOut(driveTimeout, "sm R 5")) sleep(10);
+	while (!gSensor[leftLine].value && !gSensor[rightLine].value && !TimedOut(driveTimeout, "sm R 5")) sleep(10);
 	setDrive(0, 0);
 }
 
