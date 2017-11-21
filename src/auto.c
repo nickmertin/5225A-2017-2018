@@ -241,14 +241,14 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	startTask(trackPositionTask);
 }
 
-float kP = 2.0, kI = 0.0, kD = 2.0, kIInner = PI / 6, kIOuter = PI;
+float kP = 2.0, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
 
 void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
 	sPID pidA, pidY;
 	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
-	pidInit(pidY, 0.3, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
+	pidInit(pidY, 0.2, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
 
 	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
 
@@ -289,18 +289,18 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 
 		EndTimeSlice();
 
-		bool closeToLine = fabs(localPos.x) > lineEpsilon && localPos.y < lineLength - MAX(lineEpsilon, delta);
+		bool closeToLine = false;// fabs(localPos.x) < lineEpsilon || localPos.y > lineLength - MAX(lineEpsilon, delta);
 
 		float currentDelta;
 		if (localPos.y < -delta) currentDelta = -localPos.y;
 		else if (localPos.y > lineLength - delta) currentDelta = lineLength - localPos.y;
 		else currentDelta = delta;
-		float target = closeToLine ? pidAngle - atan2(localPos.x, currentDelta) : pidAngle;
+		float target = closeToLine ? pidAngle : pidAngle - atan2(localPos.x, currentDelta);
 
 		EndTimeSlice();
 
 		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
-		pidCalculate(pidA, target, gPosition.a);
+		pidCalculate(pidA, target, nearAngle(gPosition.a, target));
 
 		EndTimeSlice();
 
@@ -327,7 +327,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 
 		writeDebugStreamLine("Global %.2f %.2f %.2f | %.2f %.2f Local %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, radToDeg(gPosition.a), gVelocity.y, gVelocity.x, localPos.y, localPos.x, radToDeg(target - pidA.error), radToDeg(target), weight, left, right);
 
-		setDrive(left, right);
+		if (cycle.count) setDrive(left, right);
 
 		// Get distance from target position
 
