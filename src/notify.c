@@ -20,13 +20,16 @@ byte waitOn(sNotifier& notifier, unsigned long timeout)
 
 bool lock(sNotifier& notifier, TSemaphore *semaphore)
 {
+	hogCPU();
 	if (notifier.semaphore || !semaphore) return false;
-	notifier.semaphore = semaphore;
-	if (semaphore->nLockCount == 0 || bDoesTaskOwnSemaphore((*semaphore)))
+	if (semaphore->nLockCount == 0)
 	{
 		semaphoreLock(*semaphore);
+		notifier.semaphore = semaphore;
+		releaseCPU();
 		return true;
 	}
+	releaseCPU();
 	return false;
 }
 
