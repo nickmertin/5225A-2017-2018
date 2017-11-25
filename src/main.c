@@ -867,7 +867,7 @@ void stack(bool downAfter)
 
 		writeDebugStreamLine( "------ STACK %d cones in %d ms -----", gNumCones, nPgmTime-gOverAllTime);
 		gLiftState = liftIdle;
-		gArmState = armIdle;
+		gArmState = downAfter && gNumCones < 11 ? armHold : armIdle;
 		gClawState = clawIdle;
 	}
 }
