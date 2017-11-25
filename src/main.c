@@ -981,6 +981,7 @@ void stackExternal()
 	gMobileTarget = MOBILE_TOP;
 	gMobileState = mobileRaise;
 	setMobile(MOBILE_UP_POWER);
+	gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 	gNumCones = 1;
 	gDriveManual = true;
 }
