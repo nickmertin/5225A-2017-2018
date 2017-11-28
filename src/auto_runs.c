@@ -115,7 +115,7 @@ void autoSkills()
 	//backupToLine();
 	moveToTarget(47, 26, -80, 6, 2, 3, true, true);
 	sleep(200);
-	moveToTarget(50, 24, -80, 6, 2, 3, true, true);
+	moveToTarget(52, 24, -80, 6, 2, 3, true, true);
 	sleep(200);
 	turnToAngle(90, ccw, 60, 60, true, true);
 	sleep(200);
