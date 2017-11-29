@@ -1153,6 +1153,22 @@ task usercontrol()
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 20, "main");
 
+	if (gSensor[jmpSkills].value)
+	{
+		driverSkillsStart();
+
+		gMobileHoldPower = 15;
+		gMobileTarget = MOBILE_MIDDLE_UP;
+		gMobileState = mobileRaise;
+		setMobile(MOBILE_UP_POWER);
+
+		gClawState = clawOpened;
+
+		gArmPosition = 2;
+		gArmTarget = gArmPositions[2];
+		gArmState = armHold;
+	}
+
 	gKillDriveOnTimeout = false;
 	gDriveManual = true;
 

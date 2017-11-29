@@ -72,6 +72,22 @@ void backupToLine()
 	setDrive(0, 0);
 }
 
+void driverSkillsStart()
+{
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+	resetPositionFull(gPosition, 19.5, 44.5, 45);
+	setMobile(MOBILE_DOWN_POWER);
+	unsigned long coneTimeout = nPgmTime + 2500;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1")) sleep(10);
+	moveToTargetAsync(36, 61, 19.5, 44.5, 80, 6, 2, 2, false, false);
+	unsigned long driveTimeout = nPgmTime + 4000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 2")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	moveToTargetAwait(driveTimeout);
+	sleep(500);
+	scoreFirstExternal(gPosition.a);
+}
+
 void autoSkills()
 {
 	setClaw(CLAW_CLOSE_HOLD_POWER);

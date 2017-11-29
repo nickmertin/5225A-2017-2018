@@ -8,6 +8,7 @@ typedef enum _tAlliance
 /* Functions */
 void selectAuto();
 void runAuto();
+void driverSkillsStart();
 void autoSkills();
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir);
 void autoStationaryBlueLeft();
