@@ -98,6 +98,6 @@ void calibrate ()
 task main()
 {
 	clearDebugStream();
-	calibrate();
+	moveToTarget(
 	writeDebugStream ("%d", nPgmTime);
 }
