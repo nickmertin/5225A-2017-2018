@@ -6,7 +6,8 @@
 #pragma config(Sensor, in6,    expander,       sensorAnalog)
 #pragma config(Sensor, in7,    leftLine,       sensorLineFollower)
 #pragma config(Sensor, in8,    rightLine,      sensorLineFollower)
-#pragma config(Sensor, dgtl1,  armSonic,       sensorSONAR_mm)
+#pragma config(Sensor, dgtl1,  jmpSkills,      sensorDigitalIn)
+#pragma config(Sensor, dgtl2,  limMobile,      sensorTouch)
 #pragma config(Sensor, dgtl3,  limBottom,      sensorTouch)
 #pragma config(Sensor, dgtl4,  limTop,         sensorTouch)
 #pragma config(Sensor, dgtl5,  driveEncL,      sensorQuadEncoder)
@@ -1099,7 +1100,6 @@ void startup()
 
 	setupDgtIn(leftLine, 0, 150);
 	setupDgtIn(rightLine, 0, 150);
-	setupDgtIn(armSonic, 20, 200);
 	setupDgtIn(leftLine, 0, 1000);
 	setupDgtIn(rightLine, 0, 1000);
 
