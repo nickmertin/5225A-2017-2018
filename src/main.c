@@ -1099,10 +1099,9 @@ void startup()
 	setupJoysticks();
 	tInit();
 
-	setupDgtIn(leftLine, 0, 150);
-	setupDgtIn(rightLine, 0, 150);
 	setupDgtIn(leftLine, 0, 1000);
 	setupDgtIn(rightLine, 0, 1000);
+	setupInvertedSen(jmpSkills);
 
 	velocityClear(driveEncL);
 	velocityClear(driveEncR);
@@ -1154,9 +1153,17 @@ task usercontrol()
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 20, "main");
 
+	updateSensorInput(jmpSkills);
+
 	if (gSensor[jmpSkills].value)
 	{
+		tStart(autoMotorSensorUpdateTask);
+		tStart(trackPositionTask);
+
 		driverSkillsStart();
+
+		tStopAll(trackPositionTask);
+		tStopAll(autoMotorSensorUpdateTask);
 
 		gMobileHoldPower = 15;
 		gMobileTarget = MOBILE_MIDDLE_UP;

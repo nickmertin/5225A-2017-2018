@@ -79,7 +79,7 @@ void driverSkillsStart()
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long coneTimeout = nPgmTime + 2500;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1")) sleep(10);
-	moveToTargetAsync(36, 61, 19.5, 44.5, 80, 6, 2, 2, false, false);
+	moveToTargetAsync(36, 61, 19.5, 44.5, 127, 6, 2, 2, false, false);
 	unsigned long driveTimeout = nPgmTime + 4000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 2")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
