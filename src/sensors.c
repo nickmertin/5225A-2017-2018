@@ -23,10 +23,18 @@ void updateSensorInput(tSensors sen)
 {
 	gSensor[sen].lstValue = gSensor[sen].value;
 
-	if (gSensor[sen].mode == snmdDgtIn)
+	switch (gSensor[sen].mode)
+	{
+	case snmdDgtIn:
 		gSensor[sen].value = correctBtnIn(sen);
-	else
+		break;
+	case snmdInverted:
+		gSensor[sen].value = !SensorValue[sen];
+		break;
+	default:
 		gSensor[sen].value = SensorValue[sen];
+		break;
+	}
 
 	if (SensorType[sen] == sensorPotentiometer && abs(gSensor[sen].value - gSensor[sen].lstValue) > 300 && ++gSensor[sen].filterAcc < 10)
 	{
@@ -62,6 +70,11 @@ void setupDgtIn(tSensors sen, int min, int max)
 	gSensor[sen].mode = snmdDgtIn;
 	gSensor[sen].dgtMin = min;
 	gSensor[sen].dgtMax = max;
+}
+
+void setupInvertedSen(tSensors sen)
+{
+	gSensor[sen].mode = snmdInverted;
 }
 
 void resetQuadratureEncoder(tSensors sen)
