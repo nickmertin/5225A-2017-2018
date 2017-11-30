@@ -10,7 +10,8 @@ typedef enum _tSensorClass
 typedef enum _tSensorMode
 {
 	snmdNormal,
-	snmdDgtIn
+	snmdDgtIn,
+	snmdInverted
 } tSensorMode;
 
 /* Structures */
@@ -45,6 +46,7 @@ void updateSensorInputs(); // Update all the input sensors
 tSensorClass checkSenClass(tSensors sen); // Check the sensor class of a motor
 bool correctBtnIn(tSensors sen); // Call this function to interpret a sensor set up using setupDgtIn
 void setupDgtIn(tSensors sen, int min, int max); // Setup a sensor to be interpreted as a boolean using a custom range
+void setupInvertedSen(tSensors sen); // Setup a sensor to be interpreted as a boolean and inverted
 void resetQuadratureEncoder(tSensors sen); // Reset a quadrature encoder
 bool safetyCheck(tSensors sen, unsigned long failedTime, float failedVal, unsigned long safetyMovingTime); // Check if a rotary sensor has failed
 void safetyClear(tSensors sen); // Clear the error flag on a rotary sensor
