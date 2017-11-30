@@ -47,11 +47,63 @@
 unsigned long gOverAllTime;
 sCycleData gMainCycle;
 
-void setDrive(word left, word right)
+bool gKillDriveOnTimeout = false;
+
+int lightVal;
+int lightThresh;
+int lightMin = 2000;
+int lightMax = 0;
+int scissorBottom = -180;
+int scissorTop = 1400;
+
+/////////////////// cycle test. delete after
+
+void setDrive (word left, word right)
 {
+	gMotor[frontRight].power = gMotor[backRight].power = right;
+	gMotor[frontLeft].power = gMotor[backLeft].power = left;
 }
 
-bool gKillDriveOnTimeout = false;
+void setArm (word speed, int distance)
+{
+	gMotor[scissorLeft].power = gMotor[scissorRight].power = speed;
+	if (speed > 0)
+	{
+		while (gSensor[scissorEnc].value < distance) sleep(10);
+	}
+	else if (speed < 0)
+	{
+		while (gSensor[scissorEnc].value < distance) sleep(10);
+	}
+
+}
+
+void closeClaw (bool state)
+{
+	if (state == true) gMotor[claw].power = 127;
+	else if (state == false) gMotor[claw].power = -127;
+	unsigned long startTimer = nPgmTime;
+	while (nPgmTime-startTimer < 200) sleep (10);
+	gMotor[claw].power = 0;
+}
+
+void calibrate ()
+{
+	sCycleData cycle;
+	initCycle(cycle, 10, "calibrate");
+
+	setDrive(127, 127);
+	while (gSensor[leftEnc].value < 700)
+	{
+		lightVal = gSensor[midLight].value;
+		if (lightVal < lightMin) lightMin = lightVal;
+		if (lightVal > lightMax) lightMax = lightVal;
+
+		endCycle(cycle);
+	}
+	lightThresh = (lightMax + lightMin) / 2;
+	setDrive (0, 0);
+} // if sensorVal<1000, should be a white line
 
 bool TimedOut(unsigned long timeOut, const string description)
 {
@@ -82,66 +134,6 @@ bool TimedOut(unsigned long timeOut, const string description)
 
 #include "auto.c"
 #include "auto_runs.c"
-
-//void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon = 1, float targetEpsilon = 1.5, bool harshStop = true, bool slow = true);
-//void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon = 1, float targetEpsilon = 1.5, bool harshStop = true, bool slow = true);
-////////////
-
-int lightVal;
-int lightThresh;
-int lightMin = 2000;
-int lightMax = 0;
-int scissorBottom = -180;
-int scissorTop = 1400;
-
-/////////////////// cycle test. delete after
-
-void setDrive (int left, int right)
-{
-	motor [frontRight] = motor [backRight] = right;
-	motor [frontLeft] = motor [backLeft] = left;
-}
-
-void setArm (int speed, int distance)
-{
-	motor [scissorLeft] = motor [scissorRight] = speed;
-	if (speed > 0)
-	{
-		while (SensorValue [scissorEnc] < distance) sleep(10);
-	}
-	else if (speed < 0)
-	{
-		while (SensorValue [scissorEnc] < distance) sleep(10);
-	}
-
-}
-
-void closeClaw (bool state)
-{
-	if (state == true) motor [claw] = 127;
-	else if (state == false) motor [claw] = -127;
-	unsigned long startTimer = nPgmTime;
-	while (nPgmTime-startTimer < 200) sleep (10);
-	motor [claw] = 0;
-}
-
-void calibrate ()
-{
-	sCycleData cycle;
-	initCycle(cycle, 10, "calibrate");
-
-	setDrive (127, 127);
-	while (SensorValue[leftEnc] < 700)
-	{
-		lightVal = SensorValue[midLight];
-		if (lightVal < lightMin) lightMin = lightVal;
-		if (lightVal > lightMax) lightMax = lightVal;
-	}
-	lightThresh = (lightMax + lightMin) / 2;
-	setDrive (0, 0);
-
-	endCycle(cycle);
-} // if sensorVal<1000, should be a white line
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
