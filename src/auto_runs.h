@@ -6,15 +6,7 @@ typedef enum _tAlliance
 } tAlliance;
 
 /* Functions */
-void selectAuto();
 void runAuto();
-void autoSkills();
-void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir);
-void autoStationaryBlueLeft();
-void autoStationaryRedRight();
-void autoSideMobileLeft();
-void autoSideMobileRight(bool reset = true);
-void autoTest();
 
 /* Variables */
 int gCurAuto = 0;

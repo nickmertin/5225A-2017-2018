@@ -75,7 +75,6 @@ float getAngleOfLine(sLine line);
 float getLengthOfLine(sLine line);
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
-task autoSafetyTask(); // Autonomous drive safety task
 task autoHitWallTask();
 void applyHarshStop();
 void resetPositionFullRad(sPos& position, float y, float x, float a);
@@ -90,8 +89,6 @@ float getTargetAngle(float y, float x, float ys, float xs);
 void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool harshStop = true, bool slow = true);
 void moveToTargetOrWall(float y, float x, byte power, bool harshStop = true, bool slow = true);
 float getDistanceFromPoint(sVector point);
-void grabPreload();
-void scoreFirstExternal(float dir);
 
 /* Async Functions */
 NEW_ASYNC_VOID_10(moveToTarget, float, float, float, float, byte, float, float, float, bool, bool)
