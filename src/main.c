@@ -523,7 +523,6 @@ bool gKillDriveOnTimeout = false;
 
 bool TimedOut(unsigned long timeOut, const string description)
 {
-	timeOut += 1000;
 	if (nPgmTime > timeOut)
 	{
 		hogCPU();
