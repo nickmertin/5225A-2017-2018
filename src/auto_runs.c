@@ -219,6 +219,33 @@ void autoSkills()
 	sleep(200);
 	lowerMobile();
 	moveToTarget(40, 40, -60, 3, 1, 1, true, true);
+	return;
+
+	// 13
+	turnToTarget(120, 34, cw, 60, 60, true, true);
+	tStart(dropArm);
+	moveToTarget(120, 34, 80, 6, 1, 8, true, true);
+	setClaw(CLAW_CLOSE_POWER);
+	coneTimeout = nPgmTime + 2000;
+	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(coneTimeout, "skills 9")) sleep(10);
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+	sleep(200);
+	setArm(127);
+	coneTimeout = nPgmTime + 1000;
+	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "skills 10")) sleep(10);
+	setArm(10);
+	moveToTarget(122, 34, 60, 4, 1, 1, false, false);
+	stackExternal(MOBILE_MIDDLE_UP);
+
+	// Different
+	moveToTarget(120, 96, 80, 6, 2, 3, false, false);
+	moveToTarget(110, 106, 80, 6, 2, 3, true, true);
+	turnToAngleRad(nearAngle(PI / 4, gPosition.a), ccw, 60, 60, true, true);
+	setDrive(127, 127);
+	sleep(400);
+	setDrive(-80, -80);
+	sleep(600);
+	setDrive(0, 0);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
