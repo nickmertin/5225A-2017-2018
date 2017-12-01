@@ -47,7 +47,7 @@ void skillsRaiseMobile()
 void lowerMobile()
 {
 	setMobile(MOBILE_DOWN_POWER);
-	unsigned long timeout = nPgmTime + 1000;
+	unsigned long timeout = nPgmTime + 3000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "lower")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
 }
@@ -140,11 +140,17 @@ void autoSkills()
 	lowerMobile();
 
 	// 6
-	moveToTarget(47, 26, -80, 6, 2, 3, true, true);
+	moveToTarget(47, 24, -80, 6, 2, 3, true, true);
+	setMobile(MOBILE_UP_POWER);
+	coneTimeout = nPgmTime + 3000;
 	sleep(200);
-	moveToTarget(52, 24, -80, 6, 2, 3, true, true);
+	moveToTarget(53, 21, -80, 3, 1, 1, true, true);
 	sleep(200);
-	turnToAngle(90, ccw, 60, 60, true, true);
+	turnToAngleAsync(90, ccw, 60, 60, true, true);
+	driveTimeout = nPgmTime + 2000;
+	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(coneTimeout, "skills 3")) sleep(10);
+	setMobile(MOBILE_UP_HOLD_POWER);
+	turnToAngleAwait(driveTimeout);
 	sleep(200);
 	setDrive(-60, -60);
 	sleep(1000);
@@ -153,29 +159,60 @@ void autoSkills()
 	resetPositionFull(gPosition, gPosition.y, 11.5, 90);
 
 	// 7
-	moveToTarget(gPosition.y, 15, 60, 4, 2, 2, true, true);
-	sleep(200);
+	gArmDown = false;
+	tStart(dropArm);
+	setClaw(CLAW_OPEN_POWER);
+	coneTimeout = nPgmTime + 2000;
+	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "skills 4")) sleep(10);
+	setClaw(CLAW_OPEN_HOLD_POWER);
+	while (!gArmDown) sleep(10);
+	moveToTarget(72, 15, 60, 4, 1, 5, false, true);
+	setClaw(CLAW_CLOSE_POWER);
+	coneTimeout = nPgmTime + 2000;
+	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(coneTimeout, "skills 5")) sleep(10);
+	setClaw(CLAW_CLOSE_HOLD_POWER);
+	setArm(127);
+	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "skills 6")) sleep(10);
+	setArm(10);
+
+	// 8
 	turnToAngle(0, ccw, 60, 60, true, true);
 	sleep(200);
-	moveToTarget(98, 10, 60, 6, 2, 2, false, false);
+	moveToTargetAsync(98, 10, gPosition.y, gPosition.x, 60, 6, 2, 2, false, false);
+	driveTimeout = nPgmTime + 6000;
+	setMobile(MOBILE_DOWN_POWER);
+	coneTimeout = nPgmTime + 3000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 7")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	moveToTargetAwait(driveTimeout);
 	sleep(500);
-	skillsRaiseMobile();
+	stackExternal();
+	tStart(dropArm);
+
+	// 9
+	moveToTarget(114, 10, 60, 3, 1, 1, false, true);
+	sleep(200);
+	stack(true);
+
+	// 10
+	moveToTarget(124, 10, 60, 3, 1, 1, false, true);
+	sleep(200);
+	stack(true);
+
+	// 11
+	moveToTarget(134, 10, 60, 3, 1, 1, false, true);
+	sleep(200);
+	stack(false);
+
+	// 12
 	moveToTarget(72, 15, -127, 6, 1.5, 3, false, false);
 	turnToTarget(36, 36, ccw, 80, 10, false, true, 180);
 	moveToTarget(36, 36, -80, 6, 3, 3, true, true);
 	sleep(200);
 	turnToAngleRad(nearAngle(degToRad(235), gPosition.a), ccw, 60, 60, true, true);
-	setMobile(MOBILE_DOWN_POWER);
-	unsigned long mobileTimeout = nPgmTime + 1000;
-	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(mobileTimeout, "sm L 4")) sleep(10);
-	setMobile(15);
-	setDrive(100, 100);
-	sleep(1000);
-	setDrive(-127, -127);
-	driveTimeout = nPgmTime + 1000;
-	sleep(300);
-	while (!gSensor[leftLine].value && !gSensor[rightLine].value && !TimedOut(driveTimeout, "sm L 5")) sleep(10);
-	setDrive(0, 0);
+	sleep(200);
+	lowerMobile();
+	moveToTarget(40, 40, -60, 3, 1, 1, true, true);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
