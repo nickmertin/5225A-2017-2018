@@ -92,6 +92,8 @@ void autoSkills()
 {
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	resetPositionFull(gPosition, 19.5, 44.5, 45);
+
+	// 1
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long coneTimeout = nPgmTime + 2500;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1")) sleep(10);
@@ -103,6 +105,8 @@ void autoSkills()
 	sleep(500);
 	scoreFirstExternal(gPosition.a);
 	skillsRaiseMobile();
+
+	// 2
 	moveToTarget(24, 52, 38, 63, -80, 6, 2, 2, true, true);
 	sleep(200);
 	turnToAngle(230, cw, 60, 60, true, true);
@@ -112,6 +116,8 @@ void autoSkills()
 	setDrive(0, 0);
 	sleep(200);
 	lowerMobile();
+
+	// 3
 	setDrive(-80, -80);
 	sleep(300);
 	applyHarshStop();
@@ -119,16 +125,21 @@ void autoSkills()
 	sleep(200);
 	moveToTarget(34, 74, -80, 4, 2, 3, true, true);
 	sleep(200);
+
+	// 4
 	turnToTarget(68, 56, cw, 60, 60, true, true, 0);
 	sleep(200);
 	moveToTarget(68, 56, 60, 6, 1, 1, false, false);
 	skillsRaiseMobile();
+
+	// 5
 	turnToTarget(46, 23, ccw, 60, 60, true, true, 0);
 	sleep(200);
 	moveToTarget(46, 23, 80, 6, 3, 3, false, true);
 	sleep(300);
 	lowerMobile();
-	//backupToLine();
+
+	// 6
 	moveToTarget(47, 26, -80, 6, 2, 3, true, true);
 	sleep(200);
 	moveToTarget(52, 24, -80, 6, 2, 3, true, true);
@@ -140,13 +151,8 @@ void autoSkills()
 	setDrive(0, 0);
 	sleep(200);
 	resetPositionFull(gPosition, gPosition.y, 11.5, 90);
-	//moveToTarget(66, 46, 80, 4, 2, 2, true, true);
-	//sleep(200);
-	//turnToTarget(91, 70, ccw, 60, 60, true, true, 0);
-	//sleep(200);
-	//moveToTarget(91, 70, 80, 6, 1, 2, false, false);
-	//sleep(400);
-	//skillsRaiseMobile();
+
+	// 7
 	moveToTarget(gPosition.y, 15, 60, 4, 2, 2, true, true);
 	sleep(200);
 	turnToAngle(0, ccw, 60, 60, true, true);
@@ -170,33 +176,6 @@ void autoSkills()
 	sleep(300);
 	while (!gSensor[leftLine].value && !gSensor[rightLine].value && !TimedOut(driveTimeout, "sm L 5")) sleep(10);
 	setDrive(0, 0);
-	return;
-	turnToAngle(270, ccw, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(116, 84, -60, 16, 3, 3, true, true);
-	sleep(200);
-	turnToTarget(120, 100, cw, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(120, 100, 80, 6, 2, 2, false, true);
-	sleep(200);
-	lowerMobile();
-	moveToTarget(117, 97, -60, 4, 2, 2, true, false);
-	sleep(200);
-	//turnToTarget(110, 95, cw, 60, 60, true, true, 180);
-	//sleep(200);
-	moveToTarget(110, 95, -60, 4, 2, 2, true, true);
-	sleep(200);
-	turnToAngle(180, cw, 60, 60, true, true);
-	sleep(200);
-	setDrive(-60, -60);
-	sleep(700);
-	setDrive(0, 0);
-	sleep(200);
-	resetPositionFull(gPosition, 11.5, 54, 0);
-	//moveToTarget(13, 54, 40, 4, 2, 2, true, true);
-	//sleep(200);
-	//turnToAngle(90, cw, 40, 40, true, true);
-	//autoSideMobileRight(false);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
