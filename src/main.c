@@ -612,6 +612,33 @@ task dropArm()
 int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
 //////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
 
+void clearArm()
+{
+	gClawState = clawManaged;
+	setClaw(CLAW_OPEN_POWER);
+	unsigned long timeout = nPgmTime + 2000;
+	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(timeout, "clear 1")) sleep(10);
+	setClaw(CLAW_OPEN_HOLD_POWER);
+	gClawState = clawOpened;
+
+	gLiftState = liftManaged;
+	gLiftTarget = LIFT_BOTTOM + gliftTargetA[gNumCones];
+	gLiftTargetReached = false;
+	tStart(LiftTaskUp);
+	timeout = nPgmTime + 1500;
+	while (!gLiftTargetReached && !TimedOut(timeout, "clear 2")) sleep(10);
+	gLiftState = liftHold;
+
+	gArmState = armManaged;
+	setArm(127);
+	timeout = nPgmTime + 1500;
+	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(timeout, "clear 3")) sleep(10);
+	gArmPosition = 2;
+	gArmState = armHold;
+}
+
+NEW_ASYNC_VOID_0(clearArm);
+
 void stack(bool downAfter)
 {
 	gArmState = armManaged;
@@ -1009,6 +1036,16 @@ bool cancel()
 
 void handleMacros()
 {
+
+	if (RISING(BTN_MACRO_CLEAR))
+	{
+		if (!cancel())
+		{
+			writeDebugStreamLine("Clearing lift and arm");
+			clearArmAsync();
+		}
+	}
+
 	if (RISING(BTN_MACRO_STACK) && gNumCones < 11 )
 	{
 		if (!cancel())
@@ -1019,17 +1056,17 @@ void handleMacros()
 		}
 	}
 
-	if (RISING(BTN_MACRO_LOADER))
-	{
-		if (!cancel())
-		{
-			writeDebugStreamLine("Stacking from loader");
-			stackFromLoaderAsync(11, true, gMobileState == mobileHold && gMobileTarget == MOBILE_TOP);
-			playSound(soundUpwardTones);
-		}
-	}
+	//if (RISING(BTN_MACRO_LOADER))
+	//{
+	//	if (!cancel())
+	//	{
+	//		writeDebugStreamLine("Stacking from loader");
+	//		stackFromLoaderAsync(11, true, gMobileState == mobileHold && gMobileTarget == MOBILE_TOP);
+	//		playSound(soundUpwardTones);
+	//	}
+	//}
 
-	if (FALLING(BTN_MACRO_LOADER)) notify(gStackFromLoaderNotifier);
+	//if (FALLING(BTN_MACRO_LOADER)) notify(gStackFromLoaderNotifier);
 
 	if (RISING(BTN_MACRO_EXTERNAL))
 	{
@@ -1041,7 +1078,7 @@ void handleMacros()
 		}
 	}
 
-	if (RISING(BTN_MACRO_STACK_CANCEL)) cancel();
+	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
 	if (FALLING(BTN_MACRO_INC))
 		writeDebugStreamLine("%06d MAcro_INC Released",nPgmTime,gNumCones);
