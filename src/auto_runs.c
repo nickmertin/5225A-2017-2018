@@ -385,8 +385,8 @@ void autoSideMobileRight(bool reset)
 	//stack(false);
 	//sleep(200);
 	moveToTarget(15, 72, -127, 6, 1.5, 3, false, false);
-	turnToTarget(34, 46, cw, 10, 80, false, true, 180);
-	moveToTarget(34, 46, -80, 6, 4, 6, true, true);
+	turnToTarget(30, 42, cw, 10, 80, false, true, 180);
+	moveToTarget(30, 42, -80, 6, 4, 6, true, true);
 	sleep(200);
 	turnToTarget(0, 0, cw, 60, 60, true, true, 0);
 	setMobile(MOBILE_DOWN_POWER);
