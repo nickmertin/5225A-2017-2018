@@ -187,7 +187,7 @@ void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 		setClaw(CLAW_CLOSE_HOLD_POWER);
 		sleep(200);
 		setArm(-80);
-		coneTimeout = nPgmTime + 1500;
+		coneTimeout = nPgmTime + 2000;
 		while (gSensor[armPoti].value > 1800 && !TimedOut(coneTimeout, "preload")) sleep(10);
 		setArm(80);
 		sleep(300);
@@ -203,20 +203,20 @@ void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 		setArm(15);
 		turnToTargetAwait(driveTimeout);
 	}
-	moveToTargetAsync(48, 48, gPosition.y, gPosition.x, 40, 4, 1, 12, true, true);
+	moveToTargetAsync(48, 48, gPosition.y, gPosition.x, 80, 4, 1, 12, true, true);
 	driveTimeout = nPgmTime + 3000;
 	gLiftTarget = liftUp;
 	tStart(LiftTaskUp);
 	coneTimeout = nPgmTime + 1000;
 	while (!gLiftTargetReached && !TimedOut(coneTimeout, "sg core 2")) sleep(10);
-	setLift(-10);
+	setLift(0);
 	moveToTargetAwait(driveTimeout);
 	sleep(500);
 	setArm(-90);
 	coneTimeout = nPgmTime + 500;
 	while (gSensor[armPoti].value > (first ? 1850 : 1750) && !TimedOut(coneTimeout, "sg core 3")) sleep(10);
 	setArm(10);
-	sleep(500);
+	//sleep(500);
 	setLift(-50);
 	coneTimeout = nPgmTime + 800;
 	while (gSensor[liftPoti].value > liftDown && !TimedOut(coneTimeout, "sg core 4")) sleep(10);
@@ -238,9 +238,10 @@ void autoStationaryBlueLeft()
 	gPosition.x = 13.5;
 	gPosition.a = 0;
 	autoStationaryCore(true, 2000, 1600, cw);
-	moveToTargetAsync(33, 35, 38.5, 38.5, -40, 6, 4, 4, false, true);
+	moveToTargetAsync(45, 25, gPosition.y, gPosition.x, -60, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
 	moveToTargetAwait(driveTimeout);
+	tStart(dropArm);
 	sleep(200);
 	turnToTargetAsync(63, 23, gPosition.y, gPosition.x, ccw, 60, 60, true, true, 0);
 	driveTimeout = nPgmTime + 1500;
@@ -248,7 +249,6 @@ void autoStationaryBlueLeft()
 	sleep(200);
 	moveToTargetAsync(63, 23, gPosition.y, gPosition.x, 60, 4, 1, 8, false, true);
 	driveTimeout = nPgmTime + 3000;
-	tStart(dropArm);
 	setLift(-80);
 	unsigned long coneTimeout = nPgmTime + 1000;
 	while (!gSensor[limBottom].value && !TimedOut(coneTimeout, "sg lb 1")) sleep(10);
@@ -263,7 +263,7 @@ void autoStationaryBlueLeft()
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	sleep(300);
 	moveToTargetAwait(driveTimeout);
-	gPosition.x += 1;
+	//gPosition.x += 1;
 	autoStationaryCore(false, 2250, 2100, cw);
 	moveToTarget(61, 35, 48, 48, -50, 6, 3, 3, false, true);
 }
