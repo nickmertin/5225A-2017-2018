@@ -183,11 +183,6 @@ void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 	unsigned long driveTimeout, coneTimeout;
 	if (first)
 	{
-		hogCPU();
-		gPosition.x = 30.5;
-		gPosition.y = 30.5;
-		gPosition.a = PI / 4;
-		releaseCPU();
 		//grabPreload();
 		setClaw(CLAW_CLOSE_HOLD_POWER);
 		sleep(200);
@@ -239,6 +234,9 @@ void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 
 void autoStationaryBlueLeft()
 {
+	gPosition.y = 50;
+	gPosition.x = 13.5;
+	gPosition.a = 0;
 	autoStationaryCore(true, 2000, 1600, cw);
 	moveToTargetAsync(33, 35, 38.5, 38.5, -40, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
@@ -272,6 +270,9 @@ void autoStationaryBlueLeft()
 
 void autoStationaryRedRight()
 {
+	gPosition.y = 13.5;
+	gPosition.x = 50;
+	gPosition.a = PI / 2;
 	autoStationaryCore(true, 2000, 1600, ccw);
 	moveToTargetAsync(35, 33, 38.5, 38.5, -40, 6, 4, 4, false, true);
 	unsigned long driveTimeout = nPgmTime + 2000;
@@ -352,14 +353,11 @@ void autoSideMobileLeft()
 	setDrive(0, 0);
 }
 
-void autoSideMobileRight(bool reset)
+void autoSideMobileRight()
 {
-	if (reset)
-	{
-		gPosition.y = 13.5;
-		gPosition.x = 50;
-		gPosition.a = PI / 2;
-	}
+	gPosition.y = 13.5;
+	gPosition.x = 50;
+	gPosition.a = PI / 2;
 	setClaw(CLAW_CLOSE_HOLD_POWER);
 	moveToTargetAsync(13.5, 95, 13.5, 50, 60, 4, 1.5, 1.5, false, true);
 	unsigned long driveTimeout = nPgmTime + 5000;
