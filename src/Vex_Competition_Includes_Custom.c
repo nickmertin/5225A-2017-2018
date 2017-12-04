@@ -42,12 +42,12 @@ word gMainTask = 255;
 
 task main()
 {
-	// Master CPU will not let competition start until powered on for at least 2-seconds
+	// Master CPU will let the competition start immediately
 	clearLCDLine(0);
 	clearLCDLine(1);
 	displayLCDPos(0, 0);
 	displayNextLCDString("Startup");
-	wait1Msec(2000);
+	//wait1Msec(2000);
 
 	startup();
 

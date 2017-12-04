@@ -65,7 +65,7 @@ void setDrive (word left, word right)
 	gMotor[frontRight].power = gMotor[backRight].power = right;
 	gMotor[frontLeft].power = gMotor[backLeft].power = left;
 }
-
+/*
 void setArm (word speed, int distance)
 {
 	gMotor[scissorLeft].power = gMotor[scissorRight].power = speed;
@@ -106,7 +106,7 @@ void calibrate ()
 	lightThresh = (lightMax + lightMin) / 2;
 	setDrive (0, 0);
 } // if sensorVal<1000, should be a white line
-
+*/
 bool TimedOut(unsigned long timeOut, const string description)
 {
 	if (nPgmTime > timeOut)
