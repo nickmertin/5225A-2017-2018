@@ -1,9 +1,9 @@
 /* Defines */
 // The diameter of the tracking wheels in inches
-#define WHEEL_DIAMETER_IN 1
+#define WHEEL_DIAMETER_IN 4
 
 // The distance between the tracking wheels and the centre of the robot in inches
-#define DRIVE_WIDTH_IN 15
+#define DRIVE_WIDTH_IN 9 //The robot is 18 inches wide
 
 // The number of tick per rotation of the tracking wheel
 #define TICKS_PER_ROTATION 360.0
