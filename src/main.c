@@ -153,6 +153,8 @@ void startup()
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
 	gJoy[JOY_LIFT].deadzone = DZ_LIFT;
 	gJoy[JOY_ARM].deadzone = DZ_ARM;
+
+	gSensor[rightEnc].scale = -1; // set encoder to reversed
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
@@ -160,8 +162,6 @@ void disabled()
 {
 	displayLCDCenteredString(0, "DISABLED");
 }
-
-gSensor[leftEnc].scale = -1;
 
 // This task gets started at the begining of the autonomous period
 task autonomous()
