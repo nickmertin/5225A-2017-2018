@@ -161,6 +161,8 @@ void disabled()
 	displayLCDCenteredString(0, "DISABLED");
 }
 
+gSensor[leftEnc].scale = -1;
+
 // This task gets started at the begining of the autonomous period
 task autonomous()
 {
@@ -187,7 +189,7 @@ task autonomous()
 	return_t;
 }
 
-task usercontrol()
+task usercontrol()//Do we need to have a usercontrol task?? Why won't it let me run if I delete it
 {
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 20, "main");

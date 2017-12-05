@@ -17,6 +17,7 @@ typedef enum _tSensorMode
 /* Structures */
 typedef struct _sSensor
 {
+	int scale;
 	int value;
 	int lstValue;
 	tSensorClass cls;

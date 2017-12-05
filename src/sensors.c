@@ -22,17 +22,18 @@ void updateSensorOutputs()
 void updateSensorInput(tSensors sen)
 {
 	gSensor[sen].lstValue = gSensor[sen].value;
+	gSensor[sen].value = gSensor[sen].value;
 
 	switch (gSensor[sen].mode)
 	{
 	case snmdDgtIn:
-		gSensor[sen].value = correctBtnIn(sen);
+		gSensor[sen].value = correctBtnIn(sen) * gSensor[sen].scale;
 		break;
 	case snmdInverted:
-		gSensor[sen].value = !SensorValue[sen];
+		gSensor[sen].value = !SensorValue[sen] * gSensor[sen].scale;
 		break;
 	default:
-		gSensor[sen].value = SensorValue[sen];
+		gSensor[sen].value = SensorValue[sen] * gSensor[sen].scale;
 		break;
 	}
 
@@ -174,6 +175,8 @@ void setupSensors()
 		gSensor[i].timeVelCheck = 0;
 		gSensor[i].velGood = false;
 		gSensor[i].filterAcc = 0;
+
+		gSensor[i].scale = 1;
 
 		startSensor(i);
 	}
