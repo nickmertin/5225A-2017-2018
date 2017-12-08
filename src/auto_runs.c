@@ -1,5 +1,6 @@
 void selectAuto()
 {
+	updateSensorInput(autoPoti);
 	int autoVal = gSensor[autoPoti].value - 2048;
 	if (autoVal < 0) gAlliance = allianceBlue;
 	else gAlliance = allianceRed;
@@ -16,6 +17,8 @@ void selectAuto()
 
 void runAuto()
 {
+	selectAuto();
+	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
 	{
 		switch (gCurAuto)
