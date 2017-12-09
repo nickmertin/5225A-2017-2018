@@ -337,8 +337,8 @@ void autoSideMobileLeft()
 	//stack(false);
 	//sleep(200);
 	moveToTarget(72, 15, -127, 6, 1.5, 3, false, false);
-	turnToTarget(46, 36, ccw, 80, 10, false, true, 180);
-	moveToTarget(46, 36, -80, 6, 4, 6, true, true);
+	turnToTarget(40, 36, ccw, 80, 10, false, true, 180);
+	moveToTarget(40, 36, -80, 6, 4, 6, true, true);
 	sleep(200);
 	turnToTarget(0, 0, ccw, 60, 60, true, true, 0);
 	//setMobile(MOBILE_DOWN_POWER);
