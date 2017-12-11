@@ -1201,8 +1201,8 @@ task usercontrol()
 		tStopAll(trackPositionTask);
 		tStopAll(autoMotorSensorUpdateTask);
 
-		gMobileHoldPower = 15;
-		gMobileTarget = MOBILE_MIDDLE_UP;
+		gMobileHoldPower = MOBILE_UP_HOLD_POWER;
+		gMobileTarget = MOBILE_TOP;
 		gMobileState = mobileRaise;
 		setMobile(MOBILE_UP_POWER);
 
