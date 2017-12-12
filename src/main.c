@@ -75,9 +75,9 @@ void setArm (word speed, int distance)
 	}
 	else if (speed < 0)
 	{
-		while (gSensor[scissorEnc].value < distance) sleep(10);
+		while (gSensor[scissorEnc].value > distance) sleep(10);
 	}
-
+	gMotor[scissorLeft].power = gMotor[scissorRight].power = 0;
 }
 
 void closeClaw (bool state)
