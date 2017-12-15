@@ -51,6 +51,8 @@
 
 #include "controls.h"
 
+//#define DEBUG_TRACKING
+
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -1111,6 +1113,17 @@ void handleLcd()
 {
 	string line;
 
+#ifdef DEBUG_TRACKING
+	sprintf(line, "%3.2f %3.2f", gPosition.y, gPosition.x);
+	clearLCDLine(0);
+	displayLCDString(0, 0, line);
+
+	sprintf(line, "%3.2f", radToDeg(gPosition.a));
+	clearLCDLine(1);
+	displayLCDString(1, 0, line);
+
+	if (nLCDButtons) resetPositionFull(gPosition, 0, 0, 0);
+#else
 	sprintf(line, "%4d %4d %2d", gSensor[driveEncL].value, gSensor[driveEncR].value, gNumCones);
 	clearLCDLine(0);
 	displayLCDString(0, 0, line);
@@ -1121,6 +1134,7 @@ void handleLcd()
 	sprintf(line, "%2.1f %2.1f %s%c", gSensor[driveEncL].velocity, gSensor[driveEncR].velocity, gAlliance == allianceRed ? "Red  " : "Blue ", '0' + gCurAuto);
 	clearLCDLine(1);
 	displayLCDString(1, 0, line);
+#endif
 }
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
@@ -1190,6 +1204,10 @@ task usercontrol()
 	initCycle(gMainCycle, 20, "main");
 
 	updateSensorInput(jmpSkills);
+
+#ifdef DEBUG_TRACKING
+	tStart(trackPositionTask);
+#endif
 
 	if (gSensor[jmpSkills].value)
 	{
