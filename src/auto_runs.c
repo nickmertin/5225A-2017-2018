@@ -42,7 +42,7 @@ void runAuto()
 void skillsRaiseMobile()
 {
 	setMobile(MOBILE_UP_POWER);
-	unsigned long timeout = nPgmTime + 1500;
+	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "skills/mobile")) sleep(10);
 	setMobile(MOBILE_UP_HOLD_POWER);
 }
@@ -50,7 +50,7 @@ void skillsRaiseMobile()
 void lowerMobile()
 {
 	setMobile(MOBILE_DOWN_POWER);
-	unsigned long timeout = nPgmTime + 1000;
+	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "lower")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
 }
@@ -93,40 +93,36 @@ void driverSkillsStart()
 
 void autoSkills()
 {
-	resetPositionFull(gPosition, 19.5, 44.5, 45);
+	resetPositionFull(gPosition, 19.5, 43.5, 45);
 
 	// 1
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long coneTimeout = nPgmTime + 2500;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1-1")) sleep(10);
-	moveToTargetAsync(40, 65, 19.5, 44.5, 127, 6, 2, 2, false, false);
+	moveToTargetAsync(48, 72, 19.5, 43.5, 127, 6, 2, 6, false, false);
 	unsigned long driveTimeout = nPgmTime + 4000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 1-2")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
-	while (!gSensor[limMobile].value && !TimedOut(driveTimeout, "skills 1-3")) sleep(10);
-	moveToTargetKill();
+	moveToTargetAwait(driveTimeout);
 	skillsRaiseMobile();
 
 	// 2
-	moveToTarget(24, 52, 38, 63, -127, 6, 2, 2, true, true);
+	moveToTarget(25, 53, -127, 6, 2, 2, true, true);
 	sleep(200);
 	turnToAngle(230, cw, 60, 60, true, true);
 	sleep(200);
-	setDrive(80, 80);
-	sleep(500);
+	setDrive(60, 60);
+	sleep(200);
 	setDrive(0, 0);
 	sleep(200);
 	lowerMobile();
 
 	// 3
-	moveToTarget(28, 56, -127, 4, 2, 2, true, true);
+	moveToTarget(24, 72, -127, 6, 2, 3, true, true);
 	sleep(200);
-	turnToTarget(12, 108, 60, 60, true, true);
+	turnToTarget(0, 108, ccw, 60, 60, true, true);
 	sleep(200);
-	moveToTargetAsync(12, 108, 30, 60, 127, 8, 1, 3, true, true);
-	driveTimeout = nPgmTime + 5000;
-	while (!gSensor[limMobile].value && !TimedOut(driveTimeout, "skills 3-1")) sleep(10);
-	moveToTargetKill();
+	moveToTarget(0, 108, 127, 8, 1, 3, true, true);
 	skillsRaiseMobile();
 
 	// 4
