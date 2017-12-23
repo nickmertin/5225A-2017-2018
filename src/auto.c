@@ -346,6 +346,67 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 
 void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, lineEpsilon, targetEpsilon, harshStop, slow); }
 
+void moveToTarget2(float y, float x, byte power, float epsilon, bool harshStop, bool slow)
+{
+	writeDebugStreamLine("Moving to %f %f (VERSION 2)", y, x);
+	sPID pidA, pidY;
+	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
+	pidInit(pidY, 0.2, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
+
+	float epsilon2 = epsilon * epsilon;
+	float distance2;
+
+	sCycleData cycle;
+	initCycle(cycle, 50, "moveToTarget2");
+	do
+	{
+		float dy = y - gPosition.y;
+		float dx = x - gPosition.x;
+
+		distance2 = dy * dy + dx * dx;
+
+		EndTimeSlice();
+
+		float currentAngle = gVelocity.y || gVelocity.x ? atan2(gVelocity.x, gVelocity.y) : gPosition.a;
+		float targetAngle = nearAngle(atan2(x, y), currentAngle);
+
+		pidCalculate(pidA, targetAngle, currentAngle);
+
+		EndTimeSlice();
+
+		float basePower;
+		if (slow)
+		{
+			pidCalculate(pidY, 0, sqrt(distance2));
+			basePower = fabs(pidY.output * power);
+		}
+		else
+			basePower = (float)abs(power);
+
+		EndTimeSlice();
+
+		float weight = pidA.output;
+
+		float scalar = basePower / (1 + fabs(weight));
+
+		word left = (word)(scalar * (sgn(power) + weight));
+		word right = (word)(scalar * (sgn(power) - weight));
+
+		writeDebugStreamLine("%.2f %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, gPosition.a, gVelocity.y, gVelocity.x, currentAngle, left, right);
+
+		if (cycle.count) setDrive(left, right);
+
+		endCycle(cycle);
+	} while (distance2 > epsilon2);
+
+	if (harshStop)
+		applyHarshStop();
+	else
+		setDrive(0, 0);
+
+	writeDebugStreamLine("Moved to %.2f %.2f | %.2f %.2f %.2f", y, x, gPosition.y, gPosition.x, gPosition.a);
+}
+
 void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
