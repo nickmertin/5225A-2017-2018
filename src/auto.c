@@ -203,7 +203,7 @@ void applyHarshStop()
 
 	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
 
-	yPow *= -0.7;
+	yPow *= -0.3;
 	aPow *= -3;
 
 	word left = yPow + aPow;
@@ -212,8 +212,8 @@ void applyHarshStop()
 	left = sgn(left) * MAX(fabs(left), 10);
 	right = sgn(right) * MAX(fabs(right), 10);
 
-	LIM_TO_VAL_SET(left, 50);
-	LIM_TO_VAL_SET(right, 50);
+	LIM_TO_VAL_SET(left, 30);
+	LIM_TO_VAL_SET(right, 30);
 
 	writeDebugStreamLine("Applying harsh stop: %f %f", left, right);
 	setDrive(left, right);
