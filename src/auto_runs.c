@@ -118,15 +118,21 @@ void autoSkills()
 	lowerMobile();
 
 	// 3
-	moveToTarget(24, 72, -127, 6, 2, 3, true, true);
+	moveToTarget(24, 60, -127, 6, 2, 3, true, true);
 	sleep(200);
-	turnToTarget(0, 108, ccw, 60, 60, true, true);
+	//turnToTarget(16, 90, ccw, 60, 60, true, true);
+	//sleep(200);
+	//moveToTarget(16, 90, 127, 8, 1, 3, true, true);
+	//sleep(200);
+	turnToTarget(15, 108, ccw, 60, 60, true, true);
 	sleep(200);
-	moveToTarget(0, 108, 127, 8, 1, 3, true, true);
+	moveToTarget(15, 108, 127, 8, 1, 3, false, false);
 	skillsRaiseMobile();
 
 	// 4
-	moveToTarget(24, 72, -127, 4, 2, 2, true, true);
+	//turnToTarget(24, 72, cw, 60, 60, true, true, 180);
+	//sleep(200);
+	moveToTarget(24, 72, -127, 6, 3, 2, true, true);
 	sleep(200);
 	turnToAngle(230, cw, 60, 60, true, true);
 	lowerMobile();
