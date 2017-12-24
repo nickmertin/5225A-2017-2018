@@ -241,7 +241,7 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	startTask(trackPositionTask);
 }
 
-float kP = 2.0, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
+float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
 
 void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
 {
@@ -300,7 +300,7 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 		EndTimeSlice();
 
 		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
-		//pidCalculate(pidA, target, nearAngle(gPosition.a, target));
+		pidCalculate(pidA, target, nearAngle(gPosition.a, target));
 
 		EndTimeSlice();
 
