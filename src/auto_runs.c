@@ -32,7 +32,7 @@ void runAuto()
 	{
 		switch (gCurAuto)
 		{
-			case 0: break;
+			case 0: autoTest(); break;
 			case 1: autoStationaryRedRight(); break;
 			case 2: autoSideMobileRight(); break;
 		}
@@ -118,21 +118,22 @@ void autoSkills()
 	lowerMobile();
 
 	// 3
-	moveToTarget(24, 60, -127, 6, 2, 3, true, true);
+	moveToTarget(30, 58, -80, 6, 2, 3, true, true);
 	sleep(200);
-	//turnToTarget(16, 90, ccw, 60, 60, true, true);
-	//sleep(200);
-	//moveToTarget(16, 90, 127, 8, 1, 3, true, true);
-	//sleep(200);
-	turnToTarget(15, 108, ccw, 60, 60, true, true);
+	turnToTarget(18, 75, ccw, 60, 60, true, true);
 	sleep(200);
-	moveToTarget(15, 108, 127, 8, 1, 3, false, false);
+	moveToTarget(18, 75, 127, 8, 1, 3, true, true);
+	sleep(200);
+	turnToTarget(12, 104, ccw, 60, 60, true, true);
+	//return;
+	sleep(200);
+	moveToTarget(12, 104, 127, 8, 1, 8, false, false);
 	skillsRaiseMobile();
 
 	// 4
-	//turnToTarget(24, 72, cw, 60, 60, true, true, 180);
-	//sleep(200);
-	moveToTarget(24, 72, -127, 6, 3, 2, true, true);
+	turnToTarget(30, 72, ch, 60, 60, true, true, 180);
+	sleep(200);
+	moveToTarget(30, 72, -127, 6, 3, 2, true, true);
 	sleep(200);
 	turnToAngle(230, cw, 60, 60, true, true);
 	lowerMobile();
@@ -361,7 +362,7 @@ void autoSideMobileRight()
 void autoTest()
 {
 	gPosition.x = gPosition.y = gPosition.a = 0;
-	moveToTarget(15, 0, 0, 0, 127, 6, 1, 2, false, true);
-	moveToTarget(25, 10, 15, 0, 127, 6, 1, 2, false, true);
-	moveToTarget(60, -20, 25, 10, 127, 8, 2, 2, true, true);
+	turnToAngle(90, cw, 60, 60, true, true);
+	sleep(500);
+	writeDebugStreamLine("%.2f %.2f %.2f", gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
