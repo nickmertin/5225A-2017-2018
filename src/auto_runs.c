@@ -47,6 +47,14 @@ void skillsRaiseMobile()
 	setMobile(MOBILE_UP_HOLD_POWER);
 }
 
+void raiseMobileMid()
+{
+	setMobile(MOBILE_UP_POWER);
+	unsigned long timeout = nPgmTime + 1000;
+	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "mid")) sleep(10);
+	setMobile(15);
+}
+
 void lowerMobile()
 {
 	setMobile(MOBILE_DOWN_POWER);
@@ -104,39 +112,57 @@ void autoSkills()
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 1-2")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
 	moveToTargetAwait(driveTimeout);
-	skillsRaiseMobile();
+	raiseMobileMid();
 
 	// 2
-	moveToTarget(25, 53, -127, 6, 2, 2, true, true);
+	turnToTarget(20, 49, ch, 60, 60, true, true);
 	sleep(200);
-	turnToAngle(230, cw, 60, 60, true, true);
+	moveToTarget(20, 49, 127, 6, 3, 2, true, false);
 	sleep(200);
-	setDrive(60, 60);
-	sleep(200);
-	setDrive(0, 0);
-	sleep(200);
-	lowerMobile();
 
 	// 3
 	moveToTarget(30, 58, -80, 6, 2, 3, true, true);
-	sleep(200);
+	lowerMobile();
 	turnToTarget(18, 75, ccw, 60, 60, true, true);
 	sleep(200);
 	moveToTarget(18, 75, 127, 8, 1, 3, true, true);
 	sleep(200);
 	turnToTarget(12, 104, ccw, 60, 60, true, true);
-	//return;
 	sleep(200);
 	moveToTarget(12, 104, 127, 8, 1, 8, false, false);
 	skillsRaiseMobile();
 
 	// 4
-	turnToTarget(30, 72, ch, 60, 60, true, true, 180);
+	turnToTarget(28, 40, ch, 60, 60, true, true, 180);
 	sleep(200);
-	moveToTarget(30, 72, -127, 6, 3, 2, true, true);
+	moveToTarget(28, 40, -127, 6, 3, 2, true, true);
+	return;
 	sleep(200);
-	turnToAngle(230, cw, 60, 60, true, true);
+	turnToTarget(25, 25, cw, 60, 60, true, true);
+	setMobile(MOBILE_DOWN_POWER);
+	coneTimeout = nPgmTime + 1500;
+	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(coneTimeout, "skills 4-1")) sleep(10);
+	setMobile(15);
+	moveToTarget(25, 25, 31, 34, 60, 4, 2, 2, true, false);
+	sleep(200);
+
+	// 5
+	moveToTarget(29, 29, -127, 4, 2, 2, true, true);
 	lowerMobile();
+	turnToTarget(48, 24, cw, 60, 60, true, true);
+	sleep(200);
+	moveToTarget(48, 24, 127, 4, 2, 2, true, true);
+	sleep(200);
+	turnToTarget(68, 44, cw, 60, 60, true, true);
+	sleep(200);
+	moveToTarget(68, 44, 127, 6, 3, 8, false, false);
+	raiseMobileMid();
+
+	// 6
+	turnToTarget(49, 20, ch, 60, 60, true, true);
+	sleep(200);
+	moveToTarget(49, 20, 127, 6, 3, 2, true, false);
+	sleep(200);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
