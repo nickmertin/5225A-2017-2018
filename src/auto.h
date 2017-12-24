@@ -76,30 +76,23 @@ float getLengthOfLine(sLine line);
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 task autoSafetyTask(); // Autonomous drive safety task
-task autoHitWallTask();
 void applyHarshStop();
 void resetPositionFullRad(sPos& position, float y, float x, float a);
 void resetPositionFull(sPos& position, float y, float x, float a); // Reset the position to a desired value and starts tracking
 void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon = 1, float targetEpsilon = 1.5, bool harshStop = true, bool slow = true);
 void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon = 1, float targetEpsilon = 1.5, bool harshStop = true, bool slow = true);
-void moveToTarget2(float y, float x, byte power, float epsilon, bool harshStop = true, bool slow = true);
 void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true);
 void turnToAngle(float a, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true);
 void turnToTarget(float y, float x, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true, float offset = 0);
 void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true, float offset = 0);
 float getTargetAngle(float y, float x, float ys, float xs);
-void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool harshStop = true, bool slow = true);
-void moveToTargetOrWall(float y, float x, byte power, bool harshStop = true, bool slow = true);
 float getDistanceFromPoint(sVector point);
-void grabPreload();
 void scoreFirstExternal(float dir);
 
 /* Async Functions */
 NEW_ASYNC_VOID_10(moveToTarget, float, float, float, float, byte, float, float, float, bool, bool)
-NEW_ASYNC_VOID_6(moveToTarget2, float, float, byte, float, bool, bool)
 NEW_ASYNC_VOID_6(turnToAngle, float, tTurnDir, byte, byte, bool, bool)
 NEW_ASYNC_VOID_10(turnToTarget, float, float, float, float, tTurnDir, byte, byte, bool, bool, float)
-NEW_ASYNC_VOID_7(moveToTargetOrWall, float, float, float, float, byte, bool, bool)
 
 /* Internal Variables */
 bool _autoNotHitWall = true;

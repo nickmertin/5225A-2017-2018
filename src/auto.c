@@ -183,7 +183,7 @@ task autoSafetyTask()
 					gMotor[i].power = 0;
 				updateMotors();
 				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
-				return;
+				return_t;
 			}
 		}
 		endCycle(cycle);
@@ -228,7 +228,7 @@ void resetPositionFull(sPos& position, float y, float x, float a) { resetPositio
 void resetPositionFullRad(sPos& position, float y, float x, float a)
 {
 	writeDebugStreamLine("Resetting position (%f %f) %f degrees)", position.x, position.y, degToRad(position.a));
-	stopTask(trackPositionTask);
+	hogCPU();
 	resetPosition(position);
 
 	resetQuadratureEncoder(driveEncL);
@@ -238,7 +238,7 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	position.y = y;
 	position.x = x;
 	position.a = a;
-	startTask(trackPositionTask);
+	releaseCPU();
 }
 
 float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
@@ -345,67 +345,6 @@ void moveToTarget(float y, float x, float ys, float xs, byte power, float delta,
 }
 
 void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, lineEpsilon, targetEpsilon, harshStop, slow); }
-
-void moveToTarget2(float y, float x, byte power, float epsilon, bool harshStop, bool slow)
-{
-	writeDebugStreamLine("Moving to %f %f (VERSION 2)", y, x);
-	sPID pidA, pidY;
-	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
-	pidInit(pidY, 0.2, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
-
-	float epsilon2 = epsilon * epsilon;
-	float distance2;
-
-	sCycleData cycle;
-	initCycle(cycle, 50, "moveToTarget2");
-	do
-	{
-		float dy = y - gPosition.y;
-		float dx = x - gPosition.x;
-
-		distance2 = dy * dy + dx * dx;
-
-		EndTimeSlice();
-
-		float currentAngle = gVelocity.y || gVelocity.x ? atan2(gVelocity.x, gVelocity.y) : gPosition.a;
-		float targetAngle = nearAngle(atan2(x, y), currentAngle);
-
-		pidCalculate(pidA, targetAngle, currentAngle);
-
-		EndTimeSlice();
-
-		float basePower;
-		if (slow)
-		{
-			pidCalculate(pidY, 0, sqrt(distance2));
-			basePower = fabs(pidY.output * power);
-		}
-		else
-			basePower = (float)abs(power);
-
-		EndTimeSlice();
-
-		float weight = pidA.output;
-
-		float scalar = basePower / (1 + fabs(weight));
-
-		word left = (word)(scalar * (sgn(power) + weight));
-		word right = (word)(scalar * (sgn(power) - weight));
-
-		writeDebugStreamLine("%.2f %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, gPosition.a, gVelocity.y, gVelocity.x, currentAngle, left, right);
-
-		if (cycle.count) setDrive(left, right);
-
-		endCycle(cycle);
-	} while (distance2 > epsilon2);
-
-	if (harshStop)
-		applyHarshStop();
-	else
-		setDrive(0, 0);
-
-	writeDebugStreamLine("Moved to %.2f %.2f | %.2f %.2f %.2f", y, x, gPosition.y, gPosition.x, gPosition.a);
-}
 
 void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
 {
@@ -569,90 +508,9 @@ float getTargetAngle(float y, float x, float ys, float xs)
 	return getAngleOfLine(line);
 }
 
-task autoHitWallTask()
-{
-	unsigned long timeStart = nPgmTime;
-	//while (_autoNotHitWall = (!*gSensor[fenceLimitLeft].value && !*gSensor[fenceLimitRight].value)) sleep(1);
-}
-
-void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool harshStop, bool slow)
-{/*
-	_autoNotHitWall = true;
-	startTask(autoHitWallTask);
-	moveToTarget(y, x, ys, xs, power, harshStop, slow, &_autoNotHitWall);
-
-	gAutoSafety = false;
-	unsigned long time, timeEnd, timeStart = nPgmTime;
-	int lstState = -1;
-	while (nPgmTime - timeStart < 1500)
-	{
-		time = nPgmTime;
-		int state = (*gSensor[fenceLimitLeft].value << 1) | *gSensor[fenceLimitRight].value;
-		if (state != lstState) S_LOG "%d -> %d", lstState, state E_LOG_DATA
-		switch (state)
-		{
-			case 0:
-				setDrive(-55);
-				break;
-			case 1:
-				setDrive(-58, -32);
-				break;
-			case 2:
-				setDrive(-32, -58);
-				break;
-			case 3:
-				setDrive(-60);
-				if (state != lstState) timeEnd = time + 200;
-				if (time > timeEnd) goto end;
-				break;
-		}
-		lstState = state;
-		sleep(10);
-	}
-end:
-	setDrive(-24);
-	gAutoSafety = true;*/
-}
-
-void moveToTargetOrWall(float y, float x, byte power, bool harshStop, bool slow)
-{
-	moveToTargetOrWall(y, x, gPosition.y, gPosition.x, power, harshStop, slow);
-}
-
 float getDistanceFromPoint(sVector point)
 {
 	return sqrt(sq(gPosition.x - point.x) + sq(gPosition.y - point.y));
-}
-
-task stopAutoAt15()
-{
-	unsigned long startTime = nPgmTime;
-	while (nPgmTime - startTime < 14500) sleep(1);
-	stopAllButCurrentTasks();
-	startTask(autoMotorSensorUpdateTask);
-	startTask(autoSafetyTask);
-	for (tMotor i = port1; i <= port10; ++i)
-		gMotor[i].power = 0;
-	updateMotors();
-}
-
-void grabPreload()
-{
-	setArm(-80);
-	unsigned long timeout = nPgmTime + 1000;
-	while (gSensor[armPoti].value > 2700 && !TimedOut(timeout, "preload 1")) sleep(10);
-	setArm(-10);
-	sleep(200);
-	setClaw(CLAW_CLOSE_POWER);
-	timeout = nPgmTime + 800;
-	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(timeout, "preload 2")) sleep(10);
-	setClaw(CLAW_CLOSE_HOLD_POWER);
-	sleep(200);
-	setArm(-80);
-	timeout = nPgmTime + 500;
-	while (gSensor[clawPoti].value > 1200 && !TimedOut(timeout, "preload 3")) sleep(10);
-	setArm(10);
-	sleep(200);
 }
 
 void scoreFirstExternal(float dir)
