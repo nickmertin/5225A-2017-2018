@@ -67,46 +67,64 @@ void setDrive (word left, word right)
 	gMotor[frontLeft].power = gMotor[backLeft].power = left;
 }
 
-void setArm (word speed, int distance)
+void setLift(word speed)
 {
 	gMotor[scissorLeft].power = gMotor[scissorRight].power = speed;
-	if (speed > 0)
-	{
-		while (gSensor[scissorEnc].value < distance) sleep(10);
-	}
-	else if (speed < 0)
-	{
-		while (gSensor[scissorEnc].value > distance) sleep(10);
-	}
-	gMotor[scissorLeft].power = gMotor[scissorRight].power = 0;
 }
 
-void closeClaw (bool state)
+typedef enum _sClawStates
 {
-	if (state == true) gMotor[claw].power = 127;
-	else if (state == false) gMotor[claw].power = -127;
-	unsigned long startTimer = nPgmTime;
-	while (nPgmTime-startTimer < 200) sleep (10);
-	gMotor[claw].power = 0;
+	clawIdle,
+	clawOpen,
+	clawClose,
+} sClawStates;
+
+#define CLAW_CLOSE_POWER 127
+#define CLAW_OPEN_POWER -127
+#define CLAW_WAIT 200
+
+sClawStates gClawState = clawIdle;
+
+void setClaw (word speed)
+{
+	gMotor[claw].power = speed;
 }
 
-void calibrate ()
+void handleClaw ()
 {
-	sCycleData cycle;
-	initCycle(cycle, 10, "calibrate");
-
-	setDrive(127, 127);
-	while (gSensor[leftEnc].value < 700)
+	switch(gClawState)
 	{
-		lightVal = gSensor[midLight].value;
-		if (lightVal < lightMin) lightMin = lightVal;
-		if (lightVal > lightMax) lightMax = lightVal;
-
-		endCycle(cycle);
+	case clawIdle:
+		{
+			setClaw(0);
+			break;
+		}
+	case clawOpen:
+		{
+			setClaw(CLAW_OPEN_POWER);
+			wait1Msec(CLAW_WAIT);
+			gClawState = clawIdle;
+			break;
+		}
+	case clawClose:
+		{
+			setClaw(CLAW_CLOSE_POWER);
+			wait1Msec(CLAW_WAIT);
+			gClawState = clawIdle;
+			break;
+		}
+		//case clawOpening:
+		//	{
+		//		setClaw(CLAW_OPEN_POWER);
+		//		break;
+		//	}
+		//case clawClosing:
+		//	{
+		//		setClaw(CLAW_CLOSE_POWER);
+		//		break;
+		//	}
 	}
-	lightThresh = (lightMax + lightMin) / 2;
-	setDrive (0, 0);
-} // if sensorVal<1000, should be a white line
+}
 
 bool TimedOut(unsigned long timeOut, const string description)
 {
@@ -131,12 +149,25 @@ bool TimedOut(unsigned long timeOut, const string description)
 		return false;
 }
 
+//update states
+task updateStates()
+{
+	sCycleData cycle;
+	initCycle(cycle, 10, "update states");
+
+	while(true)
+	{
+		handleClaw();
+		endCycle(cycle);
+	}
+}
+
 // Auto
 #include "auto.h"
 #include "auto_runs.h"
 
 #include "auto.c"
-#include "auto_runs.c"
+//#include "auto_runs.c"
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
@@ -167,6 +198,8 @@ void disabled()
 // This task gets started at the begining of the autonomous period
 task autonomous()
 {
+	tStart(updateStates);
+
 	gAutoTime = nPgmTime;
 	writeDebugStreamLine("Auto start %d", gAutoTime);
 	displayLCDCenteredString(0, "AUTO");
@@ -176,14 +209,12 @@ task autonomous()
 	gKillDriveOnTimeout = true;
 
 	resetPosition(gPosition);
-	//resetQuadratureEncoder(driveEncL);
-	//resetQuadratureEncoder(driveEncR);
-	//resetQuadratureEncoder(latEnc);
-
 	tStart(autoMotorSensorUpdateTask);
 	tStart(trackPositionTask);
+	////////////////////////////
+	//runAuto();
 
-	runAuto();
+	gClawState = clawOpen;
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
