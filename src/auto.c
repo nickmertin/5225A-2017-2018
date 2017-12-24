@@ -141,46 +141,6 @@ task autoMotorSensorUpdateTask()
 	}
 }
 
-<<<<<<< HEAD
-=======
-task autoSafetyTask()
-{
-	int bad = 0;
-	int lastL = gSensor[driveEncL].value;
-	int lastR = gSensor[driveEncR].value;
-	int lastB = gSensor[latEnc].value;
-	sCycleData cycle;
-	initCycle(cycle, 10, "auto safety");
-	while (true)
-	{
-		if (gAutoSafety)
-		{
-			int motors = abs(gMotor[driveL1].power) + abs(gMotor[driveL2].power) + abs(gMotor[driveR1].power) + abs(gMotor[driveR2].power);
-			int sensors = abs(gSensor[driveEncL].value - lastL) + abs(gSensor[driveEncR].value - lastR) + abs(gSensor[latEnc].value - lastB);
-			lastL = gSensor[driveEncL].value;
-			lastR = gSensor[driveEncR].value;
-			lastB = gSensor[latEnc].value;
-
-			// If the motors are moving fast and the encoders arn't moving
-			if (motors > 100 && sensors < 6)
-				++bad; // Remember that this is a bad cycle
-			else
-				bad = 0; // Reset the bad counter
-			if (bad >= 100) // If 100 cycles have been bad stop auto
-			{
-				stopAllButCurrentTasks();
-				for (tMotor i = port1; i <= port10; ++i)
-					gMotor[i].power = 0;
-				updateMotors();
-				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
-				return_t;
-			}
-		}
-		endCycle(cycle);
-	}
-}
-
->>>>>>> core-libraries
 void applyHarshStop()
 {
 	sVector vel;
@@ -501,42 +461,4 @@ float getTargetAngle(float y, float x, float ys, float xs)
 float getDistanceFromPoint(sVector point)
 {
 	return sqrt(sq(gPosition.x - point.x) + sq(gPosition.y - point.y));
-}
-
-<<<<<<< HEAD
-task stopAutoAt15()
-{
-	unsigned long startTime = nPgmTime;
-	while (nPgmTime - startTime < 14500) sleep(1);
-	stopAllButCurrentTasks();
-	startTask(autoMotorSensorUpdateTask);
-	for (tMotor i = port1; i <= port10; ++i)
-		gMotor[i].power = 0;
-	updateMotors();
-=======
-void scoreFirstExternal(float dir)
-{
-	sPolar offsetP;
-	offsetP.angle = dir;
-	offsetP.magnitude = 1;
-	sVector offsetV;
-	polarToVector(offsetP, offsetV);
-	moveToTarget(gPosition.y - offsetV.x, gPosition.x - offsetV.y, -40, 3, 0.5, 0.5, true, true);
-	sleep(200);
-	setArm(-80);
-	unsigned long coneTimeout = nPgmTime + 2000;
-	while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "extern 1")) sleep(10); // Increase time
-	setArm(10);
-	setClaw(CLAW_OPEN_POWER);
-	coneTimeout = nPgmTime + 800;
-	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern 2")) sleep(10);
-	setClaw(CLAW_OPEN_HOLD_POWER);
-	sleep(200);
-	gNumCones = 1;
-	setArm(80);
-	coneTimeout = nPgmTime + 800;
-	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "extern 3")) sleep(10);
-	setArm(10);
-	moveToTarget(gPosition.y + 2 * offsetV.x, gPosition.x + 2 * offsetV.y, 60, 3, 1, 1, false, false);
->>>>>>> core-libraries
 }
