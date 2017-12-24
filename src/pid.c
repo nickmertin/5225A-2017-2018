@@ -69,4 +69,5 @@ void pidReset(sPID& PID)
 	PID.lstInput = 0; // Reset the last input for a new set of PID values
 	PID.lstRunTime = nPgmTime;
 	PID.firstRun = true;
+	PID.output = 0;
 }
