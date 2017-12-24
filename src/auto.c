@@ -367,10 +367,10 @@ void moveToTarget2(float y, float x, byte power, float epsilon, bool harshStop, 
 
 		EndTimeSlice();
 
-		float currentAngle = gVelocity.y || gVelocity.x ? atan2(gVelocity.x, gVelocity.y) : gPosition.a;
+		float currentAngle = /*gVelocity.y || gVelocity.x ? atan2(gVelocity.x, gVelocity.y) :*/ gPosition.a;
 		float targetAngle = nearAngle(atan2(x, y), currentAngle);
 
-		pidCalculate(pidA, targetAngle, currentAngle);
+		//pidCalculate(pidA, targetAngle, currentAngle);
 
 		EndTimeSlice();
 
@@ -392,7 +392,7 @@ void moveToTarget2(float y, float x, byte power, float epsilon, bool harshStop, 
 		word left = (word)(scalar * (sgn(power) + weight));
 		word right = (word)(scalar * (sgn(power) - weight));
 
-		writeDebugStreamLine("%.2f %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, gPosition.a, gVelocity.y, gVelocity.x, currentAngle, left, right);
+		writeDebugStreamLine("%.2f %.2f %.2f | %.2f %.2f %.2f | %.2f | %d %d", gPosition.y, gPosition.x, radToDeg(gPosition.a), gVelocity.y, gVelocity.x, radToDeg(currentAngle), radToDeg(targetAngle), left, right);
 
 		if (cycle.count) setDrive(left, right);
 

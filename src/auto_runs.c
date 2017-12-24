@@ -99,7 +99,7 @@ void autoSkills()
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long coneTimeout = nPgmTime + 2500;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1-1")) sleep(10);
-	moveToTargetAsync(48, 72, 19.5, 43.5, 127, 6, 2, 6, false, false);
+	moveToTarget2Async(48, 72, 127, 6, false, false);
 	unsigned long driveTimeout = nPgmTime + 4000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 1-2")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
@@ -107,7 +107,7 @@ void autoSkills()
 	skillsRaiseMobile();
 
 	// 2
-	moveToTarget(25, 53, -127, 6, 2, 2, true, true);
+	moveToTarget2(25, 53, -127, 2, true, true);
 	sleep(200);
 	turnToAngle(230, cw, 60, 60, true, true);
 	sleep(200);
@@ -118,7 +118,7 @@ void autoSkills()
 	lowerMobile();
 
 	// 3
-	moveToTarget(24, 60, -127, 6, 2, 3, true, true);
+	moveToTarget2(24, 60, -127, 3, true, true);
 	sleep(200);
 	//turnToTarget(16, 90, ccw, 60, 60, true, true);
 	//sleep(200);
@@ -126,13 +126,13 @@ void autoSkills()
 	//sleep(200);
 	turnToTarget(15, 108, ccw, 60, 60, true, true);
 	sleep(200);
-	moveToTarget(15, 108, 127, 8, 1, 3, false, false);
+	moveToTarget2(15, 108, 127, 3, false, false);
 	skillsRaiseMobile();
 
 	// 4
 	//turnToTarget(24, 72, cw, 60, 60, true, true, 180);
 	//sleep(200);
-	moveToTarget(24, 72, -127, 6, 3, 2, true, true);
+	moveToTarget2(24, 72, -127, 2, true, true);
 	sleep(200);
 	turnToAngle(230, cw, 60, 60, true, true);
 	lowerMobile();

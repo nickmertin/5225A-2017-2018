@@ -51,7 +51,7 @@
 
 #include "controls.h"
 
-//#define DEBUG_TRACKING
+#define DEBUG_TRACKING
 
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
