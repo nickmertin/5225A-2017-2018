@@ -70,7 +70,6 @@ float getAngleOfLine(sLine line);
 float getLengthOfLine(sLine line);
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
-
 void applyHarshStop();
 void resetPositionFullRad(sPos& position, float y, float x, float a);
 void resetPositionFull(sPos& position, float y, float x, float a); // Reset the position to a desired value and starts tracking

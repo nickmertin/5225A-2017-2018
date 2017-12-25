@@ -67,16 +67,72 @@ void setDrive (word left, word right)
 	gMotor[frontLeft].power = gMotor[backLeft].power = left;
 }
 
+typedef enum _sLiftStates
+{
+	liftIdle,
+	liftRaise,
+	liftLower
+}sLiftStates;
+
+#define LIFT_TOP 1475
+#define LIFT_BOTTOM 0
+int gLiftPositions[] = {0, 265, 1475};
+
+#define LIFT_RAISING_POWER 127
+#define LIFT_LOWERING_POWER -127
+
+sLiftStates gLiftState = liftIdle;
+
 void setLift(word speed)
 {
 	gMotor[scissorLeft].power = gMotor[scissorRight].power = speed;
+}
+int lifttarget = 0;
+void handleLift ()
+{
+	switch (gLiftState)
+	{
+	case liftIdle:
+		{
+			setLift(0);
+			break;
+		}
+	case liftRaise:
+		{
+			setLift(LIFT_RAISING_POWER);
+			break;
+		}
+	case liftLower:
+		{
+			setLift(LIFT_LOWERING_POWER);
+			break;
+		}
+	}
+}
+
+void liftToPos (int target)
+{
+	if (liftTarget < target)
+	{
+		writeDebugStreamLine("Lift Raising");
+		gLiftState = liftRaise;
+		while (gSensor[scissorEnc].value < gLiftPositions[target]) sleep(10);
+	}
+	else if (liftTarget > target)
+	{
+		writeDebugStreamLine("Lift Lowering");
+		gLiftState = liftLower;
+		while (gSensor[scissorEnc].value > gLiftPositions[target]) sleep(10);
+	}
+	gLiftState = liftIdle;
+	liftTarget = target;
 }
 
 typedef enum _sClawStates
 {
 	clawIdle,
 	clawOpen,
-	clawClose,
+	clawClose
 } sClawStates;
 
 #define CLAW_CLOSE_POWER 127
@@ -113,16 +169,6 @@ void handleClaw ()
 			gClawState = clawIdle;
 			break;
 		}
-		//case clawOpening:
-		//	{
-		//		setClaw(CLAW_OPEN_POWER);
-		//		break;
-		//	}
-		//case clawClosing:
-		//	{
-		//		setClaw(CLAW_CLOSE_POWER);
-		//		break;
-		//	}
 	}
 }
 
@@ -157,6 +203,7 @@ task updateStates()
 
 	while(true)
 	{
+		handleLift();
 		handleClaw();
 		endCycle(cycle);
 	}
@@ -214,7 +261,6 @@ task autonomous()
 	////////////////////////////
 	//runAuto();
 
-	gClawState = clawOpen;
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
