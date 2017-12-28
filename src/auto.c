@@ -204,7 +204,7 @@ void applyHarshStop()
 	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
 
 	yPow *= -0.2;
-	aPow *= -7;
+	aPow *= -6.3;
 
 	word left = yPow + aPow;
 	word right = yPow - aPow;
@@ -431,6 +431,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 	float orA = gPosition.a;
 	float a = getTargetAngle(y, x, ys, xs) + offset;
 	a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
+	float corOffset = a;
 	if (turnDir == cw)
 		while (a + aOffset < orA) aOffset += PI * 2;
 	else if (turnDir == ccw)
@@ -438,6 +439,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 	else
 		if (a < orA) turnDir = ccw; else turnDir = cw;
 	a += aOffset;
+	corOffset -= a;
 
 	writeDebugStreamLine("Turn angle | Angle: %f | %f", radToDeg(a), radToDeg(orA));
 
@@ -452,7 +454,10 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 				{
 					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
 					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
-					a += aOffset;
+					/*while (a + aOffset < orA) aOffset += PI * 2;
+					a += aOffset;*/
+					a -= corOffset;
+					writeDebugStreamLine("%f", a);
 					pidCalculate(pidA, a, gPosition.a);
 					int power = round(abs(pidA.output));
 					LIM_TO_VAL_SET(power, 127);
@@ -465,7 +470,10 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 				{
 					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
 					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
-					a += aOffset;
+					/*while (a + aOffset > orA) aOffset -= PI * 2;
+					a += aOffset;*/
+					a -= corOffset;
+					writeDebugStreamLine("%f", a);
 					pidCalculate(pidA, a, gPosition.a);
 					int power = round(abs(pidA.output));
 					LIM_TO_VAL_SET(power, 127);

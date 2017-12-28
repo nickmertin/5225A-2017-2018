@@ -59,7 +59,7 @@ task main()
 
 		if (AUTONOMOUS)
 		{
-			startTask(autonomous);
+			tStart(autonomous);
 
 			// Waiting for autonomous phase to end
 			while (AUTONOMOUS && !DISABLED)
@@ -80,7 +80,7 @@ task main()
 
 		else
 		{
-			startTask(usercontrol);
+			tStart(usercontrol);
 
 			// Here we repeat loop waiting for user control to end and (optionally) start
 			// of a new competition run
@@ -117,25 +117,25 @@ void allMotorsOff()
 
 void allTasksStop()
 {
-	stopTask(1);
-	stopTask(2);
-	stopTask(3);
-	stopTask(4);
+	tStop(1);
+	tStop(2);
+	tStop(3);
+	tStop(4);
 #if defined(VEX2)
-	stopTask(5);
-	stopTask(6);
-	stopTask(7);
-	stopTask(8);
-	stopTask(9);
-	stopTask(10);
-	stopTask(11);
-	stopTask(12);
-	stopTask(13);
-	stopTask(14);
-	stopTask(15);
-	stopTask(16);
-	stopTask(17);
-	stopTask(18);
-	stopTask(19);
+	tStop(5);
+	tStop(6);
+	tStop(7);
+	tStop(8);
+	tStop(9);
+	tStop(10);
+	tStop(11);
+	tStop(12);
+	tStop(13);
+	tStop(14);
+	tStop(15);
+	tStop(16);
+	tStop(17);
+	tStop(18);
+	tStop(19);
 #endif
 }

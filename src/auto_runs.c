@@ -104,65 +104,91 @@ void autoSkills()
 	resetPositionFull(gPosition, 19.5, 43.5, 45);
 
 	// 1
-	setMobile(MOBILE_DOWN_POWER);
-	unsigned long coneTimeout = nPgmTime + 2500;
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 1000 && !TimedOut(coneTimeout, "skills 1-1")) sleep(10);
-	moveToTargetAsync(48, 72, 19.5, 43.5, 127, 6, 2, 6, false, false);
-	unsigned long driveTimeout = nPgmTime + 4000;
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(coneTimeout, "skills 1-2")) sleep(10);
-	setMobile(MOBILE_DOWN_HOLD_POWER);
-	moveToTargetAwait(driveTimeout);
+	writeDebugStreamLine("1");
+	lowerMobile();
+	//moveToTargetSimple(48, 72, 127, false, false);
+	moveToTargetDisSimple(45, 29, 127, 0, stopSoft, true);
 	raiseMobileMid();
 
 	// 2
-	turnToTarget(20, 49, ch, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(20, 49, 127, 6, 3, 2, true, false);
-	sleep(200);
+	writeDebugStreamLine("2");
+	turnToTarget(21, 45, cw, 55, 55, true, true);
+	moveToTargetSimple(22, 46, 127, 0, stopHarsh | stopSoft, false);
 
 	// 3
-	moveToTarget(30, 58, -80, 6, 2, 3, true, true);
+	writeDebugStreamLine("3");
+	moveToTargetDisSimple(225, -1.2, -127, 0, stopHarsh | stopSoft, false);
+	sleep(300);
+	turnToTarget(8.5, 105.5, ccw, 50, 50);
 	lowerMobile();
-	turnToTarget(18, 75, ccw, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(18, 75, 127, 8, 1, 3, true, true);
-	sleep(200);
-	turnToTarget(12, 104, ccw, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(12, 104, 127, 8, 1, 8, false, false);
+	moveToTargetSimple(8.5, 105.5, 127, 12, stopSoft, true);
 	skillsRaiseMobile();
 
-	// 4
-	turnToTarget(28, 40, ch, 60, 60, true, true, 180);
-	sleep(200);
-	moveToTarget(28, 40, -127, 6, 3, 2, true, true);
-	return;
-	sleep(200);
-	turnToTarget(25, 25, cw, 60, 60, true, true);
-	setMobile(MOBILE_DOWN_POWER);
-	coneTimeout = nPgmTime + 1500;
-	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(coneTimeout, "skills 4-1")) sleep(10);
-	setMobile(15);
-	moveToTarget(25, 25, 31, 34, 60, 4, 2, 2, true, false);
-	sleep(200);
-
-	// 5
-	moveToTarget(29, 29, -127, 4, 2, 2, true, true);
+	// 7
+	writeDebugStreamLine("7");
+	turnToTarget(28, 44, ch, 30, 30, true, true, 180);
+	moveToTargetSimple(28, 44, -127, 0, stopHarsh | stopSoft, true);
+	turnToAngle(225, cw, 127, 127);
+	setDrive(40, 40);
+	sleep(400);
+	setDrive(15, 15);
 	lowerMobile();
-	turnToTarget(48, 24, cw, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(48, 24, 127, 4, 2, 2, true, true);
-	sleep(200);
-	turnToTarget(68, 44, cw, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(68, 44, 127, 6, 3, 8, false, false);
+	setDrive(0, 0);
+
+	// 8
+	writeDebugStreamLine("8");
+	moveToTargetDisSimple(225, -1.5, -70, 0, stopHarsh | stopSoft, true);
+	turnToTarget(50, 24, cw, 127, 127);
+	moveToTargetSimple(50, 24, 127);
+	turnToTarget(72, 49, cw, 127, 127);
+	moveToTargetSimple(72, 49, 127, 9, stopSoft, true);
 	raiseMobileMid();
 
-	// 6
-	turnToTarget(49, 20, ch, 60, 60, true, true);
-	sleep(200);
-	moveToTarget(49, 20, 127, 6, 3, 2, true, false);
-	sleep(200);
+	// 10
+	writeDebugStreamLine("10");
+	turnToTarget(50, 24, ccw, 50, 50);
+	moveToTargetSimple(50, 24, gTargetLast.y, gTargetLast.x, 127, 0, stopHarsh | stopSoft, false);
+	moveToTargetDisSimple(225, -2, -127, 0, stopHarsh | stopSoft, true);
+
+	// 11
+	writeDebugStreamLine("11");
+	turnToAngle(325, cw, 60, 60, false, false);
+	turnToTarget(98, 72, cw, 30, 30);
+	lowerMobile();
+	moveToTargetSimple(98, 72, 127, 10, stopSoft, true);
+	raiseMobileMid();
+
+	// 12
+	writeDebugStreamLine("12");
+	moveToTargetSimple(119, 97, 127, 0, stopHarsh | stopSoft, false);
+	moveToTargetDisSimple(45, -1.2, -127, 0, stopHarsh | stopSoft, true);
+
+	// 13
+	writeDebugStreamLine("13");
+	turnToTarget(97, 122, cw, 75, 75);
+	moveToTargetSimple(97, 122, 127);
+	turnToTarget(68, 97, cw, 65, 65);
+	lowerMobile();
+	moveToTargetSimple(68, 97, 127, 10, stopSoft, true);
+	raiseMobileMid();
+
+	// 15
+	writeDebugStreamLine("15");
+	turnToTarget(90, 122, ccw, 55, 55);
+	moveToTargetSimple(90, 122, 127, 0, stopHarsh | stopSoft, false);
+	moveToTargetDisSimple(45, -1.5, -127, 0, stopHarsh | stopSoft, true);
+
+	// 16
+	writeDebugStreamLine("16");
+	turnToTarget(36, 124, cw, 60, 60);
+	lowerMobile();
+	moveToTargetSimple(36, 124, 127, 8, stopSoft, true);
+	skillsRaiseMobile();
+
+	// 17
+	writeDebugStreamLine("17");
+	turnToTarget(90, 117, ch, 45, 45, true, true, 180);
+	moveToTargetSimple(90, 117, -127);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
