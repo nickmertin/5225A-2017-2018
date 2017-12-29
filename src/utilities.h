@@ -1,4 +1,6 @@
 /* Defines */
+#define TAU (PI * 2)
+
 // Limit a variable to a value
 #define LIM_TO_VAL(input, val) (abs(input) > (val) ? (val) * sgn(input) : (input))
 

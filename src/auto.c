@@ -55,7 +55,7 @@ void trackVelocity(sPos position, sVel& velocity)
 {
 	unsigned long curTime = nPgmTime;
 	long passed = curTime - velocity.lstChecked;
-	if (passed > 50)
+	if (passed > 40)
 	{
 		float posA = position.a;
 		float posY = position.y;
@@ -203,7 +203,7 @@ void applyHarshStop()
 
 	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
 
-	yPow *= -0.2;
+	yPow *= -0.6;
 	aPow *= -6.3;
 
 	word left = yPow + aPow;
@@ -227,7 +227,7 @@ void resetPositionFull(sPos& position, float y, float x, float a) { resetPositio
 
 void resetPositionFullRad(sPos& position, float y, float x, float a)
 {
-	writeDebugStreamLine("Resetting position (%f %f) %f degrees)", position.x, position.y, degToRad(position.a));
+	//writeDebugStreamLine("Resetting position (%f %f) %f degrees)", position.x, position.y, degToRad(position.a));
 	hogCPU();
 	resetPosition(position);
 
@@ -427,59 +427,67 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 	left = abs(left);
 	right = abs(right);
 
-	float aOffset = 0;
-	float orA = gPosition.a;
-	float a = getTargetAngle(y, x, ys, xs) + offset;
-	a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
-	float corOffset = a;
-	if (turnDir == cw)
-		while (a + aOffset < orA) aOffset += PI * 2;
-	else if (turnDir == ccw)
-		while (a + aOffset > orA) aOffset -= PI * 2;
-	else
-		if (a < orA) turnDir = ccw; else turnDir = cw;
-	a += aOffset;
-	corOffset -= a;
+	float target = getTargetAngle(y, x, ys, xs) + offset;
+	float curAngle = gPosition.a;
 
-	writeDebugStreamLine("Turn angle | Angle: %f | %f", radToDeg(a), radToDeg(orA));
+	if (turnDir == ch)
+	{
+		if (getCWAngle(curAngle, target) < getCCWAngle(curAngle, target))
+			turnDir = cw;
+		else
+			turnDir = ccw;
+	}
+
+	float distance, distanceLst;
+
+	if (turnDir == cw)
+		distance = getCWAngle(curAngle, target);
+	else
+		distance = getCCWAngle(curAngle, target);
+
+	writeDebugStreamLine("Turn angle: %f | Angle: %f | Distance: %f", radToDeg(target), radToDeg(curAngle), radToDeg(distance));
+
+	sCycleData cycle;
+	initCycle(cycle, 10, "turnToTarget");
 
 	if (slow)
 	{
-		sCycleData cycle;
-		initCycle(cycle, 10, "moveToTarget");
 		switch (turnDir)
 		{
 			case cw:
-				while (gPosition.a < a - (gVelocity.a * 0.090))
+				do
 				{
-					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
-					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
-					/*while (a + aOffset < orA) aOffset += PI * 2;
-					a += aOffset;*/
-					a -= corOffset;
-					writeDebugStreamLine("%f", a);
-					pidCalculate(pidA, a, gPosition.a);
+					distanceLst = distance;
+
+					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+					curAngle = gPosition.a;
+					distance = getCWAngle(curAngle, target);
+
+					pidCalculate(pidA, 0, distance);
 					int power = round(abs(pidA.output));
 					LIM_TO_VAL_SET(power, 127);
 					setDrive(power > left ? left : power, power > right ? -right : -power);
 					endCycle(cycle);
-				}
+
+					writeDebugStreamLine("%f %f %d", radToDeg(curAngle), radToDeg(target), power);
+
+				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.090));
 				break;
 			case ccw:
-				while (gPosition.a > a - (gVelocity.a * 0.090))
+				do
 				{
-					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
-					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
-					/*while (a + aOffset > orA) aOffset -= PI * 2;
-					a += aOffset;*/
-					a -= corOffset;
-					writeDebugStreamLine("%f", a);
-					pidCalculate(pidA, a, gPosition.a);
+					distanceLst = distance;
+
+					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+					curAngle = gPosition.a;
+					distance = getCCWAngle(curAngle, target);
+
+					pidCalculate(pidA, 0, distance);
 					int power = round(abs(pidA.output));
 					LIM_TO_VAL_SET(power, 127);
 					setDrive(power > left ? -left : -power, power > right ? right : power);
 					endCycle(cycle);
-				}
+				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.090));
 				break;
 		}
 	}
@@ -489,11 +497,28 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 		{
 			case cw:
 				setDrive(left, -right);
-				while (gPosition.a < a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(10); }
+				do
+				{
+					distanceLst = distance;
+					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+					curAngle = gPosition.a;
+					distance = getCWAngle(curAngle, target);
+
+					endCycle(cycle);
+				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.13));
 				break;
 			case ccw:
-				setDrive(-left, right);
-				while (gPosition.a > a - (gVelocity.a * 0.13)) { a = getTargetAngle(y, x, ys, xs) + aOffset; sleep(10); }
+			setDrive(-left, right);
+				do
+				{
+					distanceLst = distance;
+
+					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+					curAngle = gPosition.a;
+					distance = getCCWAngle(curAngle, target);
+
+					endCycle(cycle);
+				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.13));
 				break;
 		}
 	}
@@ -519,6 +544,24 @@ float getTargetAngle(float y, float x, float ys, float xs)
 float getDistanceFromPoint(sVector point)
 {
 	return sqrt(sq(gPosition.x - point.x) + sq(gPosition.y - point.y));
+}
+
+float getCWAngle(float cur, float tar)
+{
+	float curM = fmod(cur, TAU);
+	float tarM = fmod(tar, TAU);
+
+	if (tarM >= curM) return tarM - curM;
+	else return TAU - (curM - tarM);
+}
+
+float getCCWAngle(float cur, float tar)
+{
+	float curM = fmod(cur, TAU);
+	float tarM = fmod(tar, TAU);
+
+	if (tarM <= curM) return curM - tarM;
+	else return TAU - (tarM - curM);
 }
 
 void scoreFirstExternal(float dir)

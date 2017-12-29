@@ -87,6 +87,8 @@ void turnToTarget(float y, float x, tTurnDir turnDir, byte left, byte right, boo
 void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte left, byte right, bool harshStop = true, bool slow = true, float offset = 0);
 float getTargetAngle(float y, float x, float ys, float xs);
 float getDistanceFromPoint(sVector point);
+float getCWAngle(float cur, float tar);
+float getCCWAngle(float cur, float tar);
 void scoreFirstExternal(float dir);
 
 /* Async Functions */
