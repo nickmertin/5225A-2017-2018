@@ -103,66 +103,7 @@ void autoSkills()
 {
 	resetPositionFull(gPosition, 0, 0, 0);
 
-	setDrive(127, -127);
-	while (gPosition.a < degToRad(100)) sleep(1);
-
-	const float target = 1.000, kP = 17, kI = 0.05, kD = 0;
-
-	unsigned long time = nPgmTime, lstTime = time, inRangeTime = 0, nextDebug = 0;
-	float input = gVelocity.a, lstInput = input, power = 0, error = 0, lstError, integral = 0, derivative = 0;
-	bool inRange = false;
-
-	while (!inRange || time - inRangeTime < 100 || gPosition.a < degToRad(180 - 5.6))
-	{
-		unsigned long deltaTime = time - lstTime;
-		float vel = gVelocity.a;
-
-		if (!inRange && vel > 0.85 && vel < 1.15)
-		{
-			inRange = true;
-			inRangeTime = time;
-		}
-
-		if (deltaTime >= 1)
-		{
-			input = vel;
-
-			derivative = (float)(input - lstInput) / (float)(deltaTime);
-			lstError = error;
-			error = target - input;
-
-			integral += error * deltaTime;
-			if (integral < -8) integral = 0;
-
-			power = error * kP + integral * kI - derivative * kD;
-
-			power += 30;
-
-			if (power < 0) power /= 6.0;
-
-			if (power > 50) power = 50;
-			if (power < -5) power = -5;
-
-			setDrive(power, -power);
-
-			if (time >= nextDebug)
-			{
-				writeDebugStreamLine("%f %f %f", power, input, integral);
-				nextDebug = time + 50;
-			}
-
-			lstInput = input;
-			lstTime = time;
-		}
-
-		sleep(1);
-
-		time = nPgmTime;
-	}
-
-	setDrive(-15, 15);
-	sleep(150);
-	setDrive(0, 0);
+	turnToAngleSimple(180, cw, 127, 127);
 	sleep(500);
 	writeDebugStreamLine("%f", radToDeg(gPosition.a));
 
@@ -175,7 +116,7 @@ void autoSkills()
 	{
 		resetPositionFull(gPosition, 0, 0, 0);
 
-		setDrive(30, -30);
+		setDrive(29, -29);
 		while (gPosition.a < degToRad(90)) EndTimeSlice();
 		float velocity = gVelocity.a;
 		velocitySum += velocity;

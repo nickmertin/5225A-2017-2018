@@ -1252,8 +1252,6 @@ task usercontrol()
 
 		handleLcd();
 
-		//writeDebugStreamLine("%f", (2.785 * (gSensor[driveEncL].value - gSensor[driveEncR].value)) / (360 * 4));
-
 		updateSensorOutputs();
 		updateMotors();
 		endCycle(gMainCycle);
