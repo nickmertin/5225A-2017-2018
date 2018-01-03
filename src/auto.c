@@ -127,7 +127,7 @@ float getLengthOfLine(sLine line)
 	return sqrt(x * x + y * y);
 }
 
-task trackPositionTask()
+void trackPositionTask()
 {
 	while (true)
 	{
@@ -140,7 +140,7 @@ task trackPositionTask()
 	}
 }
 
-task autoMotorSensorUpdateTask()
+void autoMotorSensorUpdateTask()
 {
 	sCycleData cycle;
 	initCycle(cycle, 10, "auto motor/sensor");
@@ -153,7 +153,7 @@ task autoMotorSensorUpdateTask()
 	}
 }
 
-task autoSafetyTask()
+void autoSafetyTask()
 {
 	int bad = 0;
 	int lastL = gSensor[driveEncL].value;
@@ -183,7 +183,6 @@ task autoSafetyTask()
 					gMotor[i].power = 0;
 				updateMotors();
 				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
-				return_t;
 			}
 		}
 		endCycle(cycle);

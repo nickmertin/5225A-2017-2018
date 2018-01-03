@@ -522,9 +522,9 @@ bool gLiftTargetReached;
 
 
 
-void stackAsync(bool arg0);
-task LiftTaskUp();
-task dropArm();
+byte stackAsync(bool arg0);
+byte liftUpAsync();
+byte dropArmAsync();
 
 bool gKillDriveOnTimeout = false;
 
@@ -558,7 +558,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 #include "auto.h"
 #include "auto_runs.h"
 
-task LiftTaskUp()
+void liftUp()
 {
 	int p;
 	writeDebugStreamLine("%d LiftTask started %d", nPgmTime-gOverAllTime, gLiftTarget);
@@ -594,8 +594,10 @@ task LiftTaskUp()
 	return_t;
 }
 
+NEW_ASYNC_VOID_0(liftUp);
+
 bool gArmDown;
-task dropArm()
+void dropArm()
 {
 	unsigned long armTimeOut;
 	gArmDown = false;
@@ -611,9 +613,9 @@ task dropArm()
 	gArmDown = true;
 	gArmState = armHold;
   gArmPosition = 0;
-
-	return_t;
 }
+
+NEW_ASYNC_VOID_0(dropArm);
 
 //int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
 int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
@@ -631,7 +633,7 @@ void clearArm()
 	gLiftState = liftManaged;
 	gLiftTarget = LIFT_BOTTOM + gliftTargetA[gNumCones];
 	gLiftTargetReached = false;
-	tStart(LiftTaskUp);
+	liftUpAsync();
 	timeout = nPgmTime + 1500;
 	while (!gLiftTargetReached && !TimedOut(timeout, "clear 2")) sleep(10);
 	gLiftState = liftHold;
@@ -694,7 +696,7 @@ void stack(bool downAfter)
 		if (downAfter)
 		{
 			writeDebugStreamLine("%06d starting Task dropArm", nPgmTime-gOverAllTime);
-			tStart(dropArm);
+			dropArmAsync();
 		}
 
 		while( SensorValue[clawPoti] < CLAW_OPEN )  sleep(10);
@@ -723,7 +725,7 @@ void stack(bool downAfter)
 
 		setClaw (20,true) ;
 		gLiftTarget = LIFT_BOTTOM +  gliftTargetA[gNumCones];
-		tStart( LiftTaskUp );
+		liftUpAsync();
 
 		while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 7")) sleep(10);
 
@@ -743,7 +745,7 @@ void stack(bool downAfter)
 		gArmDown= false;
 		if (downAfter)
 		{
-			tStart(dropArm);
+			dropArmAsync();
 		}
 		setClaw(-10);
 		setLift(-12);
@@ -767,7 +769,7 @@ void stack(bool downAfter)
 
 		setClaw (20,true) ;
 		gLiftTarget = LIFT_BOTTOM +  gliftTargetA[gNumCones];
-		tStart( LiftTaskUp );
+		liftUpAsync();
 		while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 11")) sleep(10);
 
 		setClaw (40,true);
@@ -787,7 +789,7 @@ void stack(bool downAfter)
 
 		gLiftTarget = LIFT_BOTTOM + gliftTargetA[3] ;
 
-		tStart( LiftTaskUp );
+		liftUpAsync();
 		while( SensorValue[clawPoti] < CLAW_OPEN )  sleep(10);
 		gNumCones++;
 		setClaw(-10,true);
@@ -797,7 +799,7 @@ void stack(bool downAfter)
 		if (downAfter)
 		{
 			armTimeOut = nPgmTime + 600;
-			tStart( dropArm );
+			dropArmAsync();
 			while (SensorValue[armPoti] > ARM_TOP-600  && !TimedOut(armTimeOut, "stack 13")) sleep(10);
 			setLift(-30,true);
 			while ( !SensorValue[limBottom] ) sleep(10);
@@ -842,7 +844,7 @@ void stack(bool downAfter)
 		}
 
 		setArm(25,true);
-		tStart( LiftTaskUp );
+		liftUpAsync();
 
 		//slow the arm down otherwise it will hit the stack on the way up
 		while ( gSensor[liftPoti].value < gLiftTarget - 400 ) sleep(10);
@@ -870,7 +872,7 @@ void stack(bool downAfter)
 			sleep(150);
 			// dont lift as high as the original stack target
 			gLiftTarget = gLiftTarget-30;//60
-			tStart(LiftTaskUp);
+			liftUpAsync();
 			while( gSensor[clawPoti].value< CLAW_OPEN ) sleep(10);
 			setClaw(CLAW_OPEN_HOLD_POWER,true);
 			gNumCones++;
@@ -879,7 +881,7 @@ void stack(bool downAfter)
 			gArmDown = false;
 			if (downAfter)
 			{
-				tStart( dropArm );
+				dropArmAsync();
 				while( gSensor[armPoti].value > ARM_TOP-400 )  sleep(10);
 				setLift(-127);
 				while ( !gSensor[limBottom].value ) sleep(10);
@@ -922,17 +924,17 @@ void stackFromLoader(int max, bool wait, bool onMobile)
 	EndTimeSlice();
 	float sy = onMobile ? gLoaderOffset[gNumCones] : 2;
 	resetPositionFull(gPosition, sy, 0, 0);
-	tStart(trackPositionTask);
-	moveToTargetAsync(0.5, 0, sy, 0, -25, 3, 0.5, 0.5, true, false);
+	trackPositionTaskAsync();
+	byte async = moveToTargetAsync(0.5, 0, sy, 0, -25, 3, 0.5, 0.5, true, false);
 	unsigned long driveTimeout = nPgmTime + 2000;
 	//setClaw(CLAW_OPEN_POWER, true);
 	unsigned long coneTimeout = nPgmTime + 1000;
 	//while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "loader 1")) sleep(10);
 	setClaw(CLAW_OPEN_HOLD_POWER);
-	moveToTargetAwait(driveTimeout);
-	tStopAll(trackPositionTask);
+	await(async, driveTimeout, "loader 1");
+	trackPositionTaskKill();
 	gDriveManual = true;
-	if (wait && waitOn(gStackFromLoaderNotifier, nPgmTime + 60_000) == -1) goto end;
+	if (wait && waitOn(gStackFromLoaderNotifier, nPgmTime + 60_000, "loader 2") == -1) goto end;
 	while (gNumCones < max)
 	{
 		gLiftState = liftManaged;
@@ -987,7 +989,7 @@ void stackExternal()
 	resetPositionFull(gPosition, 0, 0, 0);
 	EndTimeSlice();
 	writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
-	tStart(trackPositionTask);
+	byte async = trackPositionTaskAsync();
 	EndTimeSlice();
 	writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
 	moveToTargetAsync(-0.8, 0, 0, 0, -50, 4, 0.5, 0.5, true, true);
@@ -997,11 +999,11 @@ void stackExternal()
 	unsigned long coneTimeout = nPgmTime + 1000;
 	while (gSensor[armPoti].value > 750 && !TimedOut(coneTimeout, "extern/driver 1")) sleep(10);
 	setArm(-10);
-	moveToTargetAwait(driveTimeout);
-	tStopAll(trackPositionTask);
+	await(async, driveTimeout, "extern/driver 2");
+	trackPositionTaskKill();
 	setClaw(CLAW_OPEN_POWER);
 	coneTimeout = nPgmTime + 800;
-	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern/driver 2")) sleep(10);
+	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern/driver 3")) sleep(10);
 	setClaw(CLAW_OPEN_HOLD_POWER);
 	gClawState = clawOpened;
 	setArm(127);
@@ -1025,13 +1027,7 @@ NEW_ASYNC_VOID_0(stackExternal);
 
 bool cancel()
 {
-	if (tEls[asyncTask_stack].parent != -1)
-		stackKill();
-	else if (tEls[asyncTask_stackFromLoader].parent != -1)
-		stackFromLoaderKill();
-	else if (tEls[asyncTask_stackExternal].parent != -1)
-		stackExternalKill();
-	else
+	if (stackKill() || stackFromLoaderKill() || stackExternalKill())
 		return false;
 	gLiftState = liftIdle;
 	gArmState = armIdle;
@@ -1180,8 +1176,8 @@ void autonomous()
 	resetQuadratureEncoder(driveEncR);
 	resetQuadratureEncoder(latEnc);
 
-	tStart(autoMotorSensorUpdateTask);
-	tStart(trackPositionTask);
+	autoMotorSensorUpdateTaskAsync();
+	trackPositionTaskAsync();
 
 	runAuto();
 
@@ -1202,13 +1198,13 @@ void usercontrol()
 
 	if (gSensor[jmpSkills].value)
 	{
-		tStart(autoMotorSensorUpdateTask);
-		tStart(trackPositionTask);
+		autoMotorSensorUpdateTaskAsync();
+		trackPositionTaskAsync();
 
 		driverSkillsStart();
 
-		tStopAll(trackPositionTask);
-		tStopAll(autoMotorSensorUpdateTask);
+		trackPositionTaskKill();
+		autoMotorSensorUpdateTaskKill();
 
 		gMobileHoldPower = MOBILE_UP_HOLD_POWER;
 		gMobileTarget = MOBILE_TOP;
@@ -1253,4 +1249,15 @@ ASYNC_ROUTINES
 (
 USE_ASYNC(autonomous)
 USE_ASYNC(usercontrol)
+USE_ASYNC(liftUp)
+USE_ASYNC(dropArm)
+USE_ASYNC(stack)
+USE_ASYNC(stackFromLoader)
+USE_ASYNC(stackExternal)
+USE_ASYNC(trackPositionTask)
+USE_ASYNC(autoMotorSensorUpdateTask)
+USE_ASYNC(autoSafetyTask)
+USE_ASYNC(moveToTarget)
+USE_ASYNC(turnToAngle)
+USE_ASYNC(turnToTarget)
 )
