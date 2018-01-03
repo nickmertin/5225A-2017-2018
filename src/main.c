@@ -1206,7 +1206,7 @@ task autonomous()
 task usercontrol()
 {
 	startSensors(); // Initilize the sensors
-	initCycle(gMainCycle, 20, "main");
+	initCycle(gMainCycle, 10, "main");
 
 	updateSensorInput(jmpSkills);
 
