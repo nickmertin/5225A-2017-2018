@@ -59,6 +59,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
+word gUserControlTaskId;
 
 bool gDriveManual;
 
@@ -543,7 +544,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		while (true)
 		{
 			int next = tEls[current].parent;
-			if (next == -1 || next == usercontrol) break;
+			if (next == -1 || next == gUserControlTaskId || next == main) break;
 			current = next;
 		}
 		tStopAll(current);
@@ -1156,6 +1157,8 @@ void autonomous()
 // This task gets started at the beginning of the usercontrol period
 void usercontrol()
 {
+	gUserControlTaskId = nCurrentTask;
+
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 20, "main");
 
