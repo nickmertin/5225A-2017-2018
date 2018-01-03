@@ -1,52 +1,35 @@
-#define HANDLE_STATE_REQUEST(machine, code, end) \
-if (!machine##Data.stateDisabled && machine##Data.goToState == requestActive) \
+#define PUSH_STATE(machine, state, code) \
 { \
-	if (machine##Data.nextState == machine##Data.state) \
-	{ \
-		machine##Data.goToState = requestIdle; \
-	} \
-	else \
-	{ \
-		code machine##StateChangeHandler(); end \
-	} \
+	int machine##Last = _##machine##State; \
+	machine##Set(state); \
+	{ code } \
+	machine##Set(machine##Last); \
 }
 
-#define STATE_END_GO(machine, toState) { if (!machine##Data.stateDisabled) { hogCPU(); if (machine##Data.goToState != requestActive) { machine##Data.nextState = toState; machine##Data.goToState = requestActive; } releaseCPU(); machine##StateChangeHandler(); } }
-#define STATE_END(machine) STATE_END_GO(machine, machine##Data.baseState)
-#define CHANGE_STATE(machine, toState) { if (!machine##Data.stateDisabled) { hogCPU(); if (machine##Data.goToState != requestActive) { machine##Data.nextState = toState; machine##Data.goToState = requestActive; } releaseCPU(); } }
-#define CHANGE_STATE_FROM_STATE(machine, fromState, toState) { if (machine##Data.state == fromState) CHANGE_STATE(machine, toState); }
-#define CHANGE_STATE_WAIT(machine, toState) { if (!machine##Data.stateDisabled) { while (true) { hogCPU(); if (machine##Data.goToState != requestActive) { machine##Data.nextState = toState; machine##Data.goToState = requestActive; releaseCPU(); break; } releaseCPU(); EndTimeSlice(); } } }
-#define DISABLE(machine) machine##Data.stateDisabled++;
-#define DISABLE_TO_STATE(machine, toState) { if (!machine##Data.stateDisabled) { if (machine##Data.state != toState) { CHANGE_STATE_WAIT(machine, toState) while (machine##Data.state != toState) EndTimeSlice(); } } DISABLE(machine) }
-#define ENABLE(machine) { if (machine##Data.stateDisabled) machine##Data.stateDisabled--; if (!machine##Data.stateDisabled) STATE_END(machine) }
-#define ENABLE_TO_STATE(machine, toState) { if (machine##Data.stateDisabled > 0 ) machine##Data.stateDisabled--; STATE_END_GO(machine, toState) }
-#define ENABLE_FORCE(machine) { machine##Data.state = machine##Data.baseState; machine##Data.stateDisabled = 0; }
-#define ENABLE_FORCE_TO_STATE(machine, toState) { machine##Data.stateDisabled = 0; STATE_END_GO(machine, toState) }
-#define IS_ENABLED(machine) !machine##Data.stateDisabled
+#define IS_CONFIGURED(machine) (_##machine##State != -1)
 
 #define MAKE_MACHINE(machine, states, base, handler) \
-typedef struct machine##Data_S \
+states _##machine##State = -1; \
+void machine##Internal(states state) \
 { \
-	states state; \
-	states nextState; \
-	states baseState; \
-	tRequest goToState; \
-	int stateDisabled; \
-} machine##DataS; \
-machine##DataS machine##Data; \
-void machine##Setup(int disabled = 0) \
-{ \
-	machine##Data.goToState = requestIdle; \
-	machine##Data.state = base; \
-	machine##Data.baseState = base; \
-	machine##Data.stateDisabled = disabled; \
-} \
-void machine##StateChangeHandler() \
-{ \
-	S_LOG #machine " %d -> %d", machine##Data.state, machine##Data.nextState E_LOG_DATA \
-	machine##Data.state = machine##Data.nextState; \
-	machine##Data.goToState = requestConfirmed; \
-	switch (machine##Data.nextState) \
+	switch (_##machine##State = state) \
 	handler \
-	machine##Data.goToState = requestIdle; \
+} \
+NEW_ASYNC_VOID_1(machine##Internal, states); \
+void machine##Setup() \
+{ \
+	if (IS_CONFIGURED(machine)) \
+		machine##InternalKill(); \
+	machine##InternalAsync(base); \
+	writeDebugStreamLine("Initialized state machine " #machine " in base state " #base); \
+} \
+void machine##Set(states state) \
+{ \
+	machine##InternalKill(); \
+	writeDebugStreamLine(#machine " %d -> %d", _##machine##State, state); \
+	machine##InternalAsync(state); \
+} \
+void machine##Reset() \
+{ \
+	machine##Set(base); \
 }
