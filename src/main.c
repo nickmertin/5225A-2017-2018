@@ -306,126 +306,81 @@ void handleArm()
 }
 
 
-/* Mobile Goal */
+/* Mobile */
 
-typedef enum _sMobileStates {
+typedef enum _tMobileStates {
 	mobileManaged,
 	mobileIdle,
-	mobileRaise,
-	mobileLower,
-	mobileHold,
+	mobileTop,
+	mobileBottom,
 	mobileUpToMiddle,
-	mobileDownToMiddle
-} sMobileStates;
+	mobileDownToMiddle,
+	mobileBrakes
+} tMobileStates;
 
-#define MOBILE_TOP 3000
-#define MOBILE_BOTTOM 800
-#define MOBILE_MIDDLE_UP 1400
-#define MOBILE_MIDDLE_DOWN 2400
+#define MOBILE_TOP 2250
+#define MOBILE_BOTTOM 350
+#define MOBILE_MIDDLE_UP 600
+#define MOBILE_MIDDLE_DOWN 1300
+#define MOBILE_HALFWAY 1200
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
 #define MOBILE_UP_HOLD_POWER 10
 #define MOBILE_DOWN_HOLD_POWER -10
 
-short gMobileTarget;
-word gMobileHoldPower;
-sMobileStates gMobileState = mobileIdle;
-sMobileStates gMobileNextState;
-unsigned long gMobileStart;
-
 void setMobile(word power)
 {
 	gMotor[mobile].power = power;
 }
 
+MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
+{
+case mobileIdle:
+	setMobile(0);
+	break;
+case mobileTop:
+{
+	setMobile(MOBILE_UP_POWER);
+	unsigned long timeout = nPgmTime + 2000;
+	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "mobileTop")) sleep(10);
+	setMobile(MOBILE_UP_HOLD_POWER);
+	break;
+}
+case mobileBottom:
+{
+	setMobile(MOBILE_DOWN_POWER);
+	unsigned long timeout = nPgmTime + 2000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	break;
+}
+case mobileUpToMiddle:
+{
+	setMobile(MOBILE_UP_POWER);
+	unsigned long timeout = nPgmTime + 1000;
+	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
+	setMobile(15);
+	break;
+}
+case mobileDownToMiddle:
+{
+	setMobile(MOBILE_DOWN_POWER);
+	unsigned long timeout = nPgmTime + 1000;
+	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
+	setMobile(15);
+	break;
+}
+})
+
 void handleMobile()
 {
-
-	if (RISING(BTN_MOBILE_TOGGLE))
-	{
-		if (gMobileState == mobileLower || gMobileState == mobileHold && gMobileTarget == MOBILE_BOTTOM)
-		{
-			gMobileTarget = MOBILE_TOP;
-			gMobileState = mobileRaise;
-			gMobileHoldPower = MOBILE_UP_HOLD_POWER;
-			setMobile(MOBILE_UP_POWER);
-		}
-		else
-		{
-			gMobileTarget = MOBILE_BOTTOM;
-			gMobileState = mobileLower;
-			gMobileHoldPower = MOBILE_DOWN_HOLD_POWER;
-			setMobile(MOBILE_DOWN_POWER);
-		}
-		gMobileNextState = mobileHold;
-	}
+	if (RISING(BTN_MOBILE_TOP))
+		mobileSet(mobileTop);
+	if (RISING(BTN_MOBILE_BOTTOM))
+		mobileSet(mobileBottom);
 	if (RISING(BTN_MOBILE_MIDDLE))
-	{
-		if (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN)
-		{
-			gMobileTarget = MOBILE_MIDDLE_DOWN;
-			gMobileState = mobileLower;
-			gMobileNextState = mobileDownToMiddle;
-			setMobile(MOBILE_DOWN_POWER);
-		}
-		else
-		{
-			gMobileTarget = MOBILE_MIDDLE_UP;
-			gMobileState = mobileRaise;
-			gMobileNextState = mobileUpToMiddle;
-			setMobile(MOBILE_UP_POWER);
-		}
-	}
-
-	if( gMobileState==mobileManaged ) return;
-
-	switch (gMobileState)
-	{
-	case mobileRaise:
-		{
-			if (gSensor[mobilePoti].value >= gMobileTarget)
-			{
-				gMobileState = gMobileNextState;
-				gMobileStart = nPgmTime;
-			}
-			break;
-		}
-	case mobileLower:
-		{
-			if (gSensor[mobilePoti].value <= gMobileTarget)
-			{
-				gMobileState = gMobileNextState;
-				gMobileStart = nPgmTime;
-				gNumCones = 0;
-			}
-			break;
-		}
-	case mobileHold:
-		{
-			setMobile(gMobileHoldPower);
-			break;
-		}
-	case mobileDownToMiddle:
-		{
-			if( nPgmTime - gMobileStart > 300 )
-				setMobile( 10 );
-			else
-				setMobile( -5 );
-
-			break;
-		}
-	case mobileUpToMiddle:
-		{
-			setMobile(15);
-			break;
-		}
-	case mobileIdle:
-		{
-			setMobile(0);
-			break;
-		}
-	}
+		mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
 }
 
 
@@ -1056,6 +1011,8 @@ void startup()
 	setupJoysticks();
 	tInit();
 
+	mobileSetup();
+
 	setupInvertedSen(jmpSkills);
 
 	velocityClear(trackL);
@@ -1073,8 +1030,10 @@ void startup()
 	enableJoystick(JOY_LIFT);
 	enableJoystick(JOY_ARM);
 	enableJoystick(BTN_ARM_DOWN);
+	enableJoystick(BTN_MOBILE_TOP);
+	enableJoystick(BTN_MOBILE_BOTTOM);
 	enableJoystick(BTN_MOBILE_MIDDLE);
-	enableJoystick(BTN_MOBILE_TOGGLE);
+	enableJoystick(BTN_MOBILE_BRAKES);
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_CLEAR);
 	enableJoystick(BTN_MACRO_STACK);
@@ -1141,10 +1100,7 @@ void usercontrol()
 		trackPositionTaskKill();
 		autoMotorSensorUpdateTaskKill();
 
-		gMobileHoldPower = MOBILE_UP_HOLD_POWER;
-		gMobileTarget = MOBILE_TOP;
-		gMobileState = mobileRaise;
-		setMobile(MOBILE_UP_POWER);
+		mobileSet(mobileTop);
 
 		gArmPosition = 2;
 		gArmTarget = gArmPositions[2];
@@ -1162,10 +1118,10 @@ void usercontrol()
 		selectAuto();
 
 		handleDrive();
-		handleLift();
-		handleArm();
+		//handleLift();
+		//handleArm();
 		handleMobile();
-		handleMacros();
+		//handleMacros();
 
 		handleLcd();
 
@@ -1192,4 +1148,5 @@ USE_ASYNC(autoSafetyTask)
 USE_ASYNC(moveToTarget)
 USE_ASYNC(turnToAngle)
 USE_ASYNC(turnToTarget)
+USE_MACHINE(mobile)
 )
