@@ -1150,6 +1150,23 @@ void startup()
 	gJoy[JOY_ARM].deadzone = DZ_ARM;
 
 	pidInit(gArmPID, 0.2, 0.001, 0.0, 50, 150, 5, 127);
+
+	enableJoystick(JOY_TURN);
+	enableJoystick(JOY_THROTTLE);
+	enableJoystick(JOY_LIFT);
+	enableJoystick(JOY_ARM);
+	enableJoystick(BTN_ARM_DOWN);
+	enableJoystick(BTN_CLAW_CLOSE);
+	enableJoystick(BTN_CLAW_OPEN);
+	enableJoystick(BTN_MOBILE_MIDDLE);
+	enableJoystick(BTN_MOBILE_TOGGLE);
+	enableJoystick(BTN_MACRO_ZERO);
+	enableJoystick(BTN_MACRO_CLEAR);
+	enableJoystick(BTN_MACRO_STACK);
+	enableJoystick(BTN_MACRO_EXTERNAL);
+	enableJoystick(BTN_MACRO_CANCEL);
+	enableJoystick(BTN_MACRO_INC);
+	enableJoystick(BTN_MACRO_DEC);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)

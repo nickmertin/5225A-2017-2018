@@ -4,12 +4,14 @@ typedef struct _sJoy
 	short cur;
 	short lst;
 	short deadzone;
+	bool enabled;
 } sJoy; // Represent a single item on the joystick
 
 /* Functions */
 void setupJoysticks(); // Initilize all the joysticks
-void updateJoysticks(); // Update the joystick outputs
-void updateJoystick(TVexJoysticks joy); // Update a joystick output
+void updateJoysticks(); // Update the enabled joysticks
+void updateJoystick(TVexJoysticks joy); // Update a joystick
+void enableJoystick(TVexJoysticks joy); // Set a joystick to be enabled
 
 /* Variables */
 sJoy gJoy[kNumbOfVexRFIndices]; // The global joystick array
