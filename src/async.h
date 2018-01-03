@@ -1,9 +1,17 @@
 #define NEW_ASYNC_VOID_0(func) \
-void _asyncTask_##func(void *data) { \
+typedef struct _asyncData_##func { \
+} sAsyncData_##func; \
+void _asyncTask_##func(sAsyncData_##func *data) { \
   func(); \
 } \
 byte func##Async() { \
-  return _startAsync(#func, NULL); \
+sAsyncData_##func data; \
+  return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_1(func, type0) \
@@ -17,6 +25,11 @@ byte func##Async(type0 arg0) { \
 sAsyncData_##func data; \
   data.arg0 = arg0; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_2(func, type0, type1) \
@@ -32,6 +45,11 @@ sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_3(func, type0, type1, type2) \
@@ -49,6 +67,11 @@ sAsyncData_##func data; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_4(func, type0, type1, type2, type3) \
@@ -68,6 +91,11 @@ sAsyncData_##func data; \
   data.arg2 = arg2; \
   data.arg3 = arg3; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_5(func, type0, type1, type2, type3, type4) \
@@ -89,6 +117,11 @@ sAsyncData_##func data; \
   data.arg3 = arg3; \
   data.arg4 = arg4; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_6(func, type0, type1, type2, type3, type4, type5) \
@@ -112,6 +145,11 @@ sAsyncData_##func data; \
   data.arg4 = arg4; \
   data.arg5 = arg5; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_7(func, type0, type1, type2, type3, type4, type5, type6) \
@@ -137,6 +175,11 @@ sAsyncData_##func data; \
   data.arg5 = arg5; \
   data.arg6 = arg6; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
@@ -164,6 +207,11 @@ sAsyncData_##func data; \
   data.arg6 = arg6; \
   data.arg7 = arg7; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
@@ -193,6 +241,11 @@ sAsyncData_##func data; \
   data.arg7 = arg7; \
   data.arg8 = arg8; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define NEW_ASYNC_VOID_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
@@ -224,15 +277,21 @@ sAsyncData_##func data; \
   data.arg8 = arg8; \
   data.arg9 = arg9; \
   return _startAsync(#func, &data); \
+} \
+void func##Kill() { \
+  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
+    if (gAsyncTaskData[i].name == #func) \
+      kill(i); \
 }
 
 #define USE_ASYNC(func) \
 if (data->name == #func) { \
   _asyncTask_##func((sAsyncData_##func *)data->data); \
+  notify(data->notifier); \
   return true; \
 }
 
-#define ASYNC_SETUP(content) \
+#define ASYNC_ROUTINES(content) \
 bool _runAsync(sAsyncTaskData *data) { \
   content \
   return false; \
@@ -241,11 +300,11 @@ bool _runAsync(sAsyncTaskData *data) { \
 typedef struct _sAsyncTaskData {
   string name;
   void *data;
-  sNotifier *notifier;
+  sNotifier notifier;
 } sAsyncTaskData;
 sAsyncTaskData gAsyncTaskData[TASK_POOL_SIZE];
 
-void await(byte index);
+void await(byte index, unsigned long timeout, const string description);
 void kill(byte index);
 bool _runAsync(sAsyncTaskData *data);
 byte _startAsync(const string name, void *data);
