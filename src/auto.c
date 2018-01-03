@@ -127,7 +127,7 @@ float getLengthOfLine(sLine line)
 	return sqrt(x * x + y * y);
 }
 
-task trackPositionTask()
+void trackPositionTask()
 {
 	while (true)
 	{
@@ -140,7 +140,7 @@ task trackPositionTask()
 	}
 }
 
-task autoMotorSensorUpdateTask()
+void autoMotorSensorUpdateTask()
 {
 	sCycleData cycle;
 	initCycle(cycle, 10, "auto motor/sensor");
@@ -153,7 +153,7 @@ task autoMotorSensorUpdateTask()
 	}
 }
 
-task autoSafetyTask()
+void autoSafetyTask()
 {
 	int bad = 0;
 	int lastL = gSensor[trackL].value;
@@ -183,7 +183,6 @@ task autoSafetyTask()
 					gMotor[i].power = 0;
 				updateMotors();
 				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
-				return;
 			}
 		}
 		endCycle(cycle);
@@ -203,8 +202,8 @@ void applyHarshStop()
 
 	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
 
-	yPow *= -0.7;
-	aPow *= -3;
+	yPow *= -0.2;
+	aPow *= -7;
 
 	word left = yPow + aPow;
 	word right = yPow - aPow;
@@ -212,10 +211,10 @@ void applyHarshStop()
 	left = sgn(left) * MAX(fabs(left), 10);
 	right = sgn(right) * MAX(fabs(right), 10);
 
-	LIM_TO_VAL_SET(left, 50);
-	LIM_TO_VAL_SET(right, 50);
+	LIM_TO_VAL_SET(left, 30);
+	LIM_TO_VAL_SET(right, 30);
 
-	writeDebugStreamLine("Applying harsh stop: %f %f", left, right);
+	writeDebugStreamLine("Applying harsh stop: %d %d", left, right);
 	setDrive(left, right);
 	updateMotors();
 	sleep(150);
@@ -228,7 +227,7 @@ void resetPositionFull(sPos& position, float y, float x, float a) { resetPositio
 void resetPositionFullRad(sPos& position, float y, float x, float a)
 {
 	writeDebugStreamLine("Resetting position (%f %f) %f degrees)", position.x, position.y, degToRad(position.a));
-	stopTask(trackPositionTask);
+	hogCPU();
 	resetPosition(position);
 
 	resetQuadratureEncoder(trackL);
@@ -238,17 +237,17 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	position.y = y;
 	position.x = x;
 	position.a = a;
-	startTask(trackPositionTask);
+	releaseCPU();
 }
 
-float kP = 2.0, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
+float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
 
 void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
 	sPID pidA, pidY;
 	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
-	pidInit(pidY, 0.2, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
+	pidInit(pidY, 0.15, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
 
 	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
 
@@ -350,7 +349,7 @@ void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harsh
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	sPID pidA;
-	pidInit(pidA, 70.0, 0.0, 0.0, -1, -1, 46, -1);
+	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
 	left = abs(left);
 	right = abs(right);
 
@@ -423,7 +422,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 	offset = degToRad(offset);
 
 	sPID pidA;
-	pidInit(pidA, 70.0, 0.0, 0.0, -1, -1, 46, -1);
+	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
 	left = abs(left);
 	right = abs(right);
 
@@ -450,7 +449,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 			case cw:
 				while (gPosition.a < a - (gVelocity.a * 0.090))
 				{
-					a = getTargetAngle(y, x, ys, xs) + offset;
+					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
 					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
 					a += aOffset;
 					pidCalculate(pidA, a, gPosition.a);
@@ -463,7 +462,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 			case ccw:
 				while (gPosition.a > a - (gVelocity.a * 0.090))
 				{
-					a = getTargetAngle(y, x, ys, xs) + offset;
+					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
 					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
 					a += aOffset;
 					pidCalculate(pidA, a, gPosition.a);
@@ -508,90 +507,9 @@ float getTargetAngle(float y, float x, float ys, float xs)
 	return getAngleOfLine(line);
 }
 
-task autoHitWallTask()
-{
-	unsigned long timeStart = nPgmTime;
-	//while (_autoNotHitWall = (!*gSensor[fenceLimitLeft].value && !*gSensor[fenceLimitRight].value)) sleep(1);
-}
-
-void moveToTargetOrWall(float y, float x, float ys, float xs, byte power, bool harshStop, bool slow)
-{/*
-	_autoNotHitWall = true;
-	startTask(autoHitWallTask);
-	moveToTarget(y, x, ys, xs, power, harshStop, slow, &_autoNotHitWall);
-
-	gAutoSafety = false;
-	unsigned long time, timeEnd, timeStart = nPgmTime;
-	int lstState = -1;
-	while (nPgmTime - timeStart < 1500)
-	{
-		time = nPgmTime;
-		int state = (*gSensor[fenceLimitLeft].value << 1) | *gSensor[fenceLimitRight].value;
-		if (state != lstState) S_LOG "%d -> %d", lstState, state E_LOG_DATA
-		switch (state)
-		{
-			case 0:
-				setDrive(-55);
-				break;
-			case 1:
-				setDrive(-58, -32);
-				break;
-			case 2:
-				setDrive(-32, -58);
-				break;
-			case 3:
-				setDrive(-60);
-				if (state != lstState) timeEnd = time + 200;
-				if (time > timeEnd) goto end;
-				break;
-		}
-		lstState = state;
-		sleep(10);
-	}
-end:
-	setDrive(-24);
-	gAutoSafety = true;*/
-}
-
-void moveToTargetOrWall(float y, float x, byte power, bool harshStop, bool slow)
-{
-	moveToTargetOrWall(y, x, gPosition.y, gPosition.x, power, harshStop, slow);
-}
-
 float getDistanceFromPoint(sVector point)
 {
 	return sqrt(sq(gPosition.x - point.x) + sq(gPosition.y - point.y));
-}
-
-task stopAutoAt15()
-{
-	unsigned long startTime = nPgmTime;
-	while (nPgmTime - startTime < 14500) sleep(1);
-	stopAllButCurrentTasks();
-	startTask(autoMotorSensorUpdateTask);
-	startTask(autoSafetyTask);
-	for (tMotor i = port1; i <= port10; ++i)
-		gMotor[i].power = 0;
-	updateMotors();
-}
-
-void grabPreload()
-{
-	//setArm(-80);
-	//unsigned long timeout = nPgmTime + 1000;
-	//while (gSensor[armPoti].value > 2700 && !TimedOut(timeout, "preload 1")) sleep(10);
-	//setArm(-10);
-	//sleep(200);
-	//setClaw(CLAW_CLOSE_POWER);
-	//timeout = nPgmTime + 800;
-	//while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(timeout, "preload 2")) sleep(10);
-	//setClaw(CLAW_CLOSE_HOLD_POWER);
-	//sleep(200);
-	//setArm(-80);
-	//timeout = nPgmTime + 500;
-	//while (gSensor[clawPoti].value > 1200 && !TimedOut(timeout, "preload 3")) sleep(10);
-	//setArm(10);
-	//sleep(200);
 }
 
 void scoreFirstExternal(float dir)
