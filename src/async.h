@@ -1,11 +1,12 @@
 #define NEW_ASYNC_VOID_0(func) \
 typedef struct _asyncData_##func { \
+  int _dummy[0]; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sAsyncData_##func *data) { \
   func(); \
 } \
 byte func##Async() { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   return _startAsync(#func, &data); \
 } \
 void func##Kill() { \
@@ -22,7 +23,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0); \
 } \
 byte func##Async(type0 arg0) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   return _startAsync(#func, &data); \
 } \
@@ -41,7 +42,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1); \
 } \
 byte func##Async(type0 arg0, type1 arg1) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   return _startAsync(#func, &data); \
@@ -62,7 +63,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -85,7 +86,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -110,7 +111,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3, data->arg4); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -137,7 +138,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3, data->arg4, data->arg5); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -166,7 +167,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3, data->arg4, data->arg5, data->arg6); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -197,7 +198,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3, data->arg4, data->arg5, data->arg6, data->arg7); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -230,7 +231,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3, data->arg4, data->arg5, data->arg6, data->arg7, data->arg8); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \
@@ -265,7 +266,7 @@ void _asyncTask_##func(sAsyncData_##func *data) { \
   func(data->arg0, data->arg1, data->arg2, data->arg3, data->arg4, data->arg5, data->arg6, data->arg7, data->arg8, data->arg9); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
-sAsyncData_##func data; \
+  sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
   data.arg2 = arg2; \

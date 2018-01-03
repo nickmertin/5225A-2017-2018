@@ -5,14 +5,17 @@ max = int(argv[1])
 for i in range(max + 1):
     print('#define NEW_ASYNC_VOID_%d(%s) \\' % (i, ', '.join(['func', *('type%d' % j for j in range(i))])))
     print('typedef struct _asyncData_##func { \\')
-    for j in range(i):
-        print('  type%d arg%d; \\' % (j, j))
+    if i > 0:
+        for j in range(i):
+            print('  type%d arg%d; \\' % (j, j))
+    else:
+        print('  int _dummy[0]; \\')
     print('} sAsyncData_##func; \\')
     print('void _asyncTask_##func(sAsyncData_##func *data) { \\')
     print('  func(%s); \\' % ', '.join('data->arg%d' % j for j in range(i)))
     print('} \\')
     print('byte func##Async(%s) { \\' % ', '.join('type%d arg%d' % (j, j) for j in range(i)))
-    print('sAsyncData_##func data; \\')
+    print('  sAsyncData_##func data; \\')
     for j in range(i):
         print('  data.arg%d = arg%d; \\' % (j, j))
     print('  return _startAsync(#func, &data); \\')
