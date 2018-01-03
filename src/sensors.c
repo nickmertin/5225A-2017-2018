@@ -36,6 +36,7 @@ void updateSensorInput(tSensors sen)
 		break;
 	}
 
+#ifdef CHECK_POTI_JUMPS
 	if (SensorType[sen] == sensorPotentiometer && abs(gSensor[sen].value - gSensor[sen].lstValue) > 300 && ++gSensor[sen].filterAcc < 10)
 	{
 		if (gSensor[sen].filterAcc == 1)
@@ -44,6 +45,7 @@ void updateSensorInput(tSensors sen)
 	}
 	else
 		gSensor[sen].filterAcc = 0;
+#endif
 }
 
 void updateSensorInputs()
@@ -173,7 +175,10 @@ void setupSensors()
 		gSensor[i].valueVelLst = 0;
 		gSensor[i].timeVelCheck = 0;
 		gSensor[i].velGood = false;
+
+#ifdef CHECK_POTI_JUMPS
 		gSensor[i].filterAcc = 0;
+#endif
 
 		startSensor(i);
 	}
