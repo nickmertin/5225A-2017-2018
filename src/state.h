@@ -7,6 +7,7 @@
 }
 
 #define IS_CONFIGURED(machine) (_##machine##State != -1)
+#define USE_MACHINE(machine) USE_ASYNC(machine##Internal)
 
 #define MAKE_MACHINE(machine, states, base, handler) \
 states _##machine##State = -1; \
