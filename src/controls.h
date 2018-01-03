@@ -2,7 +2,7 @@
 #define JOY_TURN Ch4
 #define DZ_TURN 10
 #define JOY_THROTTLE Ch3
-#define DZ_THROTTLE 10
+#define DZ_THROTTLE 20
 
 /* Lift */
 #define JOY_LIFT Ch2
