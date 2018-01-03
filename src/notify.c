@@ -1,9 +1,9 @@
-byte waitOn(sNotifier& notifier, unsigned long timeout)
+byte waitOn(sNotifier& notifier, unsigned long timeout, const string description)
 {
 	notifier.set = false;
 	notifier.waiter = nCurrentTask;
 	notifier.waitee = -1;
-	while (!notifier.set && nPgmTime < timeout)
+	while (!notifier.set && !TimedOut(timeout, description))
 	{
 		if (notifier.semaphore)
 		{
