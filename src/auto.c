@@ -202,8 +202,8 @@ void applyHarshStop()
 
 	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
 
-	yPow *= -0.7;
-	aPow *= -3;
+	yPow *= -0.2;
+	aPow *= -7;
 
 	word left = yPow + aPow;
 	word right = yPow - aPow;
@@ -211,10 +211,10 @@ void applyHarshStop()
 	left = sgn(left) * MAX(fabs(left), 10);
 	right = sgn(right) * MAX(fabs(right), 10);
 
-	LIM_TO_VAL_SET(left, 50);
-	LIM_TO_VAL_SET(right, 50);
+	LIM_TO_VAL_SET(left, 30);
+	LIM_TO_VAL_SET(right, 30);
 
-	writeDebugStreamLine("Applying harsh stop: %f %f", left, right);
+	writeDebugStreamLine("Applying harsh stop: %d %d", left, right);
 	setDrive(left, right);
 	updateMotors();
 	sleep(150);
@@ -240,14 +240,14 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	releaseCPU();
 }
 
-float kP = 2.0, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
+float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
 
 void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
 	sPID pidA, pidY;
 	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
-	pidInit(pidY, 0.2, 0.01, 0.0, 0.5, 1.5, -1, 1.0);
+	pidInit(pidY, 0.15, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
 
 	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
 
@@ -349,7 +349,7 @@ void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harsh
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	sPID pidA;
-	pidInit(pidA, 70.0, 0.0, 0.0, -1, -1, 46, -1);
+	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
 	left = abs(left);
 	right = abs(right);
 
@@ -422,7 +422,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 	offset = degToRad(offset);
 
 	sPID pidA;
-	pidInit(pidA, 70.0, 0.0, 0.0, -1, -1, 46, -1);
+	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
 	left = abs(left);
 	right = abs(right);
 
@@ -449,7 +449,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 			case cw:
 				while (gPosition.a < a - (gVelocity.a * 0.090))
 				{
-					a = getTargetAngle(y, x, ys, xs) + offset;
+					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
 					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
 					a += aOffset;
 					pidCalculate(pidA, a, gPosition.a);
@@ -462,7 +462,7 @@ void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte l
 			case ccw:
 				while (gPosition.a > a - (gVelocity.a * 0.090))
 				{
-					a = getTargetAngle(y, x, ys, xs) + offset;
+					a = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
 					a = round((orA - a) / (2 * PI)) * (2 * PI) + a;
 					a += aOffset;
 					pidCalculate(pidA, a, gPosition.a);
