@@ -41,6 +41,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 #include "cycle.h"
 #include "utilities.h"
 #include "pid.h"
+#include "state.h"
 
 #include "notify.c"
 #include "task.c"
@@ -51,6 +52,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 #include "cycle.c"
 #include "utilities.c"
 #include "pid.c"
+#include "state.c"
 
 #include "Vex_Competition_Includes_Custom.c"
 
