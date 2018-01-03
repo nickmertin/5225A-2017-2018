@@ -9,10 +9,13 @@ byte func##Async() { \
   sAsyncData_##func data; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_1(func, type0) \
@@ -27,10 +30,13 @@ byte func##Async(type0 arg0) { \
   data.arg0 = arg0; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_2(func, type0, type1) \
@@ -47,10 +53,13 @@ byte func##Async(type0 arg0, type1 arg1) { \
   data.arg1 = arg1; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_3(func, type0, type1, type2) \
@@ -69,10 +78,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
   data.arg2 = arg2; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_4(func, type0, type1, type2, type3) \
@@ -93,10 +105,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
   data.arg3 = arg3; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_5(func, type0, type1, type2, type3, type4) \
@@ -119,10 +134,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
   data.arg4 = arg4; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_6(func, type0, type1, type2, type3, type4, type5) \
@@ -147,10 +165,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg5 = arg5; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_7(func, type0, type1, type2, type3, type4, type5, type6) \
@@ -177,10 +198,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg6 = arg6; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
@@ -209,10 +233,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg7 = arg7; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
@@ -243,10 +270,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg8 = arg8; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define NEW_ASYNC_VOID_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
@@ -279,10 +309,13 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg9 = arg9; \
   return _startAsync(#func, &data); \
 } \
-void func##Kill() { \
+bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].name == #func) \
+    if (gAsyncTaskData[i].name == #func) { \
       kill(i); \
+      return true; \
+    } \
+  return false; \
 }
 
 #define USE_ASYNC(func) \
