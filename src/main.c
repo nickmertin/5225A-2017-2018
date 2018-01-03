@@ -1129,7 +1129,7 @@ void disabled()
 }
 
 // This task gets started at the begining of the autonomous period
-task autonomous()
+void autonomous()
 {
 	gAutoTime = nPgmTime;
 	writeDebugStreamLine("Auto start %d", gAutoTime);
@@ -1154,7 +1154,7 @@ task autonomous()
 }
 
 // This task gets started at the beginning of the usercontrol period
-task usercontrol()
+void usercontrol()
 {
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 20, "main");
@@ -1185,3 +1185,9 @@ task usercontrol()
 
 	return_t;
 }
+
+ASYNC_ROUTINES
+(
+USE_ASYNC(autonomous)
+USE_ASYNC(usercontrol)
+)
