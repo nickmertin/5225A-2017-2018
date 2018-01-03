@@ -13,10 +13,6 @@
 #define DZ_ARM 70
 #define BTN_ARM_DOWN Btn7R
 
-/* Claw */
-#define BTN_CLAW_CLOSE Btn5U
-#define BTN_CLAW_OPEN Btn5D
-
 /* Mobile */
 #define BTN_MOBILE_MIDDLE Btn6U
 #define BTN_MOBILE_TOGGLE Btn6D

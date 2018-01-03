@@ -131,10 +131,10 @@ task trackPositionTask()
 {
 	while (true)
 	{
-		updateSensorInput(driveEncL);
-		updateSensorInput(driveEncR);
-		updateSensorInput(latEnc);
-		trackPosition(gSensor[driveEncL].value, gSensor[driveEncR].value, gSensor[latEnc].value, gPosition);
+		updateSensorInput(trackL);
+		updateSensorInput(trackR);
+		updateSensorInput(trackB);
+		trackPosition(gSensor[trackL].value, gSensor[trackR].value, gSensor[trackB].value, gPosition);
 		trackVelocity(gPosition, gVelocity);
 		sleep(1);
 	}
@@ -156,9 +156,9 @@ task autoMotorSensorUpdateTask()
 task autoSafetyTask()
 {
 	int bad = 0;
-	int lastL = gSensor[driveEncL].value;
-	int lastR = gSensor[driveEncR].value;
-	int lastB = gSensor[latEnc].value;
+	int lastL = gSensor[trackL].value;
+	int lastR = gSensor[trackR].value;
+	int lastB = gSensor[trackB].value;
 	sCycleData cycle;
 	initCycle(cycle, 10, "auto safety");
 	while (true)
@@ -166,10 +166,10 @@ task autoSafetyTask()
 		if (gAutoSafety)
 		{
 			int motors = abs(gMotor[driveL1].power) + abs(gMotor[driveL2].power) + abs(gMotor[driveR1].power) + abs(gMotor[driveR2].power);
-			int sensors = abs(gSensor[driveEncL].value - lastL) + abs(gSensor[driveEncR].value - lastR) + abs(gSensor[latEnc].value - lastB);
-			lastL = gSensor[driveEncL].value;
-			lastR = gSensor[driveEncR].value;
-			lastB = gSensor[latEnc].value;
+			int sensors = abs(gSensor[trackL].value - lastL) + abs(gSensor[trackR].value - lastR) + abs(gSensor[trackB].value - lastB);
+			lastL = gSensor[trackL].value;
+			lastR = gSensor[trackR].value;
+			lastB = gSensor[trackB].value;
 
 			// If the motors are moving fast and the encoders arn't moving
 			if (motors > 100 && sensors < 6)
@@ -231,9 +231,9 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	stopTask(trackPositionTask);
 	resetPosition(position);
 
-	resetQuadratureEncoder(driveEncL);
-	resetQuadratureEncoder(driveEncR);
-	resetQuadratureEncoder(latEnc);
+	resetQuadratureEncoder(trackL);
+	resetQuadratureEncoder(trackR);
+	resetQuadratureEncoder(trackB);
 
 	position.y = y;
 	position.x = x;
@@ -577,45 +577,45 @@ task stopAutoAt15()
 
 void grabPreload()
 {
-	setArm(-80);
-	unsigned long timeout = nPgmTime + 1000;
-	while (gSensor[armPoti].value > 2700 && !TimedOut(timeout, "preload 1")) sleep(10);
-	setArm(-10);
-	sleep(200);
-	setClaw(CLAW_CLOSE_POWER);
-	timeout = nPgmTime + 800;
-	while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(timeout, "preload 2")) sleep(10);
-	setClaw(CLAW_CLOSE_HOLD_POWER);
-	sleep(200);
-	setArm(-80);
-	timeout = nPgmTime + 500;
-	while (gSensor[clawPoti].value > 1200 && !TimedOut(timeout, "preload 3")) sleep(10);
-	setArm(10);
-	sleep(200);
+	//setArm(-80);
+	//unsigned long timeout = nPgmTime + 1000;
+	//while (gSensor[armPoti].value > 2700 && !TimedOut(timeout, "preload 1")) sleep(10);
+	//setArm(-10);
+	//sleep(200);
+	//setClaw(CLAW_CLOSE_POWER);
+	//timeout = nPgmTime + 800;
+	//while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(timeout, "preload 2")) sleep(10);
+	//setClaw(CLAW_CLOSE_HOLD_POWER);
+	//sleep(200);
+	//setArm(-80);
+	//timeout = nPgmTime + 500;
+	//while (gSensor[clawPoti].value > 1200 && !TimedOut(timeout, "preload 3")) sleep(10);
+	//setArm(10);
+	//sleep(200);
 }
 
 void scoreFirstExternal(float dir)
 {
-	sPolar offsetP;
-	offsetP.angle = dir;
-	offsetP.magnitude = 1;
-	sVector offsetV;
-	polarToVector(offsetP, offsetV);
-	moveToTarget(gPosition.y - offsetV.x, gPosition.x - offsetV.y, -40, 3, 0.5, 0.5, true, true);
-	sleep(200);
-	setArm(-80);
-	unsigned long coneTimeout = nPgmTime + 2000;
-	while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "extern 1")) sleep(10); // Increase time
-	setArm(10);
-	setClaw(CLAW_OPEN_POWER);
-	coneTimeout = nPgmTime + 800;
-	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern 2")) sleep(10);
-	setClaw(CLAW_OPEN_HOLD_POWER);
-	sleep(200);
-	gNumCones = 1;
-	setArm(80);
-	coneTimeout = nPgmTime + 800;
-	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "extern 3")) sleep(10);
-	setArm(10);
-	moveToTarget(gPosition.y + 2 * offsetV.x, gPosition.x + 2 * offsetV.y, 60, 3, 1, 1, false, false);
+	//sPolar offsetP;
+	//offsetP.angle = dir;
+	//offsetP.magnitude = 1;
+	//sVector offsetV;
+	//polarToVector(offsetP, offsetV);
+	//moveToTarget(gPosition.y - offsetV.x, gPosition.x - offsetV.y, -40, 3, 0.5, 0.5, true, true);
+	//sleep(200);
+	//setArm(-80);
+	//unsigned long coneTimeout = nPgmTime + 2000;
+	//while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "extern 1")) sleep(10); // Increase time
+	//setArm(10);
+	//setClaw(CLAW_OPEN_POWER);
+	//coneTimeout = nPgmTime + 800;
+	//while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern 2")) sleep(10);
+	//setClaw(CLAW_OPEN_HOLD_POWER);
+	//sleep(200);
+	//gNumCones = 1;
+	//setArm(80);
+	//coneTimeout = nPgmTime + 800;
+	//while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "extern 3")) sleep(10);
+	//setArm(10);
+	//moveToTarget(gPosition.y + 2 * offsetV.x, gPosition.x + 2 * offsetV.y, 60, 3, 1, 1, false, false);
 }
