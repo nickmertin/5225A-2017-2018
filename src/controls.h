@@ -14,8 +14,7 @@
 #define BTN_ARM_DOWN Btn7R
 
 /* Mobile */
-#define BTN_MOBILE_TOP Btn6U
-#define BTN_MOBILE_BOTTOM Btn6D
+#define BTN_MOBILE_TOGGLE Btn6U
 #define BTN_MOBILE_MIDDLE Btn5U
 #define BTN_MOBILE_BRAKES Btn5D
 
