@@ -99,7 +99,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 			while (gPosition.a < a - degToRad(80)) sleep(1);
 			writeDebugStreamLine("%f", gVelocity.a);
 
-			const float target = 1.000, kP = 17, kIi = 0.05;
+			const float target = 1.000, kP = 17, kI = 0.05;
 
 			unsigned long time = nPgmTime, lstTime = time, nextDebug = 0;
 			float input = gVelocity.a, power = 0, error = 0, lstError, integral = 0;

@@ -17,6 +17,8 @@ void selectAuto()
 
 void runAuto()
 {
+	autoTest();
+	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
@@ -100,11 +102,6 @@ void driverSkillsStart()
 
 void autoSkills()
 {
-	resetPositionFull(gPosition, 0, 0, 0);
-
-	turnToAngleSimple(180, cw, 127, 127);
-	sleep(500);
-	writeDebugStreamLine("%f", radToDeg(gPosition.a));
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
@@ -352,8 +349,9 @@ void autoSideMobileRight()
 
 void autoTest()
 {
-	gPosition.x = gPosition.y = gPosition.a = 0;
-	turnToAngle(90, cw, 60, 60, true, true);
+	resetPositionFull(gPosition, 0, 0, 0);
+
+	turnToAngleSimple(180, cw, 127, 127);
 	sleep(500);
-	writeDebugStreamLine("%.2f %.2f %.2f", gPosition.y, gPosition.x, radToDeg(gPosition.a));
+	writeDebugStreamLine("%f", radToDeg(gPosition.a));
 }
