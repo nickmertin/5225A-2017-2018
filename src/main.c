@@ -375,10 +375,20 @@ case mobileDownToMiddle:
 
 void handleMobile()
 {
-	if (RISING(BTN_MOBILE_TOGGLE))
-		mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
-	if (RISING(BTN_MOBILE_MIDDLE))
-		mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
+	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle)
+	{
+		if (RISING(BTN_MOBILE_TOGGLE))
+			mobileSet(mobileTop);
+		if (RISING(BTN_MOBILE_MIDDLE))
+			mobileSet(mobileBottom);
+	}
+	else
+	{
+		if (RISING(BTN_MOBILE_TOGGLE))
+			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
+		if (RISING(BTN_MOBILE_MIDDLE))
+			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
+	}
 }
 
 
