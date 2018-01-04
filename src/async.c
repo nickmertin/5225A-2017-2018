@@ -15,14 +15,14 @@ void kill(byte index)
 #endif
 }
 
-byte _startAsync(const string name, void *data)
+byte _startAsync(byte *id, void *data)
 {
 #if TASK_POOL_SIZE > 0
 	for (int i = 0; i < TASK_POOL_SIZE; ++i)
 	{
 		if (tEls[threadPoolTask0 + i].parent == -1)
 		{
-			gAsyncTaskData[i].name = name;
+			gAsyncTaskData[i].id = id;
 			gAsyncTaskData[i].data = data;
 			tStart(threadPoolTask0 + i);
 			return i;
