@@ -1124,6 +1124,9 @@ void usercontrol()
 
 		handleLcd();
 
+		if (RISING(BTN_MACRO_CANCEL))
+			writeDebugStreamLine("%f", (2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4));
+
 		updateSensorOutputs();
 		updateMotors();
 		endCycle(gMainCycle);
