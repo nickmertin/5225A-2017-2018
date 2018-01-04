@@ -245,7 +245,7 @@ void disabled()
 // This task gets started at the begining of the autonomous period
 task autonomous()
 {
-	tStart(updateStates);
+	//tStart(updateStates);
 
 	gAutoTime = nPgmTime;
 	writeDebugStreamLine("Auto start %d", gAutoTime);
@@ -260,6 +260,10 @@ task autonomous()
 	tStart(trackPositionTask);
 	////////////////////////////
 	//runAuto();
+	setDrive(127, 127);
+	wait1Msec(1500);
+	setDrive(0,0);
+	writeDebugStreamLine("left: %d, right: %d, difference: %d", gSensor[leftEnc].value, gSensor[rightEnc].value, gSensor[leftEnc].value-gSensor[rightEnc].value);
 
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
@@ -267,7 +271,7 @@ task autonomous()
 	return_t;
 }
 
-task usercontrol()//Do we need to have a usercontrol task?? Why won't it let me run if I delete it
+task usercontrol()
 {
 	startSensors(); // Initilize the sensors
 	initCycle(gMainCycle, 20, "main");
