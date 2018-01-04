@@ -34,8 +34,11 @@ void allMotorsOff();
 void allTasksStop();
 void disabled();
 void startup();
-task autonomous();
-task usercontrol();
+void autonomous();
+void usercontrol();
+
+NEW_ASYNC_VOID_0(autonomous);
+NEW_ASYNC_VOID_0(usercontrol);
 
 bool bStopTasksBetweenModes = true;
 word gMainTask = 255;
@@ -59,7 +62,7 @@ task main()
 
 		if (AUTONOMOUS)
 		{
-			tStart(autonomous);
+			autonomousAsync();
 
 			// Waiting for autonomous phase to end
 			while (AUTONOMOUS && !DISABLED)
@@ -80,7 +83,7 @@ task main()
 
 		else
 		{
-			tStart(usercontrol);
+			usercontrolAsync();
 
 			// Here we repeat loop waiting for user control to end and (optionally) start
 			// of a new competition run

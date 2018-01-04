@@ -1,0 +1,32 @@
+void await(byte index, unsigned long timeout, const string description)
+{
+	if (index < TASK_POOL_SIZE)
+		waitOn(gAsyncTaskData[index].notifier, timeout, description);
+}
+
+void kill(byte index)
+{
+#if TASK_POOL_SIZE > 0
+	if (index < TASK_POOL_SIZE)
+	{
+		tStop(threadPoolTask0 + index);
+		notify(gAsyncTaskData[index].notifier);
+	}
+#endif
+}
+
+byte _startAsync(const string name, void *data)
+{
+#if TASK_POOL_SIZE > 0
+	for (int i = 0; i < TASK_POOL_SIZE; ++i)
+	{
+		if (tEls[threadPoolTask0 + i].parent == -1)
+		{
+			gAsyncTaskData[i].name = name;
+			gAsyncTaskData[i].data = data;
+			tStart(threadPoolTask0 + i);
+			return i;
+		}
+	}
+#endif
+}

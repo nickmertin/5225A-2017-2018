@@ -20,7 +20,10 @@ bool pidCalculate(sPID& PID, float target, float input)
 		unsigned long time = nPgmTime;
 		unsigned long deltaTime = time - PID.lstRunTime; // Calculate the time since PID last ran
 		if (!PID.firstRun && deltaTime < 1) // If it hasn't been 1ms or more since PID last ran, don't run
+		{
+			PID.lstInput = input;
 			return false;
+		}
 		PID.lstRunTime = time;
 
 		float derivative = PID.firstRun ? 0 : (float)(input - PID.lstInput) / (float)(deltaTime); // Calculate the derivative, taking time into account
@@ -50,6 +53,8 @@ bool pidCalculate(sPID& PID, float target, float input)
 		PID.output = PID.maxOutput * sgn(PID.output);
 
 	PID.firstRun = false;
+
+	PID.lstInput = input;
 
 	return true;
 }

@@ -2,7 +2,7 @@
 #define JOY_TURN Ch4
 #define DZ_TURN 10
 #define JOY_THROTTLE Ch3
-#define DZ_THROTTLE 10
+#define DZ_THROTTLE 20
 
 /* Lift */
 #define JOY_LIFT Ch2
@@ -13,13 +13,11 @@
 #define DZ_ARM 70
 #define BTN_ARM_DOWN Btn7R
 
-/* Claw */
-#define BTN_CLAW_CLOSE Btn5U
-#define BTN_CLAW_OPEN Btn5D
-
 /* Mobile */
-#define BTN_MOBILE_MIDDLE Btn6U
-#define BTN_MOBILE_TOGGLE Btn6D
+#define BTN_MOBILE_TOP Btn6U
+#define BTN_MOBILE_BOTTOM Btn6D
+#define BTN_MOBILE_MIDDLE Btn5U
+#define BTN_MOBILE_BRAKES Btn5D
 
 /* Macros */
 #define BTN_MACRO_ZERO Btn7D

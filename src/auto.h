@@ -73,9 +73,9 @@ void transformVelocityToLocal(sVel& global, sVector& local, float angle); // Tra
 void transformVelocityToGlobal(sVel& local, sVector& global, float angle); // Transform velocity from local to global with a given orientation
 float getAngleOfLine(sLine line);
 float getLengthOfLine(sLine line);
-task trackPositionTask();
-task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
-task autoSafetyTask(); // Autonomous drive safety task
+void trackPositionTask();
+void autoMotorSensorUpdateTask(); // Update motors and sensors during auto
+void autoSafetyTask(); // Autonomous drive safety task
 void applyHarshStop();
 void resetPositionFullRad(sPos& position, float y, float x, float a);
 void resetPositionFull(sPos& position, float y, float x, float a); // Reset the position to a desired value and starts tracking
@@ -92,6 +92,9 @@ float getCCWAngle(float cur, float tar);
 void scoreFirstExternal(float dir);
 
 /* Async Functions */
+NEW_ASYNC_VOID_0(trackPositionTask);
+NEW_ASYNC_VOID_0(autoMotorSensorUpdateTask);
+NEW_ASYNC_VOID_0(autoSafetyTask);
 NEW_ASYNC_VOID_10(moveToTarget, float, float, float, float, byte, float, float, float, bool, bool)
 NEW_ASYNC_VOID_6(turnToAngle, float, tTurnDir, byte, byte, bool, bool)
 NEW_ASYNC_VOID_10(turnToTarget, float, float, float, float, tTurnDir, byte, byte, bool, bool, float)
