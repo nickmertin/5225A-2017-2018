@@ -375,10 +375,8 @@ case mobileDownToMiddle:
 
 void handleMobile()
 {
-	if (RISING(BTN_MOBILE_TOP))
-		mobileSet(mobileTop);
-	if (RISING(BTN_MOBILE_BOTTOM))
-		mobileSet(mobileBottom);
+	if (RISING(BTN_MOBILE_TOGGLE))
+		mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
 	if (RISING(BTN_MOBILE_MIDDLE))
 		mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
 }
@@ -1032,8 +1030,7 @@ void startup()
 	enableJoystick(JOY_LIFT);
 	enableJoystick(JOY_ARM);
 	enableJoystick(BTN_ARM_DOWN);
-	enableJoystick(BTN_MOBILE_TOP);
-	enableJoystick(BTN_MOBILE_BOTTOM);
+	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MOBILE_BRAKES);
 	enableJoystick(BTN_MACRO_ZERO);
