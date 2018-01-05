@@ -1135,7 +1135,11 @@ void usercontrol()
 		handleLcd();
 
 		if (RISING(BTN_MACRO_CANCEL))
-			writeDebugStreamLine("%f", (2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4));
+		{
+			writeDebugStreamLine("%f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
+			resetQuadratureEncoder(trackL);
+			resetQuadratureEncoder(trackR);
+		}
 
 		updateSensorOutputs();
 		updateMotors();
