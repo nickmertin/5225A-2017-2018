@@ -1,8 +1,8 @@
 /* Drive */
 #define JOY_TURN Ch4
-#define DZ_TURN 10
+#define DZ_TURN 15
 #define JOY_THROTTLE Ch3
-#define DZ_THROTTLE 20
+#define DZ_THROTTLE 15
 
 /* Lift */
 #define JOY_LIFT Ch2
