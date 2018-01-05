@@ -53,7 +53,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 		}
 
 		endCycle(cycle);
-	} while (currentPosVector.y < (stopType & stopSoft ? -gVelocity.y * 0.240 : 0) - dropEarly - gVelocity.y * 0.098);
+	} while (currentPosVector.y < ((stopType & stopSoft) ? (-gVelocity.y * 0.240) : 0) - dropEarly - (gVelocity.y * 0.098));
 
 	if (stopType & stopSoft)
 	{
