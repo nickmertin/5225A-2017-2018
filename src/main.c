@@ -54,7 +54,12 @@ bool TimedOut(unsigned long timeOut, const string description);
 
 #include "controls.h"
 
+#include "auto.h"
+#include "auto_simple.h"
+#include "auto_runs.h"
+
 //#define DEBUG_TRACKING
+#define TRACK_IN_DRIVER
 
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
@@ -75,7 +80,13 @@ void handleDrive()
 	if (gDriveManual)
 	{
 		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
-		setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur);
+		short y = gJoy[JOY_THROTTLE].cur;
+		short a = gJoy[JOY_TURN].cur;
+
+		if (!a && abs(gVelocity.a) > 0.2)
+			a = -6 * sgn(gVelocity.a);
+
+		setDrive(y + a, y - a);
 	}
 }
 
@@ -432,10 +443,6 @@ bool TimedOut(unsigned long timeOut, const string description)
 	else
 		return false;
 }
-
-#include "auto.h"
-#include "auto_simple.h"
-#include "auto_runs.h"
 
 void liftUp()
 {
@@ -1090,12 +1097,16 @@ void usercontrol()
 	gUserControlTaskId = nCurrentTask;
 
 	startSensors(); // Initilize the sensors
+#if defined(DEBUG_TRACKING) || defined(TRACK_IN_DRIVER)
+	initCycle(gMainCycle, 15, "main");
+#else
 	initCycle(gMainCycle, 10, "main");
+#endif
 
 	updateSensorInput(jmpSkills);
 
-#ifdef DEBUG_TRACKING
-	tStart(trackPositionTask);
+#if defined(DEBUG_TRACKING) || defined(TRACK_IN_DRIVER)
+	trackPositionTaskAsync();
 #endif
 
 	if (gSensor[jmpSkills].value)
@@ -1130,6 +1141,9 @@ void usercontrol()
 		//handleArm();
 		handleMobile();
 		//handleMacros();
+
+		if (RISING(BTN_MACRO_CANCEL))
+			writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
 
 		handleLcd();
 
