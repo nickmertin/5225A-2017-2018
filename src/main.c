@@ -76,7 +76,6 @@ void handleDrive()
 	{
 		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
 		setDrive(gJoy[JOY_THROTTLE].cur + gJoy[JOY_TURN].cur, gJoy[JOY_THROTTLE].cur - gJoy[JOY_TURN].cur);
-		if (RISING(JOY_TURN)) playSound(soundShortBlip);
 	}
 }
 
