@@ -349,9 +349,11 @@ void autoSideMobileRight()
 
 void autoTest()
 {
+
 	resetPositionFull(gPosition, 0, 0, 0);
 
 	turnToAngleSimple(180, cw, 127, 127);
 	sleep(500);
-	writeDebugStreamLine("%f", radToDeg(gPosition.a));
+	writeDebugStreamLine("%f", 180 - radToDeg(gPosition.a));
+
 }

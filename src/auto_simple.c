@@ -96,7 +96,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	{
 		case cw:
 			setDrive(left, -right);
-			while (gPosition.a < a - degToRad(80)) sleep(1);
+			while (gPosition.a < a - gVelocity.a * 0.549) sleep(1);
 			writeDebugStreamLine("%f", gVelocity.a);
 
 			const float target = 1.000, kP = 17, kI = 0.05;
