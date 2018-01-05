@@ -29,4 +29,5 @@ byte _startAsync(const string name, void *data)
 		}
 	}
 #endif
+	return 255;
 }
