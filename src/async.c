@@ -29,4 +29,5 @@ byte _startAsync(byte *id, void *data)
 		}
 	}
 #endif
+	return 255;
 }
