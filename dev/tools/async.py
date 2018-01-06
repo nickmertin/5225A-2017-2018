@@ -16,7 +16,7 @@ for i in range(max + 1):
     print('  sAsyncData_##func _data = *data; \\')
     print('  notify(*notifier); \\')
     print('  writeDebugStreamLine("Instance of " #func " started"); \\')
-    print('  func(%s); \\' % ', '.join('_data->arg%d' % j for j in range(i)))
+    print('  func(%s); \\' % ', '.join('_data.arg%d' % j for j in range(i)))
     print('} \\')
     print('byte func##Async(%s) { \\' % ', '.join('type%d arg%d' % (j, j) for j in range(i)))
     # print('  writeDebugStreamLine("Starting instance of " #func); \\')

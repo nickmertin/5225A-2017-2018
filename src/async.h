@@ -32,7 +32,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0); \
+  func(_data.arg0); \
 } \
 byte func##Async(type0 arg0) { \
   sAsyncData_##func data; \
@@ -59,7 +59,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1); \
+  func(_data.arg0, _data.arg1); \
 } \
 byte func##Async(type0 arg0, type1 arg1) { \
   sAsyncData_##func data; \
@@ -88,7 +88,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2); \
+  func(_data.arg0, _data.arg1, _data.arg2); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
   sAsyncData_##func data; \
@@ -119,7 +119,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
   sAsyncData_##func data; \
@@ -152,7 +152,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3, _data->arg4); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
   sAsyncData_##func data; \
@@ -187,7 +187,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3, _data->arg4, _data->arg5); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
   sAsyncData_##func data; \
@@ -224,7 +224,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3, _data->arg4, _data->arg5, _data->arg6); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
   sAsyncData_##func data; \
@@ -263,7 +263,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3, _data->arg4, _data->arg5, _data->arg6, _data->arg7); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
   sAsyncData_##func data; \
@@ -304,7 +304,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3, _data->arg4, _data->arg5, _data->arg6, _data->arg7, _data->arg8); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
   sAsyncData_##func data; \
@@ -347,7 +347,7 @@ void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
   sAsyncData_##func _data = *data; \
   notify(*notifier); \
   writeDebugStreamLine("Instance of " #func " started"); \
-  func(_data->arg0, _data->arg1, _data->arg2, _data->arg3, _data->arg4, _data->arg5, _data->arg6, _data->arg7, _data->arg8, _data->arg9); \
+  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8, _data.arg9); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
   sAsyncData_##func data; \
