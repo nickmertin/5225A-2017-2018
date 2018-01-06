@@ -4,9 +4,9 @@ typedef struct _asyncData_##func { \
   int _dummy[0]; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(); \
 } \
 byte func##Async() { \
@@ -29,9 +29,9 @@ typedef struct _asyncData_##func { \
   type0 arg0; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0); \
 } \
 byte func##Async(type0 arg0) { \
@@ -56,9 +56,9 @@ typedef struct _asyncData_##func { \
   type1 arg1; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1); \
 } \
 byte func##Async(type0 arg0, type1 arg1) { \
@@ -85,9 +85,9 @@ typedef struct _asyncData_##func { \
   type2 arg2; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
@@ -116,9 +116,9 @@ typedef struct _asyncData_##func { \
   type3 arg3; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
@@ -149,9 +149,9 @@ typedef struct _asyncData_##func { \
   type4 arg4; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
@@ -184,9 +184,9 @@ typedef struct _asyncData_##func { \
   type5 arg5; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
@@ -221,9 +221,9 @@ typedef struct _asyncData_##func { \
   type6 arg6; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
@@ -260,9 +260,9 @@ typedef struct _asyncData_##func { \
   type7 arg7; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
@@ -301,9 +301,9 @@ typedef struct _asyncData_##func { \
   type8 arg8; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
@@ -344,9 +344,9 @@ typedef struct _asyncData_##func { \
   type9 arg9; \
 } sAsyncData_##func; \
 void _asyncTask_##func(sNotifier *notifier, sAsyncData_##func *data) { \
-  sAsyncData_##func _data = *data; \
+  sAsyncData_##func _data; \
+  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
   notify(*notifier); \
-  writeDebugStreamLine("Instance of " #func " started"); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8, _data.arg9); \
 } \
 byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
