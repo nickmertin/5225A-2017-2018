@@ -8,11 +8,13 @@
 
 #define IS_CONFIGURED(machine) (machine##State != -1)
 #define USE_MACHINE(machine) USE_ASYNC(machine##Internal)
+#define NEXT_STATE(new_state, new_arg) { state = new_state; arg = new_arg; goto top; }
 
 #define MAKE_MACHINE(machine, states, base, handler) \
 states machine##State = -1; \
 void machine##Internal(states state, long arg) \
 { \
+	top: \
 	switch (machine##State = state) \
 	handler \
 } \
