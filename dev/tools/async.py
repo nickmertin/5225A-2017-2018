@@ -26,6 +26,7 @@ for i in range(max + 1):
         print('  data.arg%d = arg%d; \\' % (j, j))
     print('  byte id = _startAsync(&func##Dummy, &data); \\')
     print('  waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \\')
+    print('  return id; \\')
     print('} \\')
     print('bool func##Kill() { \\')
     # print('  writeDebugStreamLine("Killing all instances of " #func); \\')

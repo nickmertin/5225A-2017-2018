@@ -13,6 +13,7 @@ byte func##Async() { \
   sAsyncData_##func data; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -39,6 +40,7 @@ byte func##Async(type0 arg0) { \
   data.arg0 = arg0; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -67,6 +69,7 @@ byte func##Async(type0 arg0, type1 arg1) { \
   data.arg1 = arg1; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -97,6 +100,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
   data.arg2 = arg2; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -129,6 +133,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
   data.arg3 = arg3; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -163,6 +168,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
   data.arg4 = arg4; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -199,6 +205,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg5 = arg5; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -237,6 +244,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg6 = arg6; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -277,6 +285,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg7 = arg7; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -319,6 +328,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg8 = arg8; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
@@ -363,6 +373,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
   data.arg9 = arg9; \
   byte id = _startAsync(&func##Dummy, &data); \
   waitOn(gAsyncTaskData[id].notifier, 1000, #func " startup"); \
+  return id; \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
