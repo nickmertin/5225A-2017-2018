@@ -87,45 +87,48 @@ void setLift(word speed)
 {
 	gMotor[scissorLeft].power = gMotor[scissorRight].power = speed;
 }
-int lifttarget = 0;
-void handleLift ()
-{
-	switch (gLiftState)
-	{
-	case liftIdle:
-		{
-			setLift(0);
-			break;
-		}
-	case liftRaise:
-		{
-			setLift(LIFT_RAISING_POWER);
-			break;
-		}
-	case liftLower:
-		{
-			setLift(LIFT_LOWERING_POWER);
-			break;
-		}
-	}
-}
 
-void liftToPos (int target)
+//void handleLift ()
+//{
+//	switch (gLiftState)
+//	{
+//	case liftIdle:
+//		{
+//			setLift(0);
+//			break;
+//		}
+//	case liftRaise:
+//		{
+//			setLift(LIFT_RAISING_POWER);
+//			break;
+//		}
+//	case liftLower:
+//		{
+//			setLift(LIFT_LOWERING_POWER);
+//			break;
+//		}
+//	}
+//}
+
+int gLiftPos = 0;
+
+void liftToPos (int target, int offset = 0)
 {
-	if (liftTarget < target)
+	if (gLiftPos < target)
 	{
 		writeDebugStreamLine("Lift Raising");
-		gLiftState = liftRaise;
-		while (gSensor[scissorEnc].value < gLiftPositions[target]) sleep(10);
+		setLift(LIFT_RAISING_POWER);
+		while (gSensor[scissorEnc].value < gLiftPositions[target] + offset) sleep(10);
 	}
-	else if (liftTarget > target)
+	else if (gLiftPos > target)
 	{
 		writeDebugStreamLine("Lift Lowering");
-		gLiftState = liftLower;
-		while (gSensor[scissorEnc].value > gLiftPositions[target]) sleep(10);
+		setLift(LIFT_LOWERING_POWER);
+		while (gSensor[scissorEnc].value > gLiftPositions[target] + offset) sleep(10);
 	}
-	gLiftState = liftIdle;
-	liftTarget = target;
+	writeDebugStreamLine ("Lift pos: %d", gSensor[scissorEnc].value);
+	setLift(0);
+	gLiftPos = target;
 }
 
 typedef enum _sClawStates
@@ -146,30 +149,34 @@ void setClaw (word speed)
 	gMotor[claw].power = speed;
 }
 
-void handleClaw ()
+void openClaw (bool open)
 {
-	switch(gClawState)
-	{
-	case clawIdle:
-		{
-			setClaw(0);
-			break;
-		}
-	case clawOpen:
-		{
-			setClaw(CLAW_OPEN_POWER);
-			wait1Msec(CLAW_WAIT);
-			gClawState = clawIdle;
-			break;
-		}
-	case clawClose:
-		{
-			setClaw(CLAW_CLOSE_POWER);
-			wait1Msec(CLAW_WAIT);
-			gClawState = clawIdle;
-			break;
-		}
-	}
+	//switch(gClawState)
+	//{
+	//case clawIdle:
+	//	{
+	//		setClaw(0);
+	//		break;
+	//	}
+	//case clawOpen:
+	//	{
+	//		setClaw(CLAW_OPEN_POWER);
+	//		wait1Msec(CLAW_WAIT);
+	//		gClawState = clawIdle;
+	//		break;
+	//	}
+	//case clawClose:
+	//	{
+	//		setClaw(CLAW_CLOSE_POWER);
+	//		wait1Msec(CLAW_WAIT);
+	//		gClawState = clawIdle;
+	//		break;
+	//	}
+	//}
+
+	setClaw( open ? CLAW_OPEN_POWER : CLAW_CLOSE_POWER );
+	wait1Msec(CLAW_WAIT);
+	setClaw(0);
 }
 
 bool TimedOut(unsigned long timeOut, const string description)
@@ -196,25 +203,27 @@ bool TimedOut(unsigned long timeOut, const string description)
 }
 
 //update states
-task updateStates()
-{
-	sCycleData cycle;
-	initCycle(cycle, 10, "update states");
+//task updateStates()
+//{
+//	sCycleData cycle;
+//	initCycle(cycle, 10, "update states");
 
-	while(true)
-	{
-		handleLift();
-		handleClaw();
-		endCycle(cycle);
-	}
-}
+//	while(true)
+//	{
+//		//handleLift();
+//		//handleClaw();
+//		endCycle(cycle);
+//	}
+//}
 
 // Auto
 #include "auto.h"
+#include "auto_simple.h"
 #include "auto_runs.h"
 
 #include "auto.c"
-//#include "auto_runs.c"
+#include "auto_simple.c"
+#include "auto_runs.c"
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
@@ -259,12 +268,7 @@ task autonomous()
 	tStart(autoMotorSensorUpdateTask);
 	tStart(trackPositionTask);
 	////////////////////////////
-	//runAuto();
-	setDrive(127, 127);
-	wait1Msec(1500);
-	setDrive(0,0);
-	writeDebugStreamLine("left: %d, right: %d, difference: %d", gSensor[leftEnc].value, gSensor[rightEnc].value, gSensor[leftEnc].value-gSensor[rightEnc].value);
-
+	runAuto();
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
