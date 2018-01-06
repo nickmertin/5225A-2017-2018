@@ -91,73 +91,86 @@ void handleDrive()
 
 
 /* Lift */
-typedef enum _sLiftStates {
+typedef enum _tLiftStates {
 	liftManaged,
 	liftIdle,
-	//liftRaise,
-	//liftLower,
-	//liftRaiseBrk,
-	//liftLowerBrk,
 	liftManual,
-	liftHold,
-	liftAuto
-} sLiftStates;
-
-#define LIFT_UP_KP 2
-#define LIFT_DOWN_KP 1.5
-
-#define LIFT_BOTTOM 960
-#define LIFT_TOP 3560
-
-int gLiftTarget;
-sLiftStates gLiftState = liftIdle;
-unsigned long gLiftStart;
+	liftToTarget,
+	liftHold
+} tLiftStates;
 
 void setLift(word power,bool debug=false)
 {
 	if( debug )	writeDebugStreamLine("%06d Lift %4d", nPgmTime-gOverAllTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
-	//	Motor[liftL] = Motor[liftR] = power;
 }
+
+#define LIFT_TOP 5225
+#define LIFT_BOTTOM 5225
+#define LIFT_MID 5225
+
+#define LIFT_MID_HEIGHT 5225
+#define LIFT_ARM_LEN 9
+
+#define LIFT_HEIGHT(pos) (LIFT_MID_HEIGHT + 2 * LIFT_ARM_LEN * cos((pos - LIFT_MID) * PI / 3276))
+#define LIFT_POS(height) (LIFT_MID + acos((height - LIFT_MID_HEIGHT) / (2 * LIFT_ARM_LEN)) * 3276 / PI)
+
+MAKE_MACHINE(lift, tLiftStates, liftIdle,
+{
+case liftIdle:
+	setLift(0);
+	break;
+case liftToTarget:
+	if (arg != -1)
+	{
+		const float kP_vel = 1.0;
+		const float kP_pwr = 1.0;
+		int err;
+		velocityClear(liftPoti);
+		sCycleData cycle;
+		initCycle(cycle, 10, "liftToTarget");
+		do
+		{
+			err = (int)(arg - gSensor[liftPoti].value);
+			velocityCheck(liftPoti);
+			if (gSensor[liftPoti].velGood)
+				setLift((word)(kP_pwr * (kP_vel * err - gSensor[liftPoti].velocity)));
+			endCycle(cycle);
+		} while (abs(err) > 75);
+	}
+	NEXT_STATE(liftHold, arg);
+case liftHold:
+	if (arg == -1) arg = gSensor[liftPoti].value;
+{
+	sCycleData cycle;
+	initCycle(cycle, 10, "liftHold");
+	while (true)
+	{
+		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+		endCycle(cycle);
+	}
+}
+})
 
 void handleLift()
 {
+	if (liftState == liftManaged ) return;
 
 	if (RISING(JOY_LIFT))
 	{
-		gLiftState = liftManual;
+		liftSet(liftManual);
 	}
 	if (FALLING(JOY_LIFT))
 	{
-		gLiftState = liftHold;
+		liftSet(liftHold);
 	}
 
-	if( gLiftState == liftManaged ) return;
-
-	switch (gLiftState)
+	if (liftState == liftManual)
 	{
-
-	case liftManual:
-		{
-			word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
-			if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -10) value = -10;
-			if (gSensor[liftPoti].value >= LIFT_TOP && value > 10) value = 10;
-			setLift(value);
-			break;
-		}
-	case liftHold:
-		{
-			if (gSensor[liftPoti] < 10)
-				setLift(-10);
-			else
-				setLift(12);
-			break;
-		}
-	case liftIdle:
-		{
-			setLift(0);
-			break;
-		}
+		word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
+		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -10) value = -10;
+		if (gSensor[liftPoti].value >= LIFT_TOP && value > 10) value = 10;
+		setLift(value);
 	}
 }
 
@@ -410,7 +423,6 @@ bool gLiftTargetReached;
 
 
 byte stackAsync(bool arg0);
-byte liftUpAsync();
 byte dropArmAsync();
 
 bool gKillDriveOnTimeout = false;
@@ -427,7 +439,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		updateMotors();
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
 		gArmState= armHold;
-		gLiftState = liftHold;
+		liftSet(liftHold);
 		gDriveManual = true;
 		int current = nCurrentTask;
 		while (true)
@@ -442,42 +454,6 @@ bool TimedOut(unsigned long timeOut, const string description)
 	else
 		return false;
 }
-
-void liftUp()
-{
-	int p;
-	writeDebugStreamLine("%d LiftTask started %d", nPgmTime-gOverAllTime, gLiftTarget);
-	gLiftTargetReached = false;
-	unsigned long gLiftTopTime = 0;
-	int minPower =45;
-	if( gLiftTarget == LIFT_TOP-LIFT_BOTTOM) minPower = 60;
-	if( gLiftTarget <180 ) 	minPower = 45;
-	writeDebugStreamLine("target=%d current=%d",gLiftTarget,gSensor[liftPoti].value);
-	while (!gLiftTargetReached )
-	{
-		float err = gLiftTarget - gSensor[liftPoti].value;
-		if ( (err <10 && gLiftTarget != LIFT_TOP-LIFT_BOTTOM))
-		{
-			gLiftTargetReached = true;
-			setLift(25,true);
-			break;
-		}
-		else
-		{
-			p = err*0.44;
-		}
-
-		if (p < minPower) p = minPower;
-		setLift(p);
-		sleep(10);
-	}
-	writeDebugStreamLine("%06d LiftTask ended", nPgmTime-gOverAllTime);
-	writeDebugStreamLine("target=%d reached=%d",gLiftTarget,gSensor[liftPoti].value);
-
-	return_t;
-}
-
-NEW_ASYNC_VOID_0(liftUp);
 
 bool gArmDown;
 void dropArm()
@@ -501,23 +477,19 @@ void dropArm()
 NEW_ASYNC_VOID_0(dropArm);
 
 //int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
-int gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
+float gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
 //////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
 
 void clearArm()
 {
-	gLiftState = liftManaged;
-	gLiftTarget = LIFT_BOTTOM + gliftTargetA[gNumCones];
-	gLiftTargetReached = false;
-	liftUpAsync();
+	liftSet(liftToTarget, LIFT_POS(gliftTargetA[gNumCones]));
 	unsigned long timeout = nPgmTime + 1500;
-	while (!gLiftTargetReached && !TimedOut(timeout, "clear 2")) sleep(10);
-	gLiftState = liftHold;
+	while (liftState == liftToTarget && !TimedOut(timeout, "clear 1")) sleep(10);
 
 	gArmState = armManaged;
 	setArm(127);
 	timeout = nPgmTime + 1500;
-	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(timeout, "clear 3")) sleep(10);
+	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(timeout, "clear 2")) sleep(10);
 	gArmPosition = 2;
 	gArmState = armHold;
 }
@@ -905,7 +877,7 @@ bool cancel()
 {
 	if (stackKill() || stackFromLoaderKill() || stackExternalKill())
 		return false;
-	gLiftState = liftIdle;
+	liftSet(liftIdle);
 	gArmState = armIdle;
 	gDriveManual = true;
 	writeDebugStreamLine("Stack cancelled");
@@ -1157,7 +1129,6 @@ ASYNC_ROUTINES
 (
 USE_ASYNC(autonomous)
 USE_ASYNC(usercontrol)
-USE_ASYNC(liftUp)
 USE_ASYNC(dropArm)
 USE_ASYNC(stack)
 USE_ASYNC(stackFromLoader)
@@ -1169,4 +1140,5 @@ USE_ASYNC(moveToTarget)
 USE_ASYNC(turnToAngle)
 USE_ASYNC(turnToTarget)
 USE_MACHINE(mobile)
+USE_MACHINE(lift)
 )
