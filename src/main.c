@@ -367,11 +367,24 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_1 -60
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
+#define LIFT_MOBILE_THRESHOLD 1100
+
 unsigned long gMobileButtonTime;
+bool gMobileCheckLift;
 
 void setMobile(word power)
 {
 	gMotor[mobile].power = power;
+}
+
+void mobileClearLift()
+{
+	if (gMobileCheckLift && gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD)
+	{
+		liftSet(liftToTarget, LIFT_MOBILE_THRESHOLD + 50);
+		unsigned long timeout = nPgmTime + 1000;
+		while (gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD && !TimedOut(timeout, "mobileClearLift")) sleep(10);
+	}
 }
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
@@ -381,6 +394,7 @@ case mobileIdle:
 	break;
 case mobileTop:
 {
+	mobileClearLift();
 	setMobile(MOBILE_UP_POWER);
 	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "mobileTop")) sleep(10);
@@ -389,6 +403,7 @@ case mobileTop:
 }
 case mobileBottom:
 {
+	mobileClearLift();
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
@@ -397,6 +412,7 @@ case mobileBottom:
 }
 case mobileBottomSlow:
 {
+	mobileClearLift();
 	//sPID pid;
 	//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
 	velocityClear(mobilePoti);
@@ -436,6 +452,7 @@ case mobileUpToMiddle:
 }
 case mobileDownToMiddle:
 {
+	mobileClearLift();
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long timeout = nPgmTime + 1000;
 	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
@@ -1164,6 +1181,7 @@ void usercontrol()
 
 	gKillDriveOnTimeout = false;
 	gDriveManual = true;
+	gMobileCheckLift = true;
 
 	while (true)
 	{
