@@ -337,13 +337,15 @@ typedef enum _tMobileStates {
 	mobileBottom,
 	mobileUpToMiddle,
 	mobileDownToMiddle,
+	mobileMiddle,
 	mobileBrakes
 } tMobileStates;
 
 #define MOBILE_TOP 2250
 #define MOBILE_BOTTOM 350
 #define MOBILE_MIDDLE_UP 600
-#define MOBILE_MIDDLE_DOWN 1300
+#define MOBILE_MIDDLE_DOWN 1200
+#define MOBILE_MIDDLE_THRESHOLD 1900
 #define MOBILE_HALFWAY 1200
 
 #define MOBILE_UP_POWER 127
@@ -383,7 +385,7 @@ case mobileUpToMiddle:
 	unsigned long timeout = nPgmTime + 1000;
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 	setMobile(15);
-	break;
+	NEXT_STATE(mobileMiddle, -1)
 }
 case mobileDownToMiddle:
 {
@@ -391,13 +393,16 @@ case mobileDownToMiddle:
 	unsigned long timeout = nPgmTime + 1000;
 	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 	setMobile(15);
-	break;
+	NEXT_STATE(mobileMiddle, -1)
 }
+case mobileMiddle:
+	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
+	NEXT_STATE(mobileTop, -1)
 })
 
 void handleMobile()
 {
-	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle)
+	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
 		if (RISING(BTN_MOBILE_TOGGLE))
 			mobileSet(mobileTop);
