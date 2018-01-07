@@ -109,7 +109,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_BOTTOM 5225
 #define LIFT_MID 5225
 
-#define LIFT_MID_HEIGHT 5225
+#define LIFT_MID_HEIGHT 22.5
 #define LIFT_ARM_LEN 9
 
 #define LIFT_HEIGHT(pos) (LIFT_MID_HEIGHT + 2 * LIFT_ARM_LEN * cos((pos - LIFT_MID) * PI / 3276))
