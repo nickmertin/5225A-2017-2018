@@ -60,6 +60,8 @@ bool TimedOut(unsigned long timeOut, const string description);
 //#define DEBUG_TRACKING
 #define TRACK_IN_DRIVER
 
+#define LIFT_SLOW_DRIVE_THRESHOLD 1200
+
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -85,7 +87,16 @@ void handleDrive()
 		if (!a && abs(gVelocity.a) > 0.2)
 			a = -6 * sgn(gVelocity.a);
 
-		setDrive(y + a, y - a);
+		word l = y + a;
+		word r = y - a;
+
+		if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
+		{
+			LIM_TO_VAL_SET(l, 40);
+			LIM_TO_VAL_SET(r, 40);
+		}
+
+		setDrive(l, r);
 	}
 }
 
@@ -96,7 +107,8 @@ typedef enum _tLiftStates {
 	liftIdle,
 	liftManual,
 	liftToTarget,
-	liftHold
+	liftHold,
+	liftHoldDown
 } tLiftStates;
 
 void setLift(word power,bool debug=false)
@@ -106,8 +118,9 @@ void setLift(word power,bool debug=false)
 }
 
 #define LIFT_TOP 3100
-#define LIFT_BOTTOM 1050
+#define LIFT_BOTTOM 1000
 #define LIFT_MID 1900
+#define LIFT_HOLD_DOWN_THRESHOLD 1150
 
 #define LIFT_MID_HEIGHT 22.5
 #define LIFT_ARM_LEN 9
@@ -136,11 +149,13 @@ case liftToTarget:
 			if (gSensor[liftPoti].velGood)
 				setLift((word)(kP_pwr * (kP_vel * err - gSensor[liftPoti].velocity)));
 			endCycle(cycle);
-		} while (abs(err) > 75);
+		} while (abs(err) > 25);
 	}
+	writeDebugStreamLine("Lift at target: %d %d", arg, gSensor[liftPoti].value);
 	NEXT_STATE(liftHold, arg);
 case liftHold:
 	if (arg == -1) arg = gSensor[liftPoti].value;
+<<<<<<< HEAD
 	{
 		sCycleData cycle;
 		initCycle(cycle, 10, "liftHold");
@@ -150,6 +165,24 @@ case liftHold:
 			endCycle(cycle);
 		}
 	}
+=======
+	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
+		NEXT_STATE(liftHoldDown, arg);
+//{
+//	sCycleData cycle;
+//	initCycle(cycle, 10, "liftHold");
+//	while (true)
+//	{
+//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+//		endCycle(cycle);
+//	}
+//}
+	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 3276)));
+	break;
+case liftHoldDown:
+	setLift(-10);
+	break;
+>>>>>>> master
 })
 
 void handleLift()
@@ -382,6 +415,7 @@ typedef enum _tMobileStates {
 	mobileIdle,
 	mobileTop,
 	mobileBottom,
+	mobileBottomSlow,
 	mobileUpToMiddle,
 	mobileDownToMiddle,
 	mobileMiddle,
@@ -399,10 +433,35 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_POWER -127
 #define MOBILE_UP_HOLD_POWER 10
 #define MOBILE_DOWN_HOLD_POWER -10
+#define MOBILE_DOWN_SLOW_POWER_1 -60
+#define MOBILE_DOWN_SLOW_POWER_2 6
+
+#define MOBILE_LIFT_CHECK_THRESHOLD 1700
+#define LIFT_MOBILE_THRESHOLD 1300
+
+unsigned long gMobileButtonTime;
+bool gMobileCheckLift;
+bool gMobileResetLift = false;
 
 void setMobile(word power)
 {
 	gMotor[mobile].power = power;
+}
+
+void mobileClearLift()
+{
+	if (gMobileResetLift = (gMobileCheckLift && gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD))
+	{
+		liftSet(liftToTarget, LIFT_MOBILE_THRESHOLD + 50);
+		unsigned long timeout = nPgmTime + 1000;
+		while (gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD && !TimedOut(timeout, "mobileClearLift")) sleep(10);
+	}
+}
+
+void mobileResetLift()
+{
+	if (gMobileResetLift)
+		liftSet(liftToTarget, LIFT_BOTTOM);
 }
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
@@ -411,6 +470,7 @@ case mobileIdle:
 	setMobile(0);
 	break;
 case mobileTop:
+<<<<<<< HEAD
 	{
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 2000;
@@ -426,6 +486,64 @@ case mobileBottom:
 		setMobile(MOBILE_DOWN_HOLD_POWER);
 		break;
 	}
+=======
+{
+	if (arg)
+		mobileClearLift();
+	setMobile(MOBILE_UP_POWER);
+	unsigned long timeout = nPgmTime + 2000;
+	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
+	setMobile(15);
+	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
+	setMobile(MOBILE_UP_HOLD_POWER);
+	mobileResetLift();
+	break;
+}
+case mobileBottom:
+{
+	if (arg && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
+		mobileClearLift();
+	setMobile(MOBILE_DOWN_POWER);
+	unsigned long timeout = nPgmTime + 2000;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	mobileResetLift();
+	break;
+}
+case mobileBottomSlow:
+{
+	if (arg)
+	mobileClearLift();
+	//sPID pid;
+	//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
+	velocityClear(mobilePoti);
+	unsigned long timeout = nPgmTime + 3000;
+	setMobile(-50);
+	while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, "mobileBottomSlow 1")) sleep(10);
+	sCycleData cycle;
+	initCycle(cycle, 10, "mobileBottomSlow");
+	//const float kP = 0.02;
+	const float kP_vel = 0.001;
+	const float kP_pwr = 3.0;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, "mobileBottomSlow 2"))
+	{
+		//setMobile((MOBILE_BOTTOM - gSensor[mobilePoti].value) * kP);
+		//pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
+		//setMobile((word)pid.output);
+		velocityCheck(mobilePoti);
+		if (gSensor[mobilePoti].velGood)
+		{
+			float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
+			LIM_TO_VAL_SET(power, 10);
+			setMobile((word)power);
+		}
+		endCycle(cycle);
+	}
+	setMobile(0);
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
+	NEXT_STATE(mobileBottom, 0)
+}
+>>>>>>> master
 case mobileUpToMiddle:
 	{
 		setMobile(MOBILE_UP_POWER);
@@ -435,6 +553,7 @@ case mobileUpToMiddle:
 		NEXT_STATE(mobileMiddle, -1)
 	}
 case mobileDownToMiddle:
+<<<<<<< HEAD
 	{
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1000;
@@ -442,6 +561,18 @@ case mobileDownToMiddle:
 		setMobile(15);
 		NEXT_STATE(mobileMiddle, -1)
 	}
+=======
+{
+	if (arg)
+		mobileClearLift();
+	setMobile(MOBILE_DOWN_POWER);
+	unsigned long timeout = nPgmTime + 1000;
+	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
+	setMobile(15);
+	//mobileResetLift();
+	NEXT_STATE(mobileMiddle, -1)
+}
+>>>>>>> master
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
 	NEXT_STATE(mobileTop, -1)
@@ -454,14 +585,27 @@ void handleMobile()
 		if (RISING(BTN_MOBILE_TOGGLE))
 			mobileSet(mobileTop);
 		if (RISING(BTN_MOBILE_MIDDLE))
+		{
 			mobileSet(mobileBottom);
+			gMobileButtonTime = nPgmTime;
+		}
 	}
 	else
 	{
 		if (RISING(BTN_MOBILE_TOGGLE))
+		{
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
+			gMobileButtonTime = nPgmTime;
+		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
+		if (FALLING(BTN_MOBILE_TOGGLE) || FALLING(BTN_MOBILE_MIDDLE))
+			gMobileButtonTime = 0;
+		if ((gJoy[BTN_MOBILE_TOGGLE].cur || gJoy[BTN_MOBILE_MIDDLE].cur) && mobileState == mobileBottom && gMobileButtonTime && nPgmTime - gMobileButtonTime > 250)
+		{
+			mobileSet(mobileBottomSlow, 0);
+			gMobileButtonTime = 0;
+		}
 	}
 }
 
@@ -1125,6 +1269,7 @@ void usercontrol()
 
 	gKillDriveOnTimeout = false;
 	gDriveManual = true;
+	gMobileCheckLift = true;
 
 	while (true)
 	{
