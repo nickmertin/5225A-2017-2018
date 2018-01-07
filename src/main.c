@@ -119,6 +119,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_TOP 3100
 #define LIFT_BOTTOM 1000
 #define LIFT_MID 1900
+#define LIFT_HOLD_DOWN_THRESHOLD 1150
 
 #define LIFT_MID_HEIGHT 22.5
 #define LIFT_ARM_LEN 9
@@ -157,7 +158,7 @@ case liftHold:
 	initCycle(cycle, 10, "liftHold");
 	while (true)
 	{
-		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+		setLift(gSensor[liftPoti].value > LIFT_HOLD_DOWN_THRESHOLD ? 8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)) : -10);
 		endCycle(cycle);
 	}
 }
