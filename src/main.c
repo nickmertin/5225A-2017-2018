@@ -397,7 +397,9 @@ case mobileTop:
 	mobileClearLift();
 	setMobile(MOBILE_UP_POWER);
 	unsigned long timeout = nPgmTime + 2000;
-	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "mobileTop")) sleep(10);
+	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
+	setMobile(15);
+	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
 	setMobile(MOBILE_UP_HOLD_POWER);
 	break;
 }
