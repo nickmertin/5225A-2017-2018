@@ -141,15 +141,15 @@ case liftToTarget:
 	NEXT_STATE(liftHold, arg);
 case liftHold:
 	if (arg == -1) arg = gSensor[liftPoti].value;
-{
-	sCycleData cycle;
-	initCycle(cycle, 10, "liftHold");
-	while (true)
 	{
-		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
-		endCycle(cycle);
+		sCycleData cycle;
+		initCycle(cycle, 10, "liftHold");
+		while (true)
+		{
+			setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+			endCycle(cycle);
+		}
 	}
-}
 })
 
 void handleLift()
@@ -176,7 +176,7 @@ void handleLift()
 
 
 /* Arm */
-typedef enum _sArmStates {
+typedef enum _tArmStates { // it used to be sArmStates. Isn't that only use for structs???
 	armManaged,
 	armIdle,
 	armManual,
@@ -185,7 +185,7 @@ typedef enum _sArmStates {
 	armLower,
 	armHold,
 	armHorizontal
-} sArmStates;
+} tArmStates;
 
 #define ARM_UP_KP 0.25
 #define ARM_DOWN_KP 0.25
@@ -198,7 +198,7 @@ short gArmPositions[] = { 130, 750, 1950 };
 word gArmHoldPower[] = { -12, 0, 10 };
 short gArmPosition = 2;
 short gArmTarget;
-sArmStates gArmState = armIdle;
+//sArmStates gArmState = armIdle;
 unsigned long gArmStart;
 sPID gArmPID;
 sPID* gArmPIDInUse = &gArmPID;
@@ -210,122 +210,235 @@ void setArm(word power, bool debug = false)
 	//	motor[arm]=power;
 }
 
+MAKE_MACHINE(arm, tArmStates, armIdle,
+{
+case armIdle:
+	setArm (0);
+	break;
+case armManual:
+	{
+		word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
+		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
+		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
+		setArm(value);
+		break;
+	}
+case armPlainPID:
+	{
+		int value = gSensor[armPoti].value;
+		if (gArmTarget >= ARM_TOP && value >= ARM_TOP)
+		{
+			writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
+			NEXT_STATE (armHold, -1);
+		}
+		else if (gArmTarget <= ARM_BOTTOM && value <= ARM_BOTTOM)
+		{
+			writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
+			NEXT_STATE (armHold, -1);
+		}
+		else
+		{
+			pidCalculate(gArmPID, (float)gArmTarget, (float)value);
+			setArm((word)gArmPID.output);
+		}
+		break;
+	}
+case armRaise:
+	{
+		if (gSensor[armPoti].value >= gArmTarget)
+		{
+			writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
+			NEXT_STATE (armHold, -1);
+		}
+		else setArm(127);
+		break;
+	}
+case armLower:
+	{
+		if (gSensor[armPoti].value <= gArmTarget)
+		{
+			writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
+			NEXT_STATE (armHold, -1);
+		}
+		else setArm(-127);
+		break;
+	}
+case armHold:
+	{
+		if( gArmPosition == 1 )
+		{
+			if( gSensor[armPoti].value < 1700 )
+				setArm(15);
+			else
+				setArm(9);
+		}
+		else
+		{
+			setArm(gArmHoldPower[gArmPosition]);
+		}
+
+		//setArm(gArmPosition == 1 ? gSensor[armPoti].value < 1700 ? 15 : 9 : gArmHoldPower[gArmPosition]);
+		break;
+	}
+case armHorizontal:
+	{
+		int value = gSensor[armPoti].value;
+		if (abs(gArmTarget - value) < 400)
+		{
+			velocityCheck(armPoti);
+			if (gSensor[armPoti].velGood)
+			{
+				int power = 10 - gSensor[armPoti].velocity / 2;
+				setArm(LIM_TO_VAL(power, 15));
+			}
+		}
+		else if (value > gArmTarget) setArm(-127);
+		else setArm(127);
+		break;
+	}
+})
+
 void handleArm()
 {
 	if (RISING(JOY_ARM))
 	{
-		gArmState = armManual;
+		armSet (armManual);
 	}
 	if (FALLING(JOY_ARM) && gArmState == armManual)
 	{
 		if (gSensor[armPoti].value <= ARM_BOTTOM) gArmPosition = 0;
 		else if (gSensor[armPoti].value >= ARM_TOP) gArmPosition = 2;
 		else gArmPosition = 1;
-		gArmState = armHold;
+		armSet (armHold);
 	}
 	if (RISING(BTN_ARM_DOWN))
 	{
-		gArmState = armLower;
+		armSet (armLower);
 
 		gArmPosition = 0;
 
 		gArmTarget = gArmPositions[gArmPosition];
 		gArmStart = nPgmTime;
 	}
-
-	if( gArmState==armManaged ) return;
-
-	switch (gArmState)
-	{
-	case armManual:
-		{
-			word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
-			if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
-			if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
-			setArm(value);
-			break;
-		}
-	case armPlainPID:
-		{
-			int value = gSensor[armPoti].value;
-			if (gArmTarget >= ARM_TOP && value >= ARM_TOP)
-			{
-				writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
-				gArmState = armHold;
-			}
-			else if (gArmTarget <= ARM_BOTTOM && value <= ARM_BOTTOM)
-			{
-				writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
-				gArmState = armHold;
-			}
-			else
-			{
-				pidCalculate(gArmPID, (float)gArmTarget, (float)value);
-				setArm((word)gArmPID.output);
-			}
-			break;
-		}
-	case armRaise:
-		{
-			if (gSensor[armPoti].value >= gArmTarget)
-			{
-				writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
-				gArmState = armHold;
-			}
-			else setArm(127);
-			break;
-		}
-	case armLower:
-		{
-			if (gSensor[armPoti].value <= gArmTarget)
-			{
-				writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
-				gArmState = armHold;
-			}
-			else setArm(-127);
-			break;
-		}
-	case armHold:
-		{
-			if( gArmPosition == 1 )
-			{
-				if( gSensor[armPoti].value < 1700 )
-					setArm(15);
-				else
-					setArm(9);
-			}
-			else
-			{
-				setArm(gArmHoldPower[gArmPosition]);
-			}
-
-
-			//setArm(gArmPosition == 1 ? gSensor[armPoti].value < 1700 ? 15 : 9 : gArmHoldPower[gArmPosition]);
-			break;
-		}
-	case armHorizontal:
-		{
-			int value = gSensor[armPoti].value;
-			if (abs(gArmTarget - value) < 400)
-			{
-				velocityCheck(armPoti);
-				if (gSensor[armPoti].velGood)
-				{
-					int power = 10 - gSensor[armPoti].velocity / 2;
-					setArm(LIM_TO_VAL(power, 15));
-				}
-			}
-			else if (value > gArmTarget) setArm(-127);
-			else setArm(127);
-			break;
-		}
-	case armIdle:
-		{
-			setArm(0);
-			break;
-		}
-	}
 }
+
+
+//void handleArm()
+//{
+//	if (RISING(JOY_ARM))
+//	{
+//		gArmState = armManual;
+//	}
+//	if (FALLING(JOY_ARM) && gArmState == armManual)
+//	{
+//		if (gSensor[armPoti].value <= ARM_BOTTOM) gArmPosition = 0;
+//		else if (gSensor[armPoti].value >= ARM_TOP) gArmPosition = 2;
+//		else gArmPosition = 1;
+//		gArmState = armHold;
+//	}
+//	if (RISING(BTN_ARM_DOWN))
+//	{
+//		gArmState = armLower;
+
+//		gArmPosition = 0;
+
+//		gArmTarget = gArmPositions[gArmPosition];
+//		gArmStart = nPgmTime;
+//	}
+
+//	if( gArmState==armManaged ) return;
+
+//	switch (gArmState)
+//	{
+//	case armManual:
+//		{
+//			word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
+//			if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
+//			if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
+//			setArm(value);
+//			break;
+//		}
+//	case armPlainPID:
+//		{
+//			int value = gSensor[armPoti].value;
+//			if (gArmTarget >= ARM_TOP && value >= ARM_TOP)
+//			{
+//				writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
+//				gArmState = armHold;
+//			}
+//			else if (gArmTarget <= ARM_BOTTOM && value <= ARM_BOTTOM)
+//			{
+//				writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
+//				gArmState = armHold;
+//			}
+//			else
+//			{
+//				pidCalculate(gArmPID, (float)gArmTarget, (float)value);
+//				setArm((word)gArmPID.output);
+//			}
+//			break;
+//		}
+//	case armRaise:
+//		{
+//			if (gSensor[armPoti].value >= gArmTarget)
+//			{
+//				writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
+//				gArmState = armHold;
+//			}
+//			else setArm(127);
+//			break;
+//		}
+//	case armLower:
+//		{
+//			if (gSensor[armPoti].value <= gArmTarget)
+//			{
+//				writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
+//				gArmState = armHold;
+//			}
+//			else setArm(-127);
+//			break;
+//		}
+//	case armHold:
+//		{
+//			if( gArmPosition == 1 )
+//			{
+//				if( gSensor[armPoti].value < 1700 )
+//					setArm(15);
+//				else
+//					setArm(9);
+//			}
+//			else
+//			{
+//				setArm(gArmHoldPower[gArmPosition]);
+//			}
+
+
+//			//setArm(gArmPosition == 1 ? gSensor[armPoti].value < 1700 ? 15 : 9 : gArmHoldPower[gArmPosition]);
+//			break;
+//		}
+//	case armHorizontal:
+//		{
+//			int value = gSensor[armPoti].value;
+//			if (abs(gArmTarget - value) < 400)
+//			{
+//				velocityCheck(armPoti);
+//				if (gSensor[armPoti].velGood)
+//				{
+//					int power = 10 - gSensor[armPoti].velocity / 2;
+//					setArm(LIM_TO_VAL(power, 15));
+//				}
+//			}
+//			else if (value > gArmTarget) setArm(-127);
+//			else setArm(127);
+//			break;
+//		}
+//	case armIdle:
+//		{
+//			setArm(0);
+//			break;
+//		}
+//	}
+//}
 
 
 /* Mobile */
@@ -364,37 +477,37 @@ case mobileIdle:
 	setMobile(0);
 	break;
 case mobileTop:
-{
-	setMobile(MOBILE_UP_POWER);
-	unsigned long timeout = nPgmTime + 2000;
-	while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "mobileTop")) sleep(10);
-	setMobile(MOBILE_UP_HOLD_POWER);
-	break;
-}
+	{
+		setMobile(MOBILE_UP_POWER);
+		unsigned long timeout = nPgmTime + 2000;
+		while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "mobileTop")) sleep(10);
+		setMobile(MOBILE_UP_HOLD_POWER);
+		break;
+	}
 case mobileBottom:
-{
-	setMobile(MOBILE_DOWN_POWER);
-	unsigned long timeout = nPgmTime + 2000;
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
-	setMobile(MOBILE_DOWN_HOLD_POWER);
-	break;
-}
+	{
+		setMobile(MOBILE_DOWN_POWER);
+		unsigned long timeout = nPgmTime + 2000;
+		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
+		setMobile(MOBILE_DOWN_HOLD_POWER);
+		break;
+	}
 case mobileUpToMiddle:
-{
-	setMobile(MOBILE_UP_POWER);
-	unsigned long timeout = nPgmTime + 1000;
-	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
-	setMobile(15);
-	NEXT_STATE(mobileMiddle, -1)
-}
+	{
+		setMobile(MOBILE_UP_POWER);
+		unsigned long timeout = nPgmTime + 1000;
+		while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
+		setMobile(15);
+		NEXT_STATE(mobileMiddle, -1)
+	}
 case mobileDownToMiddle:
-{
-	setMobile(MOBILE_DOWN_POWER);
-	unsigned long timeout = nPgmTime + 1000;
-	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
-	setMobile(15);
-	NEXT_STATE(mobileMiddle, -1)
-}
+	{
+		setMobile(MOBILE_DOWN_POWER);
+		unsigned long timeout = nPgmTime + 1000;
+		while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
+		setMobile(15);
+		NEXT_STATE(mobileMiddle, -1)
+	}
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
 	NEXT_STATE(mobileTop, -1)
@@ -476,7 +589,7 @@ void dropArm()
 	sleep(120);
 	gArmDown = true;
 	gArmState = armHold;
-  gArmPosition = 0;
+	gArmPosition = 0;
 }
 
 NEW_ASYNC_VOID_0(dropArm);
@@ -714,46 +827,46 @@ void stack(bool downAfter)
 	//	setClaw(CLAW_CLOSE_HOLD_POWER,true);
 
 
-		//if( gNumCones < 10 )
-		//{
-		//	setLift(-80,true);
-		//	liftTimeOut = nPgmTime+400;
-		//	while (gSensor[liftPoti].value > gLiftTarget-60 && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 20")) sleep(10);
-		//	setLift(15,true);
+	//if( gNumCones < 10 )
+	//{
+	//	setLift(-80,true);
+	//	liftTimeOut = nPgmTime+400;
+	//	while (gSensor[liftPoti].value > gLiftTarget-60 && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 20")) sleep(10);
+	//	setLift(15,true);
 
-		//	setClaw(CLAW_OPEN_POWER,true);
-		//	sleep(150);
-		//	// dont lift as high as the original stack target
-		//	gLiftTarget = gLiftTarget-30;//60
-		//	liftUpAsync();
-		//	while( gSensor[clawPoti].value< CLAW_OPEN ) sleep(10);
-		//	setClaw(CLAW_OPEN_HOLD_POWER,true);
-		//	gNumCones++;
-		//	while( !gLiftTargetReached ) sleep(10);
+	//	setClaw(CLAW_OPEN_POWER,true);
+	//	sleep(150);
+	//	// dont lift as high as the original stack target
+	//	gLiftTarget = gLiftTarget-30;//60
+	//	liftUpAsync();
+	//	while( gSensor[clawPoti].value< CLAW_OPEN ) sleep(10);
+	//	setClaw(CLAW_OPEN_HOLD_POWER,true);
+	//	gNumCones++;
+	//	while( !gLiftTargetReached ) sleep(10);
 
-		//	gArmDown = false;
-		//	if (downAfter)
-		//	{
-		//		dropArmAsync();
-		//		while( gSensor[armPoti].value > ARM_TOP-400 )  sleep(10);
-		//		setLift(-127);
-		//		while ( !gSensor[limBottom].value ) sleep(10);
-		//		setLift(-10);
-		//		while( !gArmDown) sleep(10);
-		//	}
-		//}
-		//else
-		//{
-		//	setArm(15,true);
-		//	setLift(15,true);
-		//	sleep(200);
-		//	setLift(-50,true);
-		//	liftTimeOut = nPgmTime + 700;
-		//	gLiftTarget = 2900; //JOHN
-		//	while (gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 21")) sleep(10);
-		//	setLift(15, true);
-		//	setClaw(10,true);
-		//}
+	//	gArmDown = false;
+	//	if (downAfter)
+	//	{
+	//		dropArmAsync();
+	//		while( gSensor[armPoti].value > ARM_TOP-400 )  sleep(10);
+	//		setLift(-127);
+	//		while ( !gSensor[limBottom].value ) sleep(10);
+	//		setLift(-10);
+	//		while( !gArmDown) sleep(10);
+	//	}
+	//}
+	//else
+	//{
+	//	setArm(15,true);
+	//	setLift(15,true);
+	//	sleep(200);
+	//	setLift(-50,true);
+	//	liftTimeOut = nPgmTime + 700;
+	//	gLiftTarget = 2900; //JOHN
+	//	while (gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 21")) sleep(10);
+	//	setLift(15, true);
+	//	setClaw(10,true);
+	//}
 
 	//	writeDebugStreamLine( "------ STACK %d cones in %d ms -----", gNumCones, nPgmTime-gOverAllTime);
 	//	gLiftState = liftIdle;
