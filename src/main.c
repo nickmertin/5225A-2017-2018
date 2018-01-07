@@ -108,7 +108,8 @@ typedef enum _tLiftStates {
 	liftIdle,
 	liftManual,
 	liftToTarget,
-	liftHold
+	liftHold,
+	liftHoldDown
 } tLiftStates;
 
 void setLift(word power,bool debug=false)
@@ -151,18 +152,26 @@ case liftToTarget:
 			endCycle(cycle);
 		} while (abs(err) > 25);
 	}
+	writeDebugStreamLine("Lift at target: %d %d", arg, gSensor[liftPoti].value);
 	NEXT_STATE(liftHold, arg);
 case liftHold:
 	if (arg == -1) arg = gSensor[liftPoti].value;
-{
-	sCycleData cycle;
-	initCycle(cycle, 10, "liftHold");
-	while (true)
-	{
-		setLift(gSensor[liftPoti].value > LIFT_HOLD_DOWN_THRESHOLD ? 8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)) : -10);
-		endCycle(cycle);
-	}
-}
+	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
+		NEXT_STATE(liftHoldDown, arg);
+//{
+//	sCycleData cycle;
+//	initCycle(cycle, 10, "liftHold");
+//	while (true)
+//	{
+//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+//		endCycle(cycle);
+//	}
+//}
+	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 3276)));
+	break;
+case liftHoldDown:
+	setLift(-10);
+	break;
 })
 
 void handleLift()

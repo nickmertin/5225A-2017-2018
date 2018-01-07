@@ -15,7 +15,7 @@ states machine##State = -1; \
 void machine##Internal(states state, long arg) \
 { \
 	top: \
-	writeDebugStreamLine(#machine " %d -> %d", machine##State, state); \
+	writeDebugStreamLine("%d " #machine " %d -> %d, %d", nPgmTime, machine##State, state, arg); \
 	switch (machine##State = state) \
 	handler \
 } \
