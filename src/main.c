@@ -386,21 +386,33 @@ case mobileBottom:
 }
 case mobileBottomSlow:
 {
-	sPID pid;
-	pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
-	unsigned long timeout = nPgmTime + 2000;
-	//setMobile(-60);
-	//while (gSensor[mobilePoti].value > MOBILE_TOP - 600) sleep(10);
+	//sPID pid;
+	//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
+	velocityClear(mobilePoti);
+	unsigned long timeout = nPgmTime + 3000;
+	setMobile(-50);
+	while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, "mobileBottomSlow 1")) sleep(10);
 	sCycleData cycle;
 	initCycle(cycle, 10, "mobileBottomSlow");
-	const float kP = 0.02;
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 1"))
+	//const float kP = 0.02;
+	const float kP_vel = 0.001;
+	const float kP_pwr = 3.0;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, "mobileBottomSlow 2"))
 	{
 		//setMobile((MOBILE_BOTTOM - gSensor[mobilePoti].value) * kP);
-		pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
-		setMobile((word)pid.output);
+		//pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
+		//setMobile((word)pid.output);
+		velocityCheck(mobilePoti);
+		if (gSensor[mobilePoti].velGood)
+		{
+			float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
+			LIM_TO_VAL_SET(power, 10);
+			setMobile((word)power);
+		}
 		endCycle(cycle);
 	}
+	setMobile(0);
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
 	break;
 }
