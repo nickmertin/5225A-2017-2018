@@ -13,7 +13,7 @@ for i in range(max + 1):
         print('  int _dummy[0]; \\')
     print('} sAsyncData_##func; \\')
     print('void _asyncTask_##func(sAsyncData_##func *data) { \\')
-    print('  writeDebugStreamLine("Instance of " #func " started"); \\')
+    # print('  writeDebugStreamLine("Instance of " #func " started"); \\')
     print('  func(%s); \\' % ', '.join('data->arg%d' % j for j in range(i)))
     print('} \\')
     print('byte func##Async(%s) { \\' % ', '.join('type%d arg%d' % (j, j) for j in range(i)))
