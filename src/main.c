@@ -117,7 +117,7 @@ void setLift(word power,bool debug=false)
 }
 
 #define LIFT_TOP 3100
-#define LIFT_BOTTOM 1050
+#define LIFT_BOTTOM 1000
 #define LIFT_MID 1900
 
 #define LIFT_MID_HEIGHT 22.5
@@ -147,7 +147,7 @@ case liftToTarget:
 			if (gSensor[liftPoti].velGood)
 				setLift((word)(kP_pwr * (kP_vel * err - gSensor[liftPoti].velocity)));
 			endCycle(cycle);
-		} while (abs(err) > 75);
+		} while (abs(err) > 25);
 	}
 	NEXT_STATE(liftHold, arg);
 case liftHold:
@@ -367,10 +367,12 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_1 -60
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
-#define LIFT_MOBILE_THRESHOLD 1100
+#define MOBILE_LIFT_CHECK_THRESHOLD 1700
+#define LIFT_MOBILE_THRESHOLD 1300
 
 unsigned long gMobileButtonTime;
 bool gMobileCheckLift;
+bool gMobileResetLift = false;
 
 void setMobile(word power)
 {
@@ -379,12 +381,18 @@ void setMobile(word power)
 
 void mobileClearLift()
 {
-	if (gMobileCheckLift && gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD)
+	if (gMobileResetLift = (gMobileCheckLift && gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD))
 	{
 		liftSet(liftToTarget, LIFT_MOBILE_THRESHOLD + 50);
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD && !TimedOut(timeout, "mobileClearLift")) sleep(10);
 	}
+}
+
+void mobileResetLift()
+{
+	if (gMobileResetLift)
+		liftSet(liftToTarget, LIFT_BOTTOM);
 }
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
@@ -394,26 +402,31 @@ case mobileIdle:
 	break;
 case mobileTop:
 {
-	mobileClearLift();
+	if (arg)
+		mobileClearLift();
 	setMobile(MOBILE_UP_POWER);
 	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
 	setMobile(15);
 	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
 	setMobile(MOBILE_UP_HOLD_POWER);
+	mobileResetLift();
 	break;
 }
 case mobileBottom:
 {
-	mobileClearLift();
+	if (arg && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
+		mobileClearLift();
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
 	setMobile(MOBILE_DOWN_HOLD_POWER);
+	mobileResetLift();
 	break;
 }
 case mobileBottomSlow:
 {
+	if (arg)
 	mobileClearLift();
 	//sPID pid;
 	//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
@@ -442,7 +455,7 @@ case mobileBottomSlow:
 	}
 	setMobile(0);
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
-	NEXT_STATE(mobileBottom, -1)
+	NEXT_STATE(mobileBottom, 0)
 }
 case mobileUpToMiddle:
 {
@@ -454,11 +467,13 @@ case mobileUpToMiddle:
 }
 case mobileDownToMiddle:
 {
-	mobileClearLift();
+	if (arg)
+		mobileClearLift();
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long timeout = nPgmTime + 1000;
 	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 	setMobile(15);
+	mobileResetLift();
 	NEXT_STATE(mobileMiddle, -1)
 }
 case mobileMiddle:
@@ -474,7 +489,7 @@ void handleMobile()
 			mobileSet(mobileTop);
 		if (RISING(BTN_MOBILE_MIDDLE))
 		{
-			mobileSet(mobileBottomSlow);
+			mobileSet(mobileBottom);
 			gMobileButtonTime = nPgmTime;
 		}
 	}
@@ -482,16 +497,16 @@ void handleMobile()
 	{
 		if (RISING(BTN_MOBILE_TOGGLE))
 		{
-			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottomSlow : mobileTop);
+			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
 			gMobileButtonTime = nPgmTime;
 		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
 		if (FALLING(BTN_MOBILE_TOGGLE) || FALLING(BTN_MOBILE_MIDDLE))
 			gMobileButtonTime = 0;
-		if ((gJoy[BTN_MOBILE_TOGGLE].cur || gJoy[BTN_MOBILE_MIDDLE].cur) && mobileState == mobileBottomSlow && gMobileButtonTime && nPgmTime - gMobileButtonTime > 250)
+		if ((gJoy[BTN_MOBILE_TOGGLE].cur || gJoy[BTN_MOBILE_MIDDLE].cur) && mobileState == mobileBottom && gMobileButtonTime && nPgmTime - gMobileButtonTime > 250)
 		{
-			mobileSet(mobileBottom);
+			mobileSet(mobileBottomSlow, 0);
 			gMobileButtonTime = 0;
 		}
 	}
