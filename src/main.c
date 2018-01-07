@@ -176,32 +176,16 @@ void handleLift()
 
 
 /* Arm */
-typedef enum _tArmStates { // it used to be sArmStates. Isn't that only use for structs???
+typedef enum _tArmStates {
 	armManaged,
 	armIdle,
 	armManual,
-	armPlainPID,
-	armRaise,
-	armLower,
-	armHold,
-	armHorizontal
+	armToTarget,
+	armHold
 } tArmStates;
-
-#define ARM_UP_KP 0.25
-#define ARM_DOWN_KP 0.25
-#define ARM_POSITIONS (ARR_LEN(gArmPositions) - 1)
 
 #define ARM_TOP 1900
 #define ARM_BOTTOM  115
-
-short gArmPositions[] = { 130, 750, 1950 };
-word gArmHoldPower[] = { -12, 0, 10 };
-short gArmPosition = 2;
-short gArmTarget;
-//sArmStates gArmState = armIdle;
-unsigned long gArmStart;
-sPID gArmPID;
-sPID* gArmPIDInUse = &gArmPID;
 
 void setArm(word power, bool debug = false)
 {
@@ -215,110 +199,60 @@ MAKE_MACHINE(arm, tArmStates, armIdle,
 case armIdle:
 	setArm (0);
 	break;
-case armManual:
+case armToTarget:
+{
+	if (arg != -1)
 	{
-		word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
-		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
-		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
-		setArm(value);
-		break;
-	}
-case armPlainPID:
-	{
-		int value = gSensor[armPoti].value;
-		if (gArmTarget >= ARM_TOP && value >= ARM_TOP)
+		const float kP_vel = 1.0;
+		const float kP_pwr = 1.0;
+		int err;
+		velocityClear(armPoti);
+		sCycleData cycle;
+		initCycle(cycle, 10, "armToTarget");
+		do
 		{
-			writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
-			NEXT_STATE (armHold, -1);
-		}
-		else if (gArmTarget <= ARM_BOTTOM && value <= ARM_BOTTOM)
-		{
-			writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
-			NEXT_STATE (armHold, -1);
-		}
-		else
-		{
-			pidCalculate(gArmPID, (float)gArmTarget, (float)value);
-			setArm((word)gArmPID.output);
-		}
-		break;
-	}
-case armRaise:
-	{
-		if (gSensor[armPoti].value >= gArmTarget)
-		{
-			writeDebugStreamLine("Arm raise: %d", nPgmTime - gArmStart);
-			NEXT_STATE (armHold, -1);
-		}
-		else setArm(127);
-		break;
-	}
-case armLower:
-	{
-		if (gSensor[armPoti].value <= gArmTarget)
-		{
-			writeDebugStreamLine("Arm lower: %d", nPgmTime - gArmStart);
-			NEXT_STATE (armHold, -1);
-		}
-		else setArm(-127);
-		break;
-	}
-case armHold:
-	{
-		if( gArmPosition == 1 )
-		{
-			if( gSensor[armPoti].value < 1700 )
-				setArm(15);
-			else
-				setArm(9);
-		}
-		else
-		{
-			setArm(gArmHoldPower[gArmPosition]);
-		}
-
-		//setArm(gArmPosition == 1 ? gSensor[armPoti].value < 1700 ? 15 : 9 : gArmHoldPower[gArmPosition]);
-		break;
-	}
-case armHorizontal:
-	{
-		int value = gSensor[armPoti].value;
-		if (abs(gArmTarget - value) < 400)
-		{
+			err = (int)(arg - gSensor[armPoti].value);
 			velocityCheck(armPoti);
 			if (gSensor[armPoti].velGood)
-			{
-				int power = 10 - gSensor[armPoti].velocity / 2;
-				setArm(LIM_TO_VAL(power, 15));
-			}
-		}
-		else if (value > gArmTarget) setArm(-127);
-		else setArm(127);
-		break;
+				setLift((word)(kP_pwr * (kP_vel * err - gSensor[armPoti].velocity)));
+			endCycle(cycle);
+		} while (abs(err) > 50);
 	}
+	NEXT_STATE(armHold, arg);
+}
+case armHold:
+{
+	if (arg == -1) arg = gSensor[armPoti].value;
+	const float kP = 0.2;
+	sCycleData cycle;
+	initCycle(cycle, 10, "armHold");
+	while (true)
+	{
+		float power = (arg - gSensor[armPoti].value) * kP;
+		LIM_TO_VAL_SET(power, 10);
+		setArm((word)power);
+		endCycle(cycle);
+	}
+}
 })
 
 void handleArm()
 {
 	if (RISING(JOY_ARM))
 	{
-		armSet (armManual);
+		armSet(armManual);
 	}
-	if (FALLING(JOY_ARM) && gArmState == armManual)
+	if (FALLING(JOY_ARM) && armState == armManual)
 	{
-		if (gSensor[armPoti].value <= ARM_BOTTOM) gArmPosition = 0;
-		else if (gSensor[armPoti].value >= ARM_TOP) gArmPosition = 2;
-		else gArmPosition = 1;
-		armSet (armHold);
+		armSet(armHold);
 	}
-	if (RISING(BTN_ARM_DOWN))
+
+	if (armState == armManual)
 	{
-		armSet (armLower);
-
-		gArmPosition = 0;
-
-		gArmTarget = gArmPositions[gArmPosition];
-		gArmStart = nPgmTime;
+		word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
+		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
+		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
+		setArm(value);
 	}
 }
 
@@ -556,7 +490,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		if (gKillDriveOnTimeout) setDrive(0, 0);
 		updateMotors();
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
-		gArmState= armHold;
+		armReset();
 		liftReset();
 		gDriveManual = true;
 		int current = nCurrentTask;
@@ -573,27 +507,6 @@ bool TimedOut(unsigned long timeOut, const string description)
 		return false;
 }
 
-bool gArmDown;
-void dropArm()
-{
-	unsigned long armTimeOut;
-	gArmDown = false;
-	setArm(-127,true);
-	armTimeOut = nPgmTime + 700;
-	while (gSensor[armPoti].value > ARM_BOTTOM  + 700 && !TimedOut(armTimeOut, "dropArm")) sleep(10);
-	setArm(30,true);
-	sleep(60);
-	setArm(-90,true);
-	sleep(100);
-	setArm(-15,true);
-	sleep(120);
-	gArmDown = true;
-	gArmState = armHold;
-	gArmPosition = 0;
-}
-
-NEW_ASYNC_VOID_0(dropArm);
-
 //int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
 float gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
 //////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
@@ -604,12 +517,11 @@ void clearArm()
 	unsigned long timeout = nPgmTime + 1500;
 	while (liftState == liftToTarget && !TimedOut(timeout, "clear 1")) sleep(10);
 
-	gArmState = armManaged;
+	armSet(armManaged);
 	setArm(127);
 	timeout = nPgmTime + 1500;
-	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(timeout, "clear 2")) sleep(10);
-	gArmPosition = 2;
-	gArmState = armHold;
+	while (gSensor[armPoti].value < ARM_TOP && !TimedOut(timeout, "clear 2")) sleep(10);
+	armSet(armHold);
 }
 
 NEW_ASYNC_VOID_0(clearArm);
@@ -995,8 +907,8 @@ bool cancel()
 {
 	if (stackKill() || stackFromLoaderKill() || stackExternalKill())
 		return false;
-	liftSet(liftIdle);
-	gArmState = armIdle;
+	liftReset();
+	armReset();
 	gDriveManual = true;
 	writeDebugStreamLine("Stack cancelled");
 	return true;
@@ -1128,8 +1040,6 @@ void startup()
 	gJoy[JOY_LIFT].deadzone = DZ_LIFT;
 	gJoy[JOY_ARM].deadzone = DZ_ARM;
 
-	pidInit(gArmPID, 0.2, 0.001, 0.0, 50, 150, 5, 127);
-
 	enableJoystick(JOY_TURN);
 	enableJoystick(JOY_THROTTLE);
 	enableJoystick(JOY_LIFT);
@@ -1210,9 +1120,7 @@ void usercontrol()
 
 		mobileSet(mobileTop);
 
-		gArmPosition = 2;
-		gArmTarget = gArmPositions[2];
-		gArmState = armHold;
+		armSet(armHold);
 	}
 
 	gKillDriveOnTimeout = false;
@@ -1248,7 +1156,6 @@ ASYNC_ROUTINES
 (
 USE_ASYNC(autonomous)
 USE_ASYNC(usercontrol)
-USE_ASYNC(dropArm)
 USE_ASYNC(stack)
 USE_ASYNC(stackFromLoader)
 USE_ASYNC(stackExternal)
@@ -1258,6 +1165,7 @@ USE_ASYNC(autoSafetyTask)
 USE_ASYNC(moveToTarget)
 USE_ASYNC(turnToAngle)
 USE_ASYNC(turnToTarget)
-USE_MACHINE(mobile)
 USE_MACHINE(lift)
+USE_MACHINE(arm)
+USE_MACHINE(mobile)
 )
