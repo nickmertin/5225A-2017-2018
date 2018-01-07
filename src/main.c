@@ -105,9 +105,9 @@ void setLift(word power,bool debug=false)
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
-#define LIFT_TOP 5225
-#define LIFT_BOTTOM 5225
-#define LIFT_MID 5225
+#define LIFT_TOP 3150
+#define LIFT_BOTTOM 1050
+#define LIFT_MID 1900
 
 #define LIFT_MID_HEIGHT 22.5
 #define LIFT_ARM_LEN 9
@@ -439,7 +439,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		updateMotors();
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
 		gArmState= armHold;
-		liftSet(liftHold);
+		liftReset();
 		gDriveManual = true;
 		int current = nCurrentTask;
 		while (true)
@@ -998,6 +998,7 @@ void startup()
 	tInit();
 
 	mobileSetup();
+	liftSetup();
 
 	setupInvertedSen(jmpSkills);
 
