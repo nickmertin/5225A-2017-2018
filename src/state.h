@@ -15,6 +15,7 @@ states machine##State = -1; \
 void machine##Internal(states state, long arg) \
 { \
 	top: \
+	writeDebugStreamLine(#machine " %d -> %d", machine##State, state); \
 	switch (machine##State = state) \
 	handler \
 } \
@@ -29,7 +30,6 @@ void machine##Setup() \
 void machine##Set(states state, long arg = -1) \
 { \
 	machine##InternalKill(); \
-	writeDebugStreamLine(#machine " %d -> %d", machine##State, state); \
 	machine##InternalAsync(state, arg); \
 } \
 void machine##Reset() \
