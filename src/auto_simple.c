@@ -96,14 +96,14 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	{
 		case cw:
 			setDrive(left, -right);
-			while (gPosition.a < a - gVelocity.a * 0.549) sleep(1);
+			while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
 			writeDebugStreamLine("%f", gVelocity.a);
 
-			const float target = 1.000, kP = 17, kI = 0.05;
+			const float target = 0.900, kP = 17, kI = 0.05;
 
 			unsigned long time = nPgmTime, lstTime = time, nextDebug = 0;
 			float input = gVelocity.a, power = 0, error = 0, lstError, integral = 0;
-			while (gPosition.a < a + degToRad(-4.7 + (1 - gVelocity.a) * 5) || gVelocity.a > 1.2)
+			while (gPosition.a < a + degToRad(-5.3 + (target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
 			{
 				unsigned long deltaTime = time - lstTime;
 				float vel = gVelocity.a;
@@ -120,7 +120,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 
 					power = error * kP + integral * kI;
 
-					power += 29;
+					power += 26;
 
 					if (power < 0) power /= 6.0;
 
@@ -131,7 +131,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 
 					if (time >= nextDebug)
 					{
-						writeDebugStreamLine("%f %f %f", power, input, integral);
+						writeDebugStreamLine("%f %f %f", power, error, integral);
 						nextDebug = time + 20;
 					}
 
