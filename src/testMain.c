@@ -75,7 +75,7 @@ typedef enum _sLiftStates
 }sLiftStates;
 
 #define LIFT_TOP 1475
-#define LIFT_BOTTOM 0
+#define LIFT_BOTTOM -190
 int gLiftPositions[] = {0, 265, 1475};
 
 #define LIFT_RAISING_POWER 127
@@ -83,9 +83,9 @@ int gLiftPositions[] = {0, 265, 1475};
 
 sLiftStates gLiftState = liftIdle;
 
-void setLift(word speed)
+void setLift(word power)
 {
-	gMotor[scissorLeft].power = gMotor[scissorRight].power = speed;
+	gMotor[scissorLeft].power = gMotor[scissorRight].power = power;
 }
 
 //void handleLift ()
@@ -116,15 +116,15 @@ void liftToPos (int target, int offset = 0)
 {
 	if (gLiftPos < target)
 	{
-		writeDebugStreamLine("Lift Raising");
+		writeDebugStreamLine ("Lift raising from pos %d to %d", gSensor[scissorEnc].value, gLiftPositions[target] + offset)
 		setLift(LIFT_RAISING_POWER);
 		while (gSensor[scissorEnc].value < gLiftPositions[target] + offset) sleep(10);
 	}
 	else if (gLiftPos > target)
 	{
-		writeDebugStreamLine("Lift Lowering");
+		writeDebugStreamLine ("Lift lowering from pos %d to %d", gSensor[scissorEnc].value, target == -1 ? LIFT_BOTTOM + offset : gLiftPositions[target] + offset)
 		setLift(LIFT_LOWERING_POWER);
-		while (gSensor[scissorEnc].value > gLiftPositions[target] + offset) sleep(10);
+		while (target == -1 ? gSensor[scissorEnc].value > LIFT_BOTTOM + offset : gSensor[scissorEnc].value > gLiftPositions[target] + offset) sleep(10);
 	}
 	writeDebugStreamLine ("Lift pos: %d", gSensor[scissorEnc].value);
 	setLift(0);
@@ -177,6 +177,40 @@ void openClaw (bool open)
 	setClaw( open ? CLAW_OPEN_POWER : CLAW_CLOSE_POWER );
 	wait1Msec(CLAW_WAIT);
 	setClaw(0);
+}
+
+#define WRIST_BOTTOM 2048
+#define WRIST_TOP 4048
+#define WRIST_90 3350
+
+int gWristPos = WRIST_BOTTOM;
+
+void setWrist (word power)
+{
+	gMotor[wrist].power = power;
+}
+
+void wristToPos (int target, int offset = 0)
+{
+	if (target > gWristPos)
+	{
+		writeDebugStreamLine ("Wrist raising from pos %d to %d", gSensor[wristPoti].value, target + offset);
+		setWrist (127);
+		while (gSensor[wristPoti].value < target + offset - 200) sleep (10);
+		setWrist (80);
+		while (gSensor[wristPoti].value < target + offset) sleep (10);
+	}
+	else
+	{
+		writeDebugStreamLine ("Wrist lowering from pos %d to %d", gSensor[wristPoti].value, target + offset);
+		setWrist (-127);
+		while (gSensor[wristPoti].value > target + offset - 200) sleep (10);
+		setWrist (-80);
+		while (gSensor[wristPoti].value > target + offset) sleep (10);
+	}
+	setWrist (0);
+	gWristPos = gSensor[wristPoti].value;
+	writeDebugStreamLine ("Wrist Pos: %d", gSensor[wristPoti].value);
 }
 
 bool TimedOut(unsigned long timeOut, const string description)
