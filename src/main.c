@@ -335,6 +335,7 @@ typedef enum _tMobileStates {
 	mobileIdle,
 	mobileTop,
 	mobileBottom,
+	mobileBottomSlow,
 	mobileUpToMiddle,
 	mobileDownToMiddle,
 	mobileMiddle,
@@ -352,6 +353,10 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_POWER -127
 #define MOBILE_UP_HOLD_POWER 10
 #define MOBILE_DOWN_HOLD_POWER -10
+#define MOBILE_DOWN_SLOW_POWER_1 -60
+#define MOBILE_DOWN_SLOW_POWER_2 6
+
+unsigned long gMobileButtonTime;
 
 void setMobile(word power)
 {
@@ -376,6 +381,26 @@ case mobileBottom:
 	setMobile(MOBILE_DOWN_POWER);
 	unsigned long timeout = nPgmTime + 2000;
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
+	setMobile(MOBILE_DOWN_HOLD_POWER);
+	break;
+}
+case mobileBottomSlow:
+{
+	sPID pid;
+	pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
+	unsigned long timeout = nPgmTime + 2000;
+	//setMobile(-60);
+	//while (gSensor[mobilePoti].value > MOBILE_TOP - 600) sleep(10);
+	sCycleData cycle;
+	initCycle(cycle, 10, "mobileBottomSlow");
+	const float kP = 0.02;
+	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 1"))
+	{
+		//setMobile((MOBILE_BOTTOM - gSensor[mobilePoti].value) * kP);
+		pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
+		setMobile((word)pid.output);
+		endCycle(cycle);
+	}
 	setMobile(MOBILE_DOWN_HOLD_POWER);
 	break;
 }
@@ -411,6 +436,8 @@ void handleMobile()
 	}
 	else
 	{
+		if (RISING(BTN_MOBILE_SLOW))
+			mobileSet(mobileBottomSlow);
 		if (RISING(BTN_MOBILE_TOGGLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
 		if (RISING(BTN_MOBILE_MIDDLE))
@@ -1025,6 +1052,7 @@ void startup()
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MOBILE_BRAKES);
+	enableJoystick(BTN_MOBILE_SLOW);
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_CLEAR);
 	enableJoystick(BTN_MACRO_STACK);
