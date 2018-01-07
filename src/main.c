@@ -60,6 +60,8 @@ bool TimedOut(unsigned long timeOut, const string description);
 //#define DEBUG_TRACKING
 #define TRACK_IN_DRIVER
 
+#define LIFT_SLOW_DRIVE_THRESHOLD 1200
+
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -85,7 +87,16 @@ void handleDrive()
 		if (!a && abs(gVelocity.a) > 0.2)
 			a = -6 * sgn(gVelocity.a);
 
-		setDrive(y + a, y - a);
+		word l = y + a;
+		word r = y - a;
+
+		if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
+		{
+			LIM_TO_VAL_SET(l, 40);
+			LIM_TO_VAL_SET(r, 40);
+		}
+
+		setDrive(l, r);
 	}
 }
 
