@@ -443,16 +443,27 @@ void handleMobile()
 		if (RISING(BTN_MOBILE_TOGGLE))
 			mobileSet(mobileTop);
 		if (RISING(BTN_MOBILE_MIDDLE))
-			mobileSet(mobileBottom);
+		{
+			mobileSet(mobileBottomSlow);
+			gMobileButtonTime = nPgmTime;
+		}
 	}
 	else
 	{
-		if (RISING(BTN_MOBILE_SLOW))
-			mobileSet(mobileBottomSlow);
 		if (RISING(BTN_MOBILE_TOGGLE))
-			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
+		{
+			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottomSlow : mobileTop);
+			gMobileButtonTime = nPgmTime;
+		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
+		if (FALLING(BTN_MOBILE_TOGGLE) || FALLING(BTN_MOBILE_MIDDLE))
+			gMobileButtonTime = 0;
+		if ((gJoy[BTN_MOBILE_TOGGLE].cur || gJoy[BTN_MOBILE_MIDDLE].cur) && mobileState == mobileBottomSlow && gMobileButtonTime && nPgmTime - gMobileButtonTime > 250)
+		{
+			mobileSet(mobileBottom);
+			gMobileButtonTime = 0;
+		}
 	}
 }
 
@@ -1063,7 +1074,6 @@ void startup()
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MOBILE_BRAKES);
-	enableJoystick(BTN_MOBILE_SLOW);
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_CLEAR);
 	enableJoystick(BTN_MACRO_STACK);

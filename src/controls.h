@@ -17,7 +17,6 @@
 #define BTN_MOBILE_TOGGLE Btn6U
 #define BTN_MOBILE_MIDDLE Btn6D
 #define BTN_MOBILE_BRAKES Btn5D
-#define BTN_MOBILE_SLOW Btn5U
 
 /* Macros */
 #define BTN_MACRO_ZERO Btn7D
