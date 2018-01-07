@@ -474,7 +474,7 @@ case mobileDownToMiddle:
 	unsigned long timeout = nPgmTime + 1000;
 	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 	setMobile(15);
-	mobileResetLift();
+	//mobileResetLift();
 	NEXT_STATE(mobileMiddle, -1)
 }
 case mobileMiddle:
