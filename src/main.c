@@ -413,8 +413,7 @@ case mobileBottomSlow:
 	}
 	setMobile(0);
 	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
-	setMobile(MOBILE_DOWN_HOLD_POWER);
-	break;
+	NEXT_STATE(mobileBottom, -1)
 }
 case mobileUpToMiddle:
 {
