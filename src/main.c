@@ -155,34 +155,23 @@ case liftToTarget:
 	NEXT_STATE(liftHold, arg);
 case liftHold:
 	if (arg == -1) arg = gSensor[liftPoti].value;
-<<<<<<< HEAD
-	{
-		sCycleData cycle;
-		initCycle(cycle, 10, "liftHold");
-		while (true)
-		{
-			setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
-			endCycle(cycle);
-		}
-	}
-=======
+
 	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
 		NEXT_STATE(liftHoldDown, arg);
-//{
-//	sCycleData cycle;
-//	initCycle(cycle, 10, "liftHold");
-//	while (true)
-//	{
-//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
-//		endCycle(cycle);
-//	}
-//}
+	//{
+	//	sCycleData cycle;
+	//	initCycle(cycle, 10, "liftHold");
+	//	while (true)
+	//	{
+	//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+	//		endCycle(cycle);
+	//	}
+	//}
 	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 3276)));
 	break;
 case liftHoldDown:
 	setLift(-10);
 	break;
->>>>>>> master
 })
 
 void handleLift()
@@ -233,40 +222,40 @@ case armIdle:
 	setArm (0);
 	break;
 case armToTarget:
-{
-	if (arg != -1)
 	{
-		const float kP_vel = 1.0;
-		const float kP_pwr = 1.0;
-		int err;
-		velocityClear(armPoti);
-		sCycleData cycle;
-		initCycle(cycle, 10, "armToTarget");
-		do
+		if (arg != -1)
 		{
-			err = (int)(arg - gSensor[armPoti].value);
-			velocityCheck(armPoti);
-			if (gSensor[armPoti].velGood)
-				setLift((word)(kP_pwr * (kP_vel * err - gSensor[armPoti].velocity)));
-			endCycle(cycle);
-		} while (abs(err) > 50);
+			const float kP_vel = 1.0;
+			const float kP_pwr = 1.0;
+			int err;
+			velocityClear(armPoti);
+			sCycleData cycle;
+			initCycle(cycle, 10, "armToTarget");
+			do
+			{
+				err = (int)(arg - gSensor[armPoti].value);
+				velocityCheck(armPoti);
+				if (gSensor[armPoti].velGood)
+					setArm((word)(kP_pwr * (kP_vel * err - gSensor[armPoti].velocity)));
+				endCycle(cycle);
+			} while (abs(err) > 50);
+		}
+		NEXT_STATE(armHold, arg);
 	}
-	NEXT_STATE(armHold, arg);
-}
 case armHold:
-{
-	if (arg == -1) arg = gSensor[armPoti].value;
-	const float kP = 0.2;
-	sCycleData cycle;
-	initCycle(cycle, 10, "armHold");
-	while (true)
 	{
-		float power = (arg - gSensor[armPoti].value) * kP;
-		LIM_TO_VAL_SET(power, 10);
-		setArm((word)power);
-		endCycle(cycle);
+		if (arg == -1) arg = gSensor[armPoti].value;
+		const float kP = 0.2;
+		sCycleData cycle;
+		initCycle(cycle, 10, "armHold");
+		while (true)
+		{
+			float power = (arg - gSensor[armPoti].value) * kP;
+			LIM_TO_VAL_SET(power, 10);
+			setArm((word)power);
+			endCycle(cycle);
+		}
 	}
-}
 })
 
 void handleArm()
@@ -470,80 +459,62 @@ case mobileIdle:
 	setMobile(0);
 	break;
 case mobileTop:
-<<<<<<< HEAD
 	{
+		if (arg)
+			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 2000;
-		while (gSensor[mobilePoti].value < MOBILE_TOP && !TimedOut(timeout, "mobileTop")) sleep(10);
+		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
+		setMobile(15);
+		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
 		setMobile(MOBILE_UP_HOLD_POWER);
+		mobileResetLift();
 		break;
 	}
 case mobileBottom:
 	{
+		if (arg && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
+			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 2000;
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
 		setMobile(MOBILE_DOWN_HOLD_POWER);
+		mobileResetLift();
 		break;
 	}
-=======
-{
-	if (arg)
-		mobileClearLift();
-	setMobile(MOBILE_UP_POWER);
-	unsigned long timeout = nPgmTime + 2000;
-	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
-	setMobile(15);
-	while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
-	setMobile(MOBILE_UP_HOLD_POWER);
-	mobileResetLift();
-	break;
-}
-case mobileBottom:
-{
-	if (arg && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
-		mobileClearLift();
-	setMobile(MOBILE_DOWN_POWER);
-	unsigned long timeout = nPgmTime + 2000;
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
-	setMobile(MOBILE_DOWN_HOLD_POWER);
-	mobileResetLift();
-	break;
-}
 case mobileBottomSlow:
-{
-	if (arg)
-	mobileClearLift();
-	//sPID pid;
-	//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
-	velocityClear(mobilePoti);
-	unsigned long timeout = nPgmTime + 3000;
-	setMobile(-50);
-	while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, "mobileBottomSlow 1")) sleep(10);
-	sCycleData cycle;
-	initCycle(cycle, 10, "mobileBottomSlow");
-	//const float kP = 0.02;
-	const float kP_vel = 0.001;
-	const float kP_pwr = 3.0;
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, "mobileBottomSlow 2"))
 	{
-		//setMobile((MOBILE_BOTTOM - gSensor[mobilePoti].value) * kP);
-		//pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
-		//setMobile((word)pid.output);
-		velocityCheck(mobilePoti);
-		if (gSensor[mobilePoti].velGood)
+		if (arg)
+			mobileClearLift();
+		//sPID pid;
+		//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
+		velocityClear(mobilePoti);
+		unsigned long timeout = nPgmTime + 3000;
+		setMobile(-50);
+		while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, "mobileBottomSlow 1")) sleep(10);
+		sCycleData cycle;
+		initCycle(cycle, 10, "mobileBottomSlow");
+		//const float kP = 0.02;
+		const float kP_vel = 0.001;
+		const float kP_pwr = 3.0;
+		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, "mobileBottomSlow 2"))
 		{
-			float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
-			LIM_TO_VAL_SET(power, 10);
-			setMobile((word)power);
+			//setMobile((MOBILE_BOTTOM - gSensor[mobilePoti].value) * kP);
+			//pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
+			//setMobile((word)pid.output);
+			velocityCheck(mobilePoti);
+			if (gSensor[mobilePoti].velGood)
+			{
+				float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
+				LIM_TO_VAL_SET(power, 10);
+				setMobile((word)power);
+			}
+			endCycle(cycle);
 		}
-		endCycle(cycle);
+		setMobile(0);
+		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
+		NEXT_STATE(mobileBottom, 0)
 	}
-	setMobile(0);
-	while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
-	NEXT_STATE(mobileBottom, 0)
-}
->>>>>>> master
 case mobileUpToMiddle:
 	{
 		setMobile(MOBILE_UP_POWER);
@@ -553,26 +524,16 @@ case mobileUpToMiddle:
 		NEXT_STATE(mobileMiddle, -1)
 	}
 case mobileDownToMiddle:
-<<<<<<< HEAD
 	{
+		if (arg)
+			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 		setMobile(15);
+		//mobileResetLift();
 		NEXT_STATE(mobileMiddle, -1)
 	}
-=======
-{
-	if (arg)
-		mobileClearLift();
-	setMobile(MOBILE_DOWN_POWER);
-	unsigned long timeout = nPgmTime + 1000;
-	while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
-	setMobile(15);
-	//mobileResetLift();
-	NEXT_STATE(mobileMiddle, -1)
-}
->>>>>>> master
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
 	NEXT_STATE(mobileTop, -1)
