@@ -83,7 +83,7 @@ void handleDrive()
 		short y = gJoy[JOY_THROTTLE].cur;
 		short a = gJoy[JOY_TURN].cur;
 
-		if (!a && abs(gVelocity.a) > 0.2)
+		if (!a && abs(gVelocity.a) > 0.5)
 			a = -6 * sgn(gVelocity.a);
 
 		setDrive(y + a, y - a);
