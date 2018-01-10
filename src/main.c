@@ -243,7 +243,7 @@ case armToTarget:
 					power = kP_pwr * (targ - gSensor[armPoti].velocity);
 					setArm((word) power);
 				}
-				writeDebugStreamLine ("target speed: %d, final speed: %d", targ, power);
+				writeDebugStreamLine ("target speed: %f, final speed: %f", targ, power);
 				endCycle(cycle);
 			} while (abs(err) > 50);
 		}
