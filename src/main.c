@@ -243,10 +243,11 @@ case armToTarget:
 					power = kP_pwr * (targ - gSensor[armPoti].velocity);
 					setArm((word) power);
 				}
-				endCycle(cycle);
 				writeDebugStreamLine ("target speed: %d, final speed: %d", targ, power);
+				endCycle(cycle);
 			} while (abs(err) > 50);
 		}
+		writeDebugStreamLine("Arm at target: %d %d", arg, gSensor[armPoti].value);
 		NEXT_STATE(armHold, arg);
 	}
 case armHold:
@@ -267,6 +268,8 @@ case armHold:
 
 void handleArm()
 {
+	if (armState == armManaged ) return;
+
 	if (RISING(JOY_ARM))
 	{
 		armSet(armManual);
