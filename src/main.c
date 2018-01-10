@@ -228,6 +228,8 @@ case armToTarget:
 			const float kP_vel = 1.0;
 			const float kP_pwr = 1.0;
 			int err;
+			float targ;
+			float power;
 			velocityClear(armPoti);
 			sCycleData cycle;
 			initCycle(cycle, 10, "armToTarget");
@@ -236,8 +238,13 @@ case armToTarget:
 				err = (int)(arg - gSensor[armPoti].value);
 				velocityCheck(armPoti);
 				if (gSensor[armPoti].velGood)
-					setArm((word)(kP_pwr * (kP_vel * err - gSensor[armPoti].velocity)));
+				{
+					targ = kP_vel * err;
+					power = kP_pwr * (targ - gSensor[armPoti].velocity);
+					setArm((word) power);
+				}
 				endCycle(cycle);
+				writeDebugStreamLine ("target speed: %d, final speed: %d", targ, power);
 			} while (abs(err) > 50);
 		}
 		NEXT_STATE(armHold, arg);
