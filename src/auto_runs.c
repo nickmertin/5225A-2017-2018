@@ -25,7 +25,7 @@ void runAuto()
 	liftToPos (1, -60);
 
 	//3 shake and back up from mogo
-	resetPositionFull(gPosition, 10, 60, 180);
+	resetPositionFull(gPosition, 10, 70, 180);
 	for (byte x = 0; x < 2; x++)
 	{
 		//right shake
@@ -40,10 +40,11 @@ void runAuto()
 		setDrive(0,0);
 	}
 	//back up
-	moveToTargetSimple (40, 60, -80, 0, stopSoft | stopHarsh, true);
+	moveToTargetSimple (40, 70, -80, 0, stopSoft | stopHarsh, true);
+	//resetPositionFull(gPosition, 40, 60, 160);
 
 	//4 go to mogo
-	turnToAngle(0, ccw, 127, 127, true, true);
-
+	turnToTarget(95, 96, ccw, 127, 127, true, true, 0);
+	moveToTarget (95, 105, 127, 1.5, 1, 1, true, true);
 
 }
