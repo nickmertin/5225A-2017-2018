@@ -207,7 +207,8 @@ typedef enum _tArmStates {
 } tArmStates;
 
 #define ARM_TOP 3200
-#define ARM_BOTTOM  550
+#define ARM_BOTTOM 550
+#define ARM_PRESTACK 1900
 
 void setArm(word power, bool debug = false)
 {
