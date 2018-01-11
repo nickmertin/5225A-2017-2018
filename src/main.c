@@ -11,7 +11,7 @@
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           driveL1,       tmotorVex393TurboSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port4,           driveL2,       tmotorVex393TurboSpeed_MC29, openLoop)
-#pragma config(Motor,  port5,           arm,           tmotorVex393HighSpeed_MC29, openLoop)
+#pragma config(Motor,  port5,           arm,           tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port6,           mobile,        tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port7,           driveR2,       tmotorVex393TurboSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           driveR1,       tmotorVex393TurboSpeed_MC29, openLoop)
@@ -206,8 +206,8 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define ARM_TOP 1900
-#define ARM_BOTTOM  115
+#define ARM_TOP 3200
+#define ARM_BOTTOM  550
 
 void setArm(word power, bool debug = false)
 {
@@ -1251,7 +1251,7 @@ void usercontrol()
 
 		handleDrive();
 		handleLift();
-		//handleArm();
+		handleArm();
 		handleMobile();
 		//handleMacros();
 
