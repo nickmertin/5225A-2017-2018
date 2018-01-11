@@ -170,7 +170,7 @@ case liftHold:
 	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 3276)));
 	break;
 case liftHoldDown:
-	setLift(-10);
+	setLift(-15);
 	break;
 })
 
