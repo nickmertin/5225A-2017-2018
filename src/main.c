@@ -142,10 +142,12 @@ case liftToTarget:
 	float target = gLiftTarget;
 	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
 	const float kP_vel = 0.006;
+	const float kI_vel = 0.000001;
 	bool up = target > last;
 	float kP_pwr = up ? 2500.0 : 6000.0;
 	float err;
 	float vel;
+	float integral = 0;
 	sleep(20);
 	sCycleData cycle;
 	initCycle(cycle, 20, "liftToTarget");
@@ -154,7 +156,11 @@ case liftToTarget:
 		float cur = LIFT_HEIGHT(gSensor[liftPoti].value);
 		vel = (cur - last) / cycle.period;
 		err = target - cur;
-		float power = kP_pwr * (kP_vel * err - vel);
+		if (fabs(err) < 3.0)
+			integral += err * cycle.period;
+		else
+			integral = 0;
+		float power = kP_pwr * (kP_vel * err + kI_vel * integral - vel);
 		if (sgn(power) == -sgn(vel)) power = 0;//power *= 0.01;
 		LIM_TO_VAL_SET(power, 127);
 		setLift((word)power);
