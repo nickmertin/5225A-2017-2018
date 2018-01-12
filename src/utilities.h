@@ -20,6 +20,8 @@
 
 #define NORMAL_RAD(a) (fmod(a + PI, PI * 2) - PI)
 
+#define REINTERPRET(var, type) (*(type *)&var)
+
 #define STOP_TASK_NOT_CUR(t) if (t != nCurrentTask) stopTask(t)
 
 /* Functions */
