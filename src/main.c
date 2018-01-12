@@ -107,6 +107,7 @@ typedef enum _tLiftStates {
 	liftIdle,
 	liftManual,
 	liftToTarget,
+	liftStopping,
 	liftHold,
 	liftHoldDown
 } tLiftStates;
@@ -137,30 +138,57 @@ case liftIdle:
 	break;
 case liftToTarget:
 {
+	unsigned long begin = nPgmTime;
 	float target = gLiftTarget;
-	const float kP_vel = 1.0;
-	const float kP_pwr = 1.0;
-	int err;
 	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
-	sleep(10);
+	const float kP_vel = 0.006;
+	bool up = target > last;
+	float kP_pwr = up ? 2500.0 : 6000.0;
+	float err;
+	float vel;
+	sleep(20);
 	sCycleData cycle;
-	initCycle(cycle, 10, "liftToTarget");
+	initCycle(cycle, 20, "liftToTarget");
 	do
 	{
 		float cur = LIFT_HEIGHT(gSensor[liftPoti].value);
-		float vel = (cur - last) / cycle.period;
-		err = (int)(target - cur);
-		setLift((word)(kP_pwr * (kP_vel * err - vel)));
+		vel = (cur - last) / cycle.period;
+		err = target - cur;
+		float power = kP_pwr * (kP_vel * err - vel);
+		if (sgn(power) == -sgn(vel)) power = 0;//power *= 0.01;
+		LIM_TO_VAL_SET(power, 127);
+		setLift((word)power);
 		last = cur;
 		endCycle(cycle);
-	} while (abs(err) > 25);
-	writeDebugStreamLine("Lift at target: %f %f", arg, LIFT_HEIGHT(gSensor[liftPoti].value));
-	NEXT_STATE(liftHold, 0);
+	} while (up ? err > 20 * vel : err < 20 * vel);
+	writeDebugStreamLine("Lift at target: %f %f | %d ms", target, LIFT_HEIGHT(gSensor[liftPoti].value), nPgmTime - begin);
+	NEXT_STATE(liftStopping, 0);
+}
+case liftStopping:
+{
+	const float kP = -5.0;
+	velocityClear(liftPoti);
+	sCycleData cycle;
+	initCycle(cycle, 20, "liftStopping");
+	while (true)
+	{
+		velocityCheck(liftPoti);
+		if (gSensor[liftPoti].velGood)
+		{
+			if (fabs(gSensor[liftPoti].velocity) < 2.0)
+				break;
+			float power = kP * gSensor[liftPoti].velocity;
+			LIM_TO_VAL_SET(power, 12);
+			setLift((word)power);
+		}
+		endCycle(cycle);
+	}
+	NEXT_STATE(liftHold, arg);
 }
 case liftHold:
 {
 	float target = arg ? LIFT_HEIGHT(gSensor[liftPoti].value) : gLiftTarget;
-	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
+	if (target < LIFT_HOLD_DOWN_THRESHOLD)
 		NEXT_STATE(liftHoldDown, arg);
 	//{
 	//	sCycleData cycle;
@@ -171,7 +199,7 @@ case liftHold:
 	//		endCycle(cycle);
 	//	}
 	//}
-	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 2870)));
+	setLift(3 + (word)(4 * cos((target - LIFT_MID) * PI / 2870)));
 	break;
 }
 case liftHoldDown:
@@ -189,14 +217,20 @@ void handleLift()
 	}
 	if (FALLING(JOY_LIFT))
 	{
-		liftSet(liftHold);
+		liftSet(liftStopping);
+	}
+
+	if (RISING(BTN_LIFT_POS))
+	{
+		gLiftTarget = LIFT_MID;
+		liftSet(liftToTarget);
 	}
 
 	if (liftState == liftManual)
 	{
 		word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
-		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -10) value = -10;
-		if (gSensor[liftPoti].value >= LIFT_TOP && value > 10) value = 10;
+		if (LIFT_HEIGHT(gSensor[liftPoti].value) <= LIFT_BOTTOM && value < -10) value = -10;
+		if (LIFT_HEIGHT(gSensor[liftPoti].value) >= LIFT_TOP && value > 10) value = 10;
 		setLift(value);
 	}
 }
@@ -457,7 +491,8 @@ void mobileClearLift()
 {
 	if (gMobileResetLift = (gMobileCheckLift && gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD))
 	{
-		liftSet(liftToTarget, LIFT_MOBILE_THRESHOLD + 1.0);
+		gLiftTarget = LIFT_MOBILE_THRESHOLD + 1.0;
+		liftSet(liftToTarget);
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD && !TimedOut(timeout, "mobileClearLift")) sleep(10);
 	}
@@ -466,7 +501,10 @@ void mobileClearLift()
 void mobileResetLift()
 {
 	if (gMobileResetLift)
-		liftSet(liftToTarget, LIFT_BOTTOM);
+	{
+		gLiftTarget = LIFT_BOTTOM;
+		liftSet(liftToTarget);
+	}
 }
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
@@ -634,7 +672,8 @@ float gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LI
 
 void clearArm()
 {
-	liftSet(liftToTarget, gliftTargetA[gNumCones]);
+	gLiftTarget = gliftTargetA[gNumCones];
+	liftSet(liftToTarget);
 	unsigned long timeout = nPgmTime + 1500;
 	while (liftState == liftToTarget && !TimedOut(timeout, "clear 1")) sleep(10);
 
@@ -1165,6 +1204,7 @@ void startup()
 	enableJoystick(JOY_THROTTLE);
 	enableJoystick(JOY_LIFT);
 	enableJoystick(JOY_ARM);
+	enableJoystick(BTN_LIFT_POS);
 	enableJoystick(BTN_ARM_DOWN);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
