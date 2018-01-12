@@ -128,43 +128,38 @@ void setLift(word power,bool debug=false)
 #define LIFT_HEIGHT(pos) (LIFT_MID + 2 * LIFT_ARM_LEN * sin((pos - LIFT_MID_POS) * PI / 2870))
 #define LIFT_POS(height) (LIFT_MID_POS + asin((height - LIFT_MID) / (2 * LIFT_ARM_LEN)) * 2870 / PI)
 
+float gLiftTarget;
+
 MAKE_MACHINE(lift, tLiftStates, liftIdle,
 {
 case liftIdle:
 	setLift(0);
 	break;
 case liftToTarget:
-	if (arg != -1)
+{
+	float target = gLiftTarget;
+	const float kP_vel = 1.0;
+	const float kP_pwr = 1.0;
+	int err;
+	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
+	sleep(10);
+	sCycleData cycle;
+	initCycle(cycle, 10, "liftToTarget");
+	do
 	{
-		float target = REINTERPRET(arg, float);
-		const float kP_vel = 1.0;
-		const float kP_pwr = 1.0;
-		int err;
-		float last = LIFT_HEIGHT(gSensor[liftPoti].value);
-		sleep(10);
-		sCycleData cycle;
-		initCycle(cycle, 10, "liftToTarget");
-		do
-		{
-			float cur = LIFT_HEIGHT(gSensor[liftPoti].value);
-			float vel = (cur - last) / cycle.period;
-			err = (int)(target - cur);
-			setLift((word)(kP_pwr * (kP_vel * err - vel)));
-			last = cur;
-			endCycle(cycle);
-		} while (abs(err) > 25);
-	}
+		float cur = LIFT_HEIGHT(gSensor[liftPoti].value);
+		float vel = (cur - last) / cycle.period;
+		err = (int)(target - cur);
+		setLift((word)(kP_pwr * (kP_vel * err - vel)));
+		last = cur;
+		endCycle(cycle);
+	} while (abs(err) > 25);
 	writeDebugStreamLine("Lift at target: %f %f", arg, LIFT_HEIGHT(gSensor[liftPoti].value));
-	NEXT_STATE(liftHold, arg);
+	NEXT_STATE(liftHold, 0);
+}
 case liftHold:
 {
-	float target;
-	if (arg == -1)
-	{
-		target = LIFT_HEIGHT(gSensor[liftPoti].value);
-		arg = REINTERPRET(target, long);
-	}
-	else target = REINTERPRET(arg, float);
+	float target = arg ? LIFT_HEIGHT(gSensor[liftPoti].value) : gLiftTarget;
 	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
 		NEXT_STATE(liftHoldDown, arg);
 	//{
