@@ -117,16 +117,16 @@ void setLift(word power,bool debug=false)
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
-#define LIFT_TOP 3100
-#define LIFT_BOTTOM 1000
-#define LIFT_MID 1900
-#define LIFT_HOLD_DOWN_THRESHOLD 1150
+#define LIFT_TOP 38.16
+#define LIFT_BOTTOM 5.75
+#define LIFT_MID 20.75
+#define LIFT_HOLD_DOWN_THRESHOLD 7.58
 
-#define LIFT_MID_HEIGHT 22.5
+#define LIFT_MID_POS 1900
 #define LIFT_ARM_LEN 9
 
-#define LIFT_HEIGHT(pos) (LIFT_MID_HEIGHT + 2 * LIFT_ARM_LEN * cos((pos - LIFT_MID) * PI / 3276))
-#define LIFT_POS(height) (LIFT_MID + acos((height - LIFT_MID_HEIGHT) / (2 * LIFT_ARM_LEN)) * 3276 / PI)
+#define LIFT_HEIGHT(pos) (LIFT_MID + 2 * LIFT_ARM_LEN * sin((pos - LIFT_MID_POS) * PI / 2870))
+#define LIFT_POS(height) (LIFT_MID_POS + asin((height - LIFT_MID) / (2 * LIFT_ARM_LEN)) * 2870 / PI)
 
 MAKE_MACHINE(lift, tLiftStates, liftIdle,
 {
@@ -136,26 +136,35 @@ case liftIdle:
 case liftToTarget:
 	if (arg != -1)
 	{
+		float target = REINTERPRET(arg, float);
 		const float kP_vel = 1.0;
 		const float kP_pwr = 1.0;
 		int err;
-		velocityClear(liftPoti);
+		float last = LIFT_HEIGHT(gSensor[liftPoti].value);
+		sleep(10);
 		sCycleData cycle;
 		initCycle(cycle, 10, "liftToTarget");
 		do
 		{
-			err = (int)(arg - gSensor[liftPoti].value);
-			velocityCheck(liftPoti);
-			if (gSensor[liftPoti].velGood)
-				setLift((word)(kP_pwr * (kP_vel * err - gSensor[liftPoti].velocity)));
+			float cur = LIFT_HEIGHT(gSensor[liftPoti].value);
+			float vel = (cur - last) / cycle.period;
+			err = (int)(target - cur);
+			setLift((word)(kP_pwr * (kP_vel * err - vel)));
+			last = cur;
 			endCycle(cycle);
 		} while (abs(err) > 25);
 	}
-	writeDebugStreamLine("Lift at target: %d %d", arg, gSensor[liftPoti].value);
+	writeDebugStreamLine("Lift at target: %f %f", arg, LIFT_HEIGHT(gSensor[liftPoti].value));
 	NEXT_STATE(liftHold, arg);
 case liftHold:
-	if (arg == -1) arg = gSensor[liftPoti].value;
-
+{
+	float target;
+	if (arg == -1)
+	{
+		target = LIFT_HEIGHT(gSensor[liftPoti].value);
+		arg = REINTERPRET(target, long);
+	}
+	else target = REINTERPRET(arg, float);
 	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
 		NEXT_STATE(liftHoldDown, arg);
 	//{
@@ -163,12 +172,13 @@ case liftHold:
 	//	initCycle(cycle, 10, "liftHold");
 	//	while (true)
 	//	{
-	//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 3276)));
+	//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 2870)));
 	//		endCycle(cycle);
 	//	}
 	//}
-	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 3276)));
+	setLift(8 + (word)(5 * cos((arg - LIFT_MID) * PI / 2870)));
 	break;
+}
 case liftHoldDown:
 	setLift(-15);
 	break;
@@ -452,7 +462,7 @@ void mobileClearLift()
 {
 	if (gMobileResetLift = (gMobileCheckLift && gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD))
 	{
-		liftSet(liftToTarget, LIFT_MOBILE_THRESHOLD + 50);
+		liftSet(liftToTarget, LIFT_MOBILE_THRESHOLD + 1.0);
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[liftPoti].value < LIFT_MOBILE_THRESHOLD && !TimedOut(timeout, "mobileClearLift")) sleep(10);
 	}
@@ -629,7 +639,7 @@ float gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LI
 
 void clearArm()
 {
-	liftSet(liftToTarget, LIFT_POS(gliftTargetA[gNumCones]));
+	liftSet(liftToTarget, gliftTargetA[gNumCones]);
 	unsigned long timeout = nPgmTime + 1500;
 	while (liftState == liftToTarget && !TimedOut(timeout, "clear 1")) sleep(10);
 
