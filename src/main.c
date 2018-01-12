@@ -159,11 +159,7 @@ case liftToTarget:
 case liftHold:
 {
 	float target;
-	if (arg == -1)
-	{
-		target = LIFT_HEIGHT(gSensor[liftPoti].value);
-		arg = REINTERPRET(target, long);
-	}
+	if (arg == -1) REINTERPRET(arg, float) = target = LIFT_HEIGHT(gSensor[liftPoti].value);
 	else target = REINTERPRET(arg, float);
 	if (arg < LIFT_HOLD_DOWN_THRESHOLD)
 		NEXT_STATE(liftHoldDown, arg);
