@@ -109,7 +109,8 @@ typedef enum _tLiftStates {
 	liftToTarget,
 	liftStopping,
 	liftHold,
-	liftHoldDown
+	liftHoldDown,
+	liftHoldUp
 } tLiftStates;
 
 void setLift(word power,bool debug=false)
@@ -121,7 +122,8 @@ void setLift(word power,bool debug=false)
 #define LIFT_TOP 38.16
 #define LIFT_BOTTOM 5.75
 #define LIFT_MID 20.75
-#define LIFT_HOLD_DOWN_THRESHOLD 7.58
+#define LIFT_HOLD_DOWN_THRESHOLD 8
+#define LIFT_HOLD_UP_THRESHOLD 35
 
 #define LIFT_MID_POS 1900
 #define LIFT_ARM_LEN 9
@@ -171,6 +173,7 @@ case liftToTarget:
 		last = cur;
 		epsilon = 20 * vel;
 		LIM_TO_VAL_SET(epsilon, 4);
+		if (fabs(epsilon) < 1.0) epsilon = sgn(vel);
 		endCycle(cycle);
 	} while (up ? err > epsilon : err < epsilon);
 	writeDebugStreamLine("Lift at target: %f %f %f | %d | %d ms", target, LIFT_HEIGHT(gSensor[liftPoti].value), err, poti, nPgmTime - begin);
@@ -181,8 +184,10 @@ case liftStopping:
 	const float kP = -5.0;
 	velocityClear(liftPoti);
 	sCycleData cycle;
+	unsigned long end = nPgmTime + 200;
+	writeDebugStreamLine("%d", nPgmTime);
 	initCycle(cycle, 20, "liftStopping");
-	while (true)
+	while (nPgmTime < end)
 	{
 		velocityCheck(liftPoti);
 		if (gSensor[liftPoti].velGood)
@@ -195,6 +200,7 @@ case liftStopping:
 		}
 		endCycle(cycle);
 	}
+	writeDebugStreamLine("%d", nPgmTime);
 	NEXT_STATE(liftHold, arg);
 }
 case liftHold:
@@ -202,6 +208,8 @@ case liftHold:
 	float target = arg ? LIFT_HEIGHT(gSensor[liftPoti].value) : gLiftTarget;
 	if (target < LIFT_HOLD_DOWN_THRESHOLD)
 		NEXT_STATE(liftHoldDown, arg);
+	if (target > LIFT_HOLD_UP_THRESHOLD)
+		NEXT_STATE(liftHoldUp, arg);
 	//{
 	//	sCycleData cycle;
 	//	initCycle(cycle, 10, "liftHold");
@@ -216,6 +224,9 @@ case liftHold:
 }
 case liftHoldDown:
 	setLift(-15);
+	break;
+case liftHoldUp:
+	setLift(15);
 	break;
 })
 
