@@ -265,12 +265,14 @@ typedef enum _tArmStates {
 	armIdle,
 	armManual,
 	armToTarget,
+	armStopping,
 	armHold
 } tArmStates;
 
 #define ARM_TOP 3200
 #define ARM_BOTTOM 550
 #define ARM_PRESTACK 1900
+#define ARM_STACK 2800
 
 void setArm(word power, bool debug = false)
 {
@@ -288,41 +290,43 @@ case armToTarget:
 	{
 		if (arg != -1)
 		{
-			const float kP_vel = 1.0;
-			const float kP_pwr = 1.0;
+			const float kP = 0.1;
 			int err;
-			float targ;
-			float power;
-			velocityClear(armPoti);
 			sCycleData cycle;
 			initCycle(cycle, 10, "armToTarget");
 			do
 			{
-				err = (int)(arg - gSensor[armPoti].value);
-				velocityCheck(armPoti);
-				if (gSensor[armPoti].velGood)
-				{
-					targ = kP_vel * err;
-					power = kP_pwr * (targ - gSensor[armPoti].velocity);
-					setArm((word) power);
-				}
-				writeDebugStreamLine ("target speed: %f, final speed: %f", targ, power);
+				err = arg - gSensor[armPoti].value;
+				float power = kP * err;
+				LIM_TO_VAL_SET(power, 127);
+				setArm((word)power);
 				endCycle(cycle);
-			} while (abs(err) > 50);
+			} while (abs(err) > 100);
 		}
 		writeDebugStreamLine("Arm at target: %d %d", arg, gSensor[armPoti].value);
-		NEXT_STATE(armHold, arg);
+		NEXT_STATE(armStopping, arg);
 	}
+case armStopping:
+	velocityClear(armPoti);
+	velocityCheck(armPoti);
+	do
+	{
+		sleep(5);
+		velocityCheck(armPoti);
+	} while (!gSensor[armPoti].velGood);
+	setArm(sgn(gSensor[armPoti].velocity) * -25);
+	sleep(150);
+	NEXT_STATE(armHold, arg);
 case armHold:
 	{
 		if (arg == -1) arg = gSensor[armPoti].value;
-		const float kP = 0.2;
+		const float kP = 0.4;
 		sCycleData cycle;
 		initCycle(cycle, 10, "armHold");
 		while (true)
 		{
 			float power = (arg - gSensor[armPoti].value) * kP;
-			LIM_TO_VAL_SET(power, 10);
+			LIM_TO_VAL_SET(power, 12);
 			setArm((word)power);
 			endCycle(cycle);
 		}
@@ -339,7 +343,12 @@ void handleArm()
 	}
 	if (FALLING(JOY_ARM) && armState == armManual)
 	{
-		armSet(armHold);
+		armSet(armStopping);
+	}
+
+	if (RISING(BTN_ARM_DOWN))
+	{
+		armSet(armToTarget, ARM_STACK);
 	}
 
 	if (armState == armManual)
