@@ -141,6 +141,7 @@ case liftToTarget:
 	unsigned long begin = nPgmTime;
 	float target = gLiftTarget;
 	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
+	writeDebugStreamLine("liftToTarget %f -> %f", last, target);
 	const float kP_vel = 0.006;
 	const float kI_vel = 0.000001;
 	bool up = target > last;
@@ -148,12 +149,15 @@ case liftToTarget:
 	float err;
 	float vel;
 	float integral = 0;
+	float epsilon;
+	int poti;
 	sleep(20);
 	sCycleData cycle;
 	initCycle(cycle, 20, "liftToTarget");
 	do
 	{
-		float cur = LIFT_HEIGHT(gSensor[liftPoti].value);
+		poti = gSensor[liftPoti].value;
+		float cur = LIFT_HEIGHT(poti);
 		vel = (cur - last) / cycle.period;
 		err = target - cur;
 		if (fabs(err) < 3.0)
@@ -161,13 +165,15 @@ case liftToTarget:
 		else
 			integral = 0;
 		float power = kP_pwr * (kP_vel * err + kI_vel * integral - vel);
-		if (sgn(power) == -sgn(vel)) power = 0;//power *= 0.01;
+		if (sgn(power) == -sgn(vel)) power *= 0.05;
 		LIM_TO_VAL_SET(power, 127);
 		setLift((word)power);
 		last = cur;
+		epsilon = 20 * vel;
+		LIM_TO_VAL_SET(epsilon, 4);
 		endCycle(cycle);
-	} while (up ? err > 20 * vel : err < 20 * vel);
-	writeDebugStreamLine("Lift at target: %f %f | %d ms", target, LIFT_HEIGHT(gSensor[liftPoti].value), nPgmTime - begin);
+	} while (up ? err > epsilon : err < epsilon);
+	writeDebugStreamLine("Lift at target: %f %f %f | %d | %d ms", target, LIFT_HEIGHT(gSensor[liftPoti].value), err, poti, nPgmTime - begin);
 	NEXT_STATE(liftStopping, 0);
 }
 case liftStopping:
@@ -205,7 +211,7 @@ case liftHold:
 	//		endCycle(cycle);
 	//	}
 	//}
-	setLift(3 + (word)(4 * cos((target - LIFT_MID) * PI / 2870)));
+	setLift(4 + (word)(3 * cos((target - LIFT_MID) * PI / 2870)));
 	break;
 }
 case liftHoldDown:
