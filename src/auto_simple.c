@@ -1,4 +1,40 @@
 /* Functions */
+
+void turnSimpleInternalCw(float a)
+{
+	while (gPosition.a < a + degToRad(-5.3 + (target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
+	{
+		unsigned long deltaTime = time - lstTime;
+		float vel = gVelocity.a;
+
+		if (deltaTime >= 1)
+		{
+			cw.input = vel;
+
+			cw.lstError = cw.error;
+			cw.error = cw.target - cw.input;
+
+			cw.integral += cw.error * deltaTime;
+			if (cw.integral < -8) cw.integral = 0;
+
+			power = cw.error * kP + cw.integral * kI;
+
+			power += 26;
+
+			if (power < 0) power /= 6.0;
+
+			if (power > 50) power = 50;
+			if (power < -5) power = -5;
+
+			setDrive(power, -power);
+
+			if (time >= nextDebug)
+			{
+				writeDebugStreamLine("%f %f %f", power, error, integral);
+				nextDebug = time + 20;
+			}
+}
+
 void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float dropEarly, tStopType stopType, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
@@ -95,6 +131,12 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	switch (turnDir)
 	{
 	case cw:
+		sTurnState cw;
+		cw.power = 0;
+		cw.error = 0;
+		cw.integral = 0;
+		cw.input = gVelocity.a
+
 		setDrive(left, -right);
 		while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
@@ -102,51 +144,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 		const float target = 0.900, kP = 17, kI = 0.05;
 
 		unsigned long time = nPgmTime, lstTime = time, nextDebug = 0;
-		float input = gVelocity.a, power = 0, error = 0, lstError, integral = 0;
-		while (gPosition.a < a + degToRad(-5.3 + (target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
-		{
-			unsigned long deltaTime = time - lstTime;
-			float vel = gVelocity.a;
-
-			if (deltaTime >= 1)
-			{
-				input = vel;
-
-				lstError = error;
-				error = target - input;
-
-				integral += error * deltaTime;
-				if (integral < -8) integral = 0;
-
-				power = error * kP + integral * kI;
-
-				power += 26;
-
-				if (power < 0) power /= 6.0;
-
-				if (power > 50) power = 50;
-				if (power < -5) power = -5;
-
-				setDrive(power, -power);
-
-				if (time >= nextDebug)
-				{
-					writeDebugStreamLine("%f %f %f", power, error, integral);
-					nextDebug = time + 20;
-				}
-
-				lstTime = time;
-			}
-
-			sleep(1);
-
-			time = nPgmTime;
-		}
-
-		setDrive(-15, 15);
-		sleep(150);
-		setDrive(0, 0);
-
+		turnToSimpleInternalCw (a);
 		break;
 	case ccw:
 
@@ -160,40 +158,6 @@ void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	turnToAngleRadSimple(degToRad(a), turnDir, left, right);
 }
-
-void turnSimpleInternalCw()
-{
-	while (gPosition.a < a + degToRad(-5.3 + (target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
-	{
-		unsigned long deltaTime = time - lstTime;
-		float vel = gVelocity.a;
-
-		if (deltaTime >= 1)
-		{
-			input = vel;
-
-			lstError = error;
-			error = target - input;
-
-			integral += error * deltaTime;
-			if (integral < -8) integral = 0;
-
-			power = error * kP + integral * kI;
-
-			power += 26;
-
-			if (power < 0) power /= 6.0;
-
-			if (power > 50) power = 50;
-			if (power < -5) power = -5;
-
-			setDrive(power, -power);
-
-			if (time >= nextDebug)
-			{
-				writeDebugStreamLine("%f %f %f", power, error, integral);
-				nextDebug = time + 20;
-			}
 
 			lstTime = time;
 		}

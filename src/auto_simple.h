@@ -12,7 +12,8 @@ typedef struct _turnState
 	float power;
 	float error;
 	float lstError;
-	float intergral;
+	float integral;
+	float input;
 } sTurnState;
 
 /* Variables */
