@@ -145,7 +145,7 @@ case liftToTarget:
 	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
 	writeDebugStreamLine("liftToTarget %f -> %f", last, target);
 	const float kP_vel = 0.006;
-	const float kI_vel = 0.000001;
+	const float kI_vel = 0.00001;
 	bool up = target > last;
 	float kP_pwr = up ? 2500.0 : 6000.0;
 	float err;
@@ -243,12 +243,6 @@ void handleLift()
 		liftSet(liftStopping);
 	}
 
-	if (RISING(BTN_LIFT_POS))
-	{
-		gLiftTarget = LIFT_MID;
-		liftSet(liftToTarget);
-	}
-
 	if (liftState == liftManual)
 	{
 		word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
@@ -271,7 +265,8 @@ typedef enum _tArmStates {
 
 #define ARM_TOP 3200
 #define ARM_BOTTOM 550
-#define ARM_PRESTACK 1900
+#define ARM_PRESTACK 2100
+#define ARM_CARRY 1500
 #define ARM_STACK 2800
 
 void setArm(word power, bool debug = false)
@@ -348,7 +343,7 @@ void handleArm()
 
 	if (RISING(BTN_ARM_DOWN))
 	{
-		armSet(armToTarget, ARM_STACK);
+		armSet(armToTarget, ARM_PRESTACK);
 	}
 
 	if (armState == armManual)
@@ -547,7 +542,7 @@ bool gLiftTargetReached;
 
 
 
-byte stackAsync(bool arg0);
+byte stackAsync(bool arg0, bool arg1);
 byte dropArmAsync();
 
 bool gKillDriveOnTimeout = false;
@@ -581,8 +576,8 @@ bool TimedOut(unsigned long timeOut, const string description)
 }
 
 //int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
-float gliftTargetA[11] =   { 0, 0, 40, 190, 280, 600,  930, 1250, 1700, 2100, LIFT_TOP-LIFT_BOTTOM };
-//////      stacking ON    0  1   2   3    4    5     6     7     8     9     10
+float gliftTargetA[11] =   { 10.0, 12.8, 15.6, 18.4, 21.2, 24.5, 27.5, 30.0, 32.8, 35.6, 38.0 };
+//////      stacking ON      0     1     2     3     4     5     6     7     8     9     10
 
 void clearArm()
 {
@@ -600,16 +595,69 @@ void clearArm()
 
 NEW_ASYNC_VOID_0(clearArm);
 
-void stack(bool downAfter)
+void stack(bool pickup, bool downAfter)
 {
-	//gArmState = armManaged;
-	//gClawState = clawManaged;
-	//gLiftState = liftManaged;
-	//unsigned long armTimeOut;
-	//unsigned long clawTimeOut;
-	//unsigned long liftTimeOut;
+	writeDebugStreamLine(" STACKING on %d", gNumCones);
 
-	//gLiftTarget =LIFT_BOTTOM + gliftTargetA[gNumCones];
+	liftSet(liftIdle);
+	unsigned long armTimeOut;
+	unsigned long liftTimeOut;
+
+	if (pickup)
+	{
+		gLiftTarget = LIFT_BOTTOM;
+		liftSet(liftToTarget);
+		EndTimeSlice();
+		liftTimeOut = nPgmTime + 1500;
+		while (liftState != liftHoldDown && !TimedOut(liftTimeOut, "stack 1")) sleep(10);
+		//armSet(armToTarget, ARM_BOTTOM + 200);
+		//EndTimeSlice();
+		//armTimeOut = nPgmTime + 1000;
+		//while (armState != armHold && !TimedOut(armTimeOut, "stack 2")) sleep(10);
+		armSet(armManaged);
+		int target = ARM_BOTTOM + 350;
+		setArm(-127);
+		armTimeOut = nPgmTime + 1000;
+		while (gSensor[armPoti].value > target && !TimedOut(armTimeOut, "stack 2")) sleep(10);
+		setArm(25);
+		sleep(150);
+		armSet(armToTarget, ARM_BOTTOM + 700);
+		sleep(200);
+	}
+
+	gLiftTarget = gliftTargetA[gNumCones];
+	liftSet(liftToTarget);
+	sleep(50);
+	liftTimeOut = nPgmTime + 2500;
+	while (liftState == liftToTarget && !TimedOut(liftTimeOut, "stack 3")) sleep(10);
+	return;
+
+	armSet(armToTarget, ARM_STACK);
+	sleep(50);
+	armTimeOut = nPgmTime + 1000;
+	while (armState == armToTarget && !TimedOut(armTimeOut, "stack 4")) sleep(10);
+
+	gLiftTarget = gliftTargetA[gNumCones] - 2.0;
+	liftSet(liftManaged);
+	setLift(-70);
+	while (LIFT_HEIGHT(gSensor[liftPoti].value) > gLiftTarget && !TimedOut(liftTimeOut, "stack 5")) sleep(10);
+	liftSet(liftStopping);
+
+	armSet(armToTarget, ARM_PRESTACK);
+	sleep(50);
+	armTimeOut = nPgmTime + 1000;
+	while (armState == armToTarget && !TimedOut(armTimeOut, "stack 6")) sleep(10);
+
+	++gNumCones;
+
+	if (downAfter)
+	{
+		gLiftTarget = LIFT_BOTTOM;
+		liftSet(liftToTarget);
+		sleep(50);
+		liftTimeOut = nPgmTime + 2500;
+		while (liftState == liftToTarget && !TimedOut(liftTimeOut, "stack 7")) sleep(10);
+	}
 
 	//if( gNumCones< 2 )
 	//{
@@ -861,7 +909,7 @@ void stack(bool downAfter)
 	//}
 }
 
-NEW_ASYNC_VOID_1(stack, bool);
+NEW_ASYNC_VOID_2(stack, bool, bool);
 
 float gLoaderOffset[12] = { 5.5, 4.5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 sNotifier gStackFromLoaderNotifier;
@@ -979,13 +1027,14 @@ NEW_ASYNC_VOID_0(stackExternal);
 
 bool cancel()
 {
+	return false;
 	if (stackKill() || stackFromLoaderKill() || stackExternalKill())
-		return false;
+		return true;
 	liftReset();
 	armReset();
 	gDriveManual = true;
 	writeDebugStreamLine("Stack cancelled");
-	return true;
+	return false;
 }
 
 void handleMacros()
@@ -1005,7 +1054,7 @@ void handleMacros()
 		if (!cancel())
 		{
 			writeDebugStreamLine("Stacking");
-			stackAsync(true);
+			stackAsync(LIFT_HEIGHT(gSensor[liftPoti].value) < LIFT_BOTTOM + 2.0, true);
 			playSound(soundUpwardTones);
 		}
 	}
@@ -1118,7 +1167,6 @@ void startup()
 	enableJoystick(JOY_THROTTLE);
 	enableJoystick(JOY_LIFT);
 	enableJoystick(JOY_ARM);
-	enableJoystick(BTN_LIFT_POS);
 	enableJoystick(BTN_ARM_DOWN);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
@@ -1213,7 +1261,7 @@ void usercontrol()
 		handleLift();
 		handleArm();
 		handleMobile();
-		//handleMacros();
+		handleMacros();
 
 		if (RISING(BTN_MACRO_CANCEL))
 			writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);

@@ -7,7 +7,7 @@
 /* Lift */
 #define JOY_LIFT Ch2
 #define DZ_LIFT 70
-#define BTN_LIFT_POS Btn8R
+//#define BTN_LIFT_POS Btn8R
 
 /* Arm */
 #define JOY_ARM Ch1
