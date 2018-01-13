@@ -144,7 +144,7 @@ case liftToTarget:
 	float target = gLiftTarget;
 	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
 	writeDebugStreamLine("liftToTarget %f -> %f", last, target);
-	const float kP_vel = 0.006;
+	const float kP_vel = arg ? 0.006 : 0.01;
 	const float kI_vel = 0.00001;
 	bool up = target > last;
 	float kP_pwr = up ? 2500.0 : 6000.0;
@@ -177,7 +177,7 @@ case liftToTarget:
 		endCycle(cycle);
 	} while (up ? err > epsilon : err < epsilon);
 	writeDebugStreamLine("Lift at target: %f %f %f | %d | %d ms", target, LIFT_HEIGHT(gSensor[liftPoti].value), err, poti, nPgmTime - begin);
-	NEXT_STATE(liftStopping, 0);
+	NEXT_STATE((up ? target >= LIFT_HOLD_UP_THRESHOLD : target < LIFT_HOLD_DOWN_THRESHOLD) ? liftHold : liftStopping, 0);
 }
 case liftStopping:
 {
@@ -267,7 +267,7 @@ typedef enum _tArmStates {
 #define ARM_BOTTOM 550
 #define ARM_PRESTACK 2100
 #define ARM_CARRY 1500
-#define ARM_STACK 2800
+#define ARM_STACK 2700
 
 void setArm(word power, bool debug = false)
 {
@@ -576,7 +576,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 }
 
 //int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
-float gliftTargetA[11] =   { 10.0, 12.8, 15.6, 18.4, 21.2, 24.5, 27.5, 30.0, 32.8, 35.6, 38.0 };
+float gliftTargetA[11] =   { 9.0, 12.8, 15.6, 18.4, 21.2, 24.5, 27.5, 30.0, 32.8, 35.6, 38.0 };
 //////      stacking ON      0     1     2     3     4     5     6     7     8     9     10
 
 void clearArm()
@@ -605,50 +605,61 @@ void stack(bool pickup, bool downAfter)
 
 	if (pickup)
 	{
-		gLiftTarget = LIFT_BOTTOM;
-		liftSet(liftToTarget);
-		EndTimeSlice();
-		liftTimeOut = nPgmTime + 1500;
-		while (liftState != liftHoldDown && !TimedOut(liftTimeOut, "stack 1")) sleep(10);
+		if (LIFT_HEIGHT(gSensor[liftPoti].value) > LIFT_BOTTOM)
+		{
+			gLiftTarget = LIFT_BOTTOM;
+			liftSet(liftToTarget);
+			EndTimeSlice();
+			liftTimeOut = nPgmTime + 1500;
+			while (liftState != liftHoldDown && !TimedOut(liftTimeOut, "stack 1")) sleep(10);
+		}
 		//armSet(armToTarget, ARM_BOTTOM + 200);
 		//EndTimeSlice();
 		//armTimeOut = nPgmTime + 1000;
 		//while (armState != armHold && !TimedOut(armTimeOut, "stack 2")) sleep(10);
 		armSet(armManaged);
-		int target = ARM_BOTTOM + 350;
+		int target = ARM_BOTTOM + 150;
 		setArm(-127);
 		armTimeOut = nPgmTime + 1000;
 		while (gSensor[armPoti].value > target && !TimedOut(armTimeOut, "stack 2")) sleep(10);
 		setArm(25);
 		sleep(150);
-		armSet(armToTarget, ARM_BOTTOM + 700);
-		sleep(200);
+		setArm(80);
+		armTimeOut = nPgmTime + 1000;
+		while (gSensor[armPoti].value < ARM_BOTTOM + 650 && !TimedOut(armTimeOut, "stack 2.1")) sleep(10);
+		setArm(12);
 	}
 
 	gLiftTarget = gliftTargetA[gNumCones];
-	liftSet(liftToTarget);
+	liftSet(liftToTarget, 0);
 	sleep(50);
 	liftTimeOut = nPgmTime + 2500;
 	while (liftState == liftToTarget && !TimedOut(liftTimeOut, "stack 3")) sleep(10);
-	return;
+	//return;
 
 	armSet(armToTarget, ARM_STACK);
 	sleep(50);
 	armTimeOut = nPgmTime + 1000;
 	while (armState == armToTarget && !TimedOut(armTimeOut, "stack 4")) sleep(10);
 
-	gLiftTarget = gliftTargetA[gNumCones] - 2.0;
+	gLiftTarget = gNumCones == 0 ? LIFT_BOTTOM : gliftTargetA[gNumCones] - 2.0;
 	liftSet(liftManaged);
 	setLift(-70);
 	while (LIFT_HEIGHT(gSensor[liftPoti].value) > gLiftTarget && !TimedOut(liftTimeOut, "stack 5")) sleep(10);
-	liftSet(liftStopping);
+	//liftSet(liftStopping);
+	setLift(-10);
+
+	if (gNumCones == 0)
+	{
+		sleep(400);
+	}
 
 	armSet(armToTarget, ARM_PRESTACK);
 	sleep(50);
 	armTimeOut = nPgmTime + 1000;
 	while (armState == armToTarget && !TimedOut(armTimeOut, "stack 6")) sleep(10);
 
-	++gNumCones;
+	//++gNumCones;
 
 	if (downAfter)
 	{
