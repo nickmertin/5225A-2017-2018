@@ -86,6 +86,8 @@ void moveToTargetDisSimple(float a, float d, byte power, float dropEarly, tStopT
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
+	const float kP = 17, kI = 0.05;
+
 	left = abs(left);
 	right = abs(right);
 
@@ -95,16 +97,18 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	switch (turnDir)
 	{
 	case cw:
-
 		setDrive(left, -right);
 		while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
 		turnCw.target = 0.900;
-		const float kP = 17, kI = 0.05;
 		turnSimpleInternalCw (a);
 		break;
 	case ccw:
-
+		setDrive(-left, right);
+		while (gPosition.a > a + gVelocity.a * 0.4) sleep(1);
+		writeDebugStreamLine("%f", gVelocity.a);
+		turnCcw.target = 0.900;
+		turnSimpleInternalCcw (a);
 		break;
 	}
 
@@ -159,6 +163,53 @@ void turnSimpleInternalCw(float a)
 		turnCw.time = nPgmTime;
 	}
 	setDrive(-15, 15);
+	sleep(150);
+	setDrive(0, 0);
+}
+
+void turnSimpleInternalCcw(float a)
+{
+	while (gPosition.a > a - degToRad(-5.3 + (turnCcw.target - gVelocity.a) * 0.3) || gVelocity.a < -1.2)
+	{
+		unsigned long deltaTime = turnCcw.time - turnCcw.lstTime;
+		float vel = gVelocity.a;
+
+		if (deltaTime >= 1)
+		{
+			turnCcw.input = vel;
+
+			turnCcw.lstError = turnCcw.error;
+			turnCcw.error = turnCcw.target - turnCcw.input;
+
+			turnCcw.integral += turnCcw.error * deltaTime;
+			if (turnCcw.integral < -8) turnCcw.integral = 0;
+
+			turnCcw.power = turnCcw.error * kP + turnCcw.integral * kI;
+
+			turnCcw.power += 26;
+
+			if (turnCcw.power < 0) turnCcw.power /= 6.0;
+
+			if (turnCcw.power > 50) turnCcw.power = 50;
+			if (turnCcw.power < -5) turnCcw.power = -5;
+
+			setDrive(-turnCcw.power, turnCcw.power);
+
+			if (turnCcw.time >= turnCcw.nextDebug)
+			{
+				writeDebugStreamLine("%f %f %f", turnCcw.power, turnCcw.error, turnCcw.integral);
+				turnCcw.nextDebug = turnCcw.time + 20;
+
+			}
+
+			turnCcw.lstTime = turnCcw.time;
+		}
+
+		sleep(1);
+
+		turnCcw.time = nPgmTime;
+	}
+	setDrive(15, -15);
 	sleep(150);
 	setDrive(0, 0);
 }
