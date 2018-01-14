@@ -1000,7 +1000,7 @@ NEW_ASYNC_VOID_3(stackFromLoader, int, bool, bool);
 bool cancel()
 {
 	return false;
-	if (stackKill() || stackFromLoaderKill() || stackExternalKill())
+	if (stackKill() || stackFromLoaderKill())
 		return true;
 	liftReset();
 	armReset();
@@ -1042,16 +1042,6 @@ void handleMacros()
 	//}
 
 	//if (FALLING(BTN_MACRO_LOADER)) notify(gStackFromLoaderNotifier);
-
-	if (RISING(BTN_MACRO_EXTERNAL))
-	{
-		if (!cancel())
-		{
-			writeDebugStreamLine("Stacking on external mobile");
-			stackExternalAsync();
-			playSound(soundUpwardTones);
-		}
-	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
@@ -1146,7 +1136,6 @@ void startup()
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_CLEAR);
 	enableJoystick(BTN_MACRO_STACK);
-	enableJoystick(BTN_MACRO_EXTERNAL);
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
