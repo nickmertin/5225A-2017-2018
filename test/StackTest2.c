@@ -1,14 +1,18 @@
 #pragma config(Sensor, in4,    liftPoti,       sensorPotentiometer)
 #pragma config(Sensor, in5,    armPoti,        sensorPotentiometer)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port3,           driveL1,       tmotorVex393TurboSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port4,           driveL2,       tmotorVex393TurboSpeed_MC29, openLoop)
 #pragma config(Motor,  port5,           arm,           tmotorVex393HighSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port7,           driveR2,       tmotorVex393TurboSpeed_MC29, openLoop, reversed)
+#pragma config(Motor,  port8,           driveR1,       tmotorVex393TurboSpeed_MC29, openLoop)
 #pragma config(Motor,  port9,           liftR,         tmotorVex393HighSpeed_MC29, openLoop)
 
-#define LIFT_TOP 38.16
-#define LIFT_BOTTOM 5.75
-#define LIFT_MID 20.75
-#define LIFT_HOLD_DOWN_THRESHOLD 8
-#define LIFT_HOLD_UP_THRESHOLD 35
+#define LIFT_TOP 37.66
+#define LIFT_BOTTOM 5
+#define LIFT_MID 20.25
+#define LIFT_HOLD_DOWN_THRESHOLD 7.5
+#define LIFT_HOLD_UP_THRESHOLD 34.5
 
 #define LIFT_MID_POS 1900
 #define LIFT_ARM_LEN 9
@@ -18,9 +22,10 @@
 
 #define ARM_TOP 3200
 #define ARM_BOTTOM 550
-#define ARM_PRESTACK 2100
+#define ARM_PRESTACK 2300
 #define ARM_CARRY 1500
 #define ARM_STACK 2700
+#define ARM_HORIZONTAL 1150
 
 int gLiftTarget;
 int gArmTarget;
@@ -151,8 +156,21 @@ void moveArmDownTo(int pos, word power, word holdPower, word brakePower = 0)
 	startTask(moveArmDown);
 }
 
+task drive()
+{
+	while (true)
+	{
+		word throttle = vexRT[Ch3];
+		word turn = vexRT[Ch4];
+		motor[driveL1] = motor[driveL2] = throttle + turn;
+		motor[driveR1] = motor[driveR2] = throttle - turn;
+		sleep(10);
+	}
+}
+
 task main()
 {
+	startTask(drive);
 	while (true)
 	{
 		while (!vexRT[Btn8D]) sleep(10);
@@ -174,7 +192,9 @@ task main()
 		moveLiftDownTo(LIFT_POS(LIFT_BOTTOM), -70, -15);
 		while (!gLiftDone) sleep(10);
 
-		moveArmDownTo(ARM_PRESTACK, -127, 7, 12);
+		moveArmDownTo(ARM_HORIZONTAL, -127, 10, 25);
+		while (SensorValue[armPoti] > ARM_PRESTACK) sleep(10);
+		moveLiftUpTo(1300, 80, 10, -25);
 		while (!gArmDone) sleep(10);
 
 		writeDebugStreamLine("%d", nPgmTime - timeStart);
