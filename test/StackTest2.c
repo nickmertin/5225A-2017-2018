@@ -27,6 +27,8 @@
 #define ARM_STACK 2700
 #define ARM_HORIZONTAL 1150
 
+int gNumCones = 0;
+
 int gLiftTarget;
 int gArmTarget;
 word gLiftPower;
@@ -158,12 +160,24 @@ void moveArmDownTo(int pos, word power, word holdPower, word brakePower = 0)
 
 task drive()
 {
+	bool lstInc = false, lstDec = false, lstReset = false;
 	while (true)
 	{
 		word throttle = vexRT[Ch3];
 		word turn = vexRT[Ch4];
 		motor[driveL1] = motor[driveL2] = throttle + turn;
 		motor[driveR1] = motor[driveR2] = throttle - turn;
+
+		bool inc = vexRT[Btn5U];
+		bool dec = vexRT[Btn5D];
+		bool reset = vexRT[Btn7D];
+		if (inc && !lstInc && gNumCones < 11) ++gNumCones;
+		if (dec && !lstDec && gNumCones > 0) --gNumCones;
+		if (reset && !lstReset) gNumCones = 0;
+		lstInc = inc;
+		lstDec = dec;
+		lstReset = reset;
+
 		sleep(10);
 	}
 }
