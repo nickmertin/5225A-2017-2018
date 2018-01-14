@@ -178,9 +178,10 @@ task main()
 		unsigned long timeStart = nPgmTime;
 
 		moveLiftDownTo(LIFT_POS(LIFT_BOTTOM), -127, -15);
-		while (!gLiftDone) sleep(10);
+		while (SensorValue[liftPoti] > 1200) sleep(10);
 
-		moveArmDownTo(ARM_BOTTOM + 380, -127, 12);
+		moveArmDownTo(ARM_BOTTOM + 340, -127, 12);
+		while (!gLiftDone) sleep(10);
 		while (!gArmDone) sleep(10);
 
 		moveArmUpTo(ARM_STACK, 127, -12);
