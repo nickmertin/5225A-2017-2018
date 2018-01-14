@@ -62,6 +62,12 @@ bool TimedOut(unsigned long timeOut, const string description);
 
 #define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
+typedef struct _sSimpleConfig {
+	float target;
+	word liftPower;
+	word brakePower;
+} sSimpleConfig;
+
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -107,6 +113,8 @@ typedef enum _tLiftStates {
 	liftIdle,
 	liftManual,
 	liftToTarget,
+	liftRaiseSimple,
+	liftLowerSimple,
 	liftStopping,
 	liftHold,
 	liftHoldDown,
@@ -204,6 +212,36 @@ case liftStopping:
 	writeDebugStreamLine("%d", nPgmTime);
 	NEXT_STATE(liftHold);
 }
+case liftRaiseSimple:
+{
+	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
+	setLift(config.liftPower);
+	int pos;
+	while ((pos = gSensor[liftPoti].value) < config.target) sleep(10);
+	if (config.brakePower)
+	{
+		setLift(config.brakePower);
+		sleep(200);
+	}
+	writeDebugStreamLine("Lift moved up to %d | %d", config.target, pos);
+	arg._long = -1;
+	NEXT_STATE(liftHold);
+}
+case liftLowerSimple:
+{
+	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
+	setLift(config.liftPower);
+	int pos;
+	while ((pos = gSensor[liftPoti].value) > config.target) sleep(10);
+	if (config.brakePower)
+	{
+		setLift(config.brakePower);
+		sleep(200);
+	}
+	writeDebugStreamLine("Lift moved down to %d | %d", config.target, pos);
+	arg._long = -1;
+	NEXT_STATE(liftHold);
+}
 case liftHold:
 {
 	float target = arg._long ? LIFT_HEIGHT(gSensor[liftPoti].value) : gLiftTarget;
@@ -260,6 +298,8 @@ typedef enum _tArmStates {
 	armIdle,
 	armManual,
 	armToTarget,
+	armRaiseSimple,
+	armLowerSimple,
 	armStopping,
 	armHold
 } tArmStates;
@@ -302,6 +342,36 @@ case armToTarget:
 		writeDebugStreamLine("Arm at target: %d %d", arg, gSensor[armPoti].value);
 		NEXT_STATE(armStopping);
 	}
+case armRaiseSimple:
+{
+	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
+	setLift(config.liftPower);
+	int pos;
+	while ((pos = gSensor[liftPoti].value) < config.target) sleep(10);
+	if (config.brakePower)
+	{
+		setLift(config.brakePower);
+		sleep(200);
+	}
+	writeDebugStreamLine("Lift moved up to %d | %d", config.target, pos);
+	arg._long = -1;
+	NEXT_STATE(liftHold);
+}
+case armLowerSimple:
+{
+	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
+	setLift(config.liftPower);
+	int pos;
+	while ((pos = gSensor[liftPoti].value) > config.target) sleep(10);
+	if (config.brakePower)
+	{
+		setLift(config.brakePower);
+		sleep(200);
+	}
+	writeDebugStreamLine("Lift moved down to %d | %d", config.target, pos);
+	arg._long = -1;
+	NEXT_STATE(liftHold);
+}
 case armStopping:
 	velocityClear(armPoti);
 	velocityCheck(armPoti);
@@ -580,13 +650,13 @@ bool TimedOut(unsigned long timeOut, const string description)
 		return false;
 }
 
-//int gliftTargetA[11] = { 0, 0, 70, 190, 450, 975, 1500, 1900, 2600, 3250, 4095-LIFT_BOTTOM };
-float gliftTargetA[11] =   { 9.0, 12.8, 15.6, 18.4, 21.2, 24.5, 27.5, 30.0, 32.8, 35.6, 38.0 };
-//////      stacking ON      0     1     2     3     4     5     6     7     8     9     10
+// STACKING ON                       0     1     2      3      4      5      6      7      8      9      10
+const float gLiftRaiseTarget[11] = { 6.75, 9.55, 12.35, 15.15, 17.95, 20.75, 23.55, 27,    31,    36,    38 };
+const float gLiftPlaceTarget[11] = { 5,    7.8,  10.6,  13.4,  16.2,  19,    21.8,  24.6,  27.4,  30.2,  33 };
 
 void clearArm()
 {
-	gLiftTarget = gliftTargetA[gNumCones];
+	gLiftTarget = gLiftRaiseTarget[gNumCones];
 	liftSet(liftToTarget);
 	unsigned long timeout = nPgmTime + 1500;
 	while (liftState == liftToTarget && !TimedOut(timeout, "clear 1")) sleep(10);
@@ -635,7 +705,7 @@ void stack(bool pickup, bool downAfter)
 		setArm(12);
 	}
 
-	gLiftTarget = gliftTargetA[gNumCones];
+	//gLiftTarget = gLi[gNumCones];
 	liftSet(liftToTarget, 0);
 	sleep(50);
 	liftTimeOut = nPgmTime + 2500;
@@ -647,7 +717,7 @@ void stack(bool pickup, bool downAfter)
 	armTimeOut = nPgmTime + 1000;
 	while (armState == armToTarget && !TimedOut(armTimeOut, "stack 4")) sleep(10);
 
-	gLiftTarget = gNumCones == 0 ? LIFT_BOTTOM : gliftTargetA[gNumCones] - 2.0;
+	//gLiftTarget = gNumCones == 0 ? LIFT_BOTTOM : gliftTargetA[gNumCones] - 2.0;
 	liftSet(liftManaged);
 	setLift(-70);
 	while (LIFT_HEIGHT(gSensor[liftPoti].value) > gLiftTarget && !TimedOut(liftTimeOut, "stack 5")) sleep(10);
@@ -674,255 +744,6 @@ void stack(bool pickup, bool downAfter)
 		liftTimeOut = nPgmTime + 2500;
 		while (liftState == liftToTarget && !TimedOut(liftTimeOut, "stack 7")) sleep(10);
 	}
-
-	//if( gNumCones< 2 )
-	//{
-	//	gOverAllTime = nPgmTime;
-	//	writeDebugStreamLine(" STACKING on %d", gNumCones );
-
-	//	clawTimeOut = nPgmTime + 800;
-	//	setClaw(128, true);
-	//	while (SensorValue[clawPoti] > CLAW_CLOSE + 200 && !TimedOut(clawTimeOut, "stack 1")) sleep(10);
-	//	setArm(128, true);
-	//	clawTimeOut = nPgmTime + 500;
-	//	armTimeOut = nPgmTime +600;
-	//	while (SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 2")) sleep(10);
-
-	//	//claw holding power while lifting
-	//	setClaw (20, true) ;
-
-	//	while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 3")) sleep(10);
-	//	//squeeze claw as it approaches the top of the arm swing
-	//	setClaw ( 40, true );
-	//	armTimeOut = nPgmTime +350;
-	//	while (SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut, "stack 4")) sleep(10);
-	//	setArm(15, true);
-	//	setClaw(25, true);
-	//	sleep(450);
-	//	if (!AUTONOMOUS && (gMobileState != mobileHold || gMobileTarget != MOBILE_TOP))
-	//	{
-	//		gLiftState = liftIdle;
-	//		gArmState = armIdle;
-	//		gClawState = clawClosed;
-	//		return;
-	//	}
-	//	setClaw(-128, true);
-	//	while( SensorValue[clawPoti] < CLAW_OPEN-500 )  sleep(10);
-	//	gArmDown= false;
-	//	if (downAfter)
-	//	{
-	//		writeDebugStreamLine("%06d starting Task dropArm", nPgmTime-gOverAllTime);
-	//		dropArmAsync();
-	//	}
-
-	//	while( SensorValue[clawPoti] < CLAW_OPEN )  sleep(10);
-	//	setClaw(-10);
-	//	gNumCones++;
-	//	if (downAfter)
-	//	{
-	//		while( !gArmDown) sleep(10);
-	//	}
-	//	setArm(-15,true);
-	//	writeDebugStreamLine("stack time %dms",nPgmTime- gOverAllTime );
-
-	//}
-	//else if (gNumCones == 2)
-	//{
-
-	//	gOverAllTime = nPgmTime;
-	//	writeDebugStreamLine(" STACKING on %d", gNumCones );
-	//	clawTimeOut = nPgmTime + 800;
-	//	setClaw(128,true);
-	//	while (SensorValue[clawPoti] > CLAW_CLOSE + 200 && !TimedOut(clawTimeOut, "stack 5")) sleep(10);
-
-	//	setArm(128,true);
-	//	armTimeOut = nPgmTime + 700;
-	//	while (SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 6")) sleep(10);
-
-	//	setClaw (20,true) ;
-	//	gLiftTarget = LIFT_BOTTOM +  gliftTargetA[gNumCones];
-	//	liftUpAsync();
-
-	//	while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 7")) sleep(10);
-
-	//	setClaw (40);
-	//	while (SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut, "stack 8")) sleep(10);
-
-	//	setArm(20);
-	//	setClaw(15);
-	//	sleep(125);
-	//	setArm(15);
-
-	//	setClaw(-128);
-	//	while( SensorValue[clawPoti] < CLAW_OPEN)  sleep(10);
-	//	gNumCones++;
-	//	setLift(-30);
-	//	sleep(50);
-	//	gArmDown= false;
-	//	if (downAfter)
-	//	{
-	//		dropArmAsync();
-	//	}
-	//	setClaw(-10);
-	//	setLift(-12);
-	//	if (downAfter)
-	//	{
-	//		while( !gArmDown) sleep(10);
-	//	}
-	//	writeDebugStreamLine( " STACKTIME = %d ms", nPgmTime- gOverAllTime);
-	//}
-	//else if (gNumCones == 3)
-	//{
-	//	gOverAllTime = nPgmTime;
-	//	writeDebugStreamLine(" -------------STACKING on %d", gNumCones );
-	//	clawTimeOut = nPgmTime + 800;
-	//	setClaw(128,true);
-	//	while (SensorValue[clawPoti] > CLAW_CLOSE+200 && !TimedOut(clawTimeOut, "stack 9")) sleep(10);
-
-	//	setArm(128,true);
-	//	armTimeOut = nPgmTime + 600;
-	//	while (SensorValue[clawPoti] > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 10")) sleep(10);
-
-	//	setClaw (20,true) ;
-	//	gLiftTarget = LIFT_BOTTOM +  gliftTargetA[gNumCones];
-	//	liftUpAsync();
-	//	while (SensorValue[armPoti] < ARM_TOP - 600 && !TimedOut(armTimeOut, "stack 11")) sleep(10);
-
-	//	setClaw (40,true);
-	//	while (SensorValue[armPoti] < ARM_TOP && !TimedOut(armTimeOut, "stack 12")) sleep(10);
-
-	//	setArm (15,true);
-	//	setClaw (15,true);
-	//	setLift(-30,true);
-	//	sleep(150);
-	//	setClaw(-128,true);
-
-	//	while ( SensorValue[liftPoti] > gLiftTarget-160  && !SensorValue[limBottom] ) sleep(10); //200
-	//	setLift(15,true);
-
-	//	writeDebugStreamLine("%d sleep(100)", nPgmTime-gOverAllTime);
-	//	sleep(100);
-
-	//	gLiftTarget = LIFT_BOTTOM + gliftTargetA[3] ;
-
-	//	liftUpAsync();
-	//	while( SensorValue[clawPoti] < CLAW_OPEN )  sleep(10);
-	//	gNumCones++;
-	//	setClaw(-10,true);
-	//	while( !gLiftTargetReached) sleep(10);
-
-	//	gArmDown= false;
-	//	if (downAfter)
-	//	{
-	//		armTimeOut = nPgmTime + 600;
-	//		dropArmAsync();
-	//		while (SensorValue[armPoti] > ARM_TOP-600  && !TimedOut(armTimeOut, "stack 13")) sleep(10);
-	//		setLift(-30,true);
-	//		while ( !SensorValue[limBottom] ) sleep(10);
-	//		setLift(-10,true);
-	//		while( !gArmDown ) sleep(10);
-	//	}
-
-	//	writeDebugStreamLine( " STACKTIME = %d ms", nPgmTime- gOverAllTime);
-
-	//}
-	//else
-	//{
-
-
-	//	writeDebugStreamLine(" -------------STACKING on %d", gNumCones );
-
-	//	// if the claw is open then make sure the arm is down close the claw
-	//	/*if( gSensor[clawPoti].value > CLAW_CLOSE+100 )
-	//	{
-	//		setArm(-127,true);
-	//		armTimeOut = nPgmTime + 500;
-	//		while (gSensor[armPoti].value > ARM_BOTTOM && !TimedOut(armTimeOut, "stack 14")) sleep(10);
-	//	}*/
-
-	//	gOverAllTime = nPgmTime;
-	//	setArm(-15,true);
-	//	setClaw(CLAW_CLOSE_POWER,true);
-	//	clawTimeOut = nPgmTime + 800;
-	//	while (gSensor[clawPoti].value > CLAW_CLOSE+300 && !TimedOut(clawTimeOut, "stack 15")) sleep(10);
-
-	//	// raise the arm while closing the claw along the way.
-	//	if (gSensor[armPoti].value < ARM_BOTTOM + 100)
-	//	{
-	//		setArm(127,true);
-	//		armTimeOut = nPgmTime + 500;
-	//		clawTimeOut = nPgmTime + 300;
-	//		while (gSensor[clawPoti].value > CLAW_CLOSE && !TimedOut(clawTimeOut, "stack 16")) sleep(10);
-	//		setClaw(CLAW_CLOSE_HOLD_POWER,true);
-
-	//		//wait for the arm to pull the cone away from the base before raising the lift
-	//		while (gSensor[armPoti].value < ARM_BOTTOM+100 && !TimedOut(armTimeOut, "stack 17")) sleep(10);//200
-	//	}
-
-	//	setArm(25,true);
-	//	liftUpAsync();
-
-	//	//slow the arm down otherwise it will hit the stack on the way up
-	//	while ( gSensor[liftPoti].value < gLiftTarget - 400 ) sleep(10);
-	//	armTimeOut = nPgmTime + 650;
-	//	setArm(127,true);
-
-	//	// tighten the claw just before hitting the top
-	//	while (gSensor[armPoti].value < ARM_TOP-600 && !TimedOut(armTimeOut, "stack 18")) sleep(10);
-	//	setClaw(40,true);
-
-	//	//arm reached the top
-	//	while (gSensor[armPoti].value < ARM_TOP && !TimedOut(armTimeOut, "stack 19")) sleep(10);
-	//	setArm(25,true);
-	//	setClaw(CLAW_CLOSE_HOLD_POWER,true);
-
-
-	//if( gNumCones < 10 )
-	//{
-	//	setLift(-80,true);
-	//	liftTimeOut = nPgmTime+400;
-	//	while (gSensor[liftPoti].value > gLiftTarget-60 && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 20")) sleep(10);
-	//	setLift(15,true);
-
-	//	setClaw(CLAW_OPEN_POWER,true);
-	//	sleep(150);
-	//	// dont lift as high as the original stack target
-	//	gLiftTarget = gLiftTarget-30;//60
-	//	liftUpAsync();
-	//	while( gSensor[clawPoti].value< CLAW_OPEN ) sleep(10);
-	//	setClaw(CLAW_OPEN_HOLD_POWER,true);
-	//	gNumCones++;
-	//	while( !gLiftTargetReached ) sleep(10);
-
-	//	gArmDown = false;
-	//	if (downAfter)
-	//	{
-	//		dropArmAsync();
-	//		while( gSensor[armPoti].value > ARM_TOP-400 )  sleep(10);
-	//		setLift(-127);
-	//		while ( !gSensor[limBottom].value ) sleep(10);
-	//		setLift(-10);
-	//		while( !gArmDown) sleep(10);
-	//	}
-	//}
-	//else
-	//{
-	//	setArm(15,true);
-	//	setLift(15,true);
-	//	sleep(200);
-	//	setLift(-50,true);
-	//	liftTimeOut = nPgmTime + 700;
-	//	gLiftTarget = 2900; //JOHN
-	//	while (gSensor[liftPoti].value > gLiftTarget && !gSensor[limBottom].value && !TimedOut(liftTimeOut, "stack 21")) sleep(10);
-	//	setLift(15, true);
-	//	setClaw(10,true);
-	//}
-
-	//	writeDebugStreamLine( "------ STACK %d cones in %d ms -----", gNumCones, nPgmTime-gOverAllTime);
-	//	gLiftState = liftIdle;
-	//	gArmState = downAfter && gNumCones < 11 ? armHold : armIdle;
-	//	gClawState = clawIdle;
-	//}
 }
 
 NEW_ASYNC_VOID_2(stack, bool, bool);
