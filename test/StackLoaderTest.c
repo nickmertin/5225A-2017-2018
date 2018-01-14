@@ -27,7 +27,7 @@
 #define ARM_STACK 2600
 #define ARM_HORIZONTAL 1150
 
-int gNumCones = 4;
+int gNumCones = 5;
 
 int gLiftTarget;
 int gArmTarget;
@@ -361,6 +361,23 @@ task main()
 
 			moveArmDownTo(2250, -127, 0);
 			while (!gArmDone) sleep(10);
+
+			while (!vexRT[Btn8D]) sleep(10);
+		}
+		else if (gNumCones == 5)
+		{
+			moveLiftUpTo(LIFT_POS(18), 127, 10, -20);
+			moveArmUpTo(ARM_STACK, 127, -12);
+			while (!gLiftDone) sleep(10);
+			while (!gArmDone) sleep(10);
+
+			moveLiftDownTo(LIFT_POS(17), -70, 10);
+			while (!gLiftDone) sleep(10);
+
+			moveArmDownTo(2250, -127, 0);
+			while (!gArmDone) sleep(10);
+
+			//while (!vexRT[Btn8D]) sleep(10);
 		}
 	}
 }
