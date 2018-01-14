@@ -997,50 +997,6 @@ void stackFromLoader(int max, bool wait, bool onMobile)
 
 NEW_ASYNC_VOID_3(stackFromLoader, int, bool, bool);
 
-void stackExternal()
-{
-	//gArmState = armManaged;
-	//gClawState = clawManaged;
-	//gDriveManual = false;
-	//resetPositionFull(gPosition, 0, 0, 0);
-	//EndTimeSlice();
-	//writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
-	//byte async = trackPositionTaskAsync();
-	//EndTimeSlice();
-	//writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
-	//moveToTargetAsync(-0.8, 0, 0, 0, -50, 4, 0.5, 0.5, true, true);
-	//unsigned long driveTimeout = nPgmTime + 1000;
-	//sleep(200);
-	//setArm(-90);
-	//unsigned long coneTimeout = nPgmTime + 1000;
-	//while (gSensor[armPoti].value > 750 && !TimedOut(coneTimeout, "extern/driver 1")) sleep(10);
-	//setArm(-10);
-	//await(async, driveTimeout, "extern/driver 2");
-	//trackPositionTaskKill();
-	//setClaw(CLAW_OPEN_POWER);
-	//coneTimeout = nPgmTime + 800;
-	//while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern/driver 3")) sleep(10);
-	//setClaw(CLAW_OPEN_HOLD_POWER);
-	//gClawState = clawOpened;
-	//setArm(127);
-	//coneTimeout = nPgmTime + 100;
-	//while (gSensor[armPoti].value < gArmPositions[2]) sleep(10);
-	//setArm(10);
-	//gArmPosition = 2;
-	//gArmState = armHold;
-	//setDrive(80, 80);
-	//sleep(400);
-	//setDrive(0, 0);
-	//gMobileTarget = MOBILE_TOP;
-	//gMobileState = mobileRaise;
-	//setMobile(MOBILE_UP_POWER);
-	//gMobileHoldPower = MOBILE_UP_HOLD_POWER;
-	//gNumCones = 1;
-	//gDriveManual = true;
-}
-
-NEW_ASYNC_VOID_0(stackExternal);
-
 bool cancel()
 {
 	return false;
@@ -1298,7 +1254,6 @@ USE_ASYNC(autonomous)
 USE_ASYNC(usercontrol)
 USE_ASYNC(stack)
 USE_ASYNC(stackFromLoader)
-USE_ASYNC(stackExternal)
 USE_ASYNC(trackPositionTask)
 USE_ASYNC(autoMotorSensorUpdateTask)
 USE_ASYNC(autoSafetyTask)
