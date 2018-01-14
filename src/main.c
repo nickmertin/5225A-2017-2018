@@ -144,7 +144,7 @@ case liftToTarget:
 	float target = gLiftTarget;
 	float last = LIFT_HEIGHT(gSensor[liftPoti].value);
 	writeDebugStreamLine("liftToTarget %f -> %f", last, target);
-	const float kP_vel = arg ? 0.006 : 0.01;
+	const float kP_vel = arg._long ? 0.006 : 0.01;
 	const float kI_vel = 0.00001;
 	bool up = target > last;
 	float kP_pwr = up ? 2500.0 : 6000.0;
@@ -177,7 +177,8 @@ case liftToTarget:
 		endCycle(cycle);
 	} while (up ? err > epsilon : err < epsilon);
 	writeDebugStreamLine("Lift at target: %f %f %f | %d | %d ms", target, LIFT_HEIGHT(gSensor[liftPoti].value), err, poti, nPgmTime - begin);
-	NEXT_STATE((up ? target >= LIFT_HOLD_UP_THRESHOLD : target < LIFT_HOLD_DOWN_THRESHOLD) ? liftHold : liftStopping, 0);
+	arg._long = 0;
+	NEXT_STATE((up ? target >= LIFT_HOLD_UP_THRESHOLD : target < LIFT_HOLD_DOWN_THRESHOLD) ? liftHold : liftStopping);
 }
 case liftStopping:
 {
@@ -201,15 +202,15 @@ case liftStopping:
 		endCycle(cycle);
 	}
 	writeDebugStreamLine("%d", nPgmTime);
-	NEXT_STATE(liftHold, arg);
+	NEXT_STATE(liftHold);
 }
 case liftHold:
 {
-	float target = arg ? LIFT_HEIGHT(gSensor[liftPoti].value) : gLiftTarget;
+	float target = arg._long ? LIFT_HEIGHT(gSensor[liftPoti].value) : gLiftTarget;
 	if (target < LIFT_HOLD_DOWN_THRESHOLD)
-		NEXT_STATE(liftHoldDown, arg);
+		NEXT_STATE(liftHoldDown);
 	if (target > LIFT_HOLD_UP_THRESHOLD)
-		NEXT_STATE(liftHoldUp, arg);
+		NEXT_STATE(liftHoldUp);
 	//{
 	//	sCycleData cycle;
 	//	initCycle(cycle, 10, "liftHold");
@@ -283,7 +284,7 @@ case armIdle:
 	break;
 case armToTarget:
 	{
-		if (arg != -1)
+		if (arg._long != -1)
 		{
 			const float kP = 0.1;
 			int err;
@@ -291,7 +292,7 @@ case armToTarget:
 			initCycle(cycle, 10, "armToTarget");
 			do
 			{
-				err = arg - gSensor[armPoti].value;
+				err = arg._long - gSensor[armPoti].value;
 				float power = kP * err;
 				LIM_TO_VAL_SET(power, 127);
 				setArm((word)power);
@@ -299,7 +300,7 @@ case armToTarget:
 			} while (abs(err) > 100);
 		}
 		writeDebugStreamLine("Arm at target: %d %d", arg, gSensor[armPoti].value);
-		NEXT_STATE(armStopping, arg);
+		NEXT_STATE(armStopping);
 	}
 case armStopping:
 	velocityClear(armPoti);
@@ -311,16 +312,16 @@ case armStopping:
 	} while (!gSensor[armPoti].velGood);
 	setArm(sgn(gSensor[armPoti].velocity) * -25);
 	sleep(150);
-	NEXT_STATE(armHold, arg);
+	NEXT_STATE(armHold);
 case armHold:
 	{
-		if (arg == -1) arg = gSensor[armPoti].value;
+		if (arg._long == -1) arg._long = gSensor[armPoti].value;
 		const float kP = 0.4;
 		sCycleData cycle;
 		initCycle(cycle, 10, "armHold");
 		while (true)
 		{
-			float power = (arg - gSensor[armPoti].value) * kP;
+			float power = (arg._long - gSensor[armPoti].value) * kP;
 			LIM_TO_VAL_SET(power, 12);
 			setArm((word)power);
 			endCycle(cycle);
@@ -423,7 +424,7 @@ case mobileIdle:
 	break;
 case mobileTop:
 	{
-		if (arg)
+		if (arg._long)
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 2000;
@@ -436,7 +437,7 @@ case mobileTop:
 	}
 case mobileBottom:
 	{
-		if (arg && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
+		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 2000;
@@ -447,7 +448,7 @@ case mobileBottom:
 	}
 case mobileBottomSlow:
 	{
-		if (arg)
+		if (arg._long)
 			mobileClearLift();
 		//sPID pid;
 		//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
@@ -476,7 +477,8 @@ case mobileBottomSlow:
 		}
 		setMobile(0);
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottomSlow 3")) sleep(10);
-		NEXT_STATE(mobileBottom, 0)
+		arg._long = 0;
+		NEXT_STATE(mobileBottom)
 	}
 case mobileUpToMiddle:
 	{
@@ -484,22 +486,25 @@ case mobileUpToMiddle:
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 		setMobile(15);
-		NEXT_STATE(mobileMiddle, -1)
+		arg._long = -1;
+		NEXT_STATE(mobileMiddle)
 	}
 case mobileDownToMiddle:
 	{
-		if (arg)
+		if (arg._long)
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 		setMobile(15);
 		//mobileResetLift();
-		NEXT_STATE(mobileMiddle, -1)
+		arg._long = -1;
+		NEXT_STATE(mobileMiddle)
 	}
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
-	NEXT_STATE(mobileTop, -1)
+		arg._long = -1;
+	NEXT_STATE(mobileTop)
 })
 
 void handleMobile()
