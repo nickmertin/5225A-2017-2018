@@ -361,6 +361,6 @@ void autoTest()
 	sleep(300);
 	setDrive(-80, -80);
 	timeout = nPgmTime + 1500;
-	while (gPosition.y > 15 && !TimedOut(timeout, "test 2")) sleep(10);
+	while (gPosition.y > 10 && !TimedOut(timeout, "test 2")) sleep(10);
 	setDrive(0, 0);
 }
