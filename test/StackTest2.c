@@ -24,7 +24,7 @@
 #define ARM_BOTTOM 550
 #define ARM_PRESTACK 2300
 #define ARM_CARRY 1500
-#define ARM_STACK 2700
+#define ARM_STACK 2400
 #define ARM_HORIZONTAL 1150
 
 int gNumCones = 0;
@@ -182,11 +182,16 @@ task drive()
 	}
 }
 
+//                                   0     1     2      3      4      5      6      7      8      9      10
+const float gLiftRaiseTarget[11] = { 6.75, 9.55, 12.35, 15.15, 17.95, 20.75, 23.55, 27,    31,    36,    38 };
+const float gLiftPlaceTarget[11] = { 5,    7.8,  10.6,  13.4,  16.2,  19,    21.8,  24.6,  27.4,  30.2,  33 };
+
 task main()
 {
 	startTask(drive);
 	while (true)
 	{
+		while (gNumCones == 11) sleep(10);
 		while (!vexRT[Btn8D]) sleep(10);
 
 		unsigned long timeStart = nPgmTime;
@@ -198,19 +203,28 @@ task main()
 		while (!gLiftDone) sleep(10);
 		while (!gArmDone) sleep(10);
 
+		moveLiftUpTo(LIFT_POS(gLiftRaiseTarget[gNumCones]), 127, 7, -15);
+		while (SensorValue[liftPoti] < LIFT_POS(gLiftPlaceTarget[gNumCones])) sleep(10);
 		moveArmUpTo(ARM_STACK, 127, -12);
-
-		moveLiftUpTo(LIFT_POS(6.75), 127, 7, -15);
 		while (!gLiftDone) sleep(10);
 		while (!gArmDone) sleep(10);
 
-		moveLiftDownTo(LIFT_POS(LIFT_BOTTOM), -70, -15);
+		moveLiftDownTo(LIFT_POS(gLiftPlaceTarget[gNumCones]), -70, gNumCones == 0 ? -15 : 10);
 		while (!gLiftDone) sleep(10);
 
 		moveArmDownTo(ARM_HORIZONTAL, -127, 10, 25);
 		while (SensorValue[armPoti] > ARM_PRESTACK) sleep(10);
-		moveLiftUpTo(1300, 80, 10, -25);
-		while (!gArmDone) sleep(10);
+
+		if (gNumCones <= 4)
+			moveLiftUpTo(1300, 80, 10, -25);
+		else
+			moveLiftDownTo(1800, -80, -10, 15);
+		while (!gArmDone)
+		{
+			sleep(10);
+		}
+
+		++gNumCones;
 
 		writeDebugStreamLine("%d", nPgmTime - timeStart);
 	}
