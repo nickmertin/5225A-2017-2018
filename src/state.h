@@ -19,7 +19,7 @@ typedef union _stateMachineArg {
 #define MAKE_MACHINE(machine, states, base, handler) \
 states machine##State = -1; \
 uStateMachineArg machine##Arg; \
-void machine##Internal(states state, uStateMachineArg arg) \
+void machine##Internal(states state) \
 { \
 	uStateMachineArg &arg = machine##Arg; \
 	top: \
@@ -32,7 +32,8 @@ void machine##Setup() \
 { \
 	if (IS_CONFIGURED(machine)) \
 		machine##InternalKill(); \
-	machine##InternalAsync(base, -1); \
+	machine##Arg._long = 0; \
+	machine##InternalAsync(base); \
 	writeDebugStreamLine("Initialized state machine " #machine " in base state " #base); \
 } \
 void machine##Set(states state) \
@@ -50,13 +51,13 @@ void machine##Set(states state, float arg) \
 { \
 	machine##InternalKill(); \
 	machine##Arg._float = arg; \
-	machine##InternalAsync(state, arg); \
+	machine##InternalAsync(state); \
 } \
 void machine##Set(states state, void *arg) \
 { \
 	machine##InternalKill(); \
 	machine##Arg._ptr = arg; \
-	machine##InternalAsync(state, arg); \
+	machine##InternalAsync(state); \
 } \
 void machine##Reset() \
 { \
