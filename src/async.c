@@ -1,3 +1,9 @@
+void asyncInit()
+{
+	for (int i = 0; i < TASK_POOL_SIZE; ++i)
+		gAsyncTaskData[i].id = NULL;
+}
+
 void await(byte index, unsigned long timeout, const string description)
 {
 	if (index < TASK_POOL_SIZE)

@@ -58,6 +58,7 @@ print('} sAsyncTaskData;')
 print('sAsyncTaskData gAsyncTaskData[TASK_POOL_SIZE];')
 print()
 
+print('void asyncInit();')
 print('void await(byte index, unsigned long timeout, const string description);')
 print('void kill(byte index);')
 print('bool _runAsync(sAsyncTaskData *data);')

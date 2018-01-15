@@ -350,6 +350,7 @@ typedef struct _sAsyncTaskData {
 } sAsyncTaskData;
 sAsyncTaskData gAsyncTaskData[TASK_POOL_SIZE];
 
+void asyncInit();
 void await(byte index, unsigned long timeout, const string description);
 void kill(byte index);
 bool _runAsync(sAsyncTaskData *data);

@@ -1107,6 +1107,7 @@ void startup()
 	setupSensors();
 	setupJoysticks();
 	tInit();
+	asyncInit();
 
 	setupDgtIn(leftLine, 0, 150);
 	setupDgtIn(rightLine, 0, 150);
