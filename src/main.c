@@ -933,6 +933,7 @@ void startup()
 	setupSensors();
 	setupJoysticks();
 	tInit();
+	asyncInit();
 
 	mobileSetup();
 	liftSetup();
