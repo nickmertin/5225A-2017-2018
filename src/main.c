@@ -345,32 +345,32 @@ case armToTarget:
 case armRaiseSimple:
 {
 	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
-	setLift(config.liftPower);
+	setArm(config.liftPower);
 	int pos;
-	while ((pos = gSensor[liftPoti].value) < config.target) sleep(10);
+	while ((pos = gSensor[armPoti].value) < config.target) sleep(10);
 	if (config.brakePower)
 	{
-		setLift(config.brakePower);
+		setArm(config.brakePower);
 		sleep(200);
 	}
-	writeDebugStreamLine("Lift moved up to %d | %d", config.target, pos);
+	writeDebugStreamLine("Arm moved up to %d | %d", config.target, pos);
 	arg._long = -1;
-	NEXT_STATE(liftHold);
+	NEXT_STATE(armHold);
 }
 case armLowerSimple:
 {
 	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
-	setLift(config.liftPower);
+	setArm(config.liftPower);
 	int pos;
-	while ((pos = gSensor[liftPoti].value) > config.target) sleep(10);
+	while ((pos = gSensor[armPoti].value) > config.target) sleep(10);
 	if (config.brakePower)
 	{
-		setLift(config.brakePower);
+		setArm(config.brakePower);
 		sleep(200);
 	}
-	writeDebugStreamLine("Lift moved down to %d | %d", config.target, pos);
+	writeDebugStreamLine("Arm moved down to %d | %d", config.target, pos);
 	arg._long = -1;
-	NEXT_STATE(liftHold);
+	NEXT_STATE(armHold);
 }
 case armStopping:
 	velocityClear(armPoti);
