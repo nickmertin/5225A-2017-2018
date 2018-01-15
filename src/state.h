@@ -7,7 +7,7 @@
 }
 
 #define IS_CONFIGURED(machine) (machine##State != -1)
-#define USE_MACHINE(machine) USE_ASYNC(machine##Internal)
+#define USE_MACHINE(machine) { USE_ASYNC(machine##Internal) USE_ASYNC(machine##TimeoutWhile) USE_ASYNC(machine##TimeoutUntil) }
 #define NEXT_STATE(new_state) { state = new_state; goto top; }
 
 typedef union _stateMachineArg {
@@ -62,4 +62,12 @@ void machine##Set(states state, void *arg) \
 void machine##Reset() \
 { \
 	machine##Set(base); \
-}
+} \
+void machine##TimeoutWhile(states state) \
+	timeoutWhileEqual(&macihne##State, &state) \
+} \
+NEW_ASYNC_VOID_1(machine##TimeoutWhile, states); \
+void machine##TimeoutUntil(states state) \
+	timeoutWhileNotEqual(&machine##State, &state) \
+} \
+NEW_ASYNC_VOID_1(machine##TimeoutUntil, states);
