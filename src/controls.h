@@ -7,7 +7,7 @@
 /* Lift */
 #define JOY_LIFT Ch2
 #define DZ_LIFT 70
-#define BTN_LIFT_POS Btn8R
+//#define BTN_LIFT_POS Btn8R
 
 /* Arm */
 #define JOY_ARM Ch1
@@ -24,7 +24,6 @@
 #define BTN_MACRO_CLEAR Btn8U
 #define BTN_MACRO_STACK Btn8D
 //#define BTN_MACRO_LOADER Btn7D
-#define BTN_MACRO_EXTERNAL Btn8L
 #define BTN_MACRO_CANCEL Btn8R
 #define BTN_MACRO_INC Btn7U
 #define BTN_MACRO_DEC Btn7L
