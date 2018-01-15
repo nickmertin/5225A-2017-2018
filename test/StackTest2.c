@@ -183,7 +183,7 @@ task drive()
 }
 
 //                                   0     1     2      3      4      5      6      7      8      9      10
-const float gLiftRaiseTarget[11] = { 6.75, 9.55, 12.35, 15.15, 17.95, 20.75, 23.55, 28,    33,    36,    38 };
+const float gLiftRaiseTarget[11] = { 6.75, 10,   12.75, 15.75, 18.75, 21.75, 24.75, 28,    33,    36,    38 };
 const float gLiftPlaceTarget[11] = { 5.25, 8,    10.6,  13.4,  16.2,  19,    21.8,  24.6,  27.4,  30.2,  33 };
 
 task main()
