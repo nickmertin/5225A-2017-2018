@@ -12,6 +12,20 @@ void timeoutWhileNotEqual(void *val1, void *val2, unsigned int size, unsigned lo
 	while (memcmp(val1, val2, size) && !TimedOut(timeout, description)) sleep(10);
 }
 
+void timeoutWhileLessThanS(short *val, short threshold, unsigned long timeout)
+{
+	string description;
+	sprintf(description, "*%08x < %d", val, threshold);
+	while (*val < threshold && !TimedOut(timeout, description)) sleep(10);
+}
+
+void timeoutWhileGreaterThanS(short *val, short threshold, unsigned long timeout)
+{
+	string description;
+	sprintf(description, "*%08x > %d", val, threshold);
+	while (*val > threshold && !TimedOut(timeout, description)) sleep(10);
+}
+
 void timeoutWhileLessThanL(long *val, long threshold, unsigned long timeout)
 {
 	string description;
