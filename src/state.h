@@ -63,11 +63,13 @@ void machine##Reset() \
 { \
 	machine##Set(base); \
 } \
-void machine##TimeoutWhile(states state) \
-	timeoutWhileEqual(&macihne##State, &state) \
+void machine##TimeoutWhile(states state, unsigned long timeout) \
+{ \
+	timeoutWhileEqual(&machine##State, &state, sizeof(states), timeout); \
 } \
-NEW_ASYNC_VOID_1(machine##TimeoutWhile, states); \
-void machine##TimeoutUntil(states state) \
-	timeoutWhileNotEqual(&machine##State, &state) \
+NEW_ASYNC_VOID_2(machine##TimeoutWhile, states, unsigned long); \
+void machine##TimeoutUntil(states state, unsigned long timeout) \
+{ \
+	timeoutWhileNotEqual(&machine##State, &state, sizeof(states), timeout); \
 } \
-NEW_ASYNC_VOID_1(machine##TimeoutUntil, states);
+NEW_ASYNC_VOID_2(machine##TimeoutUntil, states, unsigned long);
