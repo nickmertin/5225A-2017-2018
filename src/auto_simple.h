@@ -22,8 +22,6 @@ typedef struct _turnState
 
 /* Variables */
 sVector gTargetLast;
-sTurnState turnCw;
-sTurnState turnCcw;
 
 /* Functions */
 void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float dropEarly = 0, tStopType stopType = stopSoft | stopHarsh, bool slow = true);
@@ -32,5 +30,5 @@ void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, flo
 void moveToTargetDisSimple(float a, float d, byte power, float dropEarly = 0, tStopType stopType = stopSoft | stopHarsh, bool slow = true);
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right);
 void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right);
-void turnSimpleInternalCw(float a);
-void turnSimpleInternalCcw(float a);
+void turnSimpleInternalCw(float a, sTurnState& state);
+void turnSimpleInternalCcw(float a, sTurnState& state);

@@ -94,21 +94,30 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	if (turnDir == ch)
 		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
 
+	sTurnState state;
 	switch (turnDir)
 	{
 	case cw:
 		setDrive(left, -right);
 		while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
-		turnCw.target = 0.900;
-		turnSimpleInternalCw (a);
+		state.target = 0.900;
+		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
+			turnSimpleInternalCw(a, state);
+		setDrive(-15, 15);
+		sleep(150);
+		setDrive(0, 0);
 		break;
 	case ccw:
 		setDrive(-left, right);
 		while (gPosition.a > a + gVelocity.a * 0.4) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
-		turnCcw.target = 0.900;
-		turnSimpleInternalCcw (a);
+		state.target = 0.900;
+		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3) || gVelocity.a < -1.2)
+			turnSimpleInternalCcw(a, state);
+		setDrive(15, -15);
+		sleep(150);
+		setDrive(0, 0);
 		break;
 	}
 
@@ -120,96 +129,84 @@ void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right)
 	turnToAngleRadSimple(degToRad(a), turnDir, left, right);
 }
 
-void turnSimpleInternalCw(float a)
+void turnSimpleInternalCw(float a, sTurnState& state)
 {
-	while (gPosition.a < a + degToRad(-5.3 + (turnCw.target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
+	unsigned long deltaTime = state.time - state.lstTime;
+	float vel = gVelocity.a;
+
+	if (deltaTime >= 1)
 	{
-		unsigned long deltaTime = turnCw.time - turnCw.lstTime;
-		float vel = gVelocity.a;
+		state.input = vel;
 
-		if (deltaTime >= 1)
+		state.lstError = state.error;
+		state.error = state.target - state.input;
+
+		state.integral += state.error * deltaTime;
+		if (state.integral < -8) state.integral = 0;
+
+		state.power = state.error * kP + state.integral * kI;
+
+		state.power += 26;
+
+		if (state.power < 0) state.power /= 6.0;
+
+		if (state.power > 50) state.power = 50;
+		if (state.power < -5) state.power = -5;
+
+		setDrive(state.power, -state.power);
+
+		if (state.time >= state.nextDebug)
 		{
-			turnCw.input = vel;
+			writeDebugStreamLine("%f %f %f", state.power, state.error, state.integral);
+			state.nextDebug = state.time + 20;
 
-			turnCw.lstError = turnCw.error;
-			turnCw.error = turnCw.target - turnCw.input;
-
-			turnCw.integral += turnCw.error * deltaTime;
-			if (turnCw.integral < -8) turnCw.integral = 0;
-
-			turnCw.power = turnCw.error * kP + turnCw.integral * kI;
-
-			turnCw.power += 26;
-
-			if (turnCw.power < 0) turnCw.power /= 6.0;
-
-			if (turnCw.power > 50) turnCw.power = 50;
-			if (turnCw.power < -5) turnCw.power = -5;
-
-			setDrive(turnCw.power, -turnCw.power);
-
-			if (turnCw.time >= turnCw.nextDebug)
-			{
-				writeDebugStreamLine("%f %f %f", turnCw.power, turnCw.error, turnCw.integral);
-				turnCw.nextDebug = turnCw.time + 20;
-
-			}
-
-			turnCw.lstTime = turnCw.time;
 		}
 
-		sleep(1);
-
-		turnCw.time = nPgmTime;
+		state.lstTime = state.time;
 	}
-	setDrive(-15, 15);
-	sleep(150);
-	setDrive(0, 0);
+
+	sleep(1);
+
+	state.time = nPgmTime;
 }
 
-void turnSimpleInternalCcw(float a)
+void turnSimpleInternalCcw(float a, sTurnState& state)
 {
-	while (gPosition.a > a - degToRad(-5.3 + (turnCcw.target - gVelocity.a) * 0.3) || gVelocity.a < -1.2)
+	unsigned long deltaTime = state.time - state.lstTime;
+	float vel = gVelocity.a;
+
+	if (deltaTime >= 1)
 	{
-		unsigned long deltaTime = turnCcw.time - turnCcw.lstTime;
-		float vel = gVelocity.a;
+		state.input = vel;
 
-		if (deltaTime >= 1)
+		state.lstError = state.error;
+		state.error = state.target - state.input;
+
+		state.integral += state.error * deltaTime;
+		if (state.integral < -8) state.integral = 0;
+
+		state.power = state.error * kP + state.integral * kI;
+
+		state.power += 26;
+
+		if (state.power < 0) state.power /= 6.0;
+
+		if (state.power > 50) state.power = 50;
+		if (state.power < -5) state.power = -5;
+
+		setDrive(-state.power, state.power);
+
+		if (state.time >= state.nextDebug)
 		{
-			turnCcw.input = vel;
+			writeDebugStreamLine("%f %f %f", state.power, state.error, state.integral);
+			state.nextDebug = state.time + 20;
 
-			turnCcw.lstError = turnCcw.error;
-			turnCcw.error = turnCcw.target - turnCcw.input;
-
-			turnCcw.integral += turnCcw.error * deltaTime;
-			if (turnCcw.integral < -8) turnCcw.integral = 0;
-
-			turnCcw.power = turnCcw.error * kP + turnCcw.integral * kI;
-
-			turnCcw.power += 26;
-
-			if (turnCcw.power < 0) turnCcw.power /= 6.0;
-
-			if (turnCcw.power > 50) turnCcw.power = 50;
-			if (turnCcw.power < -5) turnCcw.power = -5;
-
-			setDrive(-turnCcw.power, turnCcw.power);
-
-			if (turnCcw.time >= turnCcw.nextDebug)
-			{
-				writeDebugStreamLine("%f %f %f", turnCcw.power, turnCcw.error, turnCcw.integral);
-				turnCcw.nextDebug = turnCcw.time + 20;
-
-			}
-
-			turnCcw.lstTime = turnCcw.time;
 		}
 
-		sleep(1);
-
-		turnCcw.time = nPgmTime;
+		state.lstTime = state.time;
 	}
-	setDrive(15, -15);
-	sleep(150);
-	setDrive(0, 0);
+
+	sleep(1);
+
+	state.time = nPgmTime;
 }
