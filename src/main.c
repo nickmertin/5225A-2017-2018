@@ -258,16 +258,7 @@ case liftHold:
 		NEXT_STATE(liftHoldDown);
 	if (target > LIFT_HOLD_UP_THRESHOLD)
 		NEXT_STATE(liftHoldUp);
-	//{
-	//	sCycleData cycle;
-	//	initCycle(cycle, 10, "liftHold");
-	//	while (true)
-	//	{
-	//		setLift(8 + (word)(5 * cos((gSensor[liftPoti].value - LIFT_MID) * PI / 2870)));
-	//		endCycle(cycle);
-	//	}
-	//}
-	setLift(10 + (word)(12 * cos((target - LIFT_MID) * PI / 2870)));
+	setLift(7 + (word)(3 * cos((target - LIFT_MID) * PI / 2870)));
 	break;
 }
 case liftHoldDown:
