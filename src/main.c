@@ -136,7 +136,7 @@ void setLift(word power,bool debug=false)
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
-#define LIFT_TOP 38
+#define LIFT_TOP 38.25
 #define LIFT_BOTTOM 5.25
 #define LIFT_MID 20.25
 #define LIFT_HOLD_DOWN_THRESHOLD 7.5
@@ -696,7 +696,7 @@ void stack(bool pickup, bool downAfter)
 		liftTimeOut = nPgmTime + 1200;
 		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, 1200, liftTimeOut);
 
-		configure(armConfig, ARM_BOTTOM + 340, -127, 0);
+		configure(armConfig, ARM_BOTTOM + 250, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
