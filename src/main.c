@@ -1064,8 +1064,17 @@ void usercontrol()
 
 ASYNC_ROUTINES
 (
+USE_ASYNC(timeoutWhileEqual)
+USE_ASYNC(timeoutWhileNotEqual)
+USE_ASYNC(timeoutWhileLessThanS)
+USE_ASYNC(timeoutWhileGreaterThanS)
+USE_ASYNC(timeoutWhileLessThanL)
+USE_ASYNC(timeoutWhileGreaterThanL)
+USE_ASYNC(timeoutWhileLessThanF)
+USE_ASYNC(timeoutWhileGreaterThanF)
 USE_ASYNC(autonomous)
 USE_ASYNC(usercontrol)
+USE_ASYNC(clearArm)
 USE_ASYNC(stack)
 USE_ASYNC(stackFromLoader)
 USE_ASYNC(trackPositionTask)
