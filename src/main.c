@@ -463,9 +463,11 @@ typedef enum _tMobileStates {
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
 #define LIFT_MOBILE_THRESHOLD 1300
 
-unsigned long gMobileButtonTime;
+#define MOBILE_SLOW_HOLD_TIMEOUT 250
+
 bool gMobileCheckLift;
 bool gMobileResetLift = false;
+bool gMobileSlow = false;
 
 void setMobile(word power)
 {
@@ -492,6 +494,8 @@ void mobileResetLift()
 	}
 }
 
+byte detachIntakeAsync(tMobileStates arg0);
+
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
 {
 case mobileIdle:
@@ -512,6 +516,8 @@ case mobileTop:
 	}
 case mobileBottom:
 	{
+		if (gMobileSlow)
+			NEXT_STATE(mobileBottomSlow)
 		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
@@ -523,13 +529,14 @@ case mobileBottom:
 	}
 case mobileBottomSlow:
 	{
-		if (arg._long)
+		gMobileSlow = false;
+		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		//sPID pid;
 		//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
 		velocityClear(mobilePoti);
 		unsigned long timeout = nPgmTime + 3000;
-		setMobile(-50);
+		setMobile(-60);
 		while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, "mobileBottomSlow 1")) sleep(10);
 		sCycleData cycle;
 		initCycle(cycle, 10, "mobileBottomSlow");
@@ -582,34 +589,55 @@ case mobileMiddle:
 	NEXT_STATE(mobileTop)
 })
 
+void mobileWaitForSlowHold(TVexJoysticks btn)
+{
+	unsigned long timeout = nPgmTime + MOBILE_SLOW_HOLD_TIMEOUT;
+	while (nPgmTime < timeout)
+	{
+		if (!gJoy[btn].cur) return;
+		sleep(10);
+	}
+	gMobileSlow = true;
+	if (mobileState == mobileBottom)
+		mobileSet(mobileBottomSlow);
+	writeDebugStreamLine("mobileBottomSlow activated");
+}
+
+NEW_ASYNC_VOID_1(mobileWaitForSlowHold, TVexJoysticks);
+
 void handleMobile()
 {
+	if (mobileState == mobileManaged)
+		return;
+
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
 		if (RISING(BTN_MOBILE_TOGGLE))
 			mobileSet(mobileTop);
 		if (RISING(BTN_MOBILE_MIDDLE))
 		{
-			mobileSet(mobileBottom);
-			gMobileButtonTime = nPgmTime;
+			gMobileSlow = false;
+			mobileSet(mobileManaged);
+			detachIntakeAsync(mobileBottom);
+			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
 		}
 	}
 	else
 	{
 		if (RISING(BTN_MOBILE_TOGGLE))
 		{
-			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileBottom : mobileTop);
-			gMobileButtonTime = nPgmTime;
+			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
+			{
+				gMobileSlow = false;
+				mobileSet(mobileManaged);
+				detachIntakeAsync(mobileBottom);
+				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
+			}
+			else
+				mobileSet(mobileTop);
 		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
-		if (FALLING(BTN_MOBILE_TOGGLE) || FALLING(BTN_MOBILE_MIDDLE))
-			gMobileButtonTime = 0;
-		if ((gJoy[BTN_MOBILE_TOGGLE].cur || gJoy[BTN_MOBILE_MIDDLE].cur) && mobileState == mobileBottom && gMobileButtonTime && nPgmTime - gMobileButtonTime > 250)
-		{
-			mobileSet(mobileBottomSlow, 0);
-			gMobileButtonTime = 0;
-		}
 	}
 }
 
@@ -640,6 +668,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
 		armReset();
 		liftReset();
+		mobileReset();
 		gDriveManual = true;
 		int current = nCurrentTask;
 		while (true)
@@ -662,19 +691,37 @@ const float gLiftPlaceTarget[11] = { 5.25, 8,    10.6,  13.4,  16.2,  19,    21.
 
 void clearArm()
 {
-	gLiftTarget = gLiftRaiseTarget[gNumCones];
-	liftSet(liftToTarget);
+	sSimpleConfig config;
+	configure(config, LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]), 127, 0);
+	liftSet(liftRaiseSimple);
 	unsigned long timeout = nPgmTime + 1500;
-	while (liftState == liftToTarget && !TimedOut(timeout, "clear 1")) sleep(10);
+	liftTimeoutWhile(liftRaiseSimple, timeout);
 
-	armSet(armManaged);
-	setArm(127);
-	timeout = nPgmTime + 1500;
-	while (gSensor[armPoti].value < ARM_TOP && !TimedOut(timeout, "clear 2")) sleep(10);
-	armSet(armHold);
+	configure(config, ARM_TOP, 127, -15);
+	armSet(armRaiseSimple, &config);
+	timeout = nPgmTime + 1000;
+	armTimeoutWhile(armRaiseSimple, timeout);
 }
 
 NEW_ASYNC_VOID_0(clearArm);
+
+void detachIntake(tMobileStates nextMobileState)
+{
+	if (gSensor[liftPoti].value < LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]))
+	{
+		sSimpleConfig armConfig;
+		configure(armConfig, ARM_PRESTACK - 100, -127, 0);
+		armSet(armLowerSimple, &armConfig);
+		unsigned long armTimeOut = nPgmTime + 800;
+		armTimeoutWhile(armLowerSimple, armTimeOut);
+
+		clearArm();
+	}
+
+	mobileSet(nextMobileState);
+}
+
+NEW_ASYNC_VOID_1(detachIntake, tMobileStates);
 
 void stack(bool pickup, bool downAfter)
 {
@@ -1075,7 +1122,9 @@ USE_ASYNC(timeoutWhileLessThanF)
 USE_ASYNC(timeoutWhileGreaterThanF)
 USE_ASYNC(autonomous)
 USE_ASYNC(usercontrol)
+USE_ASYNC(mobileWaitForSlowHold)
 USE_ASYNC(clearArm)
+USE_ASYNC(detachIntake)
 USE_ASYNC(stack)
 USE_ASYNC(stackFromLoader)
 USE_ASYNC(trackPositionTask)
