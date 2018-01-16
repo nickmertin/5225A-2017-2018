@@ -413,10 +413,10 @@ void handleArm()
 		armSet(armHold, -1);
 	}
 
-	if (RISING(BTN_ARM_DOWN))
-	{
-		armSet(armToTarget, ARM_PRESTACK);
-	}
+	//if (RISING(BTN_ARM_DOWN))
+	//{
+	//	armSet(armToTarget, ARM_PRESTACK);
+	//}
 
 	if (armState == armManual)
 	{
@@ -943,14 +943,16 @@ void startup()
 	enableJoystick(JOY_THROTTLE);
 	enableJoystick(JOY_LIFT);
 	enableJoystick(JOY_ARM);
-	enableJoystick(BTN_ARM_DOWN);
+	enableJoystick(BTN_ARM_BACK);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
-	enableJoystick(BTN_MOBILE_BRAKES);
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_CLEAR);
 	enableJoystick(BTN_MACRO_STACK);
+	enableJoystick(BTN_MACRO_LOADER);
+	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_CANCEL);
+	enableJoystick(BTN_MACRO_RIGHT);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
 }
