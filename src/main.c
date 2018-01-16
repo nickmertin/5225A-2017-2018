@@ -648,7 +648,8 @@ bool TimedOut(unsigned long timeOut, const string description)
 			if (next == -1 || next == gUserControlTaskId || next == main) break;
 			current = next;
 		}
-		tStopAll(current);
+		if (current != gUserControlTaskId && current != main)
+			tStopAll(current);
 		return true;
 	}
 	else
