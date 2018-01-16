@@ -15,7 +15,7 @@ byte func##Async() { \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -40,7 +40,7 @@ byte func##Async(type0 arg0) { \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -67,7 +67,7 @@ byte func##Async(type0 arg0, type1 arg1) { \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -96,7 +96,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -127,7 +127,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -160,7 +160,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -195,7 +195,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -232,7 +232,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -271,7 +271,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -312,7 +312,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -355,7 +355,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy) { \
+    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
       kill(i); \
       return true; \
     } \
@@ -393,6 +393,7 @@ byte _startAsync(byte *id, void *data);
 task threadPoolTask0() {
   if (!_runAsync(&gAsyncTaskData[0]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask0!");
+  return_t;
 }
 #endif
 
@@ -400,6 +401,7 @@ task threadPoolTask0() {
 task threadPoolTask1() {
   if (!_runAsync(&gAsyncTaskData[1]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask1!");
+  return_t;
 }
 #endif
 
@@ -407,6 +409,7 @@ task threadPoolTask1() {
 task threadPoolTask2() {
   if (!_runAsync(&gAsyncTaskData[2]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask2!");
+  return_t;
 }
 #endif
 
@@ -414,6 +417,7 @@ task threadPoolTask2() {
 task threadPoolTask3() {
   if (!_runAsync(&gAsyncTaskData[3]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask3!");
+  return_t;
 }
 #endif
 
@@ -421,6 +425,7 @@ task threadPoolTask3() {
 task threadPoolTask4() {
   if (!_runAsync(&gAsyncTaskData[4]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask4!");
+  return_t;
 }
 #endif
 
@@ -428,6 +433,7 @@ task threadPoolTask4() {
 task threadPoolTask5() {
   if (!_runAsync(&gAsyncTaskData[5]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask5!");
+  return_t;
 }
 #endif
 
@@ -435,6 +441,7 @@ task threadPoolTask5() {
 task threadPoolTask6() {
   if (!_runAsync(&gAsyncTaskData[6]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask6!");
+  return_t;
 }
 #endif
 
@@ -442,6 +449,7 @@ task threadPoolTask6() {
 task threadPoolTask7() {
   if (!_runAsync(&gAsyncTaskData[7]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask7!");
+  return_t;
 }
 #endif
 
@@ -449,6 +457,7 @@ task threadPoolTask7() {
 task threadPoolTask8() {
   if (!_runAsync(&gAsyncTaskData[8]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask8!");
+  return_t;
 }
 #endif
 
@@ -456,6 +465,7 @@ task threadPoolTask8() {
 task threadPoolTask9() {
   if (!_runAsync(&gAsyncTaskData[9]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask9!");
+  return_t;
 }
 #endif
 
@@ -463,6 +473,7 @@ task threadPoolTask9() {
 task threadPoolTask10() {
   if (!_runAsync(&gAsyncTaskData[10]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask10!");
+  return_t;
 }
 #endif
 
@@ -470,6 +481,7 @@ task threadPoolTask10() {
 task threadPoolTask11() {
   if (!_runAsync(&gAsyncTaskData[11]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask11!");
+  return_t;
 }
 #endif
 
@@ -477,6 +489,7 @@ task threadPoolTask11() {
 task threadPoolTask12() {
   if (!_runAsync(&gAsyncTaskData[12]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask12!");
+  return_t;
 }
 #endif
 
@@ -484,6 +497,7 @@ task threadPoolTask12() {
 task threadPoolTask13() {
   if (!_runAsync(&gAsyncTaskData[13]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask13!");
+  return_t;
 }
 #endif
 
@@ -491,6 +505,7 @@ task threadPoolTask13() {
 task threadPoolTask14() {
   if (!_runAsync(&gAsyncTaskData[14]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask14!");
+  return_t;
 }
 #endif
 
@@ -498,6 +513,7 @@ task threadPoolTask14() {
 task threadPoolTask15() {
   if (!_runAsync(&gAsyncTaskData[15]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask15!");
+  return_t;
 }
 #endif
 
@@ -505,6 +521,7 @@ task threadPoolTask15() {
 task threadPoolTask16() {
   if (!_runAsync(&gAsyncTaskData[16]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask16!");
+  return_t;
 }
 #endif
 
@@ -512,6 +529,7 @@ task threadPoolTask16() {
 task threadPoolTask17() {
   if (!_runAsync(&gAsyncTaskData[17]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask17!");
+  return_t;
 }
 #endif
 
@@ -519,6 +537,7 @@ task threadPoolTask17() {
 task threadPoolTask18() {
   if (!_runAsync(&gAsyncTaskData[18]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask18!");
+  return_t;
 }
 #endif
 
@@ -526,6 +545,7 @@ task threadPoolTask18() {
 task threadPoolTask19() {
   if (!_runAsync(&gAsyncTaskData[19]))
     writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask19!");
+  return_t;
 }
 #endif
 
