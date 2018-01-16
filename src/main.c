@@ -413,10 +413,14 @@ void handleArm()
 		armSet(armHold, -1);
 	}
 
-	//if (RISING(BTN_ARM_DOWN))
-	//{
-	//	armSet(armToTarget, ARM_PRESTACK);
-	//}
+	if (RISING(BTN_ARM_BACK))
+	{
+		armSet(armToTarget, ARM_PRESTACK);
+	}
+	if (FALLING(BTN_ARM_BACK))
+	{
+		armSet(armToTarget, ARM_HORIZONTAL);
+	}
 
 	if (armState == armManual)
 	{
