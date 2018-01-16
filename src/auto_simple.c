@@ -86,71 +86,39 @@ void moveToTargetDisSimple(float a, float d, byte power, float dropEarly, tStopT
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
+	const float kP = 17, kI = 0.05;
+
 	left = abs(left);
 	right = abs(right);
 
 	if (turnDir == ch)
 		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
 
+	sTurnState state;
 	switch (turnDir)
 	{
-		case cw:
-			setDrive(left, -right);
-			while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
-			writeDebugStreamLine("%f", gVelocity.a);
-
-			const float target = 0.900, kP = 17, kI = 0.05;
-
-			unsigned long time = nPgmTime, lstTime = time, nextDebug = 0;
-			float input = gVelocity.a, power = 0, error = 0, lstError, integral = 0;
-			while (gPosition.a < a + degToRad(-5.3 + (target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
-			{
-				unsigned long deltaTime = time - lstTime;
-				float vel = gVelocity.a;
-
-				if (deltaTime >= 1)
-				{
-					input = vel;
-
-					lstError = error;
-					error = target - input;
-
-					integral += error * deltaTime;
-					if (integral < -8) integral = 0;
-
-					power = error * kP + integral * kI;
-
-					power += 26;
-
-					if (power < 0) power /= 6.0;
-
-					if (power > 50) power = 50;
-					if (power < -5) power = -5;
-
-					setDrive(power, -power);
-
-					if (time >= nextDebug)
-					{
-						writeDebugStreamLine("%f %f %f", power, error, integral);
-						nextDebug = time + 20;
-					}
-
-					lstTime = time;
-				}
-
-				sleep(1);
-
-				time = nPgmTime;
-			}
-
-			setDrive(-15, 15);
-			sleep(150);
-			setDrive(0, 0);
-
-			break;
-		case ccw:
-
-			break;
+	case cw:
+		setDrive(left, -right);
+		while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
+		writeDebugStreamLine("%f", gVelocity.a);
+		state.target = 0.900;
+		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
+			turnSimpleInternalCw(a, state);
+		setDrive(-15, 15);
+		sleep(150);
+		setDrive(0, 0);
+		break;
+	case ccw:
+		setDrive(-left, right);
+		while (gPosition.a > a + gVelocity.a * 0.4) sleep(1);
+		writeDebugStreamLine("%f", gVelocity.a);
+		state.target = 0.900;
+		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3) || gVelocity.a < -1.2)
+			turnSimpleInternalCcw(a, state);
+		setDrive(15, -15);
+		sleep(150);
+		setDrive(0, 0);
+		break;
 	}
 
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
@@ -159,4 +127,86 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	turnToAngleRadSimple(degToRad(a), turnDir, left, right);
+}
+
+void turnSimpleInternalCw(float a, sTurnState& state)
+{
+	unsigned long deltaTime = state.time - state.lstTime;
+	float vel = gVelocity.a;
+
+	if (deltaTime >= 1)
+	{
+		state.input = vel;
+
+		state.lstError = state.error;
+		state.error = state.target - state.input;
+
+		state.integral += state.error * deltaTime;
+		if (state.integral < -8) state.integral = 0;
+
+		state.power = state.error * kP + state.integral * kI;
+
+		state.power += 26;
+
+		if (state.power < 0) state.power /= 6.0;
+
+		if (state.power > 50) state.power = 50;
+		if (state.power < -5) state.power = -5;
+
+		setDrive(state.power, -state.power);
+
+		if (state.time >= state.nextDebug)
+		{
+			writeDebugStreamLine("%f %f %f", state.power, state.error, state.integral);
+			state.nextDebug = state.time + 20;
+
+		}
+
+		state.lstTime = state.time;
+	}
+
+	sleep(1);
+
+	state.time = nPgmTime;
+}
+
+void turnSimpleInternalCcw(float a, sTurnState& state)
+{
+	unsigned long deltaTime = state.time - state.lstTime;
+	float vel = gVelocity.a;
+
+	if (deltaTime >= 1)
+	{
+		state.input = vel;
+
+		state.lstError = state.error;
+		state.error = state.target - state.input;
+
+		state.integral += state.error * deltaTime;
+		if (state.integral < -8) state.integral = 0;
+
+		state.power = state.error * kP + state.integral * kI;
+
+		state.power += 26;
+
+		if (state.power < 0) state.power /= 6.0;
+
+		if (state.power > 50) state.power = 50;
+		if (state.power < -5) state.power = -5;
+
+		setDrive(-state.power, state.power);
+
+		if (state.time >= state.nextDebug)
+		{
+			writeDebugStreamLine("%f %f %f", state.power, state.error, state.integral);
+			state.nextDebug = state.time + 20;
+
+		}
+
+		state.lstTime = state.time;
+	}
+
+	sleep(1);
+
+	state.time = nPgmTime;
 }
