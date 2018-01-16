@@ -1,6 +1,13 @@
-byte waitOn(sNotifier& notifier, unsigned long timeout, const string description)
+void reset(sNotifier& notifier)
 {
 	notifier.set = false;
+	notifier.waiter = notifier.waitee = -1;
+	notifier.semaphore = NULL;
+}
+
+byte waitOn(sNotifier& notifier, unsigned long timeout, const string description)
+{
+	//notifier.set = false;
 	notifier.waiter = nCurrentTask;
 	notifier.waitee = -1;
 	while (!notifier.set && !TimedOut(timeout, description))

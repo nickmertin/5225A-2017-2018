@@ -1,3 +1,9 @@
+void asyncInit()
+{
+	for (int i = 0; i < TASK_POOL_SIZE; ++i)
+		gAsyncTaskData[i].id = NULL;
+}
+
 void await(byte index, unsigned long timeout, const string description)
 {
 	if (index < TASK_POOL_SIZE)
@@ -24,7 +30,9 @@ byte _startAsync(byte *id, void *data)
 		{
 			gAsyncTaskData[i].id = id;
 			gAsyncTaskData[i].data = data;
+			reset(gAsyncTaskData[i].notifier);
 			tStart(threadPoolTask0 + i);
+			waitOn(gAsyncTaskData[i].notifier, nPgmTime + 100, "Start async task");
 			return i;
 		}
 	}
