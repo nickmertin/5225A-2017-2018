@@ -516,6 +516,7 @@ case mobileTop:
 	}
 case mobileBottom:
 	{
+		gNumCones = 0;
 		if (gMobileSlow)
 			NEXT_STATE(mobileBottomSlow)
 		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
