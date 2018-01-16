@@ -145,8 +145,8 @@ void setLift(word power,bool debug=false)
 #define LIFT_MID_POS 1900
 #define LIFT_ARM_LEN 9
 
-#define LIFT_HEIGHT(pos) (LIFT_MID + 2 * LIFT_ARM_LEN * sin((pos - LIFT_MID_POS) * PI / 2870))
-#define LIFT_POS(height) (LIFT_MID_POS + asin((height - LIFT_MID) / (2 * LIFT_ARM_LEN)) * 2870 / PI)
+#define LIFT_HEIGHT(pos) (LIFT_MID + 2 * LIFT_ARM_LEN * sin(((pos) - LIFT_MID_POS) * PI / 2870))
+#define LIFT_POS(height) (LIFT_MID_POS + asin(((height) - LIFT_MID) / (2 * LIFT_ARM_LEN)) * 2870 / PI)
 
 float gLiftTarget;
 
