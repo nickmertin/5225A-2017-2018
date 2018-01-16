@@ -821,13 +821,14 @@ NEW_ASYNC_VOID_3(stackFromLoader, int, bool, bool);
 
 bool cancel()
 {
-	return false;
 	if (stackKill() || stackFromLoaderKill())
+	{
+		liftReset();
+		armReset();
+		gDriveManual = true;
+		writeDebugStreamLine("Stack cancelled");
 		return true;
-	liftReset();
-	armReset();
-	gDriveManual = true;
-	writeDebugStreamLine("Stack cancelled");
+	}
 	return false;
 }
 
