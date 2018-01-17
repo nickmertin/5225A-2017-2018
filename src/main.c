@@ -80,7 +80,7 @@ void configure(sSimpleConfig& config, float target, word mainPower, word brakePo
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
-word gUserControlTaskId;
+word gUserControlTaskId = -1;
 
 bool gDriveManual;
 
@@ -671,14 +671,22 @@ bool TimedOut(unsigned long timeOut, const string description)
 		mobileReset();
 		gDriveManual = true;
 		int current = nCurrentTask;
+		if (current == gUserControlTaskId || current == main)
+		{
+			int child = tEls[current].child;
+			while (child != -1)
+			{
+				tStopAll(child);
+				child = tEls[child].next;
+			}
+			startTaskID(current);
+		}
 		while (true)
 		{
 			int next = tEls[current].parent;
 			if (next == -1 || next == gUserControlTaskId || next == main) break;
 			current = next;
 		}
-		if (current != gUserControlTaskId && current != main)
-			tStopAll(current);
 		return true;
 	}
 	else
