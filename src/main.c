@@ -105,12 +105,11 @@ void handleDrive()
 		word l = y + a;
 		word r = y - a;
 
-		if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
-		{
-			LIM_TO_VAL_SET(l, 40);
-			LIM_TO_VAL_SET(r, 40);
-		}
-
+		//if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
+		//{
+		//	LIM_TO_VAL_SET(l, 40);
+		//	LIM_TO_VAL_SET(r, 40);
+		//}
 		setDrive(l, r);
 	}
 }
@@ -710,11 +709,23 @@ void detachIntake(tMobileStates nextMobileState)
 {
 	if (gSensor[liftPoti].value < LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]))
 	{
+		//lower lift
+		sSimpleConfig liftConfig;
+		configure(liftConfig, LIFT_POS(gNumCones == 11) - 200, -127, 10);
+		liftSet(liftLowerSimple, &liftConfig);
+		unsigned long liftTimeOut = nPgmTime + 800;
+		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
+		//lower arm
 		sSimpleConfig armConfig;
 		configure(armConfig, ARM_PRESTACK - 100, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
+		//raise lift
+		configure(liftConfig, LIFT_POS(gNumCones == 11), 127, 0);
+		liftSet(liftLowerSimple, &liftConfig);
+		liftTimeOut = nPgmTime + 800;
+		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
 
 		clearArm();
 	}
