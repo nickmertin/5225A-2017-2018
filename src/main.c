@@ -719,7 +719,7 @@ void detachIntake(tMobileStates nextMobileState)
 	{
 		//lower lift
 		sSimpleConfig liftConfig;
-		configure(liftConfig, LIFT_POS(gNumCones == 11) - 200, -127, 10);
+		configure(liftConfig, LIFT_POS(gLiftPlaceTarget[MAX(gNumCones - 1, 0)]) - 200, -127, 10);
 		liftSet(liftLowerSimple, &liftConfig);
 		unsigned long liftTimeOut = nPgmTime + 800;
 		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
@@ -730,7 +730,7 @@ void detachIntake(tMobileStates nextMobileState)
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
 		//raise lift
-		configure(liftConfig, LIFT_POS(gNumCones == 11), 127, 0);
+		configure(liftConfig, LIFT_POS(gLiftPlaceTarget[MAX(gNumCones - 1, 0)]), 127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 800;
 		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
