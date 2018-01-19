@@ -72,7 +72,7 @@ for i in range(20):
     print('#if TASK_POOL_SIZE > %d' % i)
     print('task threadPoolTask%d() {' % i)
     print('  if (!_runAsync(&gAsyncTaskData[%d]))' % i)
-    print('    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask%d!");' % i)
+    print('    writeDebugStreamLine("ASYNC %d");' % i)
     print('  return_t;')
     print('}')
     print('#endif')

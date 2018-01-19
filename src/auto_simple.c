@@ -119,7 +119,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
 		writeDebugStreamLine("%f", a);
 		setDrive(-left, right);
-		while (gPosition.a > a + gVelocity.a * 0.6) sleep(1);
+		while (gPosition.a > a - gVelocity.a * 0.6) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
 		//
 		state.target = -0.900;
@@ -184,7 +184,7 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
 		writeDebugStreamLine("%f", a);
 		setDrive(-left, right);
-		while (gPosition.a > a + gVelocity.a * 0.6)
+		while (gPosition.a > a - gVelocity.a * 0.6)
 		{
 			a = gPosition.a + fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
 			sleep(1);
@@ -275,7 +275,7 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 		if (state.power < -50) state.power = -50;
 		if (state.power > 5) state.power = 5;
 
-		setDrive(-state.power, state.power);
+		setDrive(state.power, -state.power);
 
 		if (state.time >= state.nextDebug)
 		{

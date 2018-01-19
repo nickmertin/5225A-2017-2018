@@ -1,6 +1,6 @@
 float fmod(float x, float y)
 {
-	int q = (int)(x / y);
+	int q = floor(x / y);
 	return x - (float)q * y;
 }
 

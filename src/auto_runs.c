@@ -102,6 +102,29 @@ void driverSkillsStart()
 
 void autoSkills()
 {
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+	sSimpleConfig liftConfig;
+	sSimpleConfig armConfig;
+
+	gMobileCheckLift = false;
+
+	resetPositionFull(gPosition, 20, 44, 45);
+	liftSet(liftResetEncoder);
+	coneTimeout = nPgmTime + 1400;
+
+	// 1
+	moveToTargetSimpleAsync(48, 72, 19, 44, 127, 8, stopSoft, true);
+	liftTimeoutWhile(liftResetEncoder, coneTimeout);
+	configure(liftConfig, 127, LIFT_MOBILE_THRESHOLD, -10);
+	coneTimeout = nPgmTime + 1000;
+	timeoutWhileLessThanL(&gSensor[liftEnc].value, LIFT_MOBILE_THRESHOLD, coneTimeout);
+	mobileSet(mobileBottom, 0);
+	coneTimeout = nPgmTime + 1000;
+	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout);
+	moveToTargetSimpleAsync(48, 72, gPosition.y, gPosition.x, 127, 4, stopNone, true);
+	driveTimeout = nPgmTime + 1000;
+
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)

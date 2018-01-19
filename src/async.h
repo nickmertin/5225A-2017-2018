@@ -391,7 +391,7 @@ byte _startAsync(byte *id, void *data);
 #if TASK_POOL_SIZE > 0
 task threadPoolTask0() {
   if (!_runAsync(&gAsyncTaskData[0]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask0!");
+    writeDebugStreamLine("ASYNC 0");
   return_t;
 }
 #endif
@@ -399,7 +399,7 @@ task threadPoolTask0() {
 #if TASK_POOL_SIZE > 1
 task threadPoolTask1() {
   if (!_runAsync(&gAsyncTaskData[1]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask1!");
+    writeDebugStreamLine("ASYNC 1");
   return_t;
 }
 #endif
@@ -407,7 +407,7 @@ task threadPoolTask1() {
 #if TASK_POOL_SIZE > 2
 task threadPoolTask2() {
   if (!_runAsync(&gAsyncTaskData[2]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask2!");
+    writeDebugStreamLine("ASYNC 2");
   return_t;
 }
 #endif
@@ -415,7 +415,7 @@ task threadPoolTask2() {
 #if TASK_POOL_SIZE > 3
 task threadPoolTask3() {
   if (!_runAsync(&gAsyncTaskData[3]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask3!");
+    writeDebugStreamLine("ASYNC 3");
   return_t;
 }
 #endif
@@ -423,7 +423,7 @@ task threadPoolTask3() {
 #if TASK_POOL_SIZE > 4
 task threadPoolTask4() {
   if (!_runAsync(&gAsyncTaskData[4]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask4!");
+    writeDebugStreamLine("ASYNC 4");
   return_t;
 }
 #endif
@@ -431,7 +431,7 @@ task threadPoolTask4() {
 #if TASK_POOL_SIZE > 5
 task threadPoolTask5() {
   if (!_runAsync(&gAsyncTaskData[5]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask5!");
+    writeDebugStreamLine("ASYNC 5");
   return_t;
 }
 #endif
@@ -439,7 +439,7 @@ task threadPoolTask5() {
 #if TASK_POOL_SIZE > 6
 task threadPoolTask6() {
   if (!_runAsync(&gAsyncTaskData[6]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask6!");
+    writeDebugStreamLine("ASYNC 6");
   return_t;
 }
 #endif
@@ -447,7 +447,7 @@ task threadPoolTask6() {
 #if TASK_POOL_SIZE > 7
 task threadPoolTask7() {
   if (!_runAsync(&gAsyncTaskData[7]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask7!");
+    writeDebugStreamLine("ASYNC 7");
   return_t;
 }
 #endif
@@ -455,7 +455,7 @@ task threadPoolTask7() {
 #if TASK_POOL_SIZE > 8
 task threadPoolTask8() {
   if (!_runAsync(&gAsyncTaskData[8]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask8!");
+    writeDebugStreamLine("ASYNC 8");
   return_t;
 }
 #endif
@@ -463,7 +463,7 @@ task threadPoolTask8() {
 #if TASK_POOL_SIZE > 9
 task threadPoolTask9() {
   if (!_runAsync(&gAsyncTaskData[9]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask9!");
+    writeDebugStreamLine("ASYNC 9");
   return_t;
 }
 #endif
@@ -471,7 +471,7 @@ task threadPoolTask9() {
 #if TASK_POOL_SIZE > 10
 task threadPoolTask10() {
   if (!_runAsync(&gAsyncTaskData[10]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask10!");
+    writeDebugStreamLine("ASYNC 10");
   return_t;
 }
 #endif
@@ -479,7 +479,7 @@ task threadPoolTask10() {
 #if TASK_POOL_SIZE > 11
 task threadPoolTask11() {
   if (!_runAsync(&gAsyncTaskData[11]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask11!");
+    writeDebugStreamLine("ASYNC 11");
   return_t;
 }
 #endif
@@ -487,7 +487,7 @@ task threadPoolTask11() {
 #if TASK_POOL_SIZE > 12
 task threadPoolTask12() {
   if (!_runAsync(&gAsyncTaskData[12]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask12!");
+    writeDebugStreamLine("ASYNC 12");
   return_t;
 }
 #endif
@@ -495,7 +495,7 @@ task threadPoolTask12() {
 #if TASK_POOL_SIZE > 13
 task threadPoolTask13() {
   if (!_runAsync(&gAsyncTaskData[13]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask13!");
+    writeDebugStreamLine("ASYNC 13");
   return_t;
 }
 #endif
@@ -503,7 +503,7 @@ task threadPoolTask13() {
 #if TASK_POOL_SIZE > 14
 task threadPoolTask14() {
   if (!_runAsync(&gAsyncTaskData[14]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask14!");
+    writeDebugStreamLine("ASYNC 14");
   return_t;
 }
 #endif
@@ -511,7 +511,7 @@ task threadPoolTask14() {
 #if TASK_POOL_SIZE > 15
 task threadPoolTask15() {
   if (!_runAsync(&gAsyncTaskData[15]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask15!");
+    writeDebugStreamLine("ASYNC 15");
   return_t;
 }
 #endif
@@ -519,7 +519,7 @@ task threadPoolTask15() {
 #if TASK_POOL_SIZE > 16
 task threadPoolTask16() {
   if (!_runAsync(&gAsyncTaskData[16]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask16!");
+    writeDebugStreamLine("ASYNC 16");
   return_t;
 }
 #endif
@@ -527,7 +527,7 @@ task threadPoolTask16() {
 #if TASK_POOL_SIZE > 17
 task threadPoolTask17() {
   if (!_runAsync(&gAsyncTaskData[17]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask17!");
+    writeDebugStreamLine("ASYNC 17");
   return_t;
 }
 #endif
@@ -535,7 +535,7 @@ task threadPoolTask17() {
 #if TASK_POOL_SIZE > 18
 task threadPoolTask18() {
   if (!_runAsync(&gAsyncTaskData[18]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask18!");
+    writeDebugStreamLine("ASYNC 18");
   return_t;
 }
 #endif
@@ -543,7 +543,7 @@ task threadPoolTask18() {
 #if TASK_POOL_SIZE > 19
 task threadPoolTask19() {
   if (!_runAsync(&gAsyncTaskData[19]))
-    writeDebugStreamLine("Failed to start asynchronous function on threadPoolTask19!");
+    writeDebugStreamLine("ASYNC 19");
   return_t;
 }
 #endif
