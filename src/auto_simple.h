@@ -33,3 +33,9 @@ void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right);
 void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, float offset = 0);
 void turnSimpleInternalCw(float a, sTurnState& state);
 void turnSimpleInternalCcw(float a, sTurnState& state);
+
+/* Async Functions */
+NEW_ASYNC_VOID_8(moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool);
+NEW_ASYNC_VOID_8(moveToTargetDisSimple, float, float, float, float, byte, float, tStopType, bool);
+NEW_ASYNC_VOID_4(turnToAngleSimple, float, tTurnDir, byte, byte);
+NEW_ASYNC_VOID_6(turnToTargetSimple, float, float, tTurnDir, byte, byte, float);
