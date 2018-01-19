@@ -53,11 +53,11 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 		}
 
 		endCycle(cycle);
-	} while (currentPosVector.y < ((stopType & stopSoft) ? (-gVelocity.y * 0.240) : 0) - dropEarly - (gVelocity.y * 0.098));
+	} while (currentPosVector.y < ((stopType & stopSoft) ? (-gVelocity.y * 0.040) : 0) - dropEarly - (gVelocity.y * 0.098));
 
 	if (stopType & stopSoft)
 	{
-		setDrive(-5, -5);
+		setDrive(-7, -7);
 		while (gVelocity.y > 15) sleep(1);
 	}
 
@@ -98,22 +98,36 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	switch (turnDir)
 	{
 	case cw:
+		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+		writeDebugStreamLine("%f", a);
 		setDrive(left, -right);
-		while (gPosition.a < a - gVelocity.a * 0.4) sleep(1);
+		while (gPosition.a < a - gVelocity.a * 0.6) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
 		state.target = 0.900;
-		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3) || gVelocity.a > 1.2)
+		state.time = nPgmTime;
+		state.lstTime = state.time;
+		state.nextDebug = 0;
+		state.input = gVelocity.a;
+		state.power = state.error = state.integral = 0;
+		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
 			turnSimpleInternalCw(a, state);
 		setDrive(-15, 15);
 		sleep(150);
 		setDrive(0, 0);
 		break;
 	case ccw:
+		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		writeDebugStreamLine("%f", a);
 		setDrive(-left, right);
-		while (gPosition.a > a + gVelocity.a * 0.4) sleep(1);
+		while (gPosition.a > a + gVelocity.a * 0.6) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
 		state.target = 0.900;
-		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3) || gVelocity.a < -1.2)
+		state.time = nPgmTime;
+		state.lstTime = state.time;
+		state.nextDebug = 0;
+		state.input = gVelocity.a;
+		state.power = state.error = state.integral = 0;
+		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
 			turnSimpleInternalCcw(a, state);
 		setDrive(15, -15);
 		sleep(150);
@@ -133,6 +147,8 @@ void turnSimpleInternalCw(float a, sTurnState& state)
 {
 	unsigned long deltaTime = state.time - state.lstTime;
 	float vel = gVelocity.a;
+
+	const float kP = 17, kI = 0.05;
 
 	if (deltaTime >= 1)
 	{

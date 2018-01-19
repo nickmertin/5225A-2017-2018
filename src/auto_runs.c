@@ -350,17 +350,20 @@ void autoSideMobileRight()
 void autoTest()
 {
 	resetPositionFull(gPosition, 0, 0, 0);
-	setDrive(80, 80);
-	unsigned long timeout = nPgmTime + 2000;
-	while (gPosition.y < 23 && !TimedOut(timeout, "test 1")) sleep(10);
-	setDrive(-15, -15);
-	sleep(200);
-	mobileSet(mobileDownToMiddle);
-	sleep(200);
-	setDrive(10, 10);
-	sleep(300);
-	setDrive(-80, -80);
-	timeout = nPgmTime + 1500;
-	while (gPosition.y > 10 && !TimedOut(timeout, "test 2")) sleep(10);
-	setDrive(0, 0);
+	//setDrive(80, 80);
+	//unsigned long timeout = nPgmTime + 2000;
+	//while (gPosition.y < 23 && !TimedOut(timeout, "test 1")) sleep(10);
+	//setDrive(-15, -15);
+	//sleep(200);
+	//mobileSet(mobileDownToMiddle);
+	//sleep(200);
+	//setDrive(10, 10);
+	//sleep(300);
+	//setDrive(-80, -80);
+	//timeout = nPgmTime + 1500;
+	//while (gPosition.y > 10 && !TimedOut(timeout, "test 2")) sleep(10);
+	//setDrive(0, 0);
+
+	//moveToTargetSimple(72, 0, 127, 0);
+	turnToAngleSimple(180, ccw, 127, 127);
 }

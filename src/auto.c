@@ -202,7 +202,7 @@ void applyHarshStop()
 
 	writeDebugStreamLine("Vel y | a: %f | %f", yPow, aPow);
 
-	yPow *= -0.6;
+	yPow *= -0.7;
 	aPow *= -6.3;
 
 	word left = yPow + aPow;
