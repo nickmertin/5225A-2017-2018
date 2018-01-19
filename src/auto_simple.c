@@ -86,6 +86,7 @@ void moveToTargetDisSimple(float a, float d, byte power, float dropEarly, tStopT
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
+	sTurnState state;
 	state.time = nPgmTime;
 	state.lstTime = state.time;
 	state.nextDebug = 0;
@@ -98,7 +99,6 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	if (turnDir == ch)
 		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
 
-	sTurnState state;
 	switch (turnDir)
 	{
 	case cw:
