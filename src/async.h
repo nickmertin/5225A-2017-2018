@@ -371,7 +371,6 @@ if (data->id == &func##Dummy) { \
 
 #define ASYNC_ROUTINES(content) \
 bool _runAsync(sAsyncTaskData *data) { \
-  writeDebugStreamLine("Starting asynchronous function on threadPoolTask%d", nCurrentTask - threadPoolTask0); \
   content \
   return false; \
 }
