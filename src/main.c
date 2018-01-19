@@ -70,8 +70,9 @@ typedef struct _sSimpleConfig {
 	word brakePower;
 } sSimpleConfig;
 
-void configure(sSimpleConfig& config, float target, word mainPower, word brakePower)
+void configure(sSimpleConfig& config, long target, word mainPower, word brakePower)
 {
+	writeDebugStreamLine("configure %d %d %d", target, mainPower, brakePower);
 	config.target = target;
 	config.mainPower = mainPower;
 	config.brakePower = brakePower;
@@ -137,7 +138,7 @@ void setLift(word power,bool debug=false)
 }
 
 #define LIFT_TOP 36.6
-#define LIFT_BOTTOM 5.4
+#define LIFT_BOTTOM 5.8
 #define LIFT_MID 20.25
 #define LIFT_HOLD_DOWN_THRESHOLD 7.5
 #define LIFT_HOLD_UP_THRESHOLD 35.5
@@ -225,6 +226,7 @@ case liftStopping:
 case liftRaiseSimple:
 {
 	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
+	writeDebugStreamLine("Raising lift to %d", config.target);
 	setLift(config.mainPower);
 	int pos;
 	while ((pos = gSensor[liftEnc].value) < config.target) sleep(10);
@@ -240,6 +242,7 @@ case liftRaiseSimple:
 case liftLowerSimple:
 {
 	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
+	writeDebugStreamLine("Lowering lift to %d", config.target);
 	setLift(config.mainPower);
 	int pos;
 	while ((pos = gSensor[liftEnc].value) > config.target) sleep(10);
@@ -478,12 +481,11 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
-#define LIFT_MOBILE_THRESHOLD 1300
+#define LIFT_MOBILE_THRESHOLD 17
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 250
 
 bool gMobileCheckLift;
-bool gMobileResetLift = false;
 bool gMobileSlow = false;
 
 void setMobile(word power)
@@ -493,21 +495,14 @@ void setMobile(word power)
 
 void mobileClearLift()
 {
-	if (gMobileResetLift = (gMobileCheckLift && gSensor[liftEnc].value < LIFT_MOBILE_THRESHOLD))
+	writeDebugStreamLine("mobileClearLift");
+	if (gMobileCheckLift && gSensor[liftEnc].value < LIFT_MOBILE_THRESHOLD)
 	{
-		gLiftTarget = LIFT_MOBILE_THRESHOLD + 1.0;
-		liftSet(liftToTarget);
+		sSimpleConfig config;
+		configure(config, LIFT_MOBILE_THRESHOLD + 1, 80, -15);
+		liftSet(liftRaiseSimple, &config);
 		unsigned long timeout = nPgmTime + 1000;
-		while (gSensor[liftEnc].value < LIFT_MOBILE_THRESHOLD && !TimedOut(timeout, "mobileClearLift")) sleep(10);
-	}
-}
-
-void mobileResetLift()
-{
-	if (gMobileResetLift)
-	{
-		gLiftTarget = LIFT_BOTTOM;
-		liftSet(liftToTarget);
+		liftTimeoutWhile(liftRaiseSimple, timeout);
 	}
 }
 
@@ -528,7 +523,6 @@ case mobileTop:
 		setMobile(15);
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, "mobileTop 1")) sleep(10);
 		setMobile(MOBILE_UP_HOLD_POWER);
-		mobileResetLift();
 		break;
 	}
 case mobileBottom:
@@ -542,7 +536,6 @@ case mobileBottom:
 		unsigned long timeout = nPgmTime + 2000;
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, "mobileBottom")) sleep(10);
 		setMobile(MOBILE_DOWN_HOLD_POWER);
-		mobileResetLift();
 		break;
 	}
 case mobileBottomSlow:
@@ -597,7 +590,6 @@ case mobileDownToMiddle:
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, "mobileUpToMiddle")) sleep(10);
 		setMobile(15);
-		//mobileResetLift();
 		arg._long = -1;
 		NEXT_STATE(mobileMiddle)
 	}
@@ -631,11 +623,11 @@ void handleMobile()
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
 		if (RISING(BTN_MOBILE_TOGGLE))
-			mobileSet(mobileTop);
+			mobileSet(mobileTop, -1);
 		if (RISING(BTN_MOBILE_MIDDLE))
 		{
 			gMobileSlow = false;
-			mobileSet(mobileManaged);
+			mobileSet(mobileManaged, -1);
 			detachIntakeAsync(mobileBottom);
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
 		}
@@ -647,7 +639,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				gMobileSlow = false;
-				mobileSet(mobileManaged);
+				mobileSet(mobileManaged, -1);
 				detachIntakeAsync(mobileBottom);
 				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
 			}
@@ -715,13 +707,14 @@ bool TimedOut(unsigned long timeOut, const string description)
 
 // STACKING ON                       0     1     2      3      4      5      6      7      8      9      10
 const float gLiftRaiseTarget[11] = { 6.75, 10,   12.75, 15.75, 18.75, 21.75, 24.75, 28,    33,    36,    38 };
-const float gLiftPlaceTarget[11] = { 5.25, 8,    10.6,  13.4,  16.2,  19,    21.8,  24.6,  27.4,  30.2,  33 };
+const float gLiftPlaceTarget[11] = { 5.7,  8,    10.6,  13.4,  16.2,  19,    21.8,  24.6,  27.4,  30.2,  33 };
 
 void clearArm()
 {
+	writeDebugStreamLine("clearArm");
 	sSimpleConfig config;
 	configure(config, LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]), 127, 0);
-	liftSet(liftRaiseSimple);
+	liftSet(liftRaiseSimple, &config);
 	unsigned long timeout = nPgmTime + 1500;
 	liftTimeoutWhile(liftRaiseSimple, timeout);
 
@@ -735,11 +728,11 @@ NEW_ASYNC_VOID_0(clearArm);
 
 void detachIntake(tMobileStates nextMobileState)
 {
-	if (gSensor[liftEnc].value < LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]))
+	if (gSensor[liftEnc].value < LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
 	{
 		//lower lift
 		sSimpleConfig liftConfig;
-		configure(liftConfig, LIFT_POS(gLiftPlaceTarget[MAX(gNumCones - 1, 0)]) - 200, -127, 10);
+		configure(liftConfig, LIFT_POS(gLiftPlaceTarget[gNumCones]), -127, 10);
 		liftSet(liftLowerSimple, &liftConfig);
 		unsigned long liftTimeOut = nPgmTime + 800;
 		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
@@ -749,11 +742,6 @@ void detachIntake(tMobileStates nextMobileState)
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
-		//raise lift
-		configure(liftConfig, LIFT_POS(gLiftPlaceTarget[MAX(gNumCones - 1, 0)]), 127, 0);
-		liftSet(liftLowerSimple, &liftConfig);
-		liftTimeOut = nPgmTime + 800;
-		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
 
 		clearArm();
 	}
