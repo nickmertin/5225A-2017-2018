@@ -87,6 +87,12 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	const float kP = 17, kI = 0.05;
+	state.target = 0.900;
+	state.time = nPgmTime;
+	state.lstTime = state.time;
+	state.nextDebug = 0;
+	state.input = gVelocity.a;
+	state.power = state.error = state.integral = 0;
 
 	left = abs(left);
 	right = abs(right);
@@ -103,12 +109,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 		setDrive(left, -right);
 		while (gPosition.a < a - gVelocity.a * 0.6) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
-		state.target = 0.900;
-		state.time = nPgmTime;
-		state.lstTime = state.time;
-		state.nextDebug = 0;
-		state.input = gVelocity.a;
-		state.power = state.error = state.integral = 0;
+		//
 		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
 			turnSimpleInternalCw(a, state);
 		setDrive(-15, 15);
@@ -121,12 +122,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 		setDrive(-left, right);
 		while (gPosition.a > a + gVelocity.a * 0.6) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
-		state.target = 0.900;
-		state.time = nPgmTime;
-		state.lstTime = state.time;
-		state.nextDebug = 0;
-		state.input = gVelocity.a;
-		state.power = state.error = state.integral = 0;
+		//
 		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
 			turnSimpleInternalCcw(a, state);
 		setDrive(15, -15);
