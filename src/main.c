@@ -87,8 +87,10 @@ word gUserControlTaskId = -1;
 bool gDriveManual;
 
 /* Drive */
-void setDrive(word left, word right)
+void setDrive(word left, word right, bool debug = false)
 {
+	if (debug)
+		writeDebugStreamLine("DRIVE %d %d", left, right);
 	gMotor[driveL1].power = gMotor[driveL2].power = left;
 	gMotor[driveR1].power = gMotor[driveR2].power = right;
 }
@@ -1062,13 +1064,13 @@ void autonomous()
 
 	gKillDriveOnTimeout = true;
 
-	resetPosition(gPosition);
-	resetQuadratureEncoder(trackL);
-	resetQuadratureEncoder(trackR);
-	resetQuadratureEncoder(trackB);
+	//resetPosition(gPosition);
+	//resetQuadratureEncoder(trackL);
+	//resetQuadratureEncoder(trackR);
+	//resetQuadratureEncoder(trackB);
 
 	autoMotorSensorUpdateTaskAsync();
-	trackPositionTaskAsync();
+	//trackPositionTaskAsync();
 
 	runAuto();
 

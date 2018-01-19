@@ -17,7 +17,7 @@ void selectAuto()
 
 void runAuto()
 {
-	autoTest();
+	autoSkills();
 	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
@@ -102,6 +102,8 @@ void driverSkillsStart()
 
 void autoSkills()
 {
+	byte driveAsync;
+	byte coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -109,22 +111,25 @@ void autoSkills()
 
 	gMobileCheckLift = false;
 
-	resetPositionFull(gPosition, 20, 44, 45);
+	resetPositionFull(gPosition, 16, 40, 45);
+	trackPositionTaskAsync();
 	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
-	moveToTargetSimpleAsync(48, 72, 19, 44, 127, 8, stopSoft, true);
+	moveToTargetSimpleAsync(48, 72, 16, 40, 127, 24, stopSoft | stopHarsh, true);
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
-	configure(liftConfig, 127, LIFT_MOBILE_THRESHOLD, -10);
+	configure(liftConfig, LIFT_MOBILE_THRESHOLD, 127, -10);
+	liftSet(liftRaiseSimple, &liftConfig);
 	coneTimeout = nPgmTime + 1000;
 	timeoutWhileLessThanL(&gSensor[liftEnc].value, LIFT_MOBILE_THRESHOLD, coneTimeout);
 	mobileSet(mobileBottom, 0);
 	coneTimeout = nPgmTime + 1000;
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout);
-	moveToTargetSimpleAsync(48, 72, gPosition.y, gPosition.x, 127, 4, stopNone, true);
+	driveAsync = moveToTargetSimpleAsync(48, 72, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
 	driveTimeout = nPgmTime + 1000;
-
+	await(driveAsync, driveTimeout, "skills 1-1");
+	mobileSet(mobileTop, 0);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)

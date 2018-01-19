@@ -33,6 +33,7 @@ byte _startAsync(byte *id, void *data)
 			reset(gAsyncTaskData[i].notifier);
 			tStart(threadPoolTask0 + i);
 			waitOn(gAsyncTaskData[i].notifier, nPgmTime + 100, "Start async task");
+			reset(gAsyncTaskData[i].notifier);
 			return i;
 		}
 	}

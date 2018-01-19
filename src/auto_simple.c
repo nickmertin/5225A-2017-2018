@@ -31,9 +31,13 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	sPolar currentPosPolar;
 
 	sCycleData cycle;
-	initCycle(cycle, 20, "moveToTarget");
+	initCycle(cycle, 10, "moveToTarget");
 
-	setDrive(power, power);
+	setDrive(power, power, true);
+
+	float vel;
+	float _sin = sin(lineAngle);
+	float _cos = cos(lineAngle);
 
 	unsigned long timeStart = nPgmTime;
 	do
@@ -52,13 +56,17 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 			setDrive(finalPower, finalPower);
 		}
 
+		vel = _sin * gVelocity.x + _cos * gVelocity.y;
+
 		endCycle(cycle);
-	} while (currentPosVector.y < ((stopType & stopSoft) ? (-gVelocity.y * 0.040) : 0) - dropEarly - (gVelocity.y * 0.098));
+	} while (currentPosVector.y < -dropEarly - (vel * ((stopType & stopSoft) ? 0.138 : 0.098)));
+
+	writeDebugStreamLine("%f %f", currentPosVector.y, vel);
 
 	if (stopType & stopSoft)
 	{
 		setDrive(-7, -7);
-		while (gVelocity.y > 15) sleep(1);
+		while (_sin * gVelocity.x + _cos * gVelocity.y > 15) sleep(1);
 	}
 
 	if (stopType & stopHarsh)
