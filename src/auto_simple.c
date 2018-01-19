@@ -116,7 +116,7 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 		setDrive(0, 0);
 		break;
 	case ccw:
-		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		a = gPosition.a + fmod(gPosition.a - a, PI * 2);
 		writeDebugStreamLine("%f", a);
 		setDrive(-left, right);
 		while (gPosition.a > a + gVelocity.a * 0.6) sleep(1);
