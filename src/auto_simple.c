@@ -139,6 +139,73 @@ void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right)
 	turnToAngleRadSimple(degToRad(a), turnDir, left, right);
 }
 
+void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, float offset)
+{
+	writeDebugStreamLine("Turning to %f %f", y, x);
+	sTurnState state;
+	state.time = nPgmTime;
+	state.lstTime = state.time;
+	state.nextDebug = 0;
+	state.input = gVelocity.a;
+	state.power = state.error = state.integral = 0;
+
+	left = abs(left);
+	right = abs(right);
+
+	float a = atan2(x - gPosition.x, y - gPosition.y) + offset;
+
+	if (turnDir == ch)
+		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+
+	switch (turnDir)
+	{
+	case cw:
+		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+		writeDebugStreamLine("%f", a);
+		setDrive(left, -right);
+		while (gPosition.a < a - gVelocity.a * 0.6)
+		{
+			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2);
+			sleep(1);
+		}
+		writeDebugStreamLine("%f", gVelocity.a);
+		//
+		state.target = 0.900;
+		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
+		{
+			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2);
+			turnSimpleInternalCw(a, state);
+		}
+		setDrive(-15, 15);
+		sleep(150);
+		setDrive(0, 0);
+		break;
+	case ccw:
+		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		writeDebugStreamLine("%f", a);
+		setDrive(-left, right);
+		while (gPosition.a > a + gVelocity.a * 0.6)
+		{
+			a = gPosition.a + fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
+			sleep(1);
+		}
+		writeDebugStreamLine("%f", gVelocity.a);
+		//
+		state.target = -0.900;
+		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
+		{
+			a = gPosition.a + fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
+			turnSimpleInternalCcw(a, state);
+		}
+		setDrive(15, -15);
+		sleep(150);
+		setDrive(0, 0);
+		break;
+	}
+
+	writeDebugStreamLine("Turned to %f %f | %f %f %f", y, x, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
+
 void turnSimpleInternalCw(float a, sTurnState& state)
 {
 	unsigned long deltaTime = state.time - state.lstTime;

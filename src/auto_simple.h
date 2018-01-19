@@ -30,5 +30,6 @@ void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, flo
 void moveToTargetDisSimple(float a, float d, byte power, float dropEarly = 0, tStopType stopType = stopSoft | stopHarsh, bool slow = true);
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right);
 void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right);
+void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, float offset = 0);
 void turnSimpleInternalCw(float a, sTurnState& state);
 void turnSimpleInternalCcw(float a, sTurnState& state);
