@@ -191,6 +191,8 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 	unsigned long deltaTime = state.time - state.lstTime;
 	float vel = gVelocity.a;
 
+	const float kP = 17, kI = 0.05;
+
 	if (deltaTime >= 1)
 	{
 		state.input = vel;
@@ -199,16 +201,16 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 		state.error = state.target - state.input;
 
 		state.integral += state.error * deltaTime;
-		if (state.integral < -8) state.integral = 0;
+		if (state.integral > 8) state.integral = 0;
 
 		state.power = state.error * kP + state.integral * kI;
 
-		state.power += 26;
+		state.power -= 26;
 
-		if (state.power < 0) state.power /= 6.0;
+		if (state.power > 0) state.power /= 6.0;
 
-		if (state.power > 50) state.power = 50;
-		if (state.power < -5) state.power = -5;
+		if (state.power < -50) state.power = -50;
+		if (state.power > 5) state.power = 5;
 
 		setDrive(-state.power, state.power);
 
