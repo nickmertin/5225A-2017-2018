@@ -47,7 +47,7 @@ print()
 
 print('#define ASYNC_ROUTINES(content) \\')
 print('bool _runAsync(sAsyncTaskData *data) { \\')
-print('  writeDebugStreamLine("Starting asynchronous function on threadPoolTask%d", nCurrentTask - threadPoolTask0); \\')
+# print('  writeDebugStreamLine("Starting asynchronous function on threadPoolTask%d", nCurrentTask - threadPoolTask0); \\')
 print('  content \\')
 print('  return false; \\')
 print('}')
