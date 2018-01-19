@@ -86,7 +86,6 @@ void moveToTargetDisSimple(float a, float d, byte power, float dropEarly, tStopT
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
-	const float kP = 17, kI = 0.05;
 	state.time = nPgmTime;
 	state.lstTime = state.time;
 	state.nextDebug = 0;
