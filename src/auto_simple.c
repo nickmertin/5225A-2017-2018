@@ -33,11 +33,14 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	sCycleData cycle;
 	initCycle(cycle, 10, "moveToTarget");
 
-	setDrive(power, power, true);
-
 	float vel;
 	float _sin = sin(lineAngle);
 	float _cos = cos(lineAngle);
+
+	word last = 0;
+
+	if (!slow)
+		setDrive(power, power);
 
 	unsigned long timeStart = nPgmTime;
 	do
@@ -53,6 +56,9 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 			pidCalculate(pidY, 0, currentPosVector.y);
 			word finalPower = round(power * abs(pidY.output));
 			if (abs(finalPower) < 30) finalPower = 30 * sgn(finalPower);
+			word delta = finalPower - last;
+			LIM_TO_VAL_SET(delta, 5);
+			finalPower = last += delta;
 			setDrive(finalPower, finalPower);
 		}
 
@@ -170,7 +176,7 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 	case cw:
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
 		writeDebugStreamLine("%f", a);
-		setDrive(left, -right);
+		setDrive(left, -right, true);
 		while (gPosition.a < a - gVelocity.a * 0.6)
 		{
 			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2);
@@ -191,10 +197,10 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
 		writeDebugStreamLine("%f", a);
-		setDrive(-left, right);
+		setDrive(-left, right, true);
 		while (gPosition.a > a - gVelocity.a * 0.6)
 		{
-			a = gPosition.a + fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
+			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
 			sleep(1);
 		}
 		writeDebugStreamLine("%f", gVelocity.a);
@@ -202,7 +208,7 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 		state.target = -0.900;
 		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
 		{
-			a = gPosition.a + fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
+			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
 			turnSimpleInternalCcw(a, state);
 		}
 		setDrive(15, -15);
@@ -298,4 +304,44 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 	sleep(1);
 
 	state.time = nPgmTime;
+}
+
+void turnToAngleStupidCw(float a)
+{
+	a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+	setDrive(30, -30);
+	while (gPosition.a < a - 0.01) sleep(5);
+	applyHarshStop();
+}
+
+void turnToAngleStupidCcw(float a)
+{
+	a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+	setDrive(-30, 30);
+	while (gPosition.a > a + 0.01) sleep(5);
+	applyHarshStop();
+}
+
+void turnToTargetStupidCw(float y, float x)
+{
+	float a;
+	setDrive(30, -30);
+	do
+	{
+		a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a, PI * 2);
+		sleep(5);
+	} while (gPosition.a < a - 0.01);
+	applyHarshStop();
+}
+
+void turnToTargetStupidCcw(float y, float x)
+{
+	float a;
+	setDrive(-30, 30);
+	do
+	{
+		a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y), PI * 2);
+		sleep(5);
+	} while (gPosition.a > a + 0.01);
+	applyHarshStop();
 }

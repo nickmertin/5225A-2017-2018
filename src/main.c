@@ -8,6 +8,7 @@
 #pragma config(Sensor, dgtl7,  liftEnc,        sensorQuadEncoder)
 #pragma config(Sensor, dgtl9,  jmpSkills,      sensorDigitalIn)
 #pragma config(Sensor, dgtl10, limMobile,      sensorTouch)
+#pragma config(Sensor, dgtl11, btnSetPosition, sensorTouch)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           driveL1,       tmotorVex393TurboSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port4,           driveL2,       tmotorVex393TurboSpeed_MC29, openLoop)
@@ -60,7 +61,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 #include "auto_simple.h"
 #include "auto_runs.h"
 
-//#define DEBUG_TRACKING
+#define DEBUG_TRACKING
 #define TRACK_IN_DRIVER
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
@@ -1014,6 +1015,19 @@ void handleLcd()
 #endif
 }
 
+void waitForSkillsReset()
+{
+	while (!gSensor[btnSetPosition].value)
+	{
+		updateSensorInput(btnSetPosition);
+		sleep(10);
+	}
+	resetPositionFull(gPosition, 8.25, 61.5, 0);
+	writeDebugStreamLine("RESET");
+}
+
+NEW_ASYNC_VOID_0(waitForSkillsReset);
+
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
 {
@@ -1034,6 +1048,9 @@ void startup()
 
 	velocityClear(trackL);
 	velocityClear(trackR);
+
+	trackPositionTaskAsync();
+	waitForSkillsResetAsync();
 
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
@@ -1196,6 +1213,11 @@ USE_ASYNC(moveToTargetSimple)
 USE_ASYNC(moveToTargetDisSimple)
 USE_ASYNC(turnToAngleSimple)
 USE_ASYNC(turnToTargetSimple)
+USE_ASYNC(turnToAngleStupidCw)
+USE_ASYNC(turnToAngleStupidCcw)
+USE_ASYNC(turnToTargetStupidCw)
+USE_ASYNC(turnToTargetStupidCcw)
+USE_ASYNC(waitForSkillsReset)
 USE_MACHINE(lift)
 USE_MACHINE(arm)
 USE_MACHINE(mobile)
