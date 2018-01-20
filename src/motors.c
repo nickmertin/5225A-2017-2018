@@ -16,5 +16,5 @@ void updateMotors()
 
 void updateMotor(tMotor mot)
 {
-	motor[mot] = gMotor[mot].curPower = (gMotor[mot].powerScale >= 0 ? round(gMotor[mot].power * gMotor[mot].powerScale) : gMotor[mot].power);
+	motor[mot] = gMotor[mot].curPower = gTimedOut ? 0 : (gMotor[mot].powerScale >= 0 ? round(gMotor[mot].power * gMotor[mot].powerScale) : gMotor[mot].power);
 }

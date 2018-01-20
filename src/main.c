@@ -83,6 +83,7 @@ unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
 word gUserControlTaskId = -1;
+bool gSetTimedOut = false;
 
 bool gDriveManual;
 
@@ -699,6 +700,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		//setMobile(0, true);
 		//if (gKillDriveOnTimeout) setDrive(0, 0, true);
 		//updateMotors();
+		gTimedOut = gSetTimedOut;
 		for (tMotor x = port1; x <= port10; ++x)
 			gMotor[x].power = motor[x] = 0;
 		armReset();
@@ -706,7 +708,10 @@ bool TimedOut(unsigned long timeOut, const string description)
 		mobileReset();
 		gDriveManual = true;
 		if (nCurrentTask == gUserControlTaskId || current == main)
+		{
+			releaseCPU();
 			startTaskID(current);
+		}
 		else
 			tStopAll(current);
 		return true;
@@ -1072,6 +1077,8 @@ void autonomous()
 	startSensors(); // Initilize the sensors
 
 	gKillDriveOnTimeout = true;
+	gSetTimedOut = true;
+	gTimedOut = false;
 
 	//resetPosition(gPosition);
 	//resetQuadratureEncoder(trackL);
@@ -1092,6 +1099,8 @@ void autonomous()
 void usercontrol()
 {
 	gUserControlTaskId = nCurrentTask;
+	gSetTimedOut = false;
+	gTimedOut = false;
 
 	startSensors(); // Initilize the sensors
 #if defined(DEBUG_TRACKING) || defined(TRACK_IN_DRIVER)

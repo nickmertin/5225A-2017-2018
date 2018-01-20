@@ -13,3 +13,4 @@ void updateMotor(tMotor mot); // Update a motor output
 
 /* Variables */
 sMotor gMotor[kNumbOfTotalMotors]; // The global motor array
+bool gTimedOut = false;
