@@ -491,8 +491,9 @@ typedef enum _tMobileStates {
 bool gMobileCheckLift;
 bool gMobileSlow = false;
 
-void setMobile(word power)
+void setMobile(word power, bool debug = false)
 {
+	writeDebugStreamLine("MOBILE %d", power);
 	gMotor[mobile].power = power;
 }
 
@@ -673,16 +674,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 	if (nPgmTime > timeOut)
 	{
 		hogCPU();
-		setLift(0);
-		setArm(0);
-		setMobile(0);
-		if (gKillDriveOnTimeout) setDrive(0, 0);
-		updateMotors();
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
-		armReset();
-		liftReset();
-		mobileReset();
-		gDriveManual = true;
 		int current = nCurrentTask;
 		if (current == gUserControlTaskId || current == main)
 		{
@@ -692,16 +684,31 @@ bool TimedOut(unsigned long timeOut, const string description)
 				tStopAll(child);
 				child = tEls[child].next;
 			}
-			startTaskID(current);
-			return true;
 		}
-		while (true)
+		else
 		{
-			int next = tEls[current].parent;
-			if (next == -1 || next == gUserControlTaskId || next == main) break;
-			current = next;
+			while (true)
+			{
+				int next = tEls[current].parent;
+				if (next == -1 || next == gUserControlTaskId || next == main) break;
+				current = next;
+			}
 		}
-		tStopAll(current);
+		//setLift(0, true);
+		//setArm(0, true);
+		//setMobile(0, true);
+		//if (gKillDriveOnTimeout) setDrive(0, 0, true);
+		//updateMotors();
+		for (tMotor x = port1; x <= port10; ++x)
+			gMotor[x].power = motor[x] = 0;
+		armReset();
+		liftReset();
+		mobileReset();
+		gDriveManual = true;
+		if (nCurrentTask == gUserControlTaskId || current == main)
+			startTaskID(current);
+		else
+			tStopAll(current);
 		return true;
 	}
 	else
@@ -1059,6 +1066,8 @@ void autonomous()
 {
 	gAutoTime = nPgmTime;
 	writeDebugStreamLine("Auto start %d", gAutoTime);
+
+	gUserControlTaskId = -1;
 
 	startSensors(); // Initilize the sensors
 
