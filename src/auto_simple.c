@@ -87,12 +87,13 @@ void moveToTargetSimple(float y, float x, byte power, float dropEarly, tStopType
 
 void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float dropEarly, tStopType stopType, bool slow)
 {
-	sPolar polar;
-	sVector vector;
-	polar.angle = a;
-	polar.magnitude = d;
-	polarToVector(polar, vector);
-	moveToTargetSimple(vector.y + ys, vector.x + xs, ys, xs, power, dropEarly, stopType, slow);
+	//sPolar polar;
+	//sVector vector;
+	//polar.angle = a;
+	//polar.magnitude = d;
+	//polarToVector(polar, vector);
+	//moveToTargetSimple(vector.y + ys, vector.x + xs, ys, xs, power, dropEarly, stopType, slow);
+	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, dropEarly, stopType, slow);
 }
 
 void moveToTargetDisSimple(float a, float d, byte power, float dropEarly, tStopType stopType, bool slow) { moveToTargetDisSimple(a, d, gPosition.y, gPosition.x, power, dropEarly, stopType, slow); }
@@ -306,44 +307,54 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 	state.time = nPgmTime;
 }
 
-void turnToAngleStupidCw(float a)
+void turnToAngleStupid(float a, tTurnDir turnDir)
 {
-	a = gPosition.a + fmod(a - gPosition.a, PI * 2);
-	setDrive(30, -30);
-	while (gPosition.a < a - 0.01) sleep(5);
+	if (turnDir == ch)
+		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+
+	switch (turnDir)
+	{
+	case cw:
+		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+		setDrive(30, -30);
+		while (gPosition.a < a - 0.01) sleep(5);
+		break;
+	case ccw:
+		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		setDrive(-30, 30);
+		while (gPosition.a > a + 0.01) sleep(5);
+		break;
+	}
 	applyHarshStop();
 }
 
-void turnToAngleStupidCcw(float a)
-{
-	a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-	setDrive(-30, 30);
-	while (gPosition.a > a + 0.01) sleep(5);
-	applyHarshStop();
-}
-
-void turnToTargetStupidCw(float y, float x, float offset)
+void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 {
 	float a;
-	setDrive(30, -30);
-	do
-	{
-		a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2);
-		sleep(5);
-	} while (gPosition.a < a - 0.07);
-	applyHarshStop();
-	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
+	if (turnDir == ch)
+		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
-void turnToTargetStupidCcw(float y, float x, float offset)
-{
-	float a;
-	setDrive(-30, 30);
-	do
+	switch (turnDir)
 	{
-		a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
-		sleep(5);
-	} while (gPosition.a > a + 0.07);
+	case cw:
+		writeDebugStreamLine("CW %d %d | %d", y, x, a);
+		setDrive(25, -25);
+		do
+		{
+			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2);
+			sleep(5);
+		} while (gPosition.a < a - 0.02);
+		break;
+	case ccw:
+		writeDebugStreamLine("CCW %d %d | %d", y, x, a);
+		setDrive(-25, 25);
+		do
+		{
+			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
+			sleep(5);
+		} while (gPosition.a > a + 0.02);
+		break;
+	}
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }

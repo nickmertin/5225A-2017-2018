@@ -153,41 +153,41 @@ void autoMotorSensorUpdateTask()
 	}
 }
 
-void autoSafetyTask()
-{
-	int bad = 0;
-	int lastL = gSensor[trackL].value;
-	int lastR = gSensor[trackR].value;
-	int lastB = gSensor[trackB].value;
-	sCycleData cycle;
-	initCycle(cycle, 10, "auto safety");
-	while (true)
-	{
-		if (gAutoSafety)
-		{
-			int motors = abs(gMotor[driveL1].power) + abs(gMotor[driveL2].power) + abs(gMotor[driveR1].power) + abs(gMotor[driveR2].power);
-			int sensors = abs(gSensor[trackL].value - lastL) + abs(gSensor[trackR].value - lastR) + abs(gSensor[trackB].value - lastB);
-			lastL = gSensor[trackL].value;
-			lastR = gSensor[trackR].value;
-			lastB = gSensor[trackB].value;
+//void autoSafetyTask()
+//{
+//	int bad = 0;
+//	int lastL = gSensor[trackL].value;
+//	int lastR = gSensor[trackR].value;
+//	int lastB = gSensor[trackB].value;
+//	sCycleData cycle;
+//	initCycle(cycle, 10, "auto safety");
+//	while (true)
+//	{
+//		if (gAutoSafety)
+//		{
+//			int motors = abs(gMotor[driveL1].power) + abs(gMotor[driveL2].power) + abs(gMotor[driveR1].power) + abs(gMotor[driveR2].power);
+//			int sensors = abs(gSensor[trackL].value - lastL) + abs(gSensor[trackR].value - lastR) + abs(gSensor[trackB].value - lastB);
+//			lastL = gSensor[trackL].value;
+//			lastR = gSensor[trackR].value;
+//			lastB = gSensor[trackB].value;
 
-			// If the motors are moving fast and the encoders arn't moving
-			if (motors > 100 && sensors < 6)
-				++bad; // Remember that this is a bad cycle
-			else
-				bad = 0; // Reset the bad counter
-			if (bad >= 100) // If 100 cycles have been bad stop auto
-			{
-				stopAllButCurrentTasks();
-				for (tMotor i = port1; i <= port10; ++i)
-					gMotor[i].power = 0;
-				updateMotors();
-				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
-			}
-		}
-		endCycle(cycle);
-	}
-}
+//			// If the motors are moving fast and the encoders arn't moving
+//			if (motors > 100 && sensors < 6)
+//				++bad; // Remember that this is a bad cycle
+//			else
+//				bad = 0; // Reset the bad counter
+//			if (bad >= 100) // If 100 cycles have been bad stop auto
+//			{
+//				stopAllButCurrentTasks();
+//				for (tMotor i = port1; i <= port10; ++i)
+//					gMotor[i].power = 0;
+//				updateMotors();
+//				writeDebugStreamLine("Auto safety triggered: %d %d", motors, sensors);
+//			}
+//		}
+//		endCycle(cycle);
+//	}
+//}
 
 void applyHarshStop()
 {
@@ -240,295 +240,295 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	releaseCPU();
 }
 
-float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
+//float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;
 
-void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
-{
-	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
-	sPID pidA, pidY;
-	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
-	pidInit(pidY, 0.15, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
+//void moveToTarget(float y, float x, float ys, float xs, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow)
+//{
+//	writeDebugStreamLine("Moving to %f %f from %f %f", y, x, ys, xs);
+//	sPID pidA, pidY;
+//	pidInit(pidA, kP, kI, kD, kIInner, kIOuter, -1, -1);
+//	pidInit(pidY, 0.15, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
 
-	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
+//	lineEpsilon = MIN(lineEpsilon, targetEpsilon);
 
-	// Create the line to follow
-	sLine followLine;
+//	// Create the line to follow
+//	sLine followLine;
 
-	// Start points
-	followLine.p1.y = ys;
-	followLine.p1.x = xs;
+//	// Start points
+//	followLine.p1.y = ys;
+//	followLine.p1.x = xs;
 
-	// End points
-	followLine.p2.y = y;
-	followLine.p2.x = x;
+//	// End points
+//	followLine.p2.y = y;
+//	followLine.p2.x = x;
 
-	float lineLength = getLengthOfLine(followLine);
-	writeDebugStreamLine("Line length: %.2f", lineLength);
-	float lineAngle = getAngleOfLine(followLine); // Get the angle of the line that we're following relative to the vertical
-	float pidAngle = nearAngle(lineAngle - (power < 0 ? PI : 0), gPosition.a);
-	writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
+//	float lineLength = getLengthOfLine(followLine);
+//	writeDebugStreamLine("Line length: %.2f", lineLength);
+//	float lineAngle = getAngleOfLine(followLine); // Get the angle of the line that we're following relative to the vertical
+//	float pidAngle = nearAngle(lineAngle - (power < 0 ? PI : 0), gPosition.a);
+//	writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
 
-	// The position relative to the line
-	sVector localPos;
-	sPolar polar;
+//	// The position relative to the line
+//	sVector localPos;
+//	sPolar polar;
 
-	targetEpsilon *= targetEpsilon;
+//	targetEpsilon *= targetEpsilon;
 
-	sCycleData cycle;
-	initCycle(cycle, 50, "moveToTarget");
-	do
-	{
-		// Setup our current displacement
-		localPos.x = gPosition.x - xs;
-		localPos.y = gPosition.y - ys;
+//	sCycleData cycle;
+//	initCycle(cycle, 50, "moveToTarget");
+//	do
+//	{
+//		// Setup our current displacement
+//		localPos.x = gPosition.x - xs;
+//		localPos.y = gPosition.y - ys;
 
-		vectorToPolar(localPos, polar);
-		polar.angle += lineAngle;
-		polarToVector(polar, localPos);
+//		vectorToPolar(localPos, polar);
+//		polar.angle += lineAngle;
+//		polarToVector(polar, localPos);
 
-		EndTimeSlice();
+//		EndTimeSlice();
 
-		bool closeToLine = fabs(localPos.x) < lineEpsilon || localPos.y > lineLength - MAX(lineEpsilon, delta);
+//		bool closeToLine = fabs(localPos.x) < lineEpsilon || localPos.y > lineLength - MAX(lineEpsilon, delta);
 
-		float currentDelta;
-		if (localPos.y < -delta) currentDelta = -localPos.y;
-		else if (localPos.y > lineLength - delta) currentDelta = lineLength - localPos.y;
-		else currentDelta = delta;
-		float target = closeToLine ? pidAngle : pidAngle - atan2(localPos.x, currentDelta);
+//		float currentDelta;
+//		if (localPos.y < -delta) currentDelta = -localPos.y;
+//		else if (localPos.y > lineLength - delta) currentDelta = lineLength - localPos.y;
+//		else currentDelta = delta;
+//		float target = closeToLine ? pidAngle : pidAngle - atan2(localPos.x, currentDelta);
 
-		EndTimeSlice();
+//		EndTimeSlice();
 
-		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
-		pidCalculate(pidA, target, nearAngle(gPosition.a, target));
+//		//pidCalculate(pidA, target, nearAngle((gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.1 && gVelocity.a < 0.5) ? atan2(gVelocity.x, gVelocity.y) : power > 0 ? gPosition.a : gPosition.a + PI, target));
+//		pidCalculate(pidA, target, nearAngle(gPosition.a, target));
 
-		EndTimeSlice();
+//		EndTimeSlice();
 
-		float basePower;
-		if (slow)
-		{
-			pidCalculate(pidY, lineLength, localPos.y);
-			basePower = fabs(pidY.output * power);
-		}
-		else
-			basePower = fabs((float) power);
+//		float basePower;
+//		if (slow)
+//		{
+//			pidCalculate(pidY, lineLength, localPos.y);
+//			basePower = fabs(pidY.output * power);
+//		}
+//		else
+//			basePower = fabs((float) power);
 
-		EndTimeSlice();
+//		EndTimeSlice();
 
-		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
-		//if (closeToLine) weight *= 0.5;
+//		float weight = pidA.output;//sgn(pidA.output) * pow(fabs(pidA.output), 0.2);
+//		//if (closeToLine) weight *= 0.5;
 
-		float scalar = basePower / (1 + fabs(weight));
+//		float scalar = basePower / (1 + fabs(weight));
 
-		word left = (word)(scalar * (sgn(power) + weight));
-		word right = (word)(scalar * (sgn(power) - weight));
+//		word left = (word)(scalar * (sgn(power) + weight));
+//		word right = (word)(scalar * (sgn(power) - weight));
 
-		EndTimeSlice();
+//		EndTimeSlice();
 
-		writeDebugStreamLine("Global %.2f %.2f %.2f | %.2f %.2f Local %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, radToDeg(gPosition.a), gVelocity.y, gVelocity.x, localPos.y, localPos.x, radToDeg(target - pidA.error), radToDeg(target), weight, left, right);
+//		writeDebugStreamLine("Global %.2f %.2f %.2f | %.2f %.2f Local %.2f %.2f | %.2f %.2f %.2f | %d %d", gPosition.y, gPosition.x, radToDeg(gPosition.a), gVelocity.y, gVelocity.x, localPos.y, localPos.x, radToDeg(target - pidA.error), radToDeg(target), weight, left, right);
 
-		if (cycle.count) setDrive(left, right);
+//		if (cycle.count) setDrive(left, right);
 
-		// Get distance from target position
+//		// Get distance from target position
 
-		localPos.y -= lineLength;
+//		localPos.y -= lineLength;
 
-		endCycle(cycle);
-	} while (localPos.y < 0 && localPos.x * localPos.x + localPos.y * localPos.y > targetEpsilon);
+//		endCycle(cycle);
+//	} while (localPos.y < 0 && localPos.x * localPos.x + localPos.y * localPos.y > targetEpsilon);
 
-	if (harshStop)
-		applyHarshStop();
-	else
-		setDrive(0, 0);
+//	if (harshStop)
+//		applyHarshStop();
+//	else
+//		setDrive(0, 0);
 
-	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
+//	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+//}
 
-void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, lineEpsilon, targetEpsilon, harshStop, slow); }
+//void moveToTarget(float y, float x, byte power, float delta, float lineEpsilon, float targetEpsilon, bool harshStop, bool slow) { moveToTarget(y, x, gPosition.y, gPosition.x, power, delta, lineEpsilon, targetEpsilon, harshStop, slow); }
 
-void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
-{
-	writeDebugStreamLine("Turning to %f", radToDeg(a));
-	sPID pidA;
-	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
-	left = abs(left);
-	right = abs(right);
+//void turnToAngleRad(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
+//{
+//	writeDebugStreamLine("Turning to %f", radToDeg(a));
+//	sPID pidA;
+//	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
+//	left = abs(left);
+//	right = abs(right);
 
-	if (turnDir == ch)
-		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+//	if (turnDir == ch)
+//		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
 
-	if (slow)
-	{
-		switch (turnDir)
-		{
-			case cw:
-				while (gPosition.a < a - (gVelocity.a * 0.090))
-				{
-					pidCalculate(pidA, a, gPosition.a);
-					int power = round(abs(pidA.output));
-					LIM_TO_VAL_SET(power, 127);
-					setDrive(power > left ? left : power, power > right ? -right : -power);
-					sleep(1);
-				}
-				break;
-			case ccw:
-				while (gPosition.a > a - (gVelocity.a * 0.090))
-				{
-					pidCalculate(pidA, a, gPosition.a);
-					int power = round(abs(pidA.output));
-					LIM_TO_VAL_SET(power, 127);
-					setDrive(power > left ? -left : -power, power > right ? right : power);
-					sleep(1);
-				}
-				break;
-		}
-	}
-	else
-	{
-		switch (turnDir)
-		{
-			case cw:
-				setDrive(left, -right);
-				while (gPosition.a < a - (gVelocity.a * 0.13)) sleep(1);
-				break;
-			case ccw:
-				setDrive(-left, right);
-				while (gPosition.a > a - (gVelocity.a * 0.13)) sleep(1);
-				break;
-		}
-	}
+//	if (slow)
+//	{
+//		switch (turnDir)
+//		{
+//			case cw:
+//				while (gPosition.a < a - (gVelocity.a * 0.090))
+//				{
+//					pidCalculate(pidA, a, gPosition.a);
+//					int power = round(abs(pidA.output));
+//					LIM_TO_VAL_SET(power, 127);
+//					setDrive(power > left ? left : power, power > right ? -right : -power);
+//					sleep(1);
+//				}
+//				break;
+//			case ccw:
+//				while (gPosition.a > a - (gVelocity.a * 0.090))
+//				{
+//					pidCalculate(pidA, a, gPosition.a);
+//					int power = round(abs(pidA.output));
+//					LIM_TO_VAL_SET(power, 127);
+//					setDrive(power > left ? -left : -power, power > right ? right : power);
+//					sleep(1);
+//				}
+//				break;
+//		}
+//	}
+//	else
+//	{
+//		switch (turnDir)
+//		{
+//			case cw:
+//				setDrive(left, -right);
+//				while (gPosition.a < a - (gVelocity.a * 0.13)) sleep(1);
+//				break;
+//			case ccw:
+//				setDrive(-left, right);
+//				while (gPosition.a > a - (gVelocity.a * 0.13)) sleep(1);
+//				break;
+//		}
+//	}
 
-	if (harshStop)
-		applyHarshStop();
+//	if (harshStop)
+//		applyHarshStop();
 
-	setDrive(0, 0);
+//	setDrive(0, 0);
 
-	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
+//	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
+//}
 
-void turnToAngle(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
-{
-	turnToAngleRad(degToRad(a), turnDir, left, right, harshStop, slow);
-}
+//void turnToAngle(float a, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow)
+//{
+//	turnToAngleRad(degToRad(a), turnDir, left, right, harshStop, slow);
+//}
 
-void turnToTarget(float y, float x, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow, float offset)
-{
-	turnToTarget(y, x, gPosition.y, gPosition.x, turnDir, left, right, harshStop, slow, offset);
-}
+//void turnToTarget(float y, float x, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow, float offset)
+//{
+//	turnToTarget(y, x, gPosition.y, gPosition.x, turnDir, left, right, harshStop, slow, offset);
+//}
 
-void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow, float offset)
-{
-	writeDebugStreamLine("Turning to %f %f from %f %f", y, x, ys, xs);
+//void turnToTarget(float y, float x, float ys, float xs, tTurnDir turnDir, byte left, byte right, bool harshStop, bool slow, float offset)
+//{
+//	writeDebugStreamLine("Turning to %f %f from %f %f", y, x, ys, xs);
 
-	offset = degToRad(offset);
+//	offset = degToRad(offset);
 
-	sPID pidA;
-	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
-	left = abs(left);
-	right = abs(right);
+//	sPID pidA;
+//	pidInit(pidA, 60.0, 0.0, 0.0, -1, -1, 46, -1);
+//	left = abs(left);
+//	right = abs(right);
 
-	float target = getTargetAngle(y, x, ys, xs) + offset;
-	float curAngle = gPosition.a;
+//	float target = getTargetAngle(y, x, ys, xs) + offset;
+//	float curAngle = gPosition.a;
 
-	if (turnDir == ch)
-	{
-		if (getCWAngle(curAngle, target) < getCCWAngle(curAngle, target))
-			turnDir = cw;
-		else
-			turnDir = ccw;
-	}
+//	if (turnDir == ch)
+//	{
+//		if (getCWAngle(curAngle, target) < getCCWAngle(curAngle, target))
+//			turnDir = cw;
+//		else
+//			turnDir = ccw;
+//	}
 
-	float distance, distanceLst;
+//	float distance, distanceLst;
 
-	if (turnDir == cw)
-		distance = getCWAngle(curAngle, target);
-	else
-		distance = getCCWAngle(curAngle, target);
+//	if (turnDir == cw)
+//		distance = getCWAngle(curAngle, target);
+//	else
+//		distance = getCCWAngle(curAngle, target);
 
-	writeDebugStreamLine("Turn angle: %f | Angle: %f | Distance: %f", radToDeg(target), radToDeg(curAngle), radToDeg(distance));
+//	writeDebugStreamLine("Turn angle: %f | Angle: %f | Distance: %f", radToDeg(target), radToDeg(curAngle), radToDeg(distance));
 
-	sCycleData cycle;
-	initCycle(cycle, 10, "turnToTarget");
+//	sCycleData cycle;
+//	initCycle(cycle, 10, "turnToTarget");
 
-	if (slow)
-	{
-		switch (turnDir)
-		{
-			case cw:
-				do
-				{
-					distanceLst = distance;
+//	if (slow)
+//	{
+//		switch (turnDir)
+//		{
+//			case cw:
+//				do
+//				{
+//					distanceLst = distance;
 
-					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
-					curAngle = gPosition.a;
-					distance = getCWAngle(curAngle, target);
+//					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+//					curAngle = gPosition.a;
+//					distance = getCWAngle(curAngle, target);
 
-					pidCalculate(pidA, 0, distance);
-					int power = round(abs(pidA.output));
-					LIM_TO_VAL_SET(power, 127);
-					setDrive(power > left ? left : power, power > right ? -right : -power);
-					endCycle(cycle);
+//					pidCalculate(pidA, 0, distance);
+//					int power = round(abs(pidA.output));
+//					LIM_TO_VAL_SET(power, 127);
+//					setDrive(power > left ? left : power, power > right ? -right : -power);
+//					endCycle(cycle);
 
-					writeDebugStreamLine("%f %f %d", radToDeg(curAngle), radToDeg(target), power);
+//					writeDebugStreamLine("%f %f %d", radToDeg(curAngle), radToDeg(target), power);
 
-				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.090));
-				break;
-			case ccw:
-				do
-				{
-					distanceLst = distance;
+//				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.090));
+//				break;
+//			case ccw:
+//				do
+//				{
+//					distanceLst = distance;
 
-					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
-					curAngle = gPosition.a;
-					distance = getCCWAngle(curAngle, target);
+//					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+//					curAngle = gPosition.a;
+//					distance = getCCWAngle(curAngle, target);
 
-					pidCalculate(pidA, 0, distance);
-					int power = round(abs(pidA.output));
-					LIM_TO_VAL_SET(power, 127);
-					setDrive(power > left ? -left : -power, power > right ? right : power);
-					endCycle(cycle);
-				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.090));
-				break;
-		}
-	}
-	else
-	{
-		switch (turnDir)
-		{
-			case cw:
-				setDrive(left, -right);
-				do
-				{
-					distanceLst = distance;
-					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
-					curAngle = gPosition.a;
-					distance = getCWAngle(curAngle, target);
+//					pidCalculate(pidA, 0, distance);
+//					int power = round(abs(pidA.output));
+//					LIM_TO_VAL_SET(power, 127);
+//					setDrive(power > left ? -left : -power, power > right ? right : power);
+//					endCycle(cycle);
+//				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.090));
+//				break;
+//		}
+//	}
+//	else
+//	{
+//		switch (turnDir)
+//		{
+//			case cw:
+//				setDrive(left, -right);
+//				do
+//				{
+//					distanceLst = distance;
+//					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+//					curAngle = gPosition.a;
+//					distance = getCWAngle(curAngle, target);
 
-					endCycle(cycle);
-				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.13));
-				break;
-			case ccw:
-			setDrive(-left, right);
-				do
-				{
-					distanceLst = distance;
+//					endCycle(cycle);
+//				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.13));
+//				break;
+//			case ccw:
+//			setDrive(-left, right);
+//				do
+//				{
+//					distanceLst = distance;
 
-					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
-					curAngle = gPosition.a;
-					distance = getCCWAngle(curAngle, target);
+//					target = getTargetAngle(y, x, gPosition.y, gPosition.x) + offset;
+//					curAngle = gPosition.a;
+//					distance = getCCWAngle(curAngle, target);
 
-					endCycle(cycle);
-				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.13));
-				break;
-		}
-	}
+//					endCycle(cycle);
+//				} while (abs(distance - distanceLst) < degToRad(270) && distance > (gVelocity.a * 0.13));
+//				break;
+//		}
+//	}
 
-	if (harshStop)
-		applyHarshStop();
+//	if (harshStop)
+//		applyHarshStop();
 
-	setDrive(0, 0);
+//	setDrive(0, 0);
 
-	writeDebugStreamLine("Turned to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
+//	writeDebugStreamLine("Turned to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+//}
 
 float getTargetAngle(float y, float x, float ys, float xs)
 {
@@ -563,28 +563,28 @@ float getCCWAngle(float cur, float tar)
 	else return TAU - (tarM - curM);
 }
 
-void scoreFirstExternal(float dir)
-{
-	//sPolar offsetP;
-	//offsetP.angle = dir;
-	//offsetP.magnitude = 1;
-	//sVector offsetV;
-	//polarToVector(offsetP, offsetV);
-	//moveToTarget(gPosition.y - offsetV.x, gPosition.x - offsetV.y, -40, 3, 0.5, 0.5, true, true);
-	//sleep(200);
-	//setArm(-80);
-	//unsigned long coneTimeout = nPgmTime + 2000;
-	//while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "extern 1")) sleep(10); // Increase time
-	//setArm(10);
-	//setClaw(CLAW_OPEN_POWER);
-	//coneTimeout = nPgmTime + 800;
-	//while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern 2")) sleep(10);
-	//setClaw(CLAW_OPEN_HOLD_POWER);
-	//sleep(200);
-	//gNumCones = 1;
-	//setArm(80);
-	//coneTimeout = nPgmTime + 800;
-	//while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "extern 3")) sleep(10);
-	//setArm(10);
-	//moveToTarget(gPosition.y + 2 * offsetV.x, gPosition.x + 2 * offsetV.y, 60, 3, 1, 1, false, false);
-}
+//void scoreFirstExternal(float dir)
+//{
+//	sPolar offsetP;
+//	offsetP.angle = dir;
+//	offsetP.magnitude = 1;
+//	sVector offsetV;
+//	polarToVector(offsetP, offsetV);
+//	moveToTarget(gPosition.y - offsetV.x, gPosition.x - offsetV.y, -40, 3, 0.5, 0.5, true, true);
+//	sleep(200);
+//	setArm(-80);
+//	unsigned long coneTimeout = nPgmTime + 2000;
+//	while (gSensor[armPoti].value > 1100 && !TimedOut(coneTimeout, "extern 1")) sleep(10); // Increase time
+//	setArm(10);
+//	setClaw(CLAW_OPEN_POWER);
+//	coneTimeout = nPgmTime + 800;
+//	while (gSensor[clawPoti].value < CLAW_OPEN && !TimedOut(coneTimeout, "extern 2")) sleep(10);
+//	setClaw(CLAW_OPEN_HOLD_POWER);
+//	sleep(200);
+//	gNumCones = 1;
+//	setArm(80);
+//	coneTimeout = nPgmTime + 800;
+//	while (gSensor[armPoti].value < gArmPositions[2] && !TimedOut(coneTimeout, "extern 3")) sleep(10);
+//	setArm(10);
+//	moveToTarget(gPosition.y + 2 * offsetV.x, gPosition.x + 2 * offsetV.y, 60, 3, 1, 1, false, false);
+//}
