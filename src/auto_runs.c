@@ -136,10 +136,10 @@ void autoSkills()
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
 
 	// 2
-	driveAsync = turnToTargetStupidCcwAsync(13, 39); //turnToTargetSimpleAsync(13, 39, ccw, 40, 40, 0);
+	driveAsync = turnToTargetSimpleAsync(13, 39, ccw, 40, 40, 0);
 	driveTimeout = nPgmTime + 5000;
 	await(driveAsync, driveTimeout, "skills 2-1");
-	driveAsync = moveToTargetSimpleAsync(14, 40, gPosition.y, gPosition.x, 127, 0, stopSoft, true);
+	driveAsync = moveToTargetSimpleAsync(14, 40, gPosition.y, gPosition.x, 127, 2, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
 	//mobileSet(mobileDownToMiddle, 0);
 	await(driveAsync, driveTimeout, "skills 2-2");
@@ -160,11 +160,11 @@ void autoSkills()
 	driveAsync = moveToTargetSimpleAsync(22, 48, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	await(driveAsync, driveTimeout, "skills 3-1");
-	driveAsync = turnToTargetStupidCcwAsync(18, 108); //turnToTargetSimpleAsync(18, 108, ccw, 40, 40, 0);
+	driveAsync = turnToTargetSimpleAsync(14, 108, ccw, 40, 40, 0);
 	driveTimeout = nPgmTime + 5000;
 	await(driveAsync, driveTimeout, "skills 3-2");
 	mobileSet(mobileBottom, 0);
-	driveAsync = moveToTargetSimpleAsync(18, 108, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
+	driveAsync = moveToTargetSimpleAsync(14, 108, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
 	driveTimeout = nPgmTime + 4000;
 	await(driveAsync, driveTimeout, "skills 3-3");
 	mobileSet(mobileTop, 0);
@@ -417,7 +417,9 @@ void autoSideMobileRight()
 
 void autoTest()
 {
+	trackPositionTaskKill();
 	resetPositionFull(gPosition, 0, 0, 0);
+	trackPositionTaskAsync();
 	//setDrive(80, 80);
 	//unsigned long timeout = nPgmTime + 2000;
 	//while (gPosition.y < 23 && !TimedOut(timeout, "test 1")) sleep(10);
@@ -433,6 +435,10 @@ void autoTest()
 	//setDrive(0, 0);
 
 	//moveToTargetSimple(72, 0, 127, 0);
-	trackPositionTaskAsync();
-	turnToTargetSimple(0, -10, ccw, 127, 127, 0);
+	//turnToTargetSimple(0, -10, ccw, 127, 127, 0);
+	//trackPositionTaskAsync();
+	moveToTargetSimple(50, 0, 127);
+	turnToTargetSimple(0, 0, ccw, 127, 127);
+	moveToTargetSimple(0, 0, 127, 10);
+	turnToAngleSimple(0, ccw, 127, 127);
 }
