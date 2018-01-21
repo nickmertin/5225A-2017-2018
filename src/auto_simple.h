@@ -35,8 +35,8 @@ void turnSimpleInternalCw(float a, sTurnState& state);
 void turnSimpleInternalCcw(float a, sTurnState& state);
 void turnToAngleStupidCw(float a);
 void turnToAngleStupidCcw(float a);
-void turnToTargetStupidCw(float y, float x);
-void turnToTargetStupidCcw(float y, float x);
+void turnToTargetStupidCw(float y, float x, float offset);
+void turnToTargetStupidCcw(float y, float x, float offset);
 
 /* Async Functions */
 NEW_ASYNC_VOID_8(moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool);
@@ -45,5 +45,5 @@ NEW_ASYNC_VOID_4(turnToAngleSimple, float, tTurnDir, byte, byte);
 NEW_ASYNC_VOID_6(turnToTargetSimple, float, float, tTurnDir, byte, byte, float);
 NEW_ASYNC_VOID_1(turnToAngleStupidCw, float);
 NEW_ASYNC_VOID_1(turnToAngleStupidCcw, float);
-NEW_ASYNC_VOID_2(turnToTargetStupidCw, float, float);
-NEW_ASYNC_VOID_2(turnToTargetStupidCcw, float, float);
+NEW_ASYNC_VOID_3(turnToTargetStupidCw, float, float, float);
+NEW_ASYNC_VOID_3(turnToTargetStupidCcw, float, float, float);

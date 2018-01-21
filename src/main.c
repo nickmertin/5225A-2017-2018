@@ -61,8 +61,8 @@ bool TimedOut(unsigned long timeOut, const string description);
 #include "auto_simple.h"
 #include "auto_runs.h"
 
-#define DEBUG_TRACKING
-#define TRACK_IN_DRIVER
+//#define DEBUG_TRACKING
+//#define TRACK_IN_DRIVER
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
@@ -1023,6 +1023,7 @@ void waitForSkillsReset()
 		sleep(10);
 	}
 	resetPositionFull(gPosition, 8.25, 61.5, 0);
+	trackPositionTaskAsync();
 	writeDebugStreamLine("RESET");
 }
 
@@ -1049,7 +1050,6 @@ void startup()
 	velocityClear(trackL);
 	velocityClear(trackR);
 
-	trackPositionTaskAsync();
 	waitForSkillsResetAsync();
 
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
