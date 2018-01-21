@@ -136,7 +136,7 @@ void autoSkills()
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
 
 	// 2
-	driveAsync = turnToTargetSimpleAsync(13, 39, ccw, 40, 40, 0);
+	driveAsync = turnToTargetSimpleAsync(13, 39, ccw, 127, 127, 0);
 	driveTimeout = nPgmTime + 5000;
 	await(driveAsync, driveTimeout, "skills 2-1");
 	driveAsync = moveToTargetSimpleAsync(14, 40, gPosition.y, gPosition.x, 127, 2, stopSoft, true);
@@ -151,11 +151,11 @@ void autoSkills()
 	driveAsync = moveToTargetSimpleAsync(22, 48, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	await(driveAsync, driveTimeout, "skills 3-1");
-	driveAsync = turnToTargetSimpleAsync(14, 108, ccw, 40, 40, 0);
+	driveAsync = turnToTargetSimpleAsync(16, 108, ccw, 127, 127, 0);
 	driveTimeout = nPgmTime + 5000;
 	await(driveAsync, driveTimeout, "skills 3-2");
 	mobileSet(mobileBottom, 0);
-	driveAsync = moveToTargetSimpleAsync(14, 108, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
+	driveAsync = moveToTargetSimpleAsync(16, 108, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
 	driveTimeout = nPgmTime + 4000;
 	await(driveAsync, driveTimeout, "skills 3-3");
 	mobileSet(mobileTop, 0);
