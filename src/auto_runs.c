@@ -187,17 +187,17 @@ void autoSkills()
 	await(driveAsync, driveTimeout, "skills 4-5");
 
 	// 5
-	driveAsync = turnToTargetSimpleAsync(52, 10, cw, 127, 127, 0);
+	driveAsync = turnToTargetSimpleAsync(52, 11, cw, 127, 127, 0);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "skills 5-1");
-	driveAsync = moveToTargetSimpleAsync(52, 10, gPosition.y, gPosition.x, 127, 0, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(52, 11, gPosition.y, gPosition.x, 127, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "skills 5-2");
-	driveAsync = turnToTargetSimpleAsync(108, 9, cw, 127, 127, 0);
+	driveAsync = turnToTargetSimpleAsync(108, 11, cw, 127, 127, 0);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "skills 5-3");
 	mobileSet(mobileBottom, 0);
-	driveAsync = moveToTargetSimpleAsync(108, 9, gPosition.y, gPosition.x, 127, 6, stopSoft, true);
+	driveAsync = moveToTargetSimpleAsync(108, 11, gPosition.y, gPosition.x, 127, 6, stopSoft, true);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "skills 5-4");
 	mobileSet(mobileTop, 0);
