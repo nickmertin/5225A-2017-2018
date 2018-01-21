@@ -148,14 +148,14 @@ void autoSkills()
 
 	// 3
 	sleep(200);
-	driveAsync = moveToTargetSimpleAsync(22, 48, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(21, 47, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	await(driveAsync, driveTimeout, "skills 3-1");
-	driveAsync = turnToTargetSimpleAsync(16, 108, ccw, 127, 127, 0);
+	driveAsync = turnToTargetSimpleAsync(15, 108, ccw, 127, 127, 0);
 	driveTimeout = nPgmTime + 5000;
 	await(driveAsync, driveTimeout, "skills 3-2");
 	mobileSet(mobileBottom, 0);
-	driveAsync = moveToTargetSimpleAsync(16, 108, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
+	driveAsync = moveToTargetSimpleAsync(15, 108, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
 	driveTimeout = nPgmTime + 4000;
 	await(driveAsync, driveTimeout, "skills 3-3");
 	mobileSet(mobileTop, 0);
