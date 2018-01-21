@@ -203,6 +203,29 @@ void autoSkills()
 	mobileSet(mobileTop, 0);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
+
+	// 6
+	driveAsync = turnToTargetSimpleAsync(52, 10, ch, 40, 40, PI);
+	driveTimeout = nPgmTime + 2000;
+	await(driveAsync, driveTimeout, "skills 6-1");
+	driveAsync = moveToTargetSimpleAsync(52, 10, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 3000;
+	await(driveAsync, driveTimeout, "skills 6-2");
+	driveAsync = turnToTargetSimpleAsync(28, 28, ccw, 127, 127, PI);
+	driveTimeout = nPgmTime + 3000;
+	await(driveAsync, driveTimeout, "skills 6-3");
+	driveAsync = moveToTargetSimpleAsync(28, 28, gPosition.y, gPosition.x, -127, 10, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 2000;
+	await(driveAsync, driveTimeout, "skills 6-4");
+	driveAsync = turnToAngleSimpleAsync(-135, ccw, 127, 127);
+	driveTimeout = nPgmTime + 3000;
+	await(driveAsync, driveTimeout, "skills 6-5");
+	setDrive(40, 40);
+	sleep(400);
+	setDrive(7, 7);
+	mobileSet(mobileBottom, 0);
+	coneTimeout = nPgmTime + 2000;
+	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout);
 }
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
