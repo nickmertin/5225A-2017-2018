@@ -211,8 +211,8 @@ void autoSkills()
 	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	await(driveAsync, driveTimeout, "skills 5-2");
-	driveAsync = turnToTargetSimpleAsync(53, 11, cw, 50, 50, 0);
-	configure(liftConfig, LIFT_MOBILE_THRESHOLD, 127, -15);
+	driveAsync = turnToTargetSimpleAsync(53, 11, ch, 50, 50, 0);
+	configure(liftConfig, LIFT_MOBILE_THRESHOLD, 127, -20);
 	liftSet(liftRaiseSimple, &liftConfig);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "skills 5-3");
@@ -257,10 +257,10 @@ void autoSkills()
 	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 7, gPosition.y, gPosition.x, -80, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 2000;
 	await(driveAsync, driveTimeout, "skills 7-1");
-	driveAsync = turnToTargetSimpleAsync(44, 24, ccw, 127, 127, PI);
+	driveAsync = turnToTargetSimpleAsync(43, 25, ccw, 127, 127, PI);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "skills 7-2");
-	driveAsync = moveToTargetSimpleAsync(44, 24, gPosition.y, gPosition.x, -127, 0, stopSoft, true);
+	driveAsync = moveToTargetSimpleAsync(43, 25, gPosition.y, gPosition.x, -127, 0, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
 	await(driveAsync, driveTimeout, "skills 7-3");
 	driveAsync = turnToTargetSimpleAsync(70, 48, ccw, 127, 127, 0);
@@ -301,7 +301,17 @@ void autoSkills()
 	mobileSet(mobileTop, 0);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
+
+	//10
+	driveAsync = turnToTargetSimpleAsync(118, 98, ch, 30, 30, 0);
+	driveTimeout = nPgmTime + 1000;
+	await(driveAsync, driveTimeout, "skills 10-1");
+	driveAsync = moveToTargetSimpleAsync(118, 98, gPosition.y, gPosition.x, 127, 0, stopSoft, true);
+	driveTimeout = nPgmTime + 3500;
+	await(driveAsync, driveTimeout, "skills 10-2");
+	mobileSet(mobileBottom, 0);
 }
+
 
 void autoStationaryCore(bool first, int liftUp, int liftDown, tTurnDir turnDir)
 {
