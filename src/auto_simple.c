@@ -370,24 +370,23 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 	float output;
 
 	float kP_pwr = 120;
-	float kp_vel = 0.001;
+	float kP_vel = 0.001;
 
 switch (turnDir)
 	{
 	case cw:
-		a = fmod(a + gPosition.a, PI * 2);
+		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
 
-		while (gPosition.a < a)
+		while (fabs(gPosition.a - a) > 0.02 || fabs(gVelocity.a) > 0.05)
 		{
 			time = nPgmTime;
-
-			targetVel = kP_pwr*(a - gPosition.a);
-			LIM_TO_VAL_SET(targetVel, 127);
 			unsigned long deltaTime = time - lstTime;
+
+			targetVel = kP_vel*(a - gPosition.a);
 
 			if (deltaTime >= 1)
 			{
-				output -= kp_vel*(gVelocity.a - targetVel);
+				output = kP_pwr*(targetVel - gVelocity.a);
 				LIM_TO_VAL_SET(output, 127);
 				lstTime = time;
 			}
@@ -402,15 +401,25 @@ switch (turnDir)
 		break;
 
 	case ccw:
-		a = fmod(a + gPosition.a, PI * 2);
-		while (gPosition.a > a)
+		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		while (fabs(gPosition.a - a) > 0.02 || fabs(gVelocity.a) > 0.05)
 		{
-			targetVel = kP_pwr*(a - gPosition.a);
-			LIM_TO_VAL_SET(targetVel, 127);
-			output -= kp_vel*(gVelocity.a - targetVel);
+			time = nPgmTime;
+			unsigned long deltaTime = time - lstTime;
+
+			targetVel = kP_vel*(a - gPosition.a);
+
+			if (deltaTime >= 1)
+			{
+				output = kP_pwr*(targetVel - gVelocity.a);
+				LIM_TO_VAL_SET(output, 127);
+				lstTime = time;
+			}
+
 			setDrive(-output, output);
 			sleep(1);
 		}
+
 		setDrive(10, -10);
 		sleep(150);
 		setDrive(0, 0);
