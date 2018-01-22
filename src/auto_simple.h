@@ -36,6 +36,8 @@ void turnSimpleInternalCcw(float a, sTurnState& state);
 void turnToAngleStupid(float a, tTurnDir turnDir);
 void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset);
 
+void turnToAngleNewRad (float a, tTurnDir turnDir);
+
 /* Async Functions */
 NEW_ASYNC_VOID_8(moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool);
 NEW_ASYNC_VOID_8(moveToTargetDisSimple, float, float, float, float, byte, float, tStopType, bool);

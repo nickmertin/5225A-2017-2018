@@ -358,3 +358,64 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
+
+void turnToAngleNewRad (float a, tTurnDir turnDir)
+{
+	writeDebugStreamLine("Turning to %f", radToDeg(a));
+
+	unsigned long time = nPgmTime;
+	unsigned long lstTime = time;
+
+	float targetVel;
+	float output;
+
+	float kP_pwr = 120;
+	float kp_vel = 0.001;
+
+switch (turnDir)
+	{
+	case cw:
+		a = fmod(a + gPosition.a, PI * 2);
+
+		while (gPosition.a < a)
+		{
+			time = nPgmTime;
+
+			targetVel = kP_pwr*(a - gPosition.a);
+			LIM_TO_VAL_SET(targetVel, 127);
+			unsigned long deltaTime = time - lstTime;
+
+			if (deltaTime >= 1)
+			{
+				output -= kp_vel*(gVelocity.a - targetVel);
+				LIM_TO_VAL_SET(output, 127);
+				lstTime = time;
+			}
+
+			setDrive(output, -output);
+			sleep(1);
+		}
+
+		setDrive(-10, 10);
+		sleep(150);
+		setDrive(0, 0);
+		break;
+
+	case ccw:
+		a = fmod(a + gPosition.a, PI * 2);
+		while (gPosition.a > a)
+		{
+			targetVel = kP_pwr*(a - gPosition.a);
+			LIM_TO_VAL_SET(targetVel, 127);
+			output -= kp_vel*(gVelocity.a - targetVel);
+			setDrive(-output, output);
+			sleep(1);
+		}
+		setDrive(10, -10);
+		sleep(150);
+		setDrive(0, 0);
+		break;
+	}
+
+	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
