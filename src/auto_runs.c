@@ -588,7 +588,7 @@ void autoTest()
 
 	//moveToTargetSimple(5, 0, -80, 0, stopSoft | stopHarsh, true);
 	//moveToTargetDisSimple(0, 5, -80, 0, stopSoft | stopHarsh, true);
-	turnToAngleNewRad(PI, ccw);
+	turnToAngleNew(180, ccw);
 	playSound(soundBlip);
 	sleep(1000);
 	writeDebugStreamLine("%f", radToDeg(gPosition.a));

@@ -426,3 +426,8 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
+
+void turnToAngleNew(float a, tTurnDir turnDir)
+{
+	turnToAngleNewRad(degToRad(a), turnDir);
+}
