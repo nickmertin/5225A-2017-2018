@@ -208,8 +208,8 @@ void applyHarshStop()
 	word left = yPow + aPow;
 	word right = yPow - aPow;
 
-	left = sgn(left) * MAX(fabs(left), 10);
-	right = sgn(right) * MAX(fabs(right), 10);
+	left = sgn(left) * MAX(fabs(left), 7);
+	right = sgn(right) * MAX(fabs(right), 7);
 
 	LIM_TO_VAL_SET(left, 30);
 	LIM_TO_VAL_SET(right, 30);

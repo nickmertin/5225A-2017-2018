@@ -17,7 +17,7 @@ void selectAuto()
 
 void runAuto()
 {
-	autoSkills();
+	autoTest();
 	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
@@ -558,8 +558,10 @@ void autoSideMobileRight()
 
 void autoTest()
 {
+	for (int i = 0; i < 20; ++i)
+	{
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 0, 0, 180);
+	resetPositionFull(gPosition, 0, 0, 0);
 	trackPositionTaskAsync();
 	//setDrive(80, 80);
 	//unsigned long timeout = nPgmTime + 2000;
@@ -586,4 +588,9 @@ void autoTest()
 
 	//moveToTargetSimple(5, 0, -80, 0, stopSoft | stopHarsh, true);
 	//moveToTargetDisSimple(0, 5, -80, 0, stopSoft | stopHarsh, true);
+	turnToAngleStupid(PI / 36, cw);
+	playSound(soundBlip);
+	sleep(1000);
+	writeDebugStreamLine("%f", radToDeg(gPosition.a));
+}
 }

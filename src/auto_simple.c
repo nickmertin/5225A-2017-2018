@@ -317,12 +317,12 @@ void turnToAngleStupid(float a, tTurnDir turnDir)
 	case cw:
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
 		setDrive(30, -30);
-		while (gPosition.a < a - 0.01) sleep(5);
+		while (gPosition.a < a - 0.04) sleep(5);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
 		setDrive(-30, 30);
-		while (gPosition.a > a + 0.01) sleep(5);
+		while (gPosition.a > a + 0.04) sleep(5);
 		break;
 	}
 	applyHarshStop();
@@ -343,7 +343,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 		{
 			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2);
 			sleep(5);
-		} while (gPosition.a < a - 0.02);
+		} while (gPosition.a < a - 0.04);
 		break;
 	case ccw:
 		writeDebugStreamLine("CCW %d %d | %d", y, x, a);
@@ -352,7 +352,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 		{
 			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
 			sleep(5);
-		} while (gPosition.a > a + 0.02);
+		} while (gPosition.a > a + 0.04);
 		break;
 	}
 	applyHarshStop();
@@ -363,68 +363,66 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
-	unsigned long time = nPgmTime;
-	unsigned long lstTime = time;
+	const float startPower = 35;
+
+	if (turnDir == cw)
+	{
+		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+		setDrive(startPower, -startPower);
+	}
+	else
+	{
+		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		setDrive(-startPower, startPower);
+	}
 
 	float targetVel;
 	float output;
+	float integral = 0;
 
-	float kP_pwr = 120;
-	float kP_vel = 0.001;
+	bool isLong = fabs(gPosition.a - a) >= PI;
 
-switch (turnDir)
+	float kP_vel = isLong ? 4.5 : 3.5;
+	float kP_pwr = isLong ? 27 : 30;
+	float kI_pwr = isLong ? 0.003 : 0.004;
+	float kD_pwr = isLong ? 0.5 : 0.7;
+
+	float lstErr;
+
+	float lstErrPos;
+
+	unsigned long time = nPgmTime;
+	unsigned long lstTime = time;
+	unsigned long startTime = time;
+
+	while (fabs(gPosition.a - a) > 0.02)
 	{
-	case cw:
-		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+		time = nPgmTime;
+		unsigned long deltaTime = time - lstTime;
 
-		while (fabs(gPosition.a - a) > 0.02 || fabs(gVelocity.a) > 0.05)
+		float errPos = a - gPosition.a;
+		errPos = sgn(errPos) * sqrt(fabs(errPos));
+		targetVel = kP_vel * errPos;
+
+		if (deltaTime >= 1)
 		{
-			time = nPgmTime;
-			unsigned long deltaTime = time - lstTime;
+			float err = targetVel - gVelocity.a;
+			integral += deltaTime * err;
+			output = kP_pwr * err + kI_pwr * integral + kD_pwr * (lstErr - err) / deltaTime;
+			LIM_TO_VAL_SET(output, isLong ? 127 : 50);
+			if (errPos > 0 && lstErrPos < 0) playSound(soundUpwardTones);
+			if (errPos < 0 && lstErrPos > 0) playSound(soundDownwardTones);
+			lstTime = time;
+			lstErr = err;
+			lstErrPos = errPos;
 
-			targetVel = kP_vel*(a - gPosition.a);
-
-			if (deltaTime >= 1)
-			{
-				output = kP_pwr*(targetVel - gVelocity.a);
-				LIM_TO_VAL_SET(output, 127);
-				lstTime = time;
-			}
-
-			setDrive(output, -output);
-			sleep(1);
+			if (time - startTime > 100 || fabs(output) > startPower)
+				setDrive(output, -output);
 		}
-
-		setDrive(-10, 10);
-		sleep(150);
-		setDrive(0, 0);
-		break;
-
-	case ccw:
-		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		while (fabs(gPosition.a - a) > 0.02 || fabs(gVelocity.a) > 0.05)
-		{
-			time = nPgmTime;
-			unsigned long deltaTime = time - lstTime;
-
-			targetVel = kP_vel*(a - gPosition.a);
-
-			if (deltaTime >= 1)
-			{
-				output = kP_pwr*(targetVel - gVelocity.a);
-				LIM_TO_VAL_SET(output, 127);
-				lstTime = time;
-			}
-
-			setDrive(-output, output);
-			sleep(1);
-		}
-
-		setDrive(10, -10);
-		sleep(150);
-		setDrive(0, 0);
-		break;
+		sleep(1);
 	}
+
+	applyHarshStop();
 
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
