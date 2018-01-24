@@ -363,6 +363,9 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
+	if (turnDir == ch)
+		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
+
 	sTurnNewState state;
 
 	state.startPower = 35;
@@ -409,6 +412,9 @@ void turnToAngleNew(float a, tTurnDir turnDir)
 void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset)
 {
 	writeDebugStreamLine("Turning to %f %f + %f", y, x, radToDeg(offset));
+
+	if (turnDir == ch)
+		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
 	sTurnNewState state;
 
