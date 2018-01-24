@@ -363,62 +363,36 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
-	const float startPower = 35;
+	sTurnNewState state;
+
+	state.startPower = 35;
 
 	if (turnDir == cw)
 	{
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
-		setDrive(startPower, -startPower);
+		setDrive(state.startPower, -state.startPower);
 	}
 	else
 	{
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		setDrive(-startPower, startPower);
+		setDrive(-state.startPower, state.startPower);
 	}
-
-	float targetVel;
-	float output;
-	float integral = 0;
 
 	state.isLong = fabs(gPosition.a - a) >= PI / 6;
 
-	float kP_vel = isLong ? 4.5 : 3.5;
-	float kP_pwr = isLong ? 27 : 30;
-	float kI_pwr = isLong ? 0.003 : 0.004;
-	float kD_pwr = isLong ? 0.5 : 0.7;
+	state.kP_vel = state.isLong ? 4.5 : 3.5;
+	state.kP_pwr = state.isLong ? 27 : 30;
+	state.kI_pwr = state.isLong ? 0.003 : 0.004;
+	state.kD_pwr = state.isLong ? 0.5 : 0.7;
 
-	float lstErr;
+	state.integral = 0;
+	state.lstErr = 0;
 
-	float lstErrPos;
-
-	unsigned long time = nPgmTime;
-	unsigned long lstTime = time;
-	unsigned long startTime = time;
+	state.startTime = state.lstTime = nPgmTime;
 
 	while (fabs(gPosition.a - a) > 0.02)
 	{
-		time = nPgmTime;
-		unsigned long deltaTime = time - lstTime;
-
-		float errPos = a - gPosition.a;
-		errPos = sgn(errPos) * sqrt(fabs(errPos));
-		targetVel = kP_vel * errPos;
-
-		if (deltaTime >= 1)
-		{
-			float err = targetVel - gVelocity.a;
-			integral += deltaTime * err;
-			output = kP_pwr * err + kI_pwr * integral + kD_pwr * (lstErr - err) / deltaTime;
-			LIM_TO_VAL_SET(output, isLong ? 127 : 50);
-			if (errPos > 0 && lstErrPos < 0) playSound(soundUpwardTones);
-			if (errPos < 0 && lstErrPos > 0) playSound(soundDownwardTones);
-			lstTime = time;
-			lstErr = err;
-			lstErrPos = errPos;
-
-			if (time - startTime > 100 || fabs(output) > startPower)
-				setDrive(output, -output);
-		}
+		turnNewInternal(a, state);
 		sleep(1);
 	}
 
@@ -430,4 +404,27 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 void turnToAngleNew(float a, tTurnDir turnDir)
 {
 	turnToAngleNewRad(degToRad(a), turnDir);
+}
+
+void turnNewInternal(float a, sTurnNewState& state)
+{
+	unsigned long time = nPgmTime;
+	unsigned long deltaTime = time - state.lstTime;
+
+	float errPos = a - gPosition.a;
+	errPos = sgn(errPos) * sqrt(fabs(errPos));
+	float targetVel = state.kP_vel * errPos;
+
+	if (deltaTime >= 1)
+	{
+		float err = targetVel - gVelocity.a;
+		state.integral += deltaTime * err;
+		float output = state.kP_pwr * err + state.kI_pwr * state.integral + state.kD_pwr * (state.lstErr - err) / deltaTime;
+		LIM_TO_VAL_SET(output, state.isLong ? 127 : 50);
+		state.lstTime = time;
+		state.lstErr = err;
+
+		if (time - state.startTime > 100 || fabs(output) > state.startPower)
+			setDrive(output, -output);
+	}
 }

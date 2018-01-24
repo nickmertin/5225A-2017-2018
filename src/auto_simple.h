@@ -20,6 +20,20 @@ typedef struct _turnState
 	unsigned long nextDebug;
 } sTurnState;
 
+typedef struct _turnNewState
+{
+	word startPower;
+	bool isLong;
+	float kP_vel;
+	float kP_pwr;
+	float kI_pwr;
+	float kD_pwr;
+	float integral;
+	float lstErr;
+	unsigned long startTime;
+	unsigned long lstTime;
+} sTurnNewState;
+
 /* Variables */
 sVector gTargetLast;
 
@@ -38,6 +52,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset);
 
 void turnToAngleNewRad (float a, tTurnDir turnDir);
 void turnToAngleNew(float a, tTurnDir turnDir);
+void turnNewInternal(float a, sTurnNewState& state);
 
 /* Async Functions */
 NEW_ASYNC_VOID_8(moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool);
