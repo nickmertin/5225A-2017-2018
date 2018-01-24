@@ -52,6 +52,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset);
 
 void turnToAngleNewRad (float a, tTurnDir turnDir);
 void turnToAngleNew(float a, tTurnDir turnDir);
+void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset);
 void turnNewInternal(float a, sTurnNewState& state);
 
 /* Async Functions */
@@ -62,3 +63,4 @@ NEW_ASYNC_VOID_6(turnToTargetSimple, float, float, tTurnDir, byte, byte, float);
 NEW_ASYNC_VOID_2(turnToAngleStupid, float, tTurnDir);
 NEW_ASYNC_VOID_4(turnToTargetStupid, float, float, tTurnDir, float);
 NEW_ASYNC_VOID_2(turnToAngleNew, float, tTurnDir);
+NEW_ASYNC_VOID_4(turnToTargetNew, float, float, tTurnDir, float);
