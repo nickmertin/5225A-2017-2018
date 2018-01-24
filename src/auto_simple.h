@@ -46,4 +46,4 @@ NEW_ASYNC_VOID_4(turnToAngleSimple, float, tTurnDir, byte, byte);
 NEW_ASYNC_VOID_6(turnToTargetSimple, float, float, tTurnDir, byte, byte, float);
 NEW_ASYNC_VOID_2(turnToAngleStupid, float, tTurnDir);
 NEW_ASYNC_VOID_4(turnToTargetStupid, float, float, tTurnDir, float);
-NEW_ASYNC_VOID_2(turnToAngleNewRad, float, tTurnDir);
+NEW_ASYNC_VOID_2(turnToAngleNew, float, tTurnDir);
