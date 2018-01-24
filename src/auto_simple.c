@@ -380,7 +380,7 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 	float output;
 	float integral = 0;
 
-	bool isLong = fabs(gPosition.a - a) >= PI;
+	state.isLong = fabs(gPosition.a - a) >= PI / 6;
 
 	float kP_vel = isLong ? 4.5 : 3.5;
 	float kP_pwr = isLong ? 27 : 30;
