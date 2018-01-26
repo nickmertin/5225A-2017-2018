@@ -589,9 +589,12 @@ void autoTest()
 
 	//moveToTargetSimple(5, 0, -80, 0, stopSoft | stopHarsh, true);
 	//moveToTargetDisSimple(0, 5, -80, 0, stopSoft | stopHarsh, true);
-	turnToAngleNew(180, ccw);
+
+	//turnToTargetNew(0, 100, cw, 0);
+	turnToAngleNew(45, cw);
 	playSound(soundBlip);
 	sleep(1000);
-	writeDebugStreamLine("%f", radToDeg(gPosition.a));
+	//writeDebugStreamLine("%f", radToDeg(gPosition.a - atan2(100 - gPosition.x, -gPosition.y)));
+	writeDebugStreamLine("%f", radToDeg(gPosition.a) - 45);
 }
 }

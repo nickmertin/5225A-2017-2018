@@ -23,7 +23,9 @@ typedef struct _turnState
 typedef struct _turnNewState
 {
 	word startPower;
+	bool isShort;
 	bool isLong;
+	bool firstRun;
 	float kP_vel;
 	float kP_pwr;
 	float kI_pwr;

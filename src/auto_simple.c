@@ -317,12 +317,12 @@ void turnToAngleStupid(float a, tTurnDir turnDir)
 	case cw:
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
 		setDrive(30, -30);
-		while (gPosition.a < a - 0.04) sleep(5);
+		while (gPosition.a < a - 0.04) sleep(1);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
 		setDrive(-30, 30);
-		while (gPosition.a > a + 0.04) sleep(5);
+		while (gPosition.a > a + 0.04) sleep(1);
 		break;
 	}
 	applyHarshStop();
@@ -342,7 +342,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 		do
 		{
 			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2);
-			sleep(5);
+			sleep(1);
 		} while (gPosition.a < a - 0.04);
 		break;
 	case ccw:
@@ -351,7 +351,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 		do
 		{
 			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
-			sleep(5);
+			sleep(1);
 		} while (gPosition.a > a + 0.04);
 		break;
 	}
@@ -359,7 +359,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void turnToAngleNewRad (float a, tTurnDir turnDir)
+void turnToAngleNewRad(float a, tTurnDir turnDir)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
@@ -381,12 +381,14 @@ void turnToAngleNewRad (float a, tTurnDir turnDir)
 		setDrive(-state.startPower, state.startPower);
 	}
 
-	state.isLong = fabs(gPosition.a - a) >= PI / 6;
+	state.isShort = fabs(gPosition.a - a) <= PI / 3;
+	state.isLong = fabs(gPosition.a - a) >= 0.75 * PI;
+	state.firstRun = true;
 
-	state.kP_vel = state.isLong ? 4.5 : 3.5;
-	state.kP_pwr = state.isLong ? 27 : 30;
-	state.kI_pwr = state.isLong ? 0.003 : 0.004;
-	state.kD_pwr = state.isLong ? 0.5 : 0.7;
+	state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
+	state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
+	state.kI_pwr = state.isLong ? 0.006 : state.isShort ? 0.006 : 0.007;
+	state.kD_pwr = state.isShort ? 0.2 : 0.7;
 
 	state.integral = 0;
 	state.lstErr = 0;
@@ -431,12 +433,14 @@ void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset)
 	{
 	case cw:
 		setDrive(state.startPower, -state.startPower);
-		state.isLong = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) >= PI / 6;
+		state.isShort = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) <= PI / 3;
+		state.isLong = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) >= 0.75 * PI;
+		state.firstRun = true;
 
-		state.kP_vel = state.isLong ? 4.5 : 3.5;
-		state.kP_pwr = state.isLong ? 27 : 30;
-		state.kI_pwr = state.isLong ? 0.003 : 0.004;
-		state.kD_pwr = state.isLong ? 0.5 : 0.7;
+		state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
+		state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
+		state.kI_pwr = state.isLong ? 0.006 : state.isShort ? 0.006 : 0.007;
+		state.kD_pwr = state.isShort ? 0.2 : 0.7;
 
 		do
 		{
@@ -447,12 +451,14 @@ void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset)
 		break;
 	case ccw:
 		setDrive(-state.startPower, state.startPower);
-		state.isLong = fabs(fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2)) >= PI / 6;
+		state.isShort = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) <= PI / 3;
+		state.isLong = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) >= 0.75 * PI;
+		state.firstRun = true;
 
-		state.kP_vel = state.isLong ? 4.5 : 3.5;
-		state.kP_pwr = state.isLong ? 27 : 30;
-		state.kI_pwr = state.isLong ? 0.003 : 0.004;
-		state.kD_pwr = state.isLong ? 0.5 : 0.7;
+		state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
+		state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
+		state.kI_pwr = state.isLong ? 0.006 : state.isShort ? 0.006 : 0.007;
+		state.kD_pwr = state.isShort ? 0.2 : 0.7;
 
 		do
 		{
@@ -474,17 +480,20 @@ void turnNewInternal(float a, sTurnNewState& state)
 	unsigned long deltaTime = time - state.lstTime;
 
 	float errPos = a - gPosition.a;
-	errPos = sgn(errPos) * sqrt(fabs(errPos));
+	errPos = sgn(errPos) * pow(fabs(errPos), 2.0 / 3);
 	float targetVel = state.kP_vel * errPos;
+	LIM_TO_VAL_SET(targetVel, state.isShort ? 2.5 : 4.0);
 
 	if (deltaTime >= 1)
 	{
 		float err = targetVel - gVelocity.a;
 		state.integral += deltaTime * err;
-		float output = state.kP_pwr * err + state.kI_pwr * state.integral + state.kD_pwr * (state.lstErr - err) / deltaTime;
-		LIM_TO_VAL_SET(output, state.isLong ? 127 : 50);
+		float output = state.firstRun ? 0 : state.kP_pwr * err + state.kI_pwr * state.integral + state.kD_pwr * (state.lstErr - err) / deltaTime;
+		LIM_TO_VAL_SET(output, state.isShort ? 50 : 127);
 		state.lstTime = time;
 		state.lstErr = err;
+
+		state.firstRun = false;
 
 		if (time - state.startTime > 100 || fabs(output) > state.startPower)
 			setDrive(output, -output);
