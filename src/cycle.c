@@ -16,7 +16,7 @@ void endCycle(sCycleData& data)
 	unsigned long now = nPgmTime;
 	data.time = now - data.startTime;
 	if (data.time > data.period)
-		writeDebugStreamLine("Cycle '%s' took %dms, max should be %d", data.name, data.time, data.period);
+		;//writeDebugStreamLine("Cycle '%s' took %dms, max should be %d", data.name, data.time, data.period);
 	else
 		sleep(data.period - data.time);
 	data.startTime = nPgmTime;
