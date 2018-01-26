@@ -126,7 +126,8 @@ void autoSkills()
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
-	moveToTargetSimpleAsync(48, 72, 16, 40, 127, 24, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(47, 71, 16, 40, 127, 24, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 3000;
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
 	configure(liftConfig, LIFT_MOBILE_THRESHOLD, 127, -10);
 	liftSet(liftRaiseSimple, &liftConfig);
@@ -135,11 +136,11 @@ void autoSkills()
 	mobileSet(mobileBottom, 0);
 	coneTimeout = nPgmTime + 1000;
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout);
-	moveToTargetSimpleKill();
-	setDrive(0, 0);
-	driveAsync = moveToTargetSimpleAsync(48, 72, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
-	driveTimeout = nPgmTime + 1000;
 	await(driveAsync, driveTimeout, "skills 1-1");
+	setDrive(0, 0);
+	driveAsync = moveToTargetSimpleAsync(47, 71, gPosition.y, gPosition.x, 127, 4, stopSoft, true);
+	driveTimeout = nPgmTime + 1000;
+	await(driveAsync, driveTimeout, "skills 1-2");
 	mobileSet(mobileTop, 0);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
