@@ -17,7 +17,7 @@ void selectAuto()
 
 void runAuto()
 {
-	autoTest();
+	autoSkills();
 	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
@@ -120,7 +120,7 @@ void autoSkills()
 
 	gMobileCheckLift = false;
 
-	resetPositionFull(gPosition, 16, 40, 45);
+	//resetPositionFull(gPosition, 16, 40, 45);
 	//trackPositionTaskAsync();
 	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;

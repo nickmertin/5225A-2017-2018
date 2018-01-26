@@ -1,4 +1,3 @@
-
 #pragma config(Sensor, in1,    autoPoti,       sensorPotentiometer)
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
 #pragma config(Sensor, in3,    brakesPoti,     sensorPotentiometer)
@@ -1023,8 +1022,9 @@ void waitForSkillsReset()
 		updateSensorInput(btnSetPosition);
 		sleep(10);
 	}
-	resetPositionFull(gPosition, 8.25, 61.5, 0);
+	autoMotorSensorUpdateTaskAsync();
 	trackPositionTaskAsync();
+	resetPositionFull(gPosition, 8.25, 61.5, 0);
 	writeDebugStreamLine("RESET");
 }
 
@@ -1104,7 +1104,7 @@ void autonomous()
 	//resetQuadratureEncoder(trackB);
 
 	autoMotorSensorUpdateTaskAsync();
-	//trackPositionTaskAsync();
+	trackPositionTaskAsync();
 
 	runAuto();
 
