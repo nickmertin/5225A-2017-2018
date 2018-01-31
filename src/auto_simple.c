@@ -386,9 +386,9 @@ void turnToAngleNewRad(float a, tTurnDir turnDir)
 	state.firstRun = true;
 
 	state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
-	state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
-	state.kI_pwr = state.isLong ? 0.006 : state.isShort ? 0.006 : 0.007;
-	state.kD_pwr = state.isShort ? 0.2 : 0.7;
+	state.kP_pwr = state.isLong ? 29 : state.isShort ? 35 : 26;
+	state.kI_pwr = state.isLong ? 0.007 : state.isShort ? 0.007 : 0.008;
+	state.kD_pwr = state.isShort ? 0.3 : 0.9;
 
 	state.integral = 0;
 	state.lstErr = 0;
@@ -438,9 +438,9 @@ void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset)
 		state.firstRun = true;
 
 		state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
-		state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
-		state.kI_pwr = state.isLong ? 0.006 : state.isShort ? 0.006 : 0.007;
-		state.kD_pwr = state.isShort ? 0.2 : 0.7;
+		state.kP_pwr = state.isLong ? 29 : state.isShort ? 35 : 26;
+		state.kI_pwr = state.isLong ? 0.007 : state.isShort ? 0.007 : 0.008;
+		state.kD_pwr = state.isShort ? 0.3 : 0.9;
 
 		do
 		{
@@ -456,9 +456,9 @@ void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset)
 		state.firstRun = true;
 
 		state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
-		state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
-		state.kI_pwr = state.isLong ? 0.006 : state.isShort ? 0.006 : 0.007;
-		state.kD_pwr = state.isShort ? 0.2 : 0.7;
+		state.kP_pwr = state.isLong ? 29 : state.isShort ? 35 : 26;
+		state.kI_pwr = state.isLong ? 0.007 : state.isShort ? 0.007 : 0.008;
+		state.kD_pwr = state.isShort ? 0.3 : 0.9;
 
 		do
 		{
