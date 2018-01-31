@@ -120,8 +120,11 @@ void autoSkills()
 
 	gMobileCheckLift = true;
 
-	//resetPositionFull(gPosition, 16, 40, 45);
-	//trackPositionTaskAsync();
+#ifdef SKILLS_RESET_AT_START
+	trackPositionTaskKill();
+	resetPositionFull(gPosition, 16, 40, 45);
+	trackPositionTaskAsync();
+#endif
 	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 

@@ -63,6 +63,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 
 //#define DEBUG_TRACKING
 //#define TRACK_IN_DRIVER
+#define SKILLS_RESET_AT_START
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
