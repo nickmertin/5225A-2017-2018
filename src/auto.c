@@ -51,6 +51,17 @@ void resetPosition(sPos& position)
 	position.y = position.x = position.a = 0;
 }
 
+void resetVelocity(sVel& velocity, sPos& position)
+{
+	velocity.a = velocity.y = velocity.x = 0;
+
+	velocity.lstPosA = position.a;
+	velocity.lstPosY = position.y;
+	velocity.lstPosX = position.x;
+
+	velocity.lstChecked = nPgmTime;
+}
+
 void trackVelocity(sPos position, sVel& velocity)
 {
 	unsigned long curTime = nPgmTime;

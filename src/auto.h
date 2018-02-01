@@ -4,8 +4,8 @@
 #define WHEEL_DIAMETER_IN_S 2.843
 
 // The distance between the tracking wheels and the centre of the robot in inches
-#define L_DISTANCE_IN 4.612 //6.8198
-#define R_DISTANCE_IN 4.612 //6.8198
+#define L_DISTANCE_IN 4.293 //6.8198
+#define R_DISTANCE_IN 4.293 //6.8198
 #define S_DISTANCE_IN 7
 
 // The number of tick per rotation of the tracking wheel
@@ -66,6 +66,7 @@ typedef struct _line
 /* Functions */
 void trackPosition(int left, int right, int back, sPos& position); // Update the position of the robot
 void resetPosition(sPos& position); // Reset the position
+void resetVelocity(sVel& velocity, sPos& position); // Reset the velocity
 void trackVelocity(sPos position, sVel& velocity); // Update the velocity of the robot
 void vectorToPolar(sVector& vector, sPolar& polar); // Convert a cartesian vector to a polar vector
 void polarToVector(sPolar& polar, sVector& vector); // Convert a polar vector to a cartesian vector
