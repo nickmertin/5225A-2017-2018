@@ -311,6 +311,16 @@ void autoSkills()
 	mobileSet(mobileTop, -1);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
+
+	// 10
+	driveAsync = turnToTargetStupidAsync(103, 128, gPosition.y, gPosition.x, 80, 2, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 2000;
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
+	liftSet(liftLowerSimple, &liftConfig);
+	await(driveAsync, driveTimeout, "skills 10-1");
+	mobileSet(mobileBottom, -1);
+	coneTimeout = nPgmTime + 2000;
+	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout);
 }
 
 
