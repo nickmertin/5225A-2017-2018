@@ -268,6 +268,20 @@ void autoSkills()
 	driveAsync = resetBlueRightAsync();
 	driveTimeout = nPgmTime + 1000;
 	await(driveAsync, driveTimeout, "skills 6-4");
+
+	// 7
+	driveAsync = moveToTargetDisSimpleAsync(0, 18, 0, gPosition.x, 80, 0, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 2000;
+	await(driveAsync, driveTimeout, "skills 7-1");
+	driveAsync = turnToTargetStupidAsync(47, 17, ch, 0);
+	driveTimeout = nPgmTime + 3000;
+	await(driveAsync, driveTimeout, "skills 7-2");
+	driveAsync = moveToTargetSimpleAsync(47, 71, gPosition.y, gPosition.x, 80, 6, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 2000;
+	await(driveAsync, driveTimeout, "skills 7-3");
+	mobileSet(mobileTop, -1);
+	coneTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
 }
 
 
