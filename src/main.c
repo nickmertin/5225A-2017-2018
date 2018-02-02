@@ -64,6 +64,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 #define DEBUG_TRACKING
 //#define TRACK_IN_DRIVER
 #define SKILLS_RESET_AT_START
+//#define ULTRASONIC_RESET
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
@@ -1221,6 +1222,8 @@ USE_ASYNC(turnToAngleSimple)
 USE_ASYNC(turnToTargetSimple)
 USE_ASYNC(turnToAngleStupid)
 USE_ASYNC(turnToTargetStupid)
+USE_ASYNC(turnToAngleCustom)
+USE_ASYNC(turnToTargetCustom)
 USE_ASYNC(turnToAngleNew)
 USE_ASYNC(turnToTargetNew)
 //USE_ASYNC(waitForSkillsReset)

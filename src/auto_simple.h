@@ -51,6 +51,8 @@ void turnSimpleInternalCw(float a, sTurnState& state);
 void turnSimpleInternalCcw(float a, sTurnState& state);
 void turnToAngleStupid(float a, tTurnDir turnDir);
 void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset);
+void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon);
+void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte power, float epsilon);
 
 void turnToAngleNewRad (float a, tTurnDir turnDir);
 void turnToAngleNew(float a, tTurnDir turnDir);
@@ -64,5 +66,7 @@ NEW_ASYNC_VOID_4(turnToAngleSimple, float, tTurnDir, byte, byte);
 NEW_ASYNC_VOID_6(turnToTargetSimple, float, float, tTurnDir, byte, byte, float);
 NEW_ASYNC_VOID_2(turnToAngleStupid, float, tTurnDir);
 NEW_ASYNC_VOID_4(turnToTargetStupid, float, float, tTurnDir, float);
+NEW_ASYNC_VOID_4(turnToAngleCustom, float, tTurnDir, byte, float);
+NEW_ASYNC_VOID_6(turnToTargetCustom, float, float, tTurnDir, float, byte, float);
 NEW_ASYNC_VOID_2(turnToAngleNew, float, tTurnDir);
 NEW_ASYNC_VOID_4(turnToTargetNew, float, float, tTurnDir, float);
