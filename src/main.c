@@ -723,15 +723,15 @@ bool TimedOut(unsigned long timeOut, const string description)
 		return false;
 }
 
-// STACKING ON                       0     1     2      3      4      5      6      7      8      9      10
-const float gLiftRaiseTarget[11] = { 6.75, 10,   12.75, 15.75, 18.75, 21.75, 24.75, 28,    33,    36,    38 };
-const float gLiftPlaceTarget[11] = { 5.7,  8,    10.6,  13.4,  16.2,  19,    21.8,  24.6,  27.4,  30.2,  33 };
+// STACKING ON                     0   1   2   3   4   5   6   7   8   9    10
+const int gLiftRaiseTarget[11] = { 18, 25, 37, 45, 53, 64, 72, 81, 92, 102, 120 };
+const int gLiftPlaceTarget[11] = { 1,  13, 20, 25, 34, 42, 51, 60, 70, 76,  90 };
 
 void clearArm()
 {
 	writeDebugStreamLine("clearArm");
 	sSimpleConfig config;
-	configure(config, LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]), 127, 0);
+	configure(config, gNumCones == 11 ? LIFT_POS(LIFT_TOP) : gLiftRaiseTarget[gNumCones], 127, 0);
 	liftSet(liftRaiseSimple, &config);
 	unsigned long timeout = nPgmTime + 1500;
 	liftTimeoutWhile(liftRaiseSimple, timeout);
@@ -746,11 +746,12 @@ NEW_ASYNC_VOID_0(clearArm);
 
 void detachIntake(tMobileStates nextMobileState)
 {
-	if (gSensor[liftEnc].value < LIFT_POS(gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
+	if (gSensor[liftEnc].value < (gNumCones == 11 ? LIFT_POS(LIFT_TOP) : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
 	{
+		goto skip;
 		//lower lift
 		sSimpleConfig liftConfig;
-		configure(liftConfig, LIFT_POS(gLiftPlaceTarget[gNumCones]), -127, 10);
+		configure(liftConfig, gLiftPlaceTarget[MIN(gNumCones, 10)], -127, 10);
 		liftSet(liftLowerSimple, &liftConfig);
 		unsigned long liftTimeOut = nPgmTime + 800;
 		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
@@ -760,7 +761,7 @@ void detachIntake(tMobileStates nextMobileState)
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
-
+skip:
 		clearArm();
 	}
 
@@ -787,7 +788,7 @@ void stack(bool pickup, bool downAfter)
 		configure(liftConfig, LIFT_POS(LIFT_BOTTOM), -127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 1200, liftTimeOut);
+		timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 5, liftTimeOut);
 
 		configure(armConfig, ARM_BOTTOM + 250, -127, 0);
 		armSet(armLowerSimple, &armConfig);
@@ -796,10 +797,10 @@ void stack(bool pickup, bool downAfter)
 		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
 	}
 
-	configure(liftConfig, LIFT_POS(gLiftRaiseTarget[gNumCones]), 80, -15);
+	configure(liftConfig, gLiftRaiseTarget[gNumCones], 80, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	liftTimeOut = nPgmTime + 1500;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, LIFT_POS(gLiftPlaceTarget[gNumCones]), liftTimeOut);
+	timeoutWhileLessThanL(&gSensor[liftEnc].value, gLiftPlaceTarget[gNumCones], liftTimeOut);
 
 	configure(armConfig, ARM_STACK, 127, -12);
 	armSet(armRaiseSimple, &armConfig);
@@ -807,7 +808,7 @@ void stack(bool pickup, bool downAfter)
 	liftTimeoutWhile(liftRaiseSimple, liftTimeOut);
 	armTimeoutWhile(armRaiseSimple, armTimeOut);
 
-	configure(liftConfig, LIFT_POS(gLiftPlaceTarget[gNumCones]), -70, 0);
+	configure(liftConfig, gLiftPlaceTarget[gNumCones], -70, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	liftTimeOut = nPgmTime + 800;
 	liftTimeoutWhile(liftLowerSimple, liftTimeOut);
@@ -823,14 +824,14 @@ void stack(bool pickup, bool downAfter)
 
 		if (gNumCones <= 4)
 		{
-			configure(liftConfig, 1500, 80, -25);
+			configure(liftConfig, 28, 80, -25);
 			liftSet(liftRaiseSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 800;
 			liftTimeoutWhile(liftRaiseSimple, liftTimeOut);
 		}
 		else
 		{
-			configure(liftConfig, 1800, -80, 15);
+			configure(liftConfig, 44, -80, 25);
 			liftSet(liftLowerSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 1000;
 			liftTimeoutWhile(liftLowerSimple, liftTimeOut);
@@ -841,6 +842,16 @@ void stack(bool pickup, bool downAfter)
 }
 
 NEW_ASYNC_VOID_2(stack, bool, bool);
+
+bool stackRunning()
+{
+	for (int i = 0; i < TASK_POOL_SIZE; ++i)
+	{
+		if (gAsyncTaskData[i].id == &stackDummy && tEls[threadPoolTask0 + i].parent != -1)
+			return true;
+	}
+	return false;
+}
 
 float gLoaderOffset[12] = { 5.5, 4.5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 sNotifier gStackFromLoaderNotifier;
@@ -930,20 +941,17 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_CLEAR))
 	{
-		if (!cancel())
-		{
-			writeDebugStreamLine("Clearing lift and arm");
-			clearArmAsync();
-		}
+		writeDebugStreamLine("Clearing lift and arm");
+		stackKill();
+		clearArmAsync();
 	}
 
 	if (RISING(BTN_MACRO_STACK) && gNumCones < 11 )
 	{
-		if (!cancel())
+		if (!stackRunning())
 		{
 			writeDebugStreamLine("Stacking");
 			stackAsync(true, gNumCones < 10);
-			playSound(soundUpwardTones);
 		}
 	}
 
