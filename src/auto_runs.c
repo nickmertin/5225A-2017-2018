@@ -17,7 +17,7 @@ void selectAuto()
 
 void runAuto()
 {
-	autoSideMobileRight();
+	autoSideMobileLeft();
 	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
@@ -427,11 +427,80 @@ void autoSkills()
 
 void autoSideMobileLeft()
 {
+	byte driveAsync;
+	byte coneAsync;
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+	sSimpleConfig liftConfig;
+	sSimpleConfig armConfig;
+	float _x;
+	float _y;
+
+	gMobileCheckLift = true;
+
 	trackPositionTaskKill();
 	resetPositionFull(gPosition, 40, 16, 45);
-	//resetPositionFull(gPosition, 56, 8.25, 90);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
+
+	liftSet(liftResetEncoder);
+	coneTimeout = nPgmTime + 1400;
+
+	// 1
+	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 10, gPosition.y, gPosition.x, 60, 0, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 1500;
+	await(driveAsync, driveTimeout, "skills 1-1");
+	driveAsync = turnToTargetNewAsync(107, 13, ccw, 0);
+	driveTimeout = nPgmTime + 3000;
+	await(driveAsync, driveTimeout, "skills 1-2");
+	driveAsync = moveToTargetSimpleAsync(107, 13, gPosition.y, gPosition.x, 127, 6, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 3000;
+	liftTimeoutWhile(liftResetEncoder, coneTimeout);
+	mobileSet(mobileBottom, -1);
+	await(driveAsync, driveTimeout, "skills 1-3");
+	mobileSet(mobileTop, -1);
+	coneTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout);
+
+	// 2
+	driveAsync = turnToTargetNewAsync(40, 30, ch, PI);
+	driveTimeout = nPgmTime + 3000;
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
+	liftSet(liftLowerSimple, &liftConfig);
+	coneTimeout = nPgmTime + 1500;
+	await(driveAsync, driveTimeout, "skills 2-1");
+	driveAsync = moveToTargetSimpleAsync(40, 30, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 3000;
+	liftTimeoutWhile(liftLowerSimple, coneTimeout);
+	configure(armConfig, ARM_PRESTACK - 100, -127, 20);
+	armSet(armLowerSimple, &armConfig);
+	await(driveAsync, driveTimeout, "skills 2-2");
+	driveAsync = turnToAngleNewAsync(-135, ccw);
+	driveTimeout = nPgmTime + 3000;
+	await(driveAsync, driveTimeout, "skills 2-3");
+	_x = gPosition.x;
+	_y = gPosition.y;
+	normalize(_x, _y, -1, 56);
+	driveAsync = moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 10.5, _y, _x, 60, 0, stopNone, false);
+	driveTimeout = nPgmTime + 1500;
+	await(driveAsync, driveTimeout, "skills 2-4");
+	setDrive(30, 30);
+	driveTimeout = nPgmTime + 1500;
+	timeoutWhileLessThanF(&gVelocity.y, -0.05, driveTimeout);
+	setDrive(7, 7);
+	configure(liftConfig, LIFT_MOBILE_THRESHOLD + 10, 127, 0);
+	liftSet(liftRaiseSimple, &liftConfig);
+	coneTimeout = nPgmTime + 1500;
+	liftTimeoutWhile(liftRaiseSimple, coneTimeout);
+	mobileSet(mobileDownToMiddle, -1);
+	coneTimeout = nPgmTime + 1500;
+	mobileTimeoutUntil(mobileMiddle, coneTimeout);
+	sleep(300);
+	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 17, gPosition.y, gPosition.x, -60, 0, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 3000;
+	setMobile(-7);
+	await(driveAsync, driveTimeout, "skills 2-5");
+	mobileSet(mobileManaged, 0);
 }
 
 void autoSideMobileRight()
