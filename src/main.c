@@ -630,9 +630,9 @@ void handleMobile()
 
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
-		if (RISING(BTN_MOBILE_TOGGLE))
-			mobileSet(mobileTop, -1);
 		if (RISING(BTN_MOBILE_MIDDLE))
+			mobileSet(mobileTop, -1);
+		if (RISING(BTN_MOBILE_TOGGLE))
 		{
 			gMobileSlow = false;
 			mobileSet(mobileManaged, -1);
