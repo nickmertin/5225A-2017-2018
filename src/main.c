@@ -1173,7 +1173,6 @@ void usercontrol()
 		armSet(armHold);
 	}
 
-	liftReset();
 	armReset();
 	mobileReset();
 
