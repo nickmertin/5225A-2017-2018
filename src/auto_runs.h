@@ -13,6 +13,10 @@ void auto20RedLeft();
 void auto20RedRight();
 void auto20BlueRight();
 void auto20BlueLeft();
+void auto5RedLeft();
+void auto5RedRight();
+void auto5BlueRight();
+void auto5BlueLeft();
 void autoTest();
 
 /* Variables */
