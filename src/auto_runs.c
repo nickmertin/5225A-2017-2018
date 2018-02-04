@@ -28,6 +28,8 @@ void runAuto()
 			case 2: auto20BlueLeft(); break;
 			case 3: auto5BlueRight(); break;
 			case 4: auto5BlueLeft(); break;
+			case 5: autoStationaryRight(); break;
+			case 6: autoStationaryLeft(); break;
 		}
 	}
 	else
@@ -39,6 +41,8 @@ void runAuto()
 			case 2: auto20RedRight(); break;
 			case 3: auto5RedLeft(); break;
 			case 4: auto5RedRight(); break;
+			case 5: autoStationaryLeft(); break;
+			case 6: autoStationaryRight(); break;
 		}
 	}
 }
@@ -798,6 +802,54 @@ void auto5RedLeft()
 	driveAsync = moveToTargetDisSimpleAsync(gPosition.a + PI, 6, gPosition.y, gPosition.x, -60, 0, stopSoft | stopHarsh, false);
 	driveTimeout = nPgmTime + 2000;
 	await(driveAsync, driveTimeout, "rl5 2-4");
+}
+
+void auto5RedRight()
+{
+}
+
+void auto5BlueRight()
+{
+}
+
+void auto5BlueLeft()
+{
+}
+
+void autoStationaryLeft()
+{
+	byte driveAsync;
+	byte coneAsync;
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+	sSimpleConfig liftConfig;
+	sSimpleConfig armConfig;
+	float _x;
+	float _y;
+
+	gMobileCheckLift = true;
+
+	trackPositionTaskKill();
+	resetPositionFull(gPosition, 40, 16, 45);
+	resetVelocity(gVelocity, gPosition);
+	trackPositionTaskAsync();
+
+	liftSet(liftResetEncoder);
+	coneTimeout = nPgmTime + 1400;
+
+	// 1
+	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 35, gPosition.y, gPosition.x, 70, 0, stopSoft | stopHarsh, true);
+	driveTimeout = nPgmTime + 2000;
+	liftTimeoutWhileAsync(liftResetEncoder, coneTimeout);
+	//configure(liftConfig,
+	await(driveAsync, driveTimeout, "ls 1-1");
+	driveAsync = turnToTargetCustomAsync(47, 47, ccw, 0, 60, 0.2);
+	driveTimeout = nPgmTime + 2000;
+	//await(
+}
+
+void autoStationaryRight()
+{
 }
 
 void autoTest()
