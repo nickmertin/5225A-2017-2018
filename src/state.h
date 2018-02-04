@@ -23,7 +23,7 @@ void machine##Internal(states state) \
 { \
 	uStateMachineArg &arg = machine##Arg; \
 	top: \
-	writeDebugStreamLine("%d " #machine " %d -> %d, %x", nPgmTime, machine##State, state, arg._long); \
+	writeDebugStreamLine("%d " #machine " %d -> %d, %d", nPgmTime, machine##State, state, arg); \
 	switch (machine##State = state) \
 	handler \
 } \
