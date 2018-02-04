@@ -61,7 +61,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 #include "auto_simple.h"
 #include "auto_runs.h"
 
-#define DEBUG_TRACKING
+//#define DEBUG_TRACKING
 //#define TRACK_IN_DRIVER
 #define SKILLS_RESET_AT_START
 //#define ULTRASONIC_RESET
