@@ -488,7 +488,7 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
-#define LIFT_MOBILE_THRESHOLD 17
+#define LIFT_MOBILE_THRESHOLD 18
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 250
 
@@ -939,9 +939,14 @@ bool cancel()
 	return false;
 }
 
+bool gStack = false;
+
 void handleMacros()
 {
-
+	if (RISING(BTN_MACRO_STACK))
+	{
+		gStack = true;
+	}
 	if (RISING(BTN_MACRO_CLEAR))
 	{
 		writeDebugStreamLine("Clearing lift and arm");
@@ -949,12 +954,13 @@ void handleMacros()
 		clearArmAsync();
 	}
 
-	if (RISING(BTN_MACRO_STACK) && gNumCones < 11 )
+	if (gStack == true && gNumCones < 11 )
 	{
 		if (!stackRunning())
 		{
 			writeDebugStreamLine("Stacking");
 			stackAsync(true, gNumCones < 10);
+			gStack = false;
 		}
 	}
 
