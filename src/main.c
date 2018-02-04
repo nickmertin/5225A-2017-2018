@@ -748,21 +748,24 @@ void detachIntake(tMobileStates nextMobileState)
 {
 	if (gSensor[liftEnc].value < (gNumCones == 11 ? LIFT_POS(LIFT_TOP) : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
 	{
-		goto skip;
-		//lower lift
-		sSimpleConfig liftConfig;
-		configure(liftConfig, gLiftPlaceTarget[MIN(gNumCones, 10)], -127, 10);
-		liftSet(liftLowerSimple, &liftConfig);
-		unsigned long liftTimeOut = nPgmTime + 800;
-		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
+		//goto skip;
+		////lower lift
+		//sSimpleConfig liftConfig;
+		//configure(liftConfig, gLiftPlaceTarget[MIN(gNumCones, 10)], -127, 10);
+		//liftSet(liftLowerSimple, &liftConfig);
+		//unsigned long liftTimeOut = nPgmTime + 800;
+		//liftTimeoutWhile(liftLowerSimple, liftTimeOut);
+
 		//lower arm
 		sSimpleConfig armConfig;
 		configure(armConfig, ARM_PRESTACK - 100, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
-skip:
 		clearArm();
+
+//skip:
+//		clearArm();
 	}
 
 	mobileSet(nextMobileState);
