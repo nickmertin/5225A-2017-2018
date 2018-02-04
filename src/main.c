@@ -1173,6 +1173,10 @@ void usercontrol()
 		armSet(armHold);
 	}
 
+	liftReset();
+	armReset();
+	mobileReset();
+
 	gKillDriveOnTimeout = false;
 	gDriveManual = true;
 	gMobileCheckLift = true;
