@@ -677,7 +677,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 {
 	if (nPgmTime > timeOut)
 	{
-		hogCPU();
+		tHog();
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
 		int current = nCurrentTask;
 		if (current == gUserControlTaskId || current == main)
@@ -712,7 +712,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		gDriveManual = true;
 		if (nCurrentTask == gUserControlTaskId || current == main)
 		{
-			releaseCPU();
+			tRelease();
 			startTaskID(current);
 		}
 		else

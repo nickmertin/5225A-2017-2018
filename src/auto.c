@@ -238,7 +238,7 @@ void resetPositionFull(sPos& position, float y, float x, float a) { resetPositio
 void resetPositionFullRad(sPos& position, float y, float x, float a)
 {
 	//writeDebugStreamLine("Resetting position (%f %f) %f degrees)", position.x, position.y, degToRad(position.a));
-	hogCPU();
+	tHog();
 	resetPosition(position);
 
 	resetQuadratureEncoder(trackL);
@@ -248,7 +248,7 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	position.y = y;
 	position.x = x;
 	position.a = a;
-	releaseCPU();
+	tRelease();
 }
 
 //float kP = 0.3, kI = 0.0, kD = 0.0, kIInner = PI / 6, kIOuter = PI;

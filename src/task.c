@@ -13,28 +13,28 @@ void tStart(word id, bool detached)
 {
 	if (!detached)
 	{
-		hogCPU();
+		tHog();
 		tEls[id].parent = nCurrentTask;
 		tEls[id].next = tEls[nCurrentTask].child;
 		if (tEls[nCurrentTask].child != -1) tEls[tEls[nCurrentTask].child].prev = id;
 		tEls[nCurrentTask].child = id;
-		releaseCPU();
+		tRelease();
 	}
 	startTaskID(id);
 }
 
 void tStop(word id)
 {
-	hogCPU();
+	tHog();
 	tUnreg(id);
 	stopTaskID(id);
-	releaseCPU();
+	tRelease();
 }
 
 void tStopAll(word id)
 {
 	bool stopCur = false;
-	hogCPU();
+	tHog();
 	bool updated[kNumbOfTasks];
 	memset(updated, 0, kNumbOfTasks);
 	while (tEls[id].child != -1 && !updated[tEls[id].child])
@@ -50,10 +50,10 @@ void tStopAll(word id)
 	tStop(id);
 	if (stopCur)
 	{
-		releaseCPU();
+		tRelease();
 		stopTaskID(nCurrentTask);
 	}
-	releaseCPU();
+	tRelease();
 }
 
 void tStopRoot()
@@ -63,7 +63,7 @@ void tStopRoot()
 
 void tUnreg(word id)
 {
-	hogCPU();
+	tHog();
 	if (tEls[id].next != -1)
 		tEls[tEls[id].next].prev = tEls[id].prev;
 	if (tEls[id].prev != -1)
@@ -92,7 +92,7 @@ void tUnreg(word id)
 	tEls[id].prev = -1;
 	tEls[id].parent = -1;
 	tEls[id].next = -1;
-	releaseCPU();
+	tRelease();
 }
 
 word tGetRoot(word id)
@@ -100,4 +100,16 @@ word tGetRoot(word id)
 	word _id = id;
 	while (tEls[_id].parent != -1 && _id != id) _id = tEls[_id].parent;
 	return _id;
+}
+
+void tHog()
+{
+	if (!_hogLevel++)
+		hogCPU();
+}
+
+void tRelease()
+{
+	if (_hogLevel && !--_hogLevel)
+		releaseCPU();
 }
