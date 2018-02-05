@@ -652,7 +652,7 @@ void handleMobile()
 				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
 			}
 			else
-				mobileSet(mobileTop);
+				mobileSet(mobileTop, -1);
 		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
