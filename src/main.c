@@ -1,6 +1,5 @@
 #pragma config(Sensor, in1,    autoPoti,       sensorPotentiometer)
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
-#pragma config(Sensor, in3,    brakesPoti,     sensorPotentiometer)
 #pragma config(Sensor, in5,    armPoti,        sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
@@ -469,8 +468,7 @@ typedef enum _tMobileStates {
 	mobileBottomSlow,
 	mobileUpToMiddle,
 	mobileDownToMiddle,
-	mobileMiddle,
-	mobileBrakes
+	mobileMiddle
 } tMobileStates;
 
 #define MOBILE_TOP 2250
