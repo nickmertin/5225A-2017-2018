@@ -472,7 +472,7 @@ typedef enum _tMobileStates {
 } tMobileStates;
 
 #define MOBILE_TOP 2250
-#define MOBILE_BOTTOM 350
+#define MOBILE_BOTTOM 500
 #define MOBILE_MIDDLE_UP 600
 #define MOBILE_MIDDLE_DOWN 1200
 #define MOBILE_MIDDLE_THRESHOLD 1900
