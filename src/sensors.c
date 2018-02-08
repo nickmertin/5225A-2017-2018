@@ -88,7 +88,7 @@ void resetQuadratureEncoder(tSensors sen)
 bool safetyCheck(tSensors sen, unsigned long failedTime, float failedVal, unsigned long safetyMovingTime)
 {
 	unsigned long curTime = nPgmTime;
-	hogCPU();
+	tHog();
 	if (curTime - gSensor[sen].failedCheckTime > 0)
 	{
 		if (curTime - gSensor[sen].failedCheckTime == 0) return gSensor[sen].failed && curTime - gSensor[sen].failedStartTime >= failedTime;
@@ -107,7 +107,7 @@ bool safetyCheck(tSensors sen, unsigned long failedTime, float failedVal, unsign
 			gSensor[sen].failed = false;
 		gSensor[sen].safetyVal = senVal;
 	}
-	releaseCPU();
+	tRelease();
 	return gSensor[sen].failed && curTime - gSensor[sen].failedStartTime >= failedTime;
 }
 

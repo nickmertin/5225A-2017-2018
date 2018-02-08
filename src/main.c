@@ -1,13 +1,12 @@
 #pragma config(Sensor, in1,    autoPoti,       sensorPotentiometer)
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
-#pragma config(Sensor, in3,    brakesPoti,     sensorPotentiometer)
 #pragma config(Sensor, in5,    armPoti,        sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl7,  liftEnc,        sensorQuadEncoder)
-#pragma config(Sensor, dgtl9,  jmpSkills,      sensorDigitalIn)
-#pragma config(Sensor, dgtl10, limMobile,      sensorTouch)
+#pragma config(Sensor, dgtl9,  limMobile,      sensorTouch)
+#pragma config(Sensor, dgtl10, jmpSkills,      sensorDigitalIn)
 #pragma config(Sensor, dgtl11, sonar,          sensorSONAR_raw)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           driveL1,       tmotorVex393TurboSpeed_MC29, openLoop, reversed)
@@ -469,12 +468,11 @@ typedef enum _tMobileStates {
 	mobileBottomSlow,
 	mobileUpToMiddle,
 	mobileDownToMiddle,
-	mobileMiddle,
-	mobileBrakes
+	mobileMiddle
 } tMobileStates;
 
 #define MOBILE_TOP 2250
-#define MOBILE_BOTTOM 350
+#define MOBILE_BOTTOM 500
 #define MOBILE_MIDDLE_UP 600
 #define MOBILE_MIDDLE_DOWN 1200
 #define MOBILE_MIDDLE_THRESHOLD 1900
@@ -652,7 +650,7 @@ void handleMobile()
 				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
 			}
 			else
-				mobileSet(mobileTop);
+				mobileSet(mobileTop, -1);
 		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
@@ -677,7 +675,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 {
 	if (nPgmTime > timeOut)
 	{
-		hogCPU();
+		tHog();
 		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
 		int current = nCurrentTask;
 		if (current == gUserControlTaskId || current == main)
@@ -712,7 +710,7 @@ bool TimedOut(unsigned long timeOut, const string description)
 		gDriveManual = true;
 		if (nCurrentTask == gUserControlTaskId || current == main)
 		{
-			releaseCPU();
+			tRelease();
 			startTaskID(current);
 		}
 		else

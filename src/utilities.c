@@ -32,7 +32,7 @@ float nearAngle(float angle, float reference)
 void stopAllButCurrentTasks()
 {
 	// DO NOT MAKE A FOR LOOP, WILL NOT WORK
-	hogCPU();
+	tHog();
 	STOP_TASK_NOT_CUR(1);
 	STOP_TASK_NOT_CUR(2);
 	STOP_TASK_NOT_CUR(3);
@@ -53,7 +53,7 @@ void stopAllButCurrentTasks()
 	STOP_TASK_NOT_CUR(18);
 	STOP_TASK_NOT_CUR(19);
 	STOP_TASK_NOT_CUR(20);
-	releaseCPU();
+	tRelease();
 }
 
 #define STS(id) case id: startTask(id); break;

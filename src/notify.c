@@ -27,16 +27,16 @@ byte waitOn(sNotifier& notifier, unsigned long timeout, const string description
 
 bool lock(sNotifier& notifier, TSemaphore *semaphore)
 {
-	hogCPU();
+	tHog();
 	if (notifier.semaphore || !semaphore) return false;
 	if (semaphore->nLockCount == 0)
 	{
 		semaphoreLock(*semaphore);
 		notifier.semaphore = semaphore;
-		releaseCPU();
+		tRelease();
 		return true;
 	}
-	releaseCPU();
+	tRelease();
 	return false;
 }
 
