@@ -9,14 +9,14 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(); \
 } \
-byte func##Async() { \
+unsigned long func##Async() { \
   sAsyncData_##func data; \
   return _startAsync(&func##Dummy, &data); \
 } \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -33,7 +33,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0); \
 } \
-byte func##Async(type0 arg0) { \
+unsigned long func##Async(type0 arg0) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   return _startAsync(&func##Dummy, &data); \
@@ -41,7 +41,7 @@ byte func##Async(type0 arg0) { \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -59,7 +59,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1); \
 } \
-byte func##Async(type0 arg0, type1 arg1) { \
+unsigned long func##Async(type0 arg0, type1 arg1) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -68,7 +68,7 @@ byte func##Async(type0 arg0, type1 arg1) { \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -87,7 +87,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -97,7 +97,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2) { \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -117,7 +117,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -128,7 +128,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -149,7 +149,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -161,7 +161,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -183,7 +183,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -196,7 +196,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -219,7 +219,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -233,7 +233,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -257,7 +257,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -272,7 +272,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -297,7 +297,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -313,7 +313,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -339,7 +339,7 @@ void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   notify(*notifier); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8, _data.arg9); \
 } \
-byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
+unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
   sAsyncData_##func data; \
   data.arg0 = arg0; \
   data.arg1 = arg1; \
@@ -356,7 +356,7 @@ byte func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, typ
 bool func##Kill() { \
   for (int i = 0; i < TASK_POOL_SIZE; ++i) \
     if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      kill(i); \
+      _killAsync(i); \
       return true; \
     } \
   return false; \
@@ -378,15 +378,20 @@ bool _runAsync(sAsyncTaskData *data) { \
 typedef struct _sAsyncTaskData {
   byte *id;
   void *data;
+  unsigned long unique;
   sNotifier notifier;
 } sAsyncTaskData;
+
 sAsyncTaskData gAsyncTaskData[TASK_POOL_SIZE];
+unsigned long _asyncUnique = 1;
 
 void asyncInit();
-void await(byte index, unsigned long timeout, const string description);
-void kill(byte index);
+void await(unsigned long unique, unsigned long timeout, const string description);
+void kill(unsigned long unique);
+void _awaitAsync(byte index, unsigned long timeout, const string description);
+void _killAsync(byte index);
 bool _runAsync(sAsyncTaskData *data);
-byte _startAsync(byte *id, void *data);
+unsigned long _startAsync(byte *id, void *data);
 
 #if TASK_POOL_SIZE > 0
 task threadPoolTask0() {

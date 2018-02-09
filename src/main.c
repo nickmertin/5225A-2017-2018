@@ -512,7 +512,7 @@ void mobileClearLift()
 	}
 }
 
-byte detachIntakeAsync(tMobileStates arg0);
+unsigned long detachIntakeAsync(tMobileStates arg0);
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
 {
@@ -666,8 +666,8 @@ bool gLiftTargetReached;
 
 
 
-byte stackAsync(bool arg0, bool arg1);
-byte dropArmAsync();
+unsigned long stackAsync(bool arg0, bool arg1);
+unsigned long dropArmAsync();
 
 bool gKillDriveOnTimeout = false;
 
