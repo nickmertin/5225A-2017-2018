@@ -310,7 +310,7 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 void turnToAngleStupid(float a, tTurnDir turnDir)
 {
 	if (turnDir == ch)
-		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
 	switch (turnDir)
 	{
@@ -362,7 +362,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon)
 {
 	if (turnDir == ch)
-		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
 	switch (turnDir)
 	{
