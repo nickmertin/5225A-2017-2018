@@ -9,10 +9,13 @@ typedef enum _tAlliance
 void selectAuto();
 void runAuto();
 void autoSkills();
+void autoBlock();
 void auto20RedLeft();
 void auto20RedRight();
 void auto20BlueRight();
 void auto20BlueLeft();
+void autoStationaryLeftBlock();
+void autoStationaryRightBlock();
 void autoStationaryLeft5();
 void autoStationaryRight5();
 void autoStationaryLeft2();
