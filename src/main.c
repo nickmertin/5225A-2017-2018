@@ -71,14 +71,16 @@ typedef struct _sSimpleConfig {
 	long target;
 	word mainPower;
 	word brakePower;
+	float earlyDrop;
 } sSimpleConfig;
 
-void configure(sSimpleConfig& config, long target, word mainPower, word brakePower)
+void configure(sSimpleConfig& config, long target, word mainPower, word brakePower, float earlyDrop = 0)
 {
-	writeDebugStreamLine("configure %d %d %d", target, mainPower, brakePower);
+	writeDebugStreamLine("configure %d %d %d %f", target, mainPower, brakePower, earlyDrop);
 	config.target = target;
 	config.mainPower = mainPower;
 	config.brakePower = brakePower;
+	config.earlyDrop = earlyDrop;
 }
 
 unsigned long gOverAllTime = 0;
@@ -374,7 +376,15 @@ case armRaiseSimple:
 	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
 	setArm(config.mainPower);
 	int pos;
-	while ((pos = gSensor[armPoti].value) < config.target) sleep(10);
+	velocityClear(armPoti);
+	do
+	{
+		sleep(10);
+		pos = gSensor[armPoti].value;
+		velocityCheck(armPoti);
+		if (gSensor[armPoti].velGood && pos + gSensor[armPoti].velocity * config.earlyDrop > config.target)
+			break;
+	}	while (pos < config.target);
 	if (config.brakePower)
 	{
 		setArm(config.brakePower);
@@ -389,7 +399,15 @@ case armLowerSimple:
 	sSimpleConfig &config = *(sSimpleConfig *)arg._ptr;
 	setArm(config.mainPower);
 	int pos;
-	while ((pos = gSensor[armPoti].value) > config.target) sleep(10);
+	velocityClear(armPoti);
+	do
+	{
+		sleep(10);
+		pos = gSensor[armPoti].value;
+		velocityCheck(armPoti);
+		if (gSensor[armPoti].velGood && pos + gSensor[armPoti].velocity * config.earlyDrop < config.target)
+			break;
+	} while (pos > config.target);
 	if (config.brakePower)
 	{
 		setArm(config.brakePower);
@@ -968,7 +986,7 @@ void handleMacros()
 	{
 		if (gStationary)
 		{
-			configure(gStationaryConfig, ARM_HORIZONTAL, -127, 25);
+			configure(gStationaryConfig, ARM_HORIZONTAL, -127, 25, 70);
 			armSet(armLowerSimple, &gStationaryConfig);
 			gStationary = false;
 		}
@@ -976,12 +994,12 @@ void handleMacros()
 		{
 			if (gSensor[armPoti].value > 2400)
 			{
-				configure(gStationaryConfig, 2400, -127, 25);
+				configure(gStationaryConfig, 2400, -127, 25, 70);
 				armSet(armLowerSimple, &gStationaryConfig);
 			}
 			else
 			{
-				configure(gStationaryConfig, 2400, 127, -25);
+				configure(gStationaryConfig, 2400, 127, -25, 70);
 				armSet(armRaiseSimple, &gStationaryConfig);
 			}
 			gStationary = true;
