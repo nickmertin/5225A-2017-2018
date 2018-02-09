@@ -938,6 +938,8 @@ bool cancel()
 }
 
 bool gStack = false;
+bool gStationary = false;
+sSimpleConfig gStationaryConfig;
 
 void handleMacros()
 {
@@ -959,6 +961,30 @@ void handleMacros()
 			writeDebugStreamLine("Stacking");
 			stackAsync(true, gNumCones < 10);
 			gStack = false;
+		}
+	}
+
+	if (RISING(BTN_MACRO_STATIONARY))
+	{
+		if (gStationary)
+		{
+			configure(gStationaryConfig, ARM_HORIZONTAL, -127, 25);
+			armSet(armLowerSimple, &gStationaryConfig);
+			gStationary = false;
+		}
+		else
+		{
+			if (gSensor[armPoti].value > 2400)
+			{
+				configure(gStationaryConfig, 2400, -127, 25);
+				armSet(armLowerSimple, &gStationaryConfig);
+			}
+			else
+			{
+				configure(gStationaryConfig, 2400, 127, -25);
+				armSet(armRaiseSimple, &gStationaryConfig);
+			}
+			gStationary = true;
 		}
 	}
 
