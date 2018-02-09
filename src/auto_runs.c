@@ -612,10 +612,10 @@ void auto20BlueRight()
 	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 10, gPosition.y, gPosition.x, 60, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	await(driveAsync, driveTimeout, "br20 1-1");
-	driveAsync = turnToTargetNewAsync(13, 107, cw, 0);
+	driveAsync = turnToTargetNewAsync(12, 107, cw, 0);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "br20 1-2");
-	driveAsync = moveToTargetSimpleAsync(13, 107, gPosition.y, gPosition.x, 127, 6, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(12, 107, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
 	mobileSet(mobileBottom, -1);
