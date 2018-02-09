@@ -90,8 +90,8 @@ NEW_ASYNC_VOID_0(resetBlueRight);
 
 void autoSkills()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -433,8 +433,8 @@ void autoSkills()
 
 void auto20RedLeft()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -511,8 +511,8 @@ void auto20RedLeft()
 
 void auto20RedRight()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -589,8 +589,8 @@ void auto20RedRight()
 
 void auto20BlueRight()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -667,8 +667,8 @@ void auto20BlueRight()
 
 void auto20BlueLeft()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -745,8 +745,8 @@ void auto20BlueLeft()
 
 void auto5RedLeft()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -818,8 +818,8 @@ void auto5BlueLeft()
 
 void stationaryRightCore()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -897,8 +897,8 @@ void autoStationaryLeft5()
 
 void autoStationaryRight5()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -958,8 +958,8 @@ void autoStationaryLeft2()
 
 void autoStationaryRight2()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
@@ -1027,8 +1027,8 @@ void autoStationaryRight2()
 
 void autoTest()
 {
-	byte driveAsync;
-	byte coneAsync;
+	unsigned long driveAsync;
+	unsigned long coneAsync;
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 	sSimpleConfig liftConfig;
