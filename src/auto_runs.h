@@ -17,8 +17,10 @@ void auto5RedLeft();
 void auto5RedRight();
 void auto5BlueRight();
 void auto5BlueLeft();
-void autoStationaryLeft();
-void autoStationaryRight();
+void autoStationaryLeft5();
+void autoStationaryRight5();
+void autoStationaryLeft2();
+void autoStationaryRight2();
 void autoTest();
 
 /* Variables */
