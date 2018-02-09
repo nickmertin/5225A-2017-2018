@@ -13,7 +13,7 @@ task main()
 		time = nPgmTime;
 		motor[left] = motor[right] = 127;
 		while (SensorValue[liftEnc] < 120) sleep(10);
-		motor[left] = motor[right] = 10;
+		motor[left] = motor[right] = 15;
 		diff = nPgmTime - time;
 		writeDebugStreamLine("Up:   %d.%d s", diff / 1000, diff % 1000);
 		while (vexRT[Btn8R]) sleep(10);
@@ -21,8 +21,8 @@ task main()
 		while (!vexRT[Btn8R]) sleep(10);
 		 time = nPgmTime;
 		motor[left] = motor[right] = -127;
-		while (SensorValue[liftEnc] > 1) sleep(10);
-		motor[left] = motor[right] = -10;
+		while (SensorValue[liftEnc] > 2) sleep(10);
+		motor[left] = motor[right] = -15;
 		diff = nPgmTime - time;
 		writeDebugStreamLine("Down: %d.%d s", diff / 1000, diff % 1000);
 		while (vexRT[Btn8R]) sleep(10);
