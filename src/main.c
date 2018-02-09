@@ -807,7 +807,7 @@ void stack(bool pickup, bool downAfter)
 	armSet(armRaiseSimple, &armConfig);
 	armTimeOut = nPgmTime + 1000;
 	liftTimeoutWhile(liftRaiseSimple, liftTimeOut);
-	armTimeoutWhile(armRaiseSimple, armTimeOut);
+	timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut);
 
 	configure(liftConfig, gLiftPlaceTarget[gNumCones], -70, 0);
 	liftSet(liftLowerSimple, &liftConfig);
