@@ -309,6 +309,7 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 
 void turnToAngleStupid(float a, tTurnDir turnDir)
 {
+	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	if (turnDir == ch)
 		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
@@ -326,10 +327,13 @@ void turnToAngleStupid(float a, tTurnDir turnDir)
 		break;
 	}
 	applyHarshStop();
+
+	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 {
+	writeDebugStreamLine("Turning to %f %f + %f", y, x, radToDeg(offset));
 	float a;
 	if (turnDir == ch)
 		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
@@ -361,6 +365,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon)
 {
+	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	if (turnDir == ch)
 		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
@@ -378,10 +383,12 @@ void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon)
 		break;
 	}
 	applyHarshStop();
+	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte power, float epsilon)
 {
+	writeDebugStreamLine("Turning to %f %f + %f", y, x, radToDeg(offset));
 	float a;
 	if (turnDir == ch)
 		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
