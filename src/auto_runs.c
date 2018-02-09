@@ -456,10 +456,10 @@ void auto20RedLeft()
 	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 10, gPosition.y, gPosition.x, 60, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	await(driveAsync, driveTimeout, "rl20 1-1");
-	driveAsync = turnToTargetNewAsync(107, 13, ccw, 0);
+	driveAsync = turnToTargetNewAsync(107, 12, ccw, 0);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "rl20 1-2");
-	driveAsync = moveToTargetSimpleAsync(107, 13, gPosition.y, gPosition.x, 127, 6, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(107, 12, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
 	mobileSet(mobileBottom, -1);
@@ -537,7 +537,7 @@ void auto20RedRight()
 	driveAsync = turnToTargetCustomAsync(14, 107, cw, 0, 40, 0.12);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "rr20 1-2");
-	driveAsync = moveToTargetSimpleAsync(14, 107, gPosition.y, gPosition.x, 127, 0, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(14, 107, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
 	mobileSet(mobileBottom, -1);
@@ -693,7 +693,7 @@ void auto20BlueLeft()
 	driveAsync = turnToTargetCustomAsync(107, 14, ccw, 0, 40, 0.12);
 	driveTimeout = nPgmTime + 3000;
 	await(driveAsync, driveTimeout, "bl20 1-2");
-	driveAsync = moveToTargetSimpleAsync(107, 14, gPosition.y, gPosition.x, 127, 0, stopSoft | stopHarsh, true);
+	driveAsync = moveToTargetSimpleAsync(107, 14, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
 	mobileSet(mobileBottom, -1);
