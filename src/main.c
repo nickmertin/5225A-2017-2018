@@ -504,7 +504,7 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
-#define LIFT_MOBILE_THRESHOLD 18
+#define LIFT_MOBILE_THRESHOLD 25
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 250
 
@@ -513,7 +513,7 @@ bool gMobileSlow = false;
 
 void setMobile(word power, bool debug = false)
 {
-	writeDebugStreamLine("MOBILE %d", power);
+	//writeDebugStreamLine("MOBILE %d", power);
 	gMotor[mobile].power = power;
 }
 
@@ -1175,6 +1175,9 @@ void autonomous()
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
+	armReset();
+	liftReset();
+
 	return_t;
 }
 
@@ -1290,6 +1293,7 @@ USE_ASYNC(turnToAngleNew)
 USE_ASYNC(turnToTargetNew)
 //USE_ASYNC(waitForSkillsReset)
 USE_ASYNC(resetBlueRight)
+USE_ASYNC(resetBlueLeft);
 USE_MACHINE(lift)
 USE_MACHINE(arm)
 USE_MACHINE(mobile)
