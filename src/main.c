@@ -809,7 +809,7 @@ void stack(bool pickup, bool downAfter)
 		liftTimeOut = nPgmTime + 1200;
 		timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 5, liftTimeOut);
 
-		configure(armConfig, ARM_BOTTOM + 250, -127, 0);
+		configure(armConfig, ARM_BOTTOM + 200, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
@@ -821,7 +821,7 @@ void stack(bool pickup, bool downAfter)
 	liftTimeOut = nPgmTime + 1500;
 	timeoutWhileLessThanL(&gSensor[liftEnc].value, gLiftPlaceTarget[gNumCones], liftTimeOut);
 
-	configure(armConfig, ARM_STACK, 127, -12);
+	configure(armConfig, ARM_STACK, 127, -12, 30);
 	armSet(armRaiseSimple, &armConfig);
 	armTimeOut = nPgmTime + 1000;
 	liftTimeoutWhile(liftRaiseSimple, liftTimeOut);
@@ -836,7 +836,7 @@ void stack(bool pickup, bool downAfter)
 
 	if (downAfter)
 	{
-		configure(armConfig, ARM_HORIZONTAL, -127, 25);
+		configure(armConfig, ARM_HORIZONTAL, -127, 25, 70);
 		armSet(armLowerSimple, &armConfig);
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut);
