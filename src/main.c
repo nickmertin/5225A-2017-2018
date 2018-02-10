@@ -1203,20 +1203,20 @@ void usercontrol()
 
 	liftSet(liftResetEncoder);
 
-	if (gSensor[jmpSkills].value)
-	{
-		autoMotorSensorUpdateTaskAsync();
-		trackPositionTaskAsync();
+	//if (gSensor[jmpSkills].value)
+	//{
+	//	autoMotorSensorUpdateTaskAsync();
+	//	trackPositionTaskAsync();
 
-		driverSkillsStart();
+	//	driverSkillsStart();
 
-		trackPositionTaskKill();
-		autoMotorSensorUpdateTaskKill();
+	//	trackPositionTaskKill();
+	//	autoMotorSensorUpdateTaskKill();
 
-		mobileSet(mobileTop);
+	//	mobileSet(mobileTop);
 
-		armSet(armHold);
-	}
+	//	armSet(armHold);
+	//}
 
 	armReset();
 	mobileReset();
