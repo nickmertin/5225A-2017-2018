@@ -972,12 +972,12 @@ void handleMacros()
 		clearArmAsync();
 	}
 
-	if (gStack == true && gNumCones < 11 )
+	if (gStack == true && gNumCones < 10 )
 	{
 		if (!stackRunning())
 		{
 			writeDebugStreamLine("Stacking");
-			stackAsync(true, gNumCones < 10);
+			stackAsync(true, gNumCones < 9);
 			gStack = false;
 		}
 	}
