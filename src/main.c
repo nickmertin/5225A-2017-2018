@@ -1020,8 +1020,6 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
-	if (FALLING(BTN_MACRO_INC))
-		writeDebugStreamLine("%06d MAcro_INC Released",nPgmTime,gNumCones);
 	if (RISING(BTN_MACRO_INC) && gNumCones < 11) {
 		++gNumCones;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
@@ -1237,9 +1235,6 @@ void usercontrol()
 		handleArm();
 		handleMobile();
 		handleMacros();
-
-		if (RISING(BTN_MACRO_CANCEL))
-			writeDebugStreamLine("%f %f %f", gPosition.y, gPosition.x, gPosition.a);
 
 		handleLcd();
 
