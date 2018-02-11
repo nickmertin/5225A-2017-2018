@@ -320,7 +320,7 @@ void autoSkills()
 	//mobileSet(mobileBottom, -1);
 	await(driveAsync, driveTimeout, "skills 10-1");
 	//return;
-	driveAsync = turnToTargetCustomAsync(94, 72, ccw, 0, 25, 0.05);
+	driveAsync = turnToTargetCustomAsync(95, 71, ccw, 0, 25, 0.05);
 	driveTimeout = nPgmTime + 8000;
 	//configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	//liftSet(liftLowerSimple, &liftConfig);
