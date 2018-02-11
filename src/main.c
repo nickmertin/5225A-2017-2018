@@ -61,7 +61,7 @@ bool TimedOut(unsigned long timeOut, const string description);
 #include "auto_runs.h"
 
 //#define DEBUG_TRACKING
-//#define TRACK_IN_DRIVER
+#define TRACK_IN_DRIVER
 #define SKILLS_RESET_AT_START
 //#define ULTRASONIC_RESET
 
@@ -89,6 +89,8 @@ int gNumCones = 0;
 word gUserControlTaskId = -1;
 bool gSetTimedOut = false;
 
+#define DRIVE_TURN_BRAKE 6
+
 bool gDriveManual;
 
 /* Drive */
@@ -108,8 +110,13 @@ void handleDrive()
 		short y = gJoy[JOY_THROTTLE].cur;
 		short a = gJoy[JOY_TURN].cur;
 
+#if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
+#ifndef TRACK_IN_DRIVER
+#error "Turn braking requires track in driver!"
+#endif
 		if (!a && abs(gVelocity.a) > 0.5)
-			a = -6 * sgn(gVelocity.a);
+			a = -DRIVE_TURN_BRAKE * sgn(gVelocity.a);
+#endif
 
 		word l = y + a;
 		word r = y - a;
