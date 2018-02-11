@@ -804,7 +804,7 @@ void stack(bool pickup, bool downAfter)
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut);
 
-		configure(liftConfig, LIFT_POS(LIFT_BOTTOM), -127, 0);
+		configure(liftConfig, 3, -127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 1200;
 		timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 5, liftTimeOut);
