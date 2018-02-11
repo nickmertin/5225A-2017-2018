@@ -678,7 +678,15 @@ void handleMobile()
 				mobileSet(mobileTop, -1);
 		}
 		if (RISING(BTN_MOBILE_MIDDLE))
-			mobileSet(gSensor[mobilePoti].value > MOBILE_HALFWAY ? mobileDownToMiddle : mobileUpToMiddle);
+		{
+			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
+			{
+				mobileSet(mobileManaged, -1);
+				detachIntakeAsync(mobileDownToMiddle);
+			}
+			else
+				mobileSet(mobileUpToMiddle, -1);
+		}
 	}
 }
 
@@ -785,11 +793,11 @@ void detachIntake(tMobileStates nextMobileState)
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut);
-		clearArm();
 
 //skip:
 //		clearArm();
 	}
+	clearArm();
 
 	mobileSet(nextMobileState);
 }
