@@ -10,7 +10,7 @@ byte waitOn(sNotifier& notifier, unsigned long timeout, const string description
 	//notifier.set = false;
 	notifier.waiter = nCurrentTask;
 	notifier.waitee = -1;
-	while (!notifier.set && !TimedOut(timeout, description))
+	while (!notifier.set && (&description ? !TimedOut(timeout, description) : (nPgmTime < timeout)))
 	{
 		if (notifier.semaphore)
 		{

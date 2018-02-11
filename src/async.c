@@ -52,7 +52,7 @@ unsigned long _startAsync(byte *id, void *data)
 			reset(gAsyncTaskData[i].notifier);
 			tStart(threadPoolTask0 + i);
 			tRelease();
-			waitOn(gAsyncTaskData[i].notifier, nPgmTime + 100, "Start async task");
+			waitOn(gAsyncTaskData[i].notifier, nPgmTime + 100, NULL_STR);
 			reset(gAsyncTaskData[i].notifier);
 			return unique;
 		}
