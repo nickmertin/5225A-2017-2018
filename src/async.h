@@ -6,7 +6,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(); \
 } \
 unsigned long func##Async() { \
@@ -30,7 +31,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0); \
 } \
 unsigned long func##Async(type0 arg0) { \
@@ -56,7 +58,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1) { \
@@ -84,7 +87,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2) { \
@@ -114,7 +118,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
@@ -146,7 +151,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
@@ -180,7 +186,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
@@ -216,7 +223,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
@@ -254,7 +262,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
@@ -294,7 +303,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
@@ -336,7 +346,8 @@ typedef struct _asyncData_##func { \
 void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
   sAsyncData_##func _data; \
   memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  notify(*notifier); \
+  byte _task = notify(*notifier); \
+  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
   func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8, _data.arg9); \
 } \
 unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
