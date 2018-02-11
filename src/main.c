@@ -464,15 +464,6 @@ void handleArm()
 		armSet(armHold, -1);
 	}
 
-	if (RISING(BTN_ARM_BACK))
-	{
-		armSet(armToTarget, ARM_PRESTACK);
-	}
-	if (FALLING(BTN_ARM_BACK))
-	{
-		armSet(armToTarget, ARM_HORIZONTAL);
-	}
-
 	if (armState == armManual)
 	{
 		word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
@@ -1021,6 +1012,11 @@ void handleMacros()
 		}
 	}
 
+	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning() && gNumCones == 0)
+	{
+		stackAsync(false, true);
+	}
+
 	//if (RISING(BTN_MACRO_LOADER))
 	//{
 	//	if (!cancel())
@@ -1140,7 +1136,7 @@ void startup()
 	enableJoystick(JOY_THROTTLE);
 	enableJoystick(JOY_LIFT);
 	enableJoystick(JOY_ARM);
-	enableJoystick(BTN_ARM_BACK);
+	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MACRO_ZERO);
