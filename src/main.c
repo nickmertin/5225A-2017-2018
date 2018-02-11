@@ -306,7 +306,7 @@ case liftResetEncoder:
 
 void handleLift()
 {
-	if (liftState == liftManaged ) return;
+	if (liftState == liftManaged || liftState == liftResetEncoder) return;
 
 	if (RISING(JOY_LIFT))
 	{
@@ -639,7 +639,7 @@ NEW_ASYNC_VOID_1(mobileWaitForSlowHold, TVexJoysticks);
 
 void handleMobile()
 {
-	if (mobileState == mobileManaged)
+	if (mobileState == mobileManaged || liftState == liftResetEncoder)
 		return;
 
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
