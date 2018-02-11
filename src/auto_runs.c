@@ -481,12 +481,12 @@ void auto20RedLeft()
 	await(driveAsync, driveTimeout, "rl20 1-1");
 	driveAsync = turnToTargetCustomAsync(107, 13, ccw, 0, 40, 0.2);
 	driveTimeout = nPgmTime + 3000;
-	await(driveAsync, driveTimeout, "rl20 1-2");
-	driveAsync = moveToTargetSimpleAsync(107, 13, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
-	driveTimeout = nPgmTime + 3000;
 	liftTimeoutWhile(liftResetEncoder, coneTimeout);
 	configure(liftConfig, gLiftRaiseTarget[0], 70, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
+	await(driveAsync, driveTimeout, "rl20 1-2");
+	driveAsync = moveToTargetSimpleAsync(107, 13, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
+	driveTimeout = nPgmTime + 3000;
 	mobileSet(mobileBottom, -1);
 	await(driveAsync, driveTimeout, "rl20 1-3");
 	mobileSet(mobileTop, -1);
