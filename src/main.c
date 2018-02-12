@@ -24,8 +24,6 @@
 
 bool TimedOut(unsigned long timeOut, const string description);
 
-#define TASK_POOL_SIZE 19
-
 // Year-independent libraries
 
 #include "notify.h"
@@ -524,11 +522,11 @@ void mobileClearLift()
 		configure(config, LIFT_MOBILE_THRESHOLD + 1, 80, -15);
 		liftSet(liftRaiseSimple, &config);
 		unsigned long timeout = nPgmTime + 1000;
-		liftTimeoutWhile(liftRaiseSimple, timeout);
+		liftTimeoutWhile(liftRaiseSimple, timeout, "mobileClearLift");
 	}
 }
 
-unsigned long detachIntakeAsync(tMobileStates arg0);
+void detachIntakeAsync(tMobileStates arg0);
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
 {
@@ -1271,44 +1269,3 @@ void usercontrol()
 
 	return_t;
 }
-
-ASYNC_ROUTINES
-(
-USE_ASYNC(timeoutWhileEqual)
-USE_ASYNC(timeoutWhileNotEqual)
-USE_ASYNC(timeoutWhileLessThanS)
-USE_ASYNC(timeoutWhileGreaterThanS)
-USE_ASYNC(timeoutWhileLessThanL)
-USE_ASYNC(timeoutWhileGreaterThanL)
-USE_ASYNC(timeoutWhileLessThanF)
-USE_ASYNC(timeoutWhileGreaterThanF)
-USE_ASYNC(autonomous)
-USE_ASYNC(usercontrol)
-USE_ASYNC(mobileWaitForSlowHold)
-USE_ASYNC(clearArm)
-USE_ASYNC(detachIntake)
-USE_ASYNC(stack)
-USE_ASYNC(stackFromLoader)
-USE_ASYNC(trackPositionTask)
-USE_ASYNC(autoMotorSensorUpdateTask)
-//USE_ASYNC(autoSafetyTask)
-//USE_ASYNC(moveToTarget)
-//USE_ASYNC(turnToAngle)
-//USE_ASYNC(turnToTarget)
-USE_ASYNC(moveToTargetSimple)
-USE_ASYNC(moveToTargetDisSimple)
-USE_ASYNC(turnToAngleSimple)
-USE_ASYNC(turnToTargetSimple)
-USE_ASYNC(turnToAngleStupid)
-USE_ASYNC(turnToTargetStupid)
-USE_ASYNC(turnToAngleCustom)
-USE_ASYNC(turnToTargetCustom)
-USE_ASYNC(turnToAngleNew)
-USE_ASYNC(turnToTargetNew)
-//USE_ASYNC(waitForSkillsReset)
-USE_ASYNC(resetBlueRight)
-USE_ASYNC(resetBlueLeft);
-USE_MACHINE(lift)
-USE_MACHINE(arm)
-USE_MACHINE(mobile)
-)

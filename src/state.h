@@ -16,6 +16,16 @@ typedef union _stateMachineArg {
 	void *_ptr;
 } uStateMachineArg;
 
+#define DECLARE_MACHINE(machine, states) \
+void machine##Setup(); \
+void machine##Set(states state); \
+void machine##Set(states state, long arg); \
+void machine##Set(states state, float arg); \
+void machine##Set(states state, void *arg); \
+void machine##Reset(); \
+void machine##TimeoutWhile(states state, unsigned long timeout, const string description); \
+void machine##TimeoutUntil(states state, unsigned long timeout, const string description); \
+
 #define MAKE_MACHINE(machine, states, base, handler) \
 states machine##State = -1; \
 uStateMachineArg machine##Arg; \
@@ -63,13 +73,11 @@ void machine##Reset() \
 { \
 	machine##Set(base); \
 } \
-void machine##TimeoutWhile(states state, unsigned long timeout) \
+void machine##TimeoutWhile(states state, unsigned long timeout, const string description) \
 { \
-	timeoutWhileEqual(&machine##State, &state, sizeof(states), timeout); \
+	timeoutWhileEqual(&machine##State, &state, sizeof(states), timeout, description); \
 } \
-NEW_ASYNC_VOID_2(machine##TimeoutWhile, states, unsigned long); \
-void machine##TimeoutUntil(states state, unsigned long timeout) \
+void machine##TimeoutUntil(states state, unsigned long timeout, const string description) \
 { \
-	timeoutWhileNotEqual(&machine##State, &state, sizeof(states), timeout); \
-} \
-NEW_ASYNC_VOID_2(machine##TimeoutUntil, states, unsigned long);
+	timeoutWhileNotEqual(&machine##State, &state, sizeof(states), timeout, description); \
+}

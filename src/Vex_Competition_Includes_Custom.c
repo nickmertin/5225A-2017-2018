@@ -37,8 +37,24 @@ void startup();
 void autonomous();
 void usercontrol();
 
-NEW_ASYNC_VOID_0(autonomous);
-NEW_ASYNC_VOID_0(usercontrol);
+typedef enum _competitionStates {
+	competitionDisabled,
+	competitionAutonomous,
+	competitionUsercontrol
+} tCompetitionStates;
+
+DECLARE_MACHINE(competition, tCompetitionStates);
+
+NEW_ASYNC_VOID_STATE_0(competition, competitionDisabled, disabled);
+NEW_ASYNC_VOID_STATE_0(competition, competitionAutonomous, autonomous);
+NEW_ASYNC_VOID_STATE_0(competition, competitionUsercontrol, usercontrol);
+
+MAKE_MACHINE(competition, tCompetitionStates, competitionDisabled,
+{
+case competitionDisabled:
+	STATE_INVOKE_ASYNC(disabled);
+	break;
+})
 
 bool bStopTasksBetweenModes = true;
 word gMainTask = 255;
@@ -48,17 +64,15 @@ task main()
 	// Master CPU will not let competition start until powered on for at least 2-seconds
 	clearLCDLine(0);
 	clearLCDLine(1);
-	displayLCDPos(0, 0);
-	displayNextLCDString("Startup");
-	wait1Msec(2000);
+	displayLCDString(0, 0, "Startup");
+	sleep(2000);
 
 	startup();
 
-	//wait1Msec(500);
-
 	while (true)
 	{
-		while (DISABLED) { disabled(); wait1Msec(25); }
+		disabledAsync();
+		while (DISABLED) sleep(10);
 
 		if (AUTONOMOUS)
 		{
