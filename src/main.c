@@ -92,6 +92,7 @@ bool gSetTimedOut = false;
 #define DRIVE_TURN_BRAKE 6
 
 bool gDriveManual;
+float gCheesyTurnOld = 0;
 
 /* Drive */
 void setDrive(word left, word right, bool debug = false)
@@ -100,6 +101,35 @@ void setDrive(word left, word right, bool debug = false)
 		writeDebugStreamLine("DRIVE %d %d", left, right);
 	gMotor[driveL1].power = gMotor[driveL2].power = left;
 	gMotor[driveR1].power = gMotor[driveR2].power = right;
+}
+
+void cheesyTurnCalc(float& turn)
+{
+	turn = sin(PI / 4 * turn) / sin(PI / 4);
+}
+
+void cheesyDrive(float throttle, float turn, bool quickTurn)
+{
+	float turnNonLinearity;
+	float negInertia = turn - gCheesyOldTurn;
+	gCheesyOldTurn = turn;
+
+	float turnPower = turn;
+	cheesyTurnCalc(turn);
+	cheesyTurnCalc(turn);
+	cheesyTurnCalc(turn);
+
+	float leftPower, rightPower, overPower;
+	float sensitivity; // CHEESY_SENSITIVITY_LOW
+
+	float angularPower;
+	float linearPower;
+
+	float negInertiaAccumulator = 0;
+	float negInertiaScalar = (sgn(turn) == sgn(negInertia) && turn) ? 2.5 : fabs(turn) > 0.65 ? 5.0 : 3.0;
+
+	float negInertiaPower = negInertia * negInertiaScalar;
+	negInertiaAccumulator
 }
 
 void handleDrive()
