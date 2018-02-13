@@ -87,7 +87,8 @@ typedef enum _stackFlags {
 	sfNone = 0,
 	sfStack = 1,
 	sfClear = 2,
-	sfReturn = 4
+	sfReturn = 4,
+	sfMobile = 5
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -101,6 +102,8 @@ typedef enum _stackStates {
 } tStackStates;
 
 DECLARE_MACHINE(stack, tStackStates)
+
+#define DETACH_CONFIG(flags, mobileState) ((flags) | sfMobile | ((mobileState) << 16))
 
 unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
@@ -667,7 +670,7 @@ void handleMobile()
 		{
 			gMobileSlow = false;
 			mobileSet(mobileManaged, -1);
-			detachIntakeAsync(mobileBottom);
+			stackSet(stackDetach, DETACH_CONFIG(sfClear, mobileBottom));
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
 		}
 	}
@@ -679,7 +682,7 @@ void handleMobile()
 			{
 				gMobileSlow = false;
 				mobileSet(mobileManaged, -1);
-				detachIntakeAsync(mobileBottom);
+				stackSet(stackDetach, DETACH_CONFIG(sfClear, mobileBottom));
 				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
 			}
 			else
@@ -690,7 +693,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				mobileSet(mobileManaged, -1);
-				detachIntakeAsync(mobileDownToMiddle);
+				stackSet(stackDetach, DETACH_CONFIG(sfClear, mobileBottom));
 			}
 			else
 				mobileSet(mobileUpToMiddle, -1);
@@ -830,6 +833,8 @@ case stackDetach:
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut, "stackDetach");
 	}
+	if (arg._long & sfMobile)
+		mobileSet(arg._long >> 16);
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 case stackClear:
 	{
