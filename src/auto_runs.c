@@ -221,7 +221,7 @@ void autoSkills()
 	moveToTargetSimpleAwait(driveAsync, driveTimeout, "skills 5-2");
 	driveAsync = turnToAngleNewAsync(-135, cw);
 	driveTimeout = nPgmTime + 3000;
-	await(driveAsync, driveTimeout, "skills 5-3");
+	turnToAngleNewAwait(driveAsync, driveTimeout, "skills 5-3");
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, -1, 56);
@@ -345,7 +345,7 @@ void autoSkills()
 	moveToTargetSimpleAwait(driveAsync, driveTimeout, "skills 11-2");
 	driveAsync = turnToTargetCustomAsync(110, 110, cw, 0, 45, 0.3);
 	driveTimeout = nPgmTime + 3000;
-	turnTo(driveAsync, driveTimeout, "skills 11-3");
+	turnToTargetCustomAwait(driveAsync, driveTimeout, "skills 11-3");
 	driveAsync = moveToTargetSimpleAsync(110, 110, gPosition.y, gPosition.x, 80, 6, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 2000;
 	moveToTargetDisSimpleAwait(driveAsync, driveTimeout, "skills 11-4");
@@ -701,7 +701,7 @@ void auto20BlueLeft()
 	liftTimeoutWhile(liftRaiseSimple, coneTimeout, "rl20 2-7");
 	mobileSet(mobileDownToMiddle, -1);
 	coneTimeout = nPgmTime + 1500;
-	mobileTimeoutUntil(mobileMiddle, coneTimeout. "rl20 2-8");
+	mobileTimeoutUntil(mobileMiddle, coneTimeout, "rl20 2-8");
 	sleep(300);
 	driveAsync = moveToTargetDisSimpleAsync(PI / 4, 17, gPosition.y, gPosition.x, -60, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 3000;
@@ -734,7 +734,7 @@ void stationaryLeftCore(bool goToWall = true)
 	// 1
 	driveAsync = moveToTargetSimpleAsync(47, 23, gPosition.y, gPosition.x, 70, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 2000;
-	moveToTargetSimpleAsync(driveAsync, driveTimeout, "ls 1-1");
+	moveToTargetSimpleAwait(driveAsync, driveTimeout, "ls 1-1");
 	driveAsync = turnToTargetCustomAsync(47, 47, cw, 0, 60, 0.3);
 	driveTimeout = nPgmTime + 2000;
 	turnToTargetCustomAwait(driveAsync, driveTimeout, "ls 1-2");
