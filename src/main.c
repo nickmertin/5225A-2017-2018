@@ -754,12 +754,12 @@ void clearArm()
 	configure(config, gNumCones == 11 ? LIFT_POS(LIFT_TOP) : gLiftRaiseTarget[gNumCones], 127, 0);
 	liftSet(liftRaiseSimple, &config);
 	unsigned long timeout = nPgmTime + 1500;
-	liftTimeoutWhile(liftRaiseSimple, timeout);
+	liftTimeoutWhile(liftRaiseSimple, timeout, "clearArm 1");
 
 	configure(config, ARM_TOP, 127, -15);
 	armSet(armRaiseSimple, &config);
 	timeout = nPgmTime + 1000;
-	armTimeoutWhile(armRaiseSimple, timeout);
+	armTimeoutWhile(armRaiseSimple, timeout, "clearArm 2");
 }
 
 NEW_ASYNC_VOID_0(clearArm);
@@ -781,7 +781,7 @@ void detachIntake(tMobileStates nextMobileState)
 		configure(armConfig, ARM_PRESTACK - 100, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
-		armTimeoutWhile(armLowerSimple, armTimeOut);
+		armTimeoutWhile(armLowerSimple, armTimeOut, "detachIntake");
 
 //skip:
 //		clearArm();
@@ -806,35 +806,35 @@ void stack(bool pickup, bool downAfter)
 	{
 		armSet(armToTarget, ARM_HORIZONTAL);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut);
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, "stack 1");
 
 		configure(liftConfig, 3, -127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 5, liftTimeOut);
+		timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 5, liftTimeOut, "stack 2");
 
 		configure(armConfig, ARM_BOTTOM + 200, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		armTimeOut = nPgmTime + 800;
-		armTimeoutWhile(armLowerSimple, armTimeOut);
-		liftTimeoutWhile(liftLowerSimple, liftTimeOut);
+		armTimeoutWhile(armLowerSimple, armTimeOut, "stack 3");
+		liftTimeoutWhile(liftLowerSimple, liftTimeOut, "stack 4");
 	}
 
 	configure(liftConfig, gLiftRaiseTarget[gNumCones], 80, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	liftTimeOut = nPgmTime + 1500;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, gLiftPlaceTarget[gNumCones], liftTimeOut);
+	timeoutWhileLessThanL(&gSensor[liftEnc].value, gLiftPlaceTarget[gNumCones], liftTimeOut, "stack 5");
 
 	configure(armConfig, ARM_STACK, 127, -12, 30);
 	armSet(armRaiseSimple, &armConfig);
 	armTimeOut = nPgmTime + 1000;
-	liftTimeoutWhile(liftRaiseSimple, liftTimeOut);
-	timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut);
+	liftTimeoutWhile(liftRaiseSimple, liftTimeOut, "stack 6");
+	timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, "stack 7");
 
 	configure(liftConfig, gLiftPlaceTarget[gNumCones], -70, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	liftTimeOut = nPgmTime + 800;
-	liftTimeoutWhile(liftLowerSimple, liftTimeOut);
+	liftTimeoutWhile(liftLowerSimple, liftTimeOut, "stack 8");
 
 	++gNumCones;
 
@@ -843,24 +843,24 @@ void stack(bool pickup, bool downAfter)
 		configure(armConfig, ARM_HORIZONTAL, -127, 25, 70);
 		armSet(armLowerSimple, &armConfig);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut);
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, "stack 9");
 
 		if (gNumCones <= 4)
 		{
 			configure(liftConfig, 28, 80, -25);
 			liftSet(liftRaiseSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 800;
-			liftTimeoutWhile(liftRaiseSimple, liftTimeOut);
+			liftTimeoutWhile(liftRaiseSimple, liftTimeOut, "stack 10");
 		}
 		else
 		{
 			configure(liftConfig, 44, -80, 25);
 			liftSet(liftLowerSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 1000;
-			liftTimeoutWhile(liftLowerSimple, liftTimeOut);
+			liftTimeoutWhile(liftLowerSimple, liftTimeOut, "stack 11");
 		}
 
-		armTimeoutWhile(armLowerSimple, armTimeOut);
+		armTimeoutWhile(armLowerSimple, armTimeOut, "stack 12");
 	}
 }
 
