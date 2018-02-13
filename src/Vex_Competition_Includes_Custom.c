@@ -54,6 +54,12 @@ MAKE_MACHINE(competition, tCompetitionStates, competitionDisabled,
 case competitionDisabled:
 	STATE_INVOKE_ASYNC(disabled);
 	break;
+case competitionAutonomous:
+	STATE_INVOKE_ASYNC(autonomous);
+	break;
+case competitionUsercontrol:
+	STATE_INVOKE_ASYNC(usercontrol);
+	break;
 })
 
 bool bStopTasksBetweenModes = true;
