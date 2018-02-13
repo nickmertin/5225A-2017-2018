@@ -1,5 +1,8 @@
 #define STATE_INVOKE_ASYNC(func) _asyncInvoke_##func((sAsyncData_##func *)arg._ptr);
-#define RUNNING(func, unique) (_asyncUnique_##func == unique)
+#define CUR_UNIQUE(func) _asyncUnique_##func
+#define RUNNING(func, unique) (CUR_UNIQUE(func) == unique)
+#define RUNNING_STANDALONE(func, unique) (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1)
+#define RUNNING_STATE(machine, state, func, unique) (RUNNING(func, unique) && machine##State == state)
 
 #define NEW_ASYNC_VOID_TEMPLATE_0(func) \
 typedef struct _asyncData_##func { \
@@ -34,7 +37,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_0(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func) \
+NEW_ASYNC_VOID_API_0(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -81,7 +84,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_1(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0) \
+NEW_ASYNC_VOID_API_1(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -130,7 +133,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_2(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1) \
+NEW_ASYNC_VOID_API_2(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -181,7 +184,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_3(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2) \
+NEW_ASYNC_VOID_API_3(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -234,7 +237,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_4(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3) \
+NEW_ASYNC_VOID_API_4(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -289,7 +292,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_5(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4) \
+NEW_ASYNC_VOID_API_5(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -346,7 +349,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_6(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5) \
+NEW_ASYNC_VOID_API_6(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -405,7 +408,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_7(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6) \
+NEW_ASYNC_VOID_API_7(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -466,7 +469,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_8(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6, type7) \
+NEW_ASYNC_VOID_API_8(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6, type7) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -529,7 +532,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_9(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
+NEW_ASYNC_VOID_API_9(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -594,7 +597,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(&_asyncDataStandalone_##func); \
   return_t \
 } \
-NEW_ASYNC_VOID_API_10(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
+NEW_ASYNC_VOID_API_10(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \

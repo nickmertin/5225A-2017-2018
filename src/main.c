@@ -526,7 +526,7 @@ void mobileClearLift()
 	}
 }
 
-void detachIntakeAsync(tMobileStates arg0);
+unsigned long detachIntakeAsync(tMobileStates arg0);
 
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
 {
@@ -868,12 +868,7 @@ NEW_ASYNC_VOID_2(stack, bool, bool);
 
 bool stackRunning()
 {
-	for (int i = 0; i < TASK_POOL_SIZE; ++i)
-	{
-		if (gAsyncTaskData[i].id == &stackDummy && tEls[threadPoolTask0 + i].parent != -1)
-			return true;
-	}
-	return false;
+	return RUNNING_STANDALONE(stack, CUR_UNIQUE(stack));
 }
 
 float gLoaderOffset[12] = { 5.5, 4.5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };

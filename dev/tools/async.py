@@ -1,7 +1,10 @@
 from sys import argv
 
 print('#define STATE_INVOKE_ASYNC(func) _asyncInvoke_##func((sAsyncData_##func *)arg._ptr);')
-print('#define RUNNING(func, unique) (_asyncUnique_##func == unique)')
+print('#define CUR_UNIQUE(func) _asyncUnique_##func')
+print('#define RUNNING(func, unique) (CUR_UNIQUE(func) == unique)')
+print('#define RUNNING_STANDALONE(func, unique) (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1)')
+print('#define RUNNING_STATE(machine, state, func, unique) (RUNNING(func, unique) && machine##State == state)')
 print()
 
 for i in range(int(argv[1]) + 1):
@@ -49,8 +52,7 @@ for i in range(int(argv[1]) + 1):
     print('  return_t \\')
     print('} \\')
     print('NEW_ASYNC_VOID_API_%d(; , _asyncDataStandalone_##func, tStart(_asyncTask_##func);, '
-          'while (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1 && !TimedOut(timeout, "await"))'
-          ' sleep(10);, %s) \\' % (i, header))
+          'while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10);, %s) \\' % (i, header))
     print('void func##Kill(bool killAll = false) { \\')
     print('  if (killAll) \\')
     print('    tStopAll(_asyncTask_##func); \\')
