@@ -10,7 +10,6 @@ print('}')
 print()
 
 print('#define IS_CONFIGURED(machine) (machine##State != -1)')
-print('#define USE_MACHINE(machine) { USE_ASYNC(machine##Internal) USE_ASYNC(machine##TimeoutWhile) USE_ASYNC(machine##TimeoutUntil) }')
 print('#define NEXT_STATE(new_state) { state = new_state; goto top; }')
 print()
 
