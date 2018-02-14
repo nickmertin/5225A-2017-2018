@@ -915,8 +915,7 @@ void handleMacros()
 	if (RISING(BTN_MACRO_CLEAR))
 	{
 		writeDebugStreamLine("Clearing lift and arm");
-		stackKill();
-		clearArmAsync();
+		stackSet(stackDetach, sfClear);
 	}
 
 	if (gStack == true && gNumCones < 10 )

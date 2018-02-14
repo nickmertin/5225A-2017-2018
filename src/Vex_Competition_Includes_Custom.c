@@ -37,30 +37,11 @@ void startup();
 void autonomous();
 void usercontrol();
 
-typedef enum _competitionStates {
-	competitionDisabled,
-	competitionAutonomous,
-	competitionUsercontrol
-} tCompetitionStates;
-
-DECLARE_MACHINE(competition, tCompetitionStates);
-
-NEW_ASYNC_VOID_STATE_0(competition, competitionDisabled, disabled);
-NEW_ASYNC_VOID_STATE_0(competition, competitionAutonomous, autonomous);
-NEW_ASYNC_VOID_STATE_0(competition, competitionUsercontrol, usercontrol);
-
-MAKE_MACHINE(competition, tCompetitionStates, competitionDisabled,
-{
-case competitionDisabled:
-	STATE_INVOKE_ASYNC(disabled);
-	break;
-case competitionAutonomous:
-	STATE_INVOKE_ASYNC(autonomous);
-	break;
-case competitionUsercontrol:
-	STATE_INVOKE_ASYNC(usercontrol);
-	break;
-})
+MAKE_ASYNC_ONLY_MACHINE_3(competition,
+0, (disabled), ;,
+0, (autonomous), ;,
+0, (usercontrol), ;
+)
 
 bool bStopTasksBetweenModes = true;
 word gMainTask = 255;
