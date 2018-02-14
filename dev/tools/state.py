@@ -89,7 +89,8 @@ print('}')
 print()
 
 for i in range(1, int(argv[1]) + 1):
-    print('#define MAKE_ASYNC_ONLY_MACHINE_%d(machine, %s) \\' % (i, ', '.join('argc%d, argv%d, after%d' % (j, j, j) for j in range(i))))
+    print('#define MAKE_ASYNC_ONLY_MACHINE_%d(machine, baseImpl, %s) \\'
+          % (i, ', '.join('argc%d, argv%d, after%d' % (j, j, j) for j in range(i))))
     print('typedef enum _asyncStates_##machine { \\')
     print('  machine##NotRunning, \\')
     for j in range(i):
@@ -99,6 +100,9 @@ for i in range(1, int(argv[1]) + 1):
     for j in range(i):
         print('__ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc%d argv%d, argc%d, argv%d) \\' % (j, j, j, j))
     print('MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \\')
+    print('case machine##NotRunning: \\')
+    print('  { baseImpl } \\')
+    print('  break; \\')
     for j in range(i):
         print('case __ASYNC_STATE_NAME_##argc%d argv%d : \\' % (j, j))
         print('  __ASYNC_STATE_INVOKE_##argc%d argv%d \\' % (j, j))

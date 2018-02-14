@@ -62,7 +62,7 @@ void turnNewInternal(float a, sTurnNewState& state);
 void resetBlueLeft();
 void resetBlueRight();
 
-MAKE_ASYNC_ONLY_MACHINE_12(autoSimple,
+MAKE_ASYNC_ONLY_MACHINE_12(autoSimple, ;,
 8, (moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool), ;,
 8, (moveToTargetDisSimple, float, float, float, float, byte, float, tStopType, bool), ;,
 4, (turnToAngleSimple, float, tTurnDir, byte, byte), ;,

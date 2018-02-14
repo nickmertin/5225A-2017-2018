@@ -81,7 +81,7 @@ void machine##TimeoutUntil(states state, unsigned long timeout, const string des
   timeoutWhileNotEqual(&machine##State, &state, sizeof(states), timeout, description); \
 }
 
-#define MAKE_ASYNC_ONLY_MACHINE_1(machine, argc0, argv0, after0) \
+#define MAKE_ASYNC_ONLY_MACHINE_1(machine, baseImpl, argc0, argv0, after0) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0  \
@@ -89,13 +89,16 @@ typedef enum _asyncStates_##machine { \
 DECLARE_MACHINE(machine, sAsyncStates_##machine) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc0 argv0, argc0, argv0) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_2(machine, argc0, argv0, after0, argc1, argv1, after1) \
+#define MAKE_ASYNC_ONLY_MACHINE_2(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -105,6 +108,9 @@ DECLARE_MACHINE(machine, sAsyncStates_##machine) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc0 argv0, argc0, argv0) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc1 argv1, argc1, argv1) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -115,7 +121,7 @@ case __ASYNC_STATE_NAME_##argc1 argv1 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_3(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2) \
+#define MAKE_ASYNC_ONLY_MACHINE_3(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -127,6 +133,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc0 argv0, argc0, argv0) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc1 argv1, argc1, argv1) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc2 argv2, argc2, argv2) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -141,7 +150,7 @@ case __ASYNC_STATE_NAME_##argc2 argv2 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_4(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3) \
+#define MAKE_ASYNC_ONLY_MACHINE_4(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -155,6 +164,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc1 argv1, argc1, argv1) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc2 argv2, argc2, argv2) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc3 argv3, argc3, argv3) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -173,7 +185,7 @@ case __ASYNC_STATE_NAME_##argc3 argv3 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_5(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4) \
+#define MAKE_ASYNC_ONLY_MACHINE_5(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -189,6 +201,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc2 argv2, argc2, argv2) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc3 argv3, argc3, argv3) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc4 argv4, argc4, argv4) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -211,7 +226,7 @@ case __ASYNC_STATE_NAME_##argc4 argv4 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_6(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5) \
+#define MAKE_ASYNC_ONLY_MACHINE_6(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -229,6 +244,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc3 argv3, argc3, argv3) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc4 argv4, argc4, argv4) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc5 argv5, argc5, argv5) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -255,7 +273,7 @@ case __ASYNC_STATE_NAME_##argc5 argv5 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_7(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6) \
+#define MAKE_ASYNC_ONLY_MACHINE_7(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -275,6 +293,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc4 argv4, argc4, argv4) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc5 argv5, argc5, argv5) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc6 argv6, argc6, argv6) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -305,7 +326,7 @@ case __ASYNC_STATE_NAME_##argc6 argv6 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_8(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7) \
+#define MAKE_ASYNC_ONLY_MACHINE_8(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -327,6 +348,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc5 argv5, argc5, argv5) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc6 argv6, argc6, argv6) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc7 argv7, argc7, argv7) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -361,7 +385,7 @@ case __ASYNC_STATE_NAME_##argc7 argv7 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_9(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8) \
+#define MAKE_ASYNC_ONLY_MACHINE_9(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -385,6 +409,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc6 argv6, argc6, argv6) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc7 argv7, argc7, argv7) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc8 argv8, argc8, argv8) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -423,7 +450,7 @@ case __ASYNC_STATE_NAME_##argc8 argv8 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_10(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8, argc9, argv9, after9) \
+#define MAKE_ASYNC_ONLY_MACHINE_10(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8, argc9, argv9, after9) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -449,6 +476,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc7 argv7, argc7, argv7) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc8 argv8, argc8, argv8) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc9 argv9, argc9, argv9) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -491,7 +521,7 @@ case __ASYNC_STATE_NAME_##argc9 argv9 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_11(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8, argc9, argv9, after9, argc10, argv10, after10) \
+#define MAKE_ASYNC_ONLY_MACHINE_11(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8, argc9, argv9, after9, argc10, argv10, after10) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -519,6 +549,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc8 argv8, argc8, argv8) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc9 argv9, argc9, argv9) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc10 argv10, argc10, argv10) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
@@ -565,7 +598,7 @@ case __ASYNC_STATE_NAME_##argc10 argv10 : \
   NEXT_STATE(machine##NotRunning) \
 })
 
-#define MAKE_ASYNC_ONLY_MACHINE_12(machine, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8, argc9, argv9, after9, argc10, argv10, after10, argc11, argv11, after11) \
+#define MAKE_ASYNC_ONLY_MACHINE_12(machine, baseImpl, argc0, argv0, after0, argc1, argv1, after1, argc2, argv2, after2, argc3, argv3, after3, argc4, argv4, after4, argc5, argv5, after5, argc6, argv6, after6, argc7, argv7, after7, argc8, argv8, after8, argc9, argv9, after9, argc10, argv10, after10, argc11, argv11, after11) \
 typedef enum _asyncStates_##machine { \
   machine##NotRunning, \
   __ASYNC_STATE_NAME_##argc0 argv0 , \
@@ -595,6 +628,9 @@ __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc9 argv9, argc9, argv9) 
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc10 argv10, argc10, argv10) \
 __ASYNC_STATE_INTERNAL(machine, __ASYNC_STATE_NAME_##argc11 argv11, argc11, argv11) \
 MAKE_MACHINE(machine, sAsyncStates_##machine, machine##NotRunning, { \
+case machine##NotRunning: \
+  { baseImpl } \
+  break; \
 case __ASYNC_STATE_NAME_##argc0 argv0 : \
   __ASYNC_STATE_INVOKE_##argc0 argv0 \
   { after0 } \
