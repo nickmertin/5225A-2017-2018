@@ -149,11 +149,11 @@ void setLift(word power,bool debug=false)
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
-#define LIFT_BOTTOM 100
-#define LIFT_TOP (LIFT_BOTTOM + 3000)
-#define LIFT_MID (LIFT_BOTTOM + 1500)
-#define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 300)
-#define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 300)
+#define LIFT_BOTTOM 1100
+#define LIFT_TOP (LIFT_BOTTOM + 3200)
+#define LIFT_MID (LIFT_BOTTOM + 900)
+#define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 150)
+#define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 150)
 
 MAKE_MACHINE(lift, tLiftStates, liftIdle,
 {
@@ -408,7 +408,7 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
-#define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 500)
+#define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 400)
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 250
 
