@@ -107,7 +107,7 @@ typedef enum _stackStates {
 
 DECLARE_MACHINE(stack, tStackStates)
 
-#define DETACH_CONFIG(flags, mobileState) ((flags) | sfMobile | ((mobileState) << 16))
+#define STACK_CLEAR_CONFIG(flags, mobileState) ((flags) | sfClear | sfMobile | ((mobileState) << 16))
 
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -578,8 +578,7 @@ void handleMobile()
 		if (RISING(BTN_MOBILE_TOGGLE))
 		{
 			gMobileSlow = false;
-			mobileSet(mobileManaged, -1);
-			stackSet(stackDetach, DETACH_CONFIG(sfClear, mobileBottom));
+			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom));
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
 		}
 	}
@@ -590,8 +589,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				gMobileSlow = false;
-				mobileSet(mobileManaged, -1);
-				stackSet(stackDetach, DETACH_CONFIG(sfClear, mobileBottom));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom));
 				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
 			}
 			else
@@ -601,8 +599,7 @@ void handleMobile()
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				mobileSet(mobileManaged, -1);
-				stackSet(stackDetach, DETACH_CONFIG(sfClear, mobileBottom));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileDownToMiddle));
 			}
 			else
 				mobileSet(mobileUpToMiddle, -1);
@@ -752,8 +749,6 @@ case stackDetach:
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut, TID0(stackDetach));
 	}
-	if (arg._long & sfMobile)
-		mobileSet(arg._long >> 16);
 	if (gStack) {
 		gStack = false;
 		NEXT_STATE(stackPickupGround)
@@ -771,6 +766,9 @@ case stackClear:
 		armSet(armRaiseSimple, &config);
 		timeout = nPgmTime + 1000;
 		armTimeoutWhile(armRaiseSimple, timeout, TID1(stackClear, 2));
+
+		if (arg._long & sfMobile)
+			mobileSet(arg._long >> 16);
 
 		NEXT_STATE(stackNotRunning)
 	}
@@ -1062,6 +1060,7 @@ void autonomous()
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
 	stackReset();
+	liftReset();
 	armReset();
 	liftReset();
 
@@ -1104,6 +1103,7 @@ void usercontrol()
 	//}
 
 	stackReset();
+	liftReset()
 	armReset();
 	mobileReset();
 
