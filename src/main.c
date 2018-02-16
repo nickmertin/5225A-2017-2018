@@ -681,6 +681,8 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
 const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2600 };
 
+bool gStack = false;
+
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackPickupGround:
@@ -739,7 +741,7 @@ case stackStack:
 
 		++gNumCones;
 
-		NEXT_STATE((arg._long & sfClear) ? stackDetach : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
+		NEXT_STATE((arg._long & (sfClear | sfReturn)) ? stackDetach : stackNotRunning)
 	}
 case stackDetach:
 	if (gSensor[liftPoti].value < (gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
@@ -752,6 +754,10 @@ case stackDetach:
 	}
 	if (arg._long & sfMobile)
 		mobileSet(arg._long >> 16);
+	if (gStack) {
+		gStack = false;
+		NEXT_STATE(stackPickupGround)
+	}
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 case stackClear:
 	{
@@ -797,6 +803,7 @@ case stackClear:
 		}
 
 		armTimeoutWhile(armLowerSimple, armTimeOut, TID1(stack, 12));
+		NEXT_STATE(stackNotRunning)
 	}
 })
 
@@ -819,7 +826,6 @@ bool cancel()
 	return false;
 }
 
-bool gStack = false;
 bool gStationary = false;
 sSimpleConfig gStationaryConfig;
 
