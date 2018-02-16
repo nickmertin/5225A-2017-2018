@@ -1028,7 +1028,7 @@ void disabled()
 	sCycleData cycle;
 	initCycle(cycle, 25, "disabled");
 	while (true) {
-		updateSensorInput(autoPoti);
+		updateSensorInputs();
 		selectAuto();
 		handleLcd();
 		endCycle(cycle);
