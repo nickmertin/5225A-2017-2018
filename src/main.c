@@ -722,7 +722,11 @@ case stackPickupGround:
 		armTimeOut = nPgmTime + 500;
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_BOTTOM + 300, armTimeOut, TID1(stackPickupGround, 5));
 
-		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
+		if (arg._long & sfStack)
+			NEXT_STATE(stackStack)
+		liftSet(liftHold);
+		armSet(armHold);
+		NEXT_STATE(stackNotRunning)
 	}
 case stackPickupLoader:
 	{
