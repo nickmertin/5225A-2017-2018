@@ -838,11 +838,6 @@ void handleMacros()
 	{
 		gStack = true;
 	}
-	if (RISING(BTN_MACRO_CLEAR))
-	{
-		writeDebugStreamLine("Clearing lift and arm");
-		stackSet(stackDetach, sfClear);
-	}
 
 	if (gStack == true && gNumCones < MAX_STACK)
 	{
@@ -1006,7 +1001,6 @@ void startup()
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MACRO_ZERO);
-	enableJoystick(BTN_MACRO_CLEAR);
 	enableJoystick(BTN_MACRO_STACK);
 	//enableJoystick(BTN_MACRO_LOADER);
 	enableJoystick(BTN_MACRO_STATIONARY);
