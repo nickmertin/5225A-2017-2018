@@ -17,7 +17,7 @@
 #define BTN_MOBILE_MIDDLE Btn6D
 
 /* Macros */
-#define BTN_MACRO_ZERO Btn8U
+#define BTN_MACRO_ZERO Btn7U
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7R
 #define BTN_MACRO_STATIONARY Btn8R
