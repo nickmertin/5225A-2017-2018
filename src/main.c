@@ -903,6 +903,11 @@ void handleMacros()
 		stackSet(stackStack, (gNumCones < 9) ? sfStack | sfReturn : sfStack);
 	}
 
+	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
+	{
+		stackSet(stackPickupGround, sfNone);
+	}
+
 	//if (RISING(BTN_MACRO_LOADER))
 	//{
 	//	if (!cancel())
