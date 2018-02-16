@@ -369,15 +369,18 @@ case armStopping:
 	NEXT_STATE(armHold);
 case armHold:
 	{
-		if (arg._long == -1) arg._long = gSensor[armPoti].value;
-		const float kP = 0.4;
+		const float kP = -5;
+		velocityClear(armPoti);
 		sCycleData cycle;
 		initCycle(cycle, 10, "armHold");
 		while (true)
 		{
-			float power = (arg._long - gSensor[armPoti].value) * kP;
-			LIM_TO_VAL_SET(power, 12);
-			setArm((word)power);
+			velocityCheck(armPoti);
+			if (gSensor[armPoti].velGood) {
+				float power = 5 + gSensor[armPoti].velocity * kP;
+				LIM_TO_VAL_SET(power, 12);
+				setArm((word)power);
+			}
 			endCycle(cycle);
 		}
 	}
