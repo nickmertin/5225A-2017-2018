@@ -81,17 +81,15 @@ void autoSkills()
 	//resetQuadratureEncoder(liftEnc);
 	//goto skip;
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
 	moveToTargetSimpleAsync(71, 47, 40, 16, 127, 24, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 3000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(skills, 1, 1));
 	configure(liftConfig, LIFT_MOBILE_THRESHOLD, 127, -10);
 	liftSet(liftRaiseSimple, &liftConfig);
 	coneTimeout = nPgmTime + 1000;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, LIFT_MOBILE_THRESHOLD, coneTimeout, TID2(skills, 1, 2));
+	timeoutWhileLessThanL(&gSensor[liftPoti].value, LIFT_MOBILE_THRESHOLD, coneTimeout, TID2(skills, 1, 2));
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 1000;
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 1, 3));
@@ -361,7 +359,6 @@ void auto20RedLeft()
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
@@ -370,7 +367,6 @@ void auto20RedLeft()
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(rl20, 1, 1));
 	turnToTargetCustomAsync(107, 13, ccw, 0, 40, 0.2);
 	driveTimeout = nPgmTime + 3000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(rl20, 1, 2));
 	configure(liftConfig, gLiftRaiseTarget[0], 70, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(rl20, 1, 3));
@@ -441,7 +437,6 @@ void auto20RedRight()
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
@@ -453,7 +448,6 @@ void auto20RedRight()
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(rr20, 1, 2));
 	moveToTargetSimpleAsync(14, 107, gPosition.y, gPosition.x, 70, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(rr20, 1, 3));
 	configure(liftConfig, gLiftRaiseTarget[0], 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	mobileSet(mobileBottom, -1);
@@ -521,7 +515,6 @@ void auto20BlueRight()
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
@@ -533,7 +526,6 @@ void auto20BlueRight()
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(br20, 1, 2));
 	moveToTargetSimpleAsync(14, 107, gPosition.y, gPosition.x, 70, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(br20, 1, 3));
 	configure(liftConfig, gLiftRaiseTarget[0], 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	mobileSet(mobileBottom, -1);
@@ -601,7 +593,6 @@ void auto20BlueLeft()
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
@@ -613,7 +604,6 @@ void auto20BlueLeft()
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(bl20, 1, 2));
 	moveToTargetSimpleAsync(107, 14, gPosition.y, gPosition.x, 70, 4, stopSoft, false);
 	driveTimeout = nPgmTime + 3000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(bl20, 1, 3));
 	configure(liftConfig, gLiftRaiseTarget[0], 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	mobileSet(mobileBottom, -1);
@@ -681,7 +671,6 @@ void stationaryLeftCore(bool goToWall = true)
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
@@ -693,7 +682,6 @@ void stationaryLeftCore(bool goToWall = true)
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(ls, 1, 2));
 	setDrive(40, 40);
 	driveTimeout = nPgmTime + 2000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(ls, 1, 3));
 	configure(liftConfig, 83, 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	configure(armConfig, 2600, -127, 25);
@@ -704,7 +692,7 @@ void stationaryLeftCore(bool goToWall = true)
 	configure(liftConfig, 47, -127, 25);
 	liftSet(liftLowerSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 47, coneTimeout, TID2(ls, 1, 5));
+	timeoutWhileGreaterThanL(&gSensor[liftPoti].value, 47, coneTimeout, TID2(ls, 1, 5));
 	configure(armConfig, ARM_HORIZONTAL, -127, 25);
 	armSet(armLowerSimple, &armConfig);
 	coneTimeout = nPgmTime + 1500;
@@ -714,7 +702,7 @@ void stationaryLeftCore(bool goToWall = true)
 	configure(liftConfig, 82, 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, 75, coneTimeout, TID2(ls, 2, 1));
+	timeoutWhileLessThanL(&gSensor[liftPoti].value, 75, coneTimeout, TID2(ls, 2, 1));
 	configure(armConfig, ARM_TOP, 127, -15);
 	armSet(armRaiseSimple, &armConfig);
 	coneTimeout = nPgmTime + 2000;
@@ -728,7 +716,7 @@ void stationaryLeftCore(bool goToWall = true)
 		driveTimeout = nPgmTime + 2000;
 		coneTimeout = nPgmTime + 1500;
 		timeoutWhileLessThanF(&gPosition.y, 50, coneTimeout, TID2(ls, 2, 4));
-		configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+		configure(liftConfig, LIFT_BOTTOM, -127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		coneTimeout = nPgmTime + 2000;
 		autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(ls, 2, 5));
@@ -759,7 +747,6 @@ void stationaryRightCore(bool goToWall = true)
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
@@ -771,7 +758,6 @@ void stationaryRightCore(bool goToWall = true)
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(rs, 1, 2));
 	setDrive(40, 40);
 	driveTimeout = nPgmTime + 2000;
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID2(rs, 1, 3));
 	configure(liftConfig, 83, 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	configure(armConfig, 2600, -127, 25);
@@ -782,7 +768,7 @@ void stationaryRightCore(bool goToWall = true)
 	configure(liftConfig, 52, -127, 25);
 	liftSet(liftLowerSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 52, coneTimeout, TID2(rs, 1, 5));
+	timeoutWhileGreaterThanL(&gSensor[liftPoti].value, 52, coneTimeout, TID2(rs, 1, 5));
 	configure(armConfig, ARM_HORIZONTAL, -127, 25);
 	armSet(armLowerSimple, &armConfig);
 	coneTimeout = nPgmTime + 1500;
@@ -792,7 +778,7 @@ void stationaryRightCore(bool goToWall = true)
 	configure(liftConfig, 82, 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, 75, coneTimeout, TID2(rs, 1, 7));
+	timeoutWhileLessThanL(&gSensor[liftPoti].value, 75, coneTimeout, TID2(rs, 1, 7));
 	configure(armConfig, ARM_TOP, 127, -15);
 	armSet(armRaiseSimple, &armConfig);
 	coneTimeout = nPgmTime + 2000;
@@ -806,7 +792,7 @@ void stationaryRightCore(bool goToWall = true)
 		driveTimeout = nPgmTime + 2000;
 		coneTimeout = nPgmTime + 1500;
 		timeoutWhileLessThanF(&gPosition.x, 50, coneTimeout, TID2(rs, 2, 4));
-		configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+		configure(liftConfig, LIFT_BOTTOM, -127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		coneTimeout = nPgmTime + 2000;
 		autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(rs, 2, 5));
@@ -839,7 +825,7 @@ void autoStationaryLeftBlock()
 	moveToTargetSimpleAsync(71, 23, gPosition.y, gPosition.x, -70, 6, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	timeoutWhileLessThanF(&gPosition.y, 50, driveTimeout, TID2(ls+b, 2, 2));
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM , -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(ls+b, 2, 3));
 	turnToTargetCustomAsync(119, 71, ch, PI, 60, 0.3);
@@ -870,7 +856,7 @@ void autoStationaryRightBlock()
 	moveToTargetSimpleAsync(23, 71, gPosition.y, gPosition.x, -70, 6, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1500;
 	timeoutWhileLessThanF(&gPosition.x, 50, driveTimeout, TID2(rs+b, 2, 2));
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(rs+b, 2, 3));
 	turnToTargetCustomAsync(71, 119, ch, PI, 60, 0.3);
@@ -909,7 +895,7 @@ void autoStationaryLeft5()
 	moveToTargetSimpleAsync(107, 14, gPosition.y, gPosition.x, 127, 6, stopSoft, true);
 	driveTimeout = nPgmTime + 3000;
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(ls+5, 3, 4));
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(ls+5, 3, 5));
 	mobileSet(mobileTop, -1);
@@ -919,7 +905,7 @@ void autoStationaryLeft5()
 	// 4
 	turnToTargetCustomAsync(62, 18, ch, PI, 45, 0.05);
 	driveTimeout = nPgmTime + 3000;
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(ls+5, 4, 1));
 	moveToTargetDisSimpleAsync(gPosition.a, -36, gPosition.y, gPosition.x, -127, 0, stopHarsh, true);
@@ -966,7 +952,7 @@ void autoStationaryRight5()
 	moveToTargetSimpleAsync(14, 107, gPosition.y, gPosition.x, 127, 6, stopSoft, true);
 	driveTimeout = nPgmTime + 3000;
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(rs+5, 3, 4));
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(rs+5, 3, 5));
 	mobileSet(mobileTop, -1);
@@ -976,7 +962,7 @@ void autoStationaryRight5()
 	// 4
 	turnToTargetCustomAsync(18, 62, ch, PI, 45, 0.05);
 	driveTimeout = nPgmTime + 3000;
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(rs+5, 4, 1));
 	moveToTargetDisSimpleAsync(gPosition.a, -36, gPosition.y, gPosition.x, -127, 0, stopHarsh, true);
@@ -1040,7 +1026,7 @@ void autoStationaryLeft2()
 	configure(liftConfig, 55, -127, 25);
 	liftSet(liftLowerSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 55, coneTimeout, TID2(ls+2, 4, 3));
+	timeoutWhileGreaterThanL(&gSensor[liftPoti].value, 55, coneTimeout, TID2(ls+2, 4, 3));
 	configure(armConfig, ARM_HORIZONTAL, -127, 25);
 	armSet(armLowerSimple, &armConfig);
 	coneTimeout = nPgmTime + 1500;
@@ -1050,7 +1036,7 @@ void autoStationaryLeft2()
 	configure(liftConfig, 95, 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, 85, coneTimeout, TID2(ls+2, 5, 1));
+	timeoutWhileLessThanL(&gSensor[liftPoti].value, 85, coneTimeout, TID2(ls+2, 5, 1));
 	configure(armConfig, ARM_TOP, 127, -15);
 	armSet(armRaiseSimple, &armConfig);
 	coneTimeout = nPgmTime + 2000;
@@ -1058,7 +1044,7 @@ void autoStationaryLeft2()
 	moveToTargetDisSimpleAsync(gPosition.a, -18, gPosition.y, gPosition.x, -40, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(ls+2, 5, 3));
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	coneTimeout = nPgmTime + 1200;
 	liftTimeoutWhile(liftLowerSimple, coneTimeout, TID2(ls+2, 5, 4));
@@ -1109,7 +1095,7 @@ void autoStationaryRight2()
 	configure(liftConfig, 55, -127, 25);
 	liftSet(liftLowerSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileGreaterThanL(&gSensor[liftEnc].value, 55, coneTimeout, TID2(rs+2, 4, 3));
+	timeoutWhileGreaterThanL(&gSensor[liftPoti].value, 55, coneTimeout, TID2(rs+2, 4, 3));
 	configure(armConfig, ARM_HORIZONTAL, -127, 25);
 	armSet(armLowerSimple, &armConfig);
 	coneTimeout = nPgmTime + 1500;
@@ -1119,7 +1105,7 @@ void autoStationaryRight2()
 	configure(liftConfig, 95, 127, -15);
 	liftSet(liftRaiseSimple, &liftConfig);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileLessThanL(&gSensor[liftEnc].value, 85, coneTimeout, TID2(rs+2, 5, 1));
+	timeoutWhileLessThanL(&gSensor[liftPoti].value, 85, coneTimeout, TID2(rs+2, 5, 1));
 	configure(armConfig, ARM_TOP, 127, -15);
 	armSet(armRaiseSimple, &armConfig);
 	coneTimeout = nPgmTime + 2000;
@@ -1127,7 +1113,7 @@ void autoStationaryRight2()
 	moveToTargetDisSimpleAsync(gPosition.a, -18, gPosition.y, gPosition.x, -40, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(rs+2, 5, 3));
-	configure(liftConfig, LIFT_BOTTOM + 2, -127, 0);
+	configure(liftConfig, LIFT_BOTTOM, -127, 0);
 	liftSet(liftLowerSimple, &liftConfig);
 	coneTimeout = nPgmTime + 1200;
 	liftTimeoutWhile(liftLowerSimple, coneTimeout, TID2(rs+2, 5, 4));
@@ -1148,10 +1134,8 @@ void autoTest()
 	resetPositionFull(gPosition, 0, 0, 0);
 	resetVelocity(gVelocity, gPosition);
 
-	liftSet(liftResetEncoder);
 	coneTimeout = nPgmTime + 1400;
 
-	liftTimeoutWhile(liftResetEncoder, coneTimeout, TID1(test, 1));
 	liftSet(liftManaged);
 	setLift(10);
 	setDrive(40, 40);
