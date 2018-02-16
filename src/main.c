@@ -1013,7 +1013,6 @@ void startup()
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MACRO_CANCEL);
-	//enableJoystick(BTN_MACRO_RIGHT);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
 	MIRROR(BTN_MOBILE_TOGGLE);
