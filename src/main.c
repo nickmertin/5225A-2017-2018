@@ -503,7 +503,7 @@ case mobileBottomSlow:
 		velocityClear(mobilePoti);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
-		while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileBottomSlow, 1))) sleep(10);
+		while (gSensor[mobilePoti].value > MOBILE_HALFWAY && !TimedOut(timeout, TID1(mobileBottomSlow, 1))) sleep(10);
 		sCycleData cycle;
 		initCycle(cycle, 10, "mobileBottomSlow");
 		//const float kP = 0.02;
@@ -518,7 +518,7 @@ case mobileBottomSlow:
 			if (gSensor[mobilePoti].velGood)
 			{
 				float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
-				LIM_TO_VAL_SET(power, 10);
+				LIM_TO_VAL_SET(power, 7);
 				setMobile((word)power);
 			}
 			endCycle(cycle);
