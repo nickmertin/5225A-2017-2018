@@ -176,7 +176,7 @@ void setLift(word power,bool debug=false)
 }
 
 #define LIFT_BOTTOM 1050
-#define LIFT_TOP (LIFT_BOTTOM + 2300)
+#define LIFT_TOP (LIFT_BOTTOM + 2200)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
@@ -252,8 +252,8 @@ void handleLift()
 	if (liftState == liftManual)
 	{
 		word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
-		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -10) value = -10;
-		if (gSensor[liftPoti].value >= LIFT_TOP && value > 10) value = 10;
+		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -15) value = -15;
+		if (gSensor[liftPoti].value >= LIFT_TOP && value > 15) value = 15;
 		setLift(value);
 	}
 }
