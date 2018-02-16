@@ -672,7 +672,7 @@ case stackPickupGround:
 		setLift(30);
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackPickupGround, 4));
 
-		armRaiseSimpleAsync(ARM_HORIZONTAL, 127, 20);
+		armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -20);
 		armTimeOut = nPgmTime + 500;
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_BOTTOM + 300, armTimeOut, TID1(stackPickupGround, 5));
 
