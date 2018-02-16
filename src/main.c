@@ -174,11 +174,11 @@ void setLift(word power,bool debug=false)
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
-#define LIFT_BOTTOM 1100
-#define LIFT_TOP (LIFT_BOTTOM + 3200)
+#define LIFT_BOTTOM 1050
+#define LIFT_TOP (LIFT_BOTTOM + 2300)
 #define LIFT_MID (LIFT_BOTTOM + 900)
-#define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 150)
-#define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 150)
+#define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
+#define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 
 MAKE_MACHINE(lift, tLiftStates, liftIdle,
 {
@@ -677,9 +677,9 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 		return false;
 }
 
-// STACKING ON                     0   1   2   3   4   5   6   7   8   9    10
-const int gLiftRaiseTarget[11] = { 18, 25, 37, 45, 53, 64, 72, 81, 92, 102, 120 };
-const int gLiftPlaceTarget[11] = { 1,  13, 20, 25, 34, 42, 51, 60, 70, 76,  90 };
+// STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
+const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
+const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2600 };
 
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
@@ -695,10 +695,10 @@ case stackPickupGround:
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
 
-		configure(liftConfig, 3, -127, 0);
+		configure(liftConfig, LIFT_BOTTOM, -127, 0);
 		liftSet(liftLowerSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, 5, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, LIFT_BOTTOM + 300, liftTimeOut, TID1(stackPickupGround, 2));
 
 		configure(armConfig, ARM_BOTTOM + 200, -127, 0);
 		armSet(armLowerSimple, &armConfig);
@@ -783,14 +783,14 @@ case stackClear:
 
 		if (gNumCones <= 4)
 		{
-			configure(liftConfig, 28, 80, -25);
+			configure(liftConfig, 1350, 80, -25);
 			liftSet(liftRaiseSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 800;
 			liftTimeoutWhile(liftRaiseSimple, liftTimeOut, TID1(stack, 10));
 		}
 		else
 		{
-			configure(liftConfig, 44, -80, 25);
+			configure(liftConfig, 1650, -80, 25);
 			liftSet(liftLowerSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 1000;
 			liftTimeoutWhile(liftLowerSimple, liftTimeOut, TID1(stack, 11));
