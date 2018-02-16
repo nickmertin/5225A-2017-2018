@@ -1053,6 +1053,7 @@ void autonomous()
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
+	stackReset();
 	armReset();
 	liftReset();
 
@@ -1094,6 +1095,7 @@ void usercontrol()
 	//	armSet(armHold);
 	//}
 
+	stackReset();
 	armReset();
 	mobileReset();
 
