@@ -969,8 +969,10 @@ void startup()
 	setupJoysticks();
 	tInit();
 
+	competitionSetup();
 	mobileSetup();
 	liftSetup();
+	stackSetup();
 
 	setupInvertedSen(jmpSkills);
 
