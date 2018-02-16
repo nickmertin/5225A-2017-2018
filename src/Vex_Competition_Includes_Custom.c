@@ -37,8 +37,11 @@ void startup();
 void autonomous();
 void usercontrol();
 
-NEW_ASYNC_VOID_0(autonomous);
-NEW_ASYNC_VOID_0(usercontrol);
+MAKE_ASYNC_ONLY_MACHINE_3(competition, ;,
+0, (disabled), ;,
+0, (autonomous), ;,
+0, (usercontrol), ;
+)
 
 bool bStopTasksBetweenModes = true;
 word gMainTask = 255;
@@ -48,17 +51,15 @@ task main()
 	// Master CPU will not let competition start until powered on for at least 2-seconds
 	clearLCDLine(0);
 	clearLCDLine(1);
-	displayLCDPos(0, 0);
-	displayNextLCDString("Startup");
-	wait1Msec(2000);
+	displayLCDString(0, 0, "Startup");
+	sleep(2000);
 
 	startup();
 
-	//wait1Msec(500);
-
 	while (true)
 	{
-		while (DISABLED) { disabled(); wait1Msec(25); }
+		disabledAsync();
+		while (DISABLED) sleep(10);
 
 		if (AUTONOMOUS)
 		{

@@ -558,3 +558,25 @@ void turnNewInternal(float a, sTurnNewState& state)
 			setDrive(output, -output);
 	}
 }
+
+void resetBlueLeft()
+{
+	setDrive(-30, -30);
+	unsigned long timeout = nPgmTime + 1500;
+	sleep(500);
+	timeoutWhileLessThanF(&gVelocity.x, -0.1, timeout, TID0(rbl));
+	setDrive(-7, -7);
+	sleep(500);
+	resetPositionFull(gPosition, gPosition.y, 8.25, 90);
+}
+
+void resetBlueRight()
+{
+	setDrive(-30, -30);
+	unsigned long timeout = nPgmTime + 1500;
+	sleep(500);
+	timeoutWhileLessThanF(&gVelocity.y, -0.1, timeout, TID0(rbr));
+	setDrive(-7, -7);
+	sleep(500);
+	resetPositionFull(gPosition, 8.25, gPosition.x, 0);
+}

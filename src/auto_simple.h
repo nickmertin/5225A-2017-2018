@@ -59,14 +59,20 @@ void turnToAngleNew(float a, tTurnDir turnDir);
 void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset);
 void turnNewInternal(float a, sTurnNewState& state);
 
-/* Async Functions */
-NEW_ASYNC_VOID_8(moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool);
-NEW_ASYNC_VOID_8(moveToTargetDisSimple, float, float, float, float, byte, float, tStopType, bool);
-NEW_ASYNC_VOID_4(turnToAngleSimple, float, tTurnDir, byte, byte);
-NEW_ASYNC_VOID_6(turnToTargetSimple, float, float, tTurnDir, byte, byte, float);
-NEW_ASYNC_VOID_2(turnToAngleStupid, float, tTurnDir);
-NEW_ASYNC_VOID_4(turnToTargetStupid, float, float, tTurnDir, float);
-NEW_ASYNC_VOID_4(turnToAngleCustom, float, tTurnDir, byte, float);
-NEW_ASYNC_VOID_6(turnToTargetCustom, float, float, tTurnDir, float, byte, float);
-NEW_ASYNC_VOID_2(turnToAngleNew, float, tTurnDir);
-NEW_ASYNC_VOID_4(turnToTargetNew, float, float, tTurnDir, float);
+void resetBlueLeft();
+void resetBlueRight();
+
+MAKE_ASYNC_ONLY_MACHINE_12(autoSimple, ;,
+8, (moveToTargetSimple, float, float, float, float, byte, float, tStopType, bool), ;,
+8, (moveToTargetDisSimple, float, float, float, float, byte, float, tStopType, bool), ;,
+4, (turnToAngleSimple, float, tTurnDir, byte, byte), ;,
+6, (turnToTargetSimple, float, float, tTurnDir, byte, byte, float), ;,
+2, (turnToAngleStupid, float, tTurnDir), ;,
+4, (turnToTargetStupid, float, float, tTurnDir, float), ;,
+4, (turnToAngleCustom, float, tTurnDir, byte, float), ;,
+6, (turnToTargetCustom, float, float, tTurnDir, float, byte, float), ;,
+2, (turnToAngleNew, float, tTurnDir), ;,
+4, (turnToTargetNew, float, float, tTurnDir, float), ;,
+0, (resetBlueLeft), ;,
+0, (resetBlueRight), ;
+)

@@ -1,146 +1,342 @@
-#define NEW_ASYNC_VOID_0(func) \
-byte func##Dummy; \
-typedef struct _asyncData_##func { \
-  int _dummy[0]; \
-} sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(); \
-} \
-unsigned long func##Async() { \
-  sAsyncData_##func data; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+#define __ASYNC_UNIQUE_0(func) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_0(func) func##State
+#define __ASYNC_STATE_INVOKE_0(func) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_0(func) unsigned long func##Async()
+
+#define __ASYNC_COPYTOVAR_0(func) \
+{ \
 }
 
-#define NEW_ASYNC_VOID_1(func, type0) \
-byte func##Dummy; \
+#define __ASYNC_UNIQUE_1(func, type0) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_1(func, type0) func##State
+#define __ASYNC_STATE_INVOKE_1(func, type0) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_1(func, type0) unsigned long func##Async(type0 arg0)
+
+#define __ASYNC_COPYTOVAR_1(func, type0) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+}
+
+#define __ASYNC_UNIQUE_2(func, type0, type1) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_2(func, type0, type1) func##State
+#define __ASYNC_STATE_INVOKE_2(func, type0, type1) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_2(func, type0, type1) unsigned long func##Async(type0 arg0, type1 arg1)
+
+#define __ASYNC_COPYTOVAR_2(func, type0, type1) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+}
+
+#define __ASYNC_UNIQUE_3(func, type0, type1, type2) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_3(func, type0, type1, type2) func##State
+#define __ASYNC_STATE_INVOKE_3(func, type0, type1, type2) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_3(func, type0, type1, type2) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2)
+
+#define __ASYNC_COPYTOVAR_3(func, type0, type1, type2) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+}
+
+#define __ASYNC_UNIQUE_4(func, type0, type1, type2, type3) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_4(func, type0, type1, type2, type3) func##State
+#define __ASYNC_STATE_INVOKE_4(func, type0, type1, type2, type3) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_4(func, type0, type1, type2, type3) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3)
+
+#define __ASYNC_COPYTOVAR_4(func, type0, type1, type2, type3) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+}
+
+#define __ASYNC_UNIQUE_5(func, type0, type1, type2, type3, type4) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_5(func, type0, type1, type2, type3, type4) func##State
+#define __ASYNC_STATE_INVOKE_5(func, type0, type1, type2, type3, type4) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_5(func, type0, type1, type2, type3, type4) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4)
+
+#define __ASYNC_COPYTOVAR_5(func, type0, type1, type2, type3, type4) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+}
+
+#define __ASYNC_UNIQUE_6(func, type0, type1, type2, type3, type4, type5) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_6(func, type0, type1, type2, type3, type4, type5) func##State
+#define __ASYNC_STATE_INVOKE_6(func, type0, type1, type2, type3, type4, type5) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_6(func, type0, type1, type2, type3, type4, type5) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)
+
+#define __ASYNC_COPYTOVAR_6(func, type0, type1, type2, type3, type4, type5) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+  _asyncDataVar_##func.arg5 = arg5; \
+}
+
+#define __ASYNC_UNIQUE_7(func, type0, type1, type2, type3, type4, type5, type6) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_7(func, type0, type1, type2, type3, type4, type5, type6) func##State
+#define __ASYNC_STATE_INVOKE_7(func, type0, type1, type2, type3, type4, type5, type6) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_7(func, type0, type1, type2, type3, type4, type5, type6) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6)
+
+#define __ASYNC_COPYTOVAR_7(func, type0, type1, type2, type3, type4, type5, type6) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+  _asyncDataVar_##func.arg5 = arg5; \
+  _asyncDataVar_##func.arg6 = arg6; \
+}
+
+#define __ASYNC_UNIQUE_8(func, type0, type1, type2, type3, type4, type5, type6, type7) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_8(func, type0, type1, type2, type3, type4, type5, type6, type7) func##State
+#define __ASYNC_STATE_INVOKE_8(func, type0, type1, type2, type3, type4, type5, type6, type7) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_8(func, type0, type1, type2, type3, type4, type5, type6, type7) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7)
+
+#define __ASYNC_COPYTOVAR_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+  _asyncDataVar_##func.arg5 = arg5; \
+  _asyncDataVar_##func.arg6 = arg6; \
+  _asyncDataVar_##func.arg7 = arg7; \
+}
+
+#define __ASYNC_UNIQUE_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) func##State
+#define __ASYNC_STATE_INVOKE_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8)
+
+#define __ASYNC_COPYTOVAR_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+  _asyncDataVar_##func.arg5 = arg5; \
+  _asyncDataVar_##func.arg6 = arg6; \
+  _asyncDataVar_##func.arg7 = arg7; \
+  _asyncDataVar_##func.arg8 = arg8; \
+}
+
+#define __ASYNC_UNIQUE_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) func##State
+#define __ASYNC_STATE_INVOKE_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9)
+
+#define __ASYNC_COPYTOVAR_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+  _asyncDataVar_##func.arg5 = arg5; \
+  _asyncDataVar_##func.arg6 = arg6; \
+  _asyncDataVar_##func.arg7 = arg7; \
+  _asyncDataVar_##func.arg8 = arg8; \
+  _asyncDataVar_##func.arg9 = arg9; \
+}
+
+#define STATE_INVOKE_ASYNC(func) _asyncInvoke_##func();
+#define CUR_UNIQUE(func) _asyncUnique_##func
+#define RUNNING(func, unique) (CUR_UNIQUE(func) == unique)
+#define RUNNING_STANDALONE(func, unique) (RUNNING(func, unique) && tEls[_asyncTask_##func].parent != -1)
+#define RUNNING_STATE(machine, state, func, unique) (RUNNING(func, unique) && machine##State == state)
+
+#define __ASYNC_API(before, after, n, argv) \
+unsigned long __ASYNC_UNIQUE_##n argv = 0; \
+__ASYNC_HEADER_##n argv { \
+  tHog(); \
+  unsigned long unique = _asyncUnique++; \
+  __ASYNC_UNIQUE_##n argv = unique; \
+  tRelease(); \
+  before \
+  __ASYNC_COPYTOVAR_##n argv \
+  after \
+  return unique; \
+}
+
+#define __ASYNC_STATE_INTERNAL(machine, state, n, argv) \
+__ASYNC_TEMPLATE_##n argv \
+__ASYNC_API(;, machine##Set(state);, n, argv) \
+
+#define __ASYNC_TEMPLATE_0(func) \
+typedef struct _asyncData_##func { \
+  char _dummy[0]; \
+} sAsyncData_##func; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(); \
+}
+
+#define NEW_ASYNC_VOID_0(func) \
+__ASYNC_TEMPLATE_0(func) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 0, (func)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_0(machine, state, func) __ASYNC_STATE_INTERNAL(machine, state, 0, (func))
+
+#define __ASYNC_TEMPLATE_1(func, type0) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0); \
-} \
-unsigned long func##Async(type0 arg0) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0); \
 }
 
-#define NEW_ASYNC_VOID_2(func, type0, type1) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_1(func, type0) \
+__ASYNC_TEMPLATE_1(func, type0) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 1, (func, type0)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_1(machine, state, func, type0) __ASYNC_STATE_INTERNAL(machine, state, 1, (func, type0))
+
+#define __ASYNC_TEMPLATE_2(func, type0, type1) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1); \
 }
 
-#define NEW_ASYNC_VOID_3(func, type0, type1, type2) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_2(func, type0, type1) \
+__ASYNC_TEMPLATE_2(func, type0, type1) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 2, (func, type0, type1)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_2(machine, state, func, type0, type1) __ASYNC_STATE_INTERNAL(machine, state, 2, (func, type0, type1))
+
+#define __ASYNC_TEMPLATE_3(func, type0, type1, type2) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
   type2 arg2; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2); \
 }
 
-#define NEW_ASYNC_VOID_4(func, type0, type1, type2, type3) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_3(func, type0, type1, type2) \
+__ASYNC_TEMPLATE_3(func, type0, type1, type2) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 3, (func, type0, type1, type2)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_3(machine, state, func, type0, type1, type2) __ASYNC_STATE_INTERNAL(machine, state, 3, (func, type0, type1, type2))
+
+#define __ASYNC_TEMPLATE_4(func, type0, type1, type2, type3) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
   type2 arg2; \
   type3 arg3; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3); \
 }
 
-#define NEW_ASYNC_VOID_5(func, type0, type1, type2, type3, type4) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_4(func, type0, type1, type2, type3) \
+__ASYNC_TEMPLATE_4(func, type0, type1, type2, type3) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 4, (func, type0, type1, type2, type3)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_4(machine, state, func, type0, type1, type2, type3) __ASYNC_STATE_INTERNAL(machine, state, 4, (func, type0, type1, type2, type3))
+
+#define __ASYNC_TEMPLATE_5(func, type0, type1, type2, type3, type4) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
@@ -148,33 +344,34 @@ typedef struct _asyncData_##func { \
   type3 arg3; \
   type4 arg4; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  data.arg4 = arg4; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4); \
 }
 
-#define NEW_ASYNC_VOID_6(func, type0, type1, type2, type3, type4, type5) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_5(func, type0, type1, type2, type3, type4) \
+__ASYNC_TEMPLATE_5(func, type0, type1, type2, type3, type4) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 5, (func, type0, type1, type2, type3, type4)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_5(machine, state, func, type0, type1, type2, type3, type4) __ASYNC_STATE_INTERNAL(machine, state, 5, (func, type0, type1, type2, type3, type4))
+
+#define __ASYNC_TEMPLATE_6(func, type0, type1, type2, type3, type4, type5) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
@@ -183,34 +380,34 @@ typedef struct _asyncData_##func { \
   type4 arg4; \
   type5 arg5; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  data.arg4 = arg4; \
-  data.arg5 = arg5; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4, _asyncDataVar_##func.arg5); \
 }
 
-#define NEW_ASYNC_VOID_7(func, type0, type1, type2, type3, type4, type5, type6) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_6(func, type0, type1, type2, type3, type4, type5) \
+__ASYNC_TEMPLATE_6(func, type0, type1, type2, type3, type4, type5) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 6, (func, type0, type1, type2, type3, type4, type5)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_6(machine, state, func, type0, type1, type2, type3, type4, type5) __ASYNC_STATE_INTERNAL(machine, state, 6, (func, type0, type1, type2, type3, type4, type5))
+
+#define __ASYNC_TEMPLATE_7(func, type0, type1, type2, type3, type4, type5, type6) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
@@ -220,35 +417,34 @@ typedef struct _asyncData_##func { \
   type5 arg5; \
   type6 arg6; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  data.arg4 = arg4; \
-  data.arg5 = arg5; \
-  data.arg6 = arg6; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4, _asyncDataVar_##func.arg5, _asyncDataVar_##func.arg6); \
 }
 
-#define NEW_ASYNC_VOID_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_7(func, type0, type1, type2, type3, type4, type5, type6) \
+__ASYNC_TEMPLATE_7(func, type0, type1, type2, type3, type4, type5, type6) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 7, (func, type0, type1, type2, type3, type4, type5, type6)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_7(machine, state, func, type0, type1, type2, type3, type4, type5, type6) __ASYNC_STATE_INTERNAL(machine, state, 7, (func, type0, type1, type2, type3, type4, type5, type6))
+
+#define __ASYNC_TEMPLATE_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
@@ -259,36 +455,34 @@ typedef struct _asyncData_##func { \
   type6 arg6; \
   type7 arg7; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  data.arg4 = arg4; \
-  data.arg5 = arg5; \
-  data.arg6 = arg6; \
-  data.arg7 = arg7; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4, _asyncDataVar_##func.arg5, _asyncDataVar_##func.arg6, _asyncDataVar_##func.arg7); \
 }
 
-#define NEW_ASYNC_VOID_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
+__ASYNC_TEMPLATE_8(func, type0, type1, type2, type3, type4, type5, type6, type7) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_8(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7) __ASYNC_STATE_INTERNAL(machine, state, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7))
+
+#define __ASYNC_TEMPLATE_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
@@ -300,37 +494,34 @@ typedef struct _asyncData_##func { \
   type7 arg7; \
   type8 arg8; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8); \
-} \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  data.arg4 = arg4; \
-  data.arg5 = arg5; \
-  data.arg6 = arg6; \
-  data.arg7 = arg7; \
-  data.arg8 = arg8; \
-  return _startAsync(&func##Dummy, &data); \
-} \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4, _asyncDataVar_##func.arg5, _asyncDataVar_##func.arg6, _asyncDataVar_##func.arg7, _asyncDataVar_##func.arg8); \
 }
 
-#define NEW_ASYNC_VOID_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
-byte func##Dummy; \
+#define NEW_ASYNC_VOID_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
+__ASYNC_TEMPLATE_9(func, type0, type1, type2, type3, type4, type5, type6, type7, type8) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_9(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7, type8) __ASYNC_STATE_INTERNAL(machine, state, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8))
+
+#define __ASYNC_TEMPLATE_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
 typedef struct _asyncData_##func { \
   type0 arg0; \
   type1 arg1; \
@@ -343,224 +534,32 @@ typedef struct _asyncData_##func { \
   type8 arg8; \
   type9 arg9; \
 } sAsyncData_##func; \
-void _asyncTask_##func(sAsyncData_##func *data, sNotifier *notifier) { \
-  sAsyncData_##func _data; \
-  memcpy(&_data, data, sizeof(sAsyncData_##func)); \
-  byte _task = notify(*notifier); \
-  writeDebugStreamLine("%d ASYNC %x %d", nPgmTime, &func##Dummy, _task); \
-  func(_data.arg0, _data.arg1, _data.arg2, _data.arg3, _data.arg4, _data.arg5, _data.arg6, _data.arg7, _data.arg8, _data.arg9); \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4, _asyncDataVar_##func.arg5, _asyncDataVar_##func.arg6, _asyncDataVar_##func.arg7, _asyncDataVar_##func.arg8, _asyncDataVar_##func.arg9); \
+}
+
+#define NEW_ASYNC_VOID_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
+__ASYNC_TEMPLATE_10(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
 } \
-unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9) { \
-  sAsyncData_##func data; \
-  data.arg0 = arg0; \
-  data.arg1 = arg1; \
-  data.arg2 = arg2; \
-  data.arg3 = arg3; \
-  data.arg4 = arg4; \
-  data.arg5 = arg5; \
-  data.arg6 = arg6; \
-  data.arg7 = arg7; \
-  data.arg8 = arg8; \
-  data.arg9 = arg9; \
-  return _startAsync(&func##Dummy, &data); \
+__ASYNC_API(; , tStart(_asyncTask_##func);, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
 } \
-bool func##Kill() { \
-  for (int i = 0; i < TASK_POOL_SIZE; ++i) \
-    if (gAsyncTaskData[i].id == &func##Dummy && tEls[threadPoolTask0 + i].parent != -1) { \
-      _killAsync(i); \
-      return true; \
-    } \
-  return false; \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
-#define USE_ASYNC(func) \
-if (data->id == &func##Dummy) { \
-  _asyncTask_##func((sAsyncData_##func *)data->data, &data->notifier); \
-  notify(data->notifier); \
-  return true; \
-}
+#define NEW_ASYNC_VOID_STATE_10(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) __ASYNC_STATE_INTERNAL(machine, state, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9))
 
-#define ASYNC_ROUTINES(content) \
-bool _runAsync(sAsyncTaskData *data) { \
-  content \
-  return false; \
-}
-
-typedef struct _sAsyncTaskData {
-  byte *id;
-  void *data;
-  unsigned long unique;
-  sNotifier notifier;
-} sAsyncTaskData;
-
-sAsyncTaskData gAsyncTaskData[TASK_POOL_SIZE];
 unsigned long _asyncUnique = 1;
-
-void asyncInit();
-void await(unsigned long unique, unsigned long timeout, const string description);
-void kill(unsigned long unique);
-void _awaitAsync(byte index, unsigned long timeout, const string description);
-void _killAsync(byte index);
-bool _runAsync(sAsyncTaskData *data);
-unsigned long _startAsync(byte *id, void *data);
-
-#if TASK_POOL_SIZE > 0
-task threadPoolTask0() {
-  if (!_runAsync(&gAsyncTaskData[0]))
-    writeDebugStreamLine("ASYNC 0");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 1
-task threadPoolTask1() {
-  if (!_runAsync(&gAsyncTaskData[1]))
-    writeDebugStreamLine("ASYNC 1");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 2
-task threadPoolTask2() {
-  if (!_runAsync(&gAsyncTaskData[2]))
-    writeDebugStreamLine("ASYNC 2");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 3
-task threadPoolTask3() {
-  if (!_runAsync(&gAsyncTaskData[3]))
-    writeDebugStreamLine("ASYNC 3");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 4
-task threadPoolTask4() {
-  if (!_runAsync(&gAsyncTaskData[4]))
-    writeDebugStreamLine("ASYNC 4");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 5
-task threadPoolTask5() {
-  if (!_runAsync(&gAsyncTaskData[5]))
-    writeDebugStreamLine("ASYNC 5");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 6
-task threadPoolTask6() {
-  if (!_runAsync(&gAsyncTaskData[6]))
-    writeDebugStreamLine("ASYNC 6");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 7
-task threadPoolTask7() {
-  if (!_runAsync(&gAsyncTaskData[7]))
-    writeDebugStreamLine("ASYNC 7");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 8
-task threadPoolTask8() {
-  if (!_runAsync(&gAsyncTaskData[8]))
-    writeDebugStreamLine("ASYNC 8");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 9
-task threadPoolTask9() {
-  if (!_runAsync(&gAsyncTaskData[9]))
-    writeDebugStreamLine("ASYNC 9");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 10
-task threadPoolTask10() {
-  if (!_runAsync(&gAsyncTaskData[10]))
-    writeDebugStreamLine("ASYNC 10");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 11
-task threadPoolTask11() {
-  if (!_runAsync(&gAsyncTaskData[11]))
-    writeDebugStreamLine("ASYNC 11");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 12
-task threadPoolTask12() {
-  if (!_runAsync(&gAsyncTaskData[12]))
-    writeDebugStreamLine("ASYNC 12");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 13
-task threadPoolTask13() {
-  if (!_runAsync(&gAsyncTaskData[13]))
-    writeDebugStreamLine("ASYNC 13");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 14
-task threadPoolTask14() {
-  if (!_runAsync(&gAsyncTaskData[14]))
-    writeDebugStreamLine("ASYNC 14");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 15
-task threadPoolTask15() {
-  if (!_runAsync(&gAsyncTaskData[15]))
-    writeDebugStreamLine("ASYNC 15");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 16
-task threadPoolTask16() {
-  if (!_runAsync(&gAsyncTaskData[16]))
-    writeDebugStreamLine("ASYNC 16");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 17
-task threadPoolTask17() {
-  if (!_runAsync(&gAsyncTaskData[17]))
-    writeDebugStreamLine("ASYNC 17");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 18
-task threadPoolTask18() {
-  if (!_runAsync(&gAsyncTaskData[18]))
-    writeDebugStreamLine("ASYNC 18");
-  return_t;
-}
-#endif
-
-#if TASK_POOL_SIZE > 19
-task threadPoolTask19() {
-  if (!_runAsync(&gAsyncTaskData[19]))
-    writeDebugStreamLine("ASYNC 19");
-  return_t;
-}
-#endif
 

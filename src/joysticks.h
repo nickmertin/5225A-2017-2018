@@ -13,7 +13,6 @@ void setupJoysticks(); // Initilize all the joysticks
 void updateJoysticks(); // Update the enabled joysticks
 void updateJoystick(TVexJoysticks joy); // Update a joystick
 void enableJoystick(TVexJoysticks joy); // Set a joystick to be enabled
-void mirrorJoystick(TVexJoysticks joy); // set a joystick to be mirrored on the second controller
 void mirrorJoystick(TVexJoysticks joy, TVexJoysticks mirror); // set a joystick to be mirrored
 
 /* Variables */
@@ -22,3 +21,4 @@ sJoy gJoy[kNumbOfVexRFIndices]; // The global joystick array
 /* Defines */
 #define RISING(joy) (gJoy[joy].cur && !gJoy[joy].lst)
 #define FALLING(joy) (!gJoy[joy].cur && gJoy[joy].lst)
+#define MIRROR(joy) mirrorJoystick(joy, joy##Xmtr2)

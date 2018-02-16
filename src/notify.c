@@ -5,12 +5,12 @@ void reset(sNotifier& notifier)
 	notifier.semaphore = NULL;
 }
 
-byte waitOn(sNotifier& notifier, unsigned long timeout, const string description)
+byte waitOn(sNotifier& notifier, unsigned long timeout, const unsigned char *routine, unsigned short id)
 {
 	//notifier.set = false;
 	notifier.waiter = nCurrentTask;
 	notifier.waitee = -1;
-	while (!notifier.set && (&description ? !TimedOut(timeout, description) : (nPgmTime < timeout)))
+	while (!notifier.set && (routine ? !TimedOut(timeout, routine, id) : (nPgmTime < timeout)))
 	{
 		if (notifier.semaphore)
 		{
