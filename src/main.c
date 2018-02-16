@@ -160,7 +160,7 @@ void setLift(word power,bool debug=false)
 }
 
 #define LIFT_BOTTOM 1050
-#define LIFT_TOP (LIFT_BOTTOM + 2200)
+#define LIFT_TOP (LIFT_BOTTOM + 2150)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
@@ -640,18 +640,16 @@ bool gKillDriveOnTimeout = false;
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
 const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2800 };
-const int gLiftRaiseTargetS[6] = { 2150, 2250, 2400, 2650, 2850, LIFT_TOP };
-const int gLiftPlaceTargetS[6] = { 1900, 2000, 2150, 2350, 2550, 2750 };
+const int gLiftRaiseTargetS[5] = { 2250, 2350, 2500, 2750, LIFT_TOP };
+const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 };
 
 bool gStack = false;
 
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
-	if (liftState != liftHold && liftState != liftHoldUp && liftState != liftHoldDown)
-		liftReset();
-	if (armState != armHold)
-		armReset();
+	liftSet(liftHold);
+	armSet(armHold);
 	gDriveManual = true;
 	break;
 case stackPickupGround:
@@ -695,6 +693,9 @@ case stackStationary:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
+		if (gNumCones >= 5)
+			NEXT_STATE(stackNotRunning)
+
 		if (gSensor[armPoti].value > ARM_STATIONARY)
 			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
 		else
@@ -705,20 +706,22 @@ case stackStationary:
 		setDrive(40, 40);
 		driveTimeout = nPgmTime + 2000;
 		sleep(300);
-		while (gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.01 && !TimedOut(driveTimeout, TID1(stackStationary, 1))) sleep(10);
+		while (gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a) > 0.05 && !TimedOut(driveTimeout, TID1(stackStationary, 1))) sleep(10);
+		setDrive(15, 15);
 
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones] - 200, liftTimeOut, TID1(stackStationary, 2));
+		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones] + 200, liftTimeOut, TID1(stackStationary, 2));
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 50);
 		armTimeOut = nPgmTime + 1500;
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 200, armTimeOut, TID1(stackStationary, 3));
+		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackStationary, 3));
 
 		++gNumCones;
 
-		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, -15);
+		long target = (gNumCones >= 5) ? LIFT_TOP : gLiftRaiseTargetS[gNumCones];
+		liftRaiseSimpleAsync(target, 127, -15);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTargetS[gNumCones] - 200, liftTimeOut, TID1(stackStationary, 4));
+		timeoutWhileLessThanL(&gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
 
 		gDriveManual = true;
 
