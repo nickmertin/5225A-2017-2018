@@ -42,7 +42,7 @@ print()
 
 print('#define __ASYNC_STATE_INTERNAL(machine, state, n, argv) \\')
 print('__ASYNC_TEMPLATE_##n argv \\')
-print('__ASYNC_API(;, machine##Set(state), n, argv) \\')
+print('__ASYNC_API(;, machine##Set(state);, n, argv) \\')
 print()
 
 for i in range(maxArgc + 1):

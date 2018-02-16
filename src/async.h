@@ -173,7 +173,7 @@ __ASYNC_HEADER_##n argv { \
 
 #define __ASYNC_STATE_INTERNAL(machine, state, n, argv) \
 __ASYNC_TEMPLATE_##n argv \
-__ASYNC_API(;, machine##Set(state), n, argv) \
+__ASYNC_API(;, machine##Set(state);, n, argv) \
 
 #define __ASYNC_TEMPLATE_0(func) \
 typedef struct _asyncData_##func { \

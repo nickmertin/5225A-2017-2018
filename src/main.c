@@ -1108,7 +1108,7 @@ void usercontrol()
 	//}
 
 	stackReset();
-	liftReset()
+	liftReset();
 	armReset();
 	mobileReset();
 
