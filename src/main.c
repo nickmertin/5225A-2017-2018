@@ -696,9 +696,9 @@ case stackStationary:
 		unsigned long liftTimeOut;
 
 		if (gSensor[armPoti].value > ARM_STATIONARY)
-			armLowerSimpleAsync(ARM_STATIONARY, -127, 25);
+			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
 		else
-			armRaiseSimpleAsync(ARM_STATIONARY, 127, 25);
+			armRaiseSimpleAsync(ARM_STATIONARY, 127, -25, 50);
 		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, -15);
 
 		gDriveManual = false;
@@ -710,7 +710,7 @@ case stackStationary:
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
 		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones] - 200, liftTimeOut, TID1(stackStationary, 2));
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25);
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 50);
 		armTimeOut = nPgmTime + 1500;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 200, armTimeOut, TID1(stackStationary, 3));
 
