@@ -108,6 +108,7 @@ typedef enum _stackStates {
 DECLARE_MACHINE(stack, tStackStates)
 
 #define STACK_CLEAR_CONFIG(flags, mobileState) ((flags) | sfClear | sfMobile | ((mobileState) << 16))
+#define MAX_STACK 11
 
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -699,7 +700,7 @@ case stackPickupGround:
 		liftTimeOut = nPgmTime + 1200;
 		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, LIFT_BOTTOM + 300, liftTimeOut, TID1(stackPickupGround, 2));
 
-		configure(armConfig, ARM_BOTTOM + 200, -127, 0);
+		configure(armConfig, ARM_BOTTOM + 100, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut, TID1(stackPickupGround, 3));
@@ -720,12 +721,15 @@ case stackStack:
 		sSimpleConfig armConfig;
 		sSimpleConfig liftConfig;
 
+		if (gNumCones >= MAX_STACK)
+			NEXT_STATE(stackNotRunning)
+
 		configure(liftConfig, gLiftRaiseTarget[gNumCones], 80, -15);
 		liftSet(liftRaiseSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 1500;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftPlaceTarget[gNumCones], liftTimeOut, TID1(stackStack, 1));
 
-		configure(armConfig, ARM_STACK, 127, -12, 30);
+		configure(armConfig, ARM_STACK, 127, -12, 20);
 		armSet(armRaiseSimple, &armConfig);
 		armTimeOut = nPgmTime + 1000;
 		liftTimeoutWhile(liftRaiseSimple, liftTimeOut, TID1(stackStack, 2));
@@ -751,7 +755,8 @@ case stackDetach:
 	}
 	if (gStack) {
 		gStack = false;
-		NEXT_STATE(stackPickupGround)
+		if (gNumCones < MAX_STACK)
+			NEXT_STATE(stackPickupGround)
 	}
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 case stackClear:
@@ -839,12 +844,12 @@ void handleMacros()
 		stackSet(stackDetach, sfClear);
 	}
 
-	if (gStack == true && gNumCones < 10 )
+	if (gStack == true && gNumCones < MAX_STACK)
 	{
 		if (!stackRunning())
 		{
 			writeDebugStreamLine("Stacking");
-			stackSet(stackPickupGround, (gNumCones < 9) ? sfStack | sfReturn : sfStack);
+			stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack);
 			gStack = false;
 		}
 	}
