@@ -796,10 +796,13 @@ case stackClear:
 		unsigned long timeout = nPgmTime + 1500;
 		liftTimeoutWhile(liftRaiseSimple, timeout, TID1(stackClear, 1));
 
-		configure(config, ARM_TOP, 127, -15);
-		armSet(armRaiseSimple, &config);
-		timeout = nPgmTime + 1000;
-		armTimeoutWhile(armRaiseSimple, timeout, TID1(stackClear, 2));
+		if (gSensor[armPoti].value < ARM_STACK)
+		{
+			configure(config, ARM_TOP, 127, -15);
+			armSet(armRaiseSimple, &config);
+			timeout = nPgmTime + 1000;
+			armTimeoutWhile(armRaiseSimple, timeout, TID1(stackClear, 2));
+		}
 
 		if (arg._long & sfMobile)
 			mobileSet(arg._long >> 16);
