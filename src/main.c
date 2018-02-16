@@ -147,7 +147,7 @@ void handleDrive()
 		word l = y + a;
 		word r = y - a;
 
-		//if (gSensor[liftEnc].value > LIFT_SLOW_DRIVE_THRESHOLD)
+		//if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
 		//{
 		//	LIM_TO_VAL_SET(l, 40);
 		//	LIM_TO_VAL_SET(r, 40);
@@ -740,7 +740,7 @@ case stackStack:
 		NEXT_STATE((arg._long & sfClear) ? stackDetach : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 	}
 case stackDetach:
-	if (gSensor[liftEnc].value < (gNumCones == 11 ? LIFT_POS(LIFT_TOP) : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
+	if (gSensor[liftPoti].value < (gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
 	{
 		sSimpleConfig armConfig;
 		configure(armConfig, ARM_PRESTACK - 100, -127, 0);
@@ -754,7 +754,7 @@ case stackDetach:
 case stackClear:
 	{
 		sSimpleConfig config;
-		configure(config, gNumCones == 11 ? LIFT_POS(LIFT_TOP) : gLiftRaiseTarget[gNumCones], 127, 0);
+		configure(config, gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones], 127, 0);
 		liftSet(liftRaiseSimple, &config);
 		unsigned long timeout = nPgmTime + 1500;
 		liftTimeoutWhile(liftRaiseSimple, timeout, TID1(stackClear, 1));
