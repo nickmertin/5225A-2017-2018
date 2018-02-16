@@ -30,11 +30,6 @@ void enableJoystick(TVexJoysticks joy)
 	gJoy[joy].enabled = true;
 }
 
-void mirrorJoystick(TVexJoysticks joy)
-{
-	mirrorJoystick(joy, joy + Ch1Xmtr2 - Ch1);
-}
-
 void mirrorJoystick(TVexJoysticks joy, TVexJoysticks mirror)
 {
 	enableJoystick(mirror);

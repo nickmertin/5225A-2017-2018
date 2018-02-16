@@ -1004,14 +1004,14 @@ void startup()
 	//enableJoystick(BTN_MACRO_RIGHT);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
-	mirrorJoystick(BTN_MOBILE_TOGGLE);
-	mirrorJoystick(BTN_MOBILE_MIDDLE);
-	mirrorJoystick(BTN_MACRO_ZERO);
-	mirrorJoystick(BTN_MACRO_STACK);
-	mirrorJoystick(BTN_MACRO_PRELOAD);
-	mirrorJoystick(BTN_MACRO_CANCEL);
-	mirrorJoystick(BTN_MACRO_INC);
-	mirrorJoystick(BTN_MACRO_DEC);
+	MIRROR(BTN_MOBILE_TOGGLE);
+	MIRROR(BTN_MOBILE_MIDDLE);
+	MIRROR(BTN_MACRO_ZERO);
+	MIRROR(BTN_MACRO_STACK);
+	MIRROR(BTN_MACRO_PRELOAD);
+	MIRROR(BTN_MACRO_CANCEL);
+	MIRROR(BTN_MACRO_INC);
+	MIRROR(BTN_MACRO_DEC);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
