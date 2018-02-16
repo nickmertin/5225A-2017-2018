@@ -1017,9 +1017,14 @@ void startup()
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
 void disabled()
 {
-	updateSensorInput(autoPoti);
-	selectAuto();
-	handleLcd();
+	sCycleData cycle;
+	initCycle(cycle, 25, "disabled");
+	while (true) {
+		updateSensorInput(autoPoti);
+		selectAuto();
+		handleLcd();
+		endCycle(cycle);
+	}
 }
 
 // This task gets started at the begining of the autonomous period
