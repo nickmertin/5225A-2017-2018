@@ -197,11 +197,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_0(machine, state, func) __ASYNC_STATE_INTERNAL(machine, state, 0, (func))
@@ -228,11 +228,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_1(machine, state, func, type0) __ASYNC_STATE_INTERNAL(machine, state, 1, (func, type0))
@@ -260,11 +260,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_2(machine, state, func, type0, type1) __ASYNC_STATE_INTERNAL(machine, state, 2, (func, type0, type1))
@@ -293,11 +293,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_3(machine, state, func, type0, type1, type2) __ASYNC_STATE_INTERNAL(machine, state, 3, (func, type0, type1, type2))
@@ -327,11 +327,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_4(machine, state, func, type0, type1, type2, type3) __ASYNC_STATE_INTERNAL(machine, state, 4, (func, type0, type1, type2, type3))
@@ -362,11 +362,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_5(machine, state, func, type0, type1, type2, type3, type4) __ASYNC_STATE_INTERNAL(machine, state, 5, (func, type0, type1, type2, type3, type4))
@@ -398,11 +398,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_6(machine, state, func, type0, type1, type2, type3, type4, type5) __ASYNC_STATE_INTERNAL(machine, state, 6, (func, type0, type1, type2, type3, type4, type5))
@@ -435,11 +435,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_7(machine, state, func, type0, type1, type2, type3, type4, type5, type6) __ASYNC_STATE_INTERNAL(machine, state, 7, (func, type0, type1, type2, type3, type4, type5, type6))
@@ -473,11 +473,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_8(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7) __ASYNC_STATE_INTERNAL(machine, state, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7))
@@ -512,11 +512,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_9(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7, type8) __ASYNC_STATE_INTERNAL(machine, state, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8))
@@ -552,11 +552,11 @@ void func##Kill(bool killAll = false) { \
   else \
     tStop(_asyncTask_##func); \
 } \
-void func##Await(unsigned long unique, unsigned long timeout, const string description) { \
-  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, "await")) sleep(10); \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
 } \
-void func##Await(unsigned long timeout, const string description) { \
-  func##Await(_asyncUnique_##func, timeout, description); \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
 }
 
 #define NEW_ASYNC_VOID_STATE_10(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9) __ASYNC_STATE_INTERNAL(machine, state, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9))
