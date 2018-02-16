@@ -109,7 +109,6 @@ DECLARE_MACHINE(stack, tStackStates)
 
 #define DETACH_CONFIG(flags, mobileState) ((flags) | sfMobile | ((mobileState) << 16))
 
-unsigned long gOverAllTime = 0;
 sCycleData gMainCycle;
 int gNumCones = 0;
 word gUserControlTaskId = -1;
@@ -171,7 +170,7 @@ typedef enum _tLiftStates {
 
 void setLift(word power,bool debug=false)
 {
-	if( debug )	writeDebugStreamLine("%06d Lift %4d", nPgmTime-gOverAllTime,power );
+	if( debug )	writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
@@ -280,7 +279,7 @@ typedef enum _tArmStates {
 
 void setArm(word power, bool debug = false)
 {
-	if( debug ) writeDebugStreamLine("%06d Arm  %4d", nPgmTime-gOverAllTime, power);
+	if( debug ) writeDebugStreamLine("%06d Arm  %4d", nPgmTime, power);
 	gMotor[arm].power = power;
 	//	motor[arm]=power;
 }
@@ -625,12 +624,15 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	if (nPgmTime > timeOut)
 	{
 		tHog();
-		string description;
+		char description[40];
 		if (id >> 8)
-			sprintf(description, "%s %d-%d", routine, id >> 8, id & 0xFF);
+			snprintf(description, 40, "%s %d-%d", routine, id >> 8, (word) (id & 0xFF));
+		else if (id)
+			snprintf(description, 40, "%s %d", routine, (word) id);
 		else
-			sprintf(description, "%s %d", routine, id);
-		writeDebugStreamLine("%06d EXCEEDED TIME %d - %s", nPgmTime - gOverAllTime, timeOut - gOverAllTime, description);
+			strcpy(description, routine);
+		writeDebugStream("%06d EXCEEDED TIME %d - ", nPgmTime, timeOut);
+		writeDebugStreamLine(description);
 		int current = nCurrentTask;
 		if (current == gUserControlTaskId || current == main)
 		{
