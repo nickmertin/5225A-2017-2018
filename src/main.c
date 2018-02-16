@@ -270,8 +270,8 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define ARM_TOP 3100
-#define ARM_BOTTOM 550
+#define ARM_TOP 3300
+#define ARM_BOTTOM 700
 #define ARM_PRESTACK 2300
 #define ARM_CARRY 1500
 #define ARM_STACK 2400
