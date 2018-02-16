@@ -191,7 +191,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 0, (func)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 0, (func)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -222,7 +222,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 1, (func, type0)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 1, (func, type0)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -254,7 +254,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 2, (func, type0, type1)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 2, (func, type0, type1)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -287,7 +287,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 3, (func, type0, type1, type2)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 3, (func, type0, type1, type2)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -321,7 +321,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 4, (func, type0, type1, type2, type3)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 4, (func, type0, type1, type2, type3)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -356,7 +356,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 5, (func, type0, type1, type2, type3, type4)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 5, (func, type0, type1, type2, type3, type4)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -392,7 +392,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 6, (func, type0, type1, type2, type3, type4, type5)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 6, (func, type0, type1, type2, type3, type4, type5)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -429,7 +429,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 7, (func, type0, type1, type2, type3, type4, type5, type6)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 7, (func, type0, type1, type2, type3, type4, type5, type6)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -467,7 +467,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -506,7 +506,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -546,7 +546,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStart(_asyncTask_##func);, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9)) \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
