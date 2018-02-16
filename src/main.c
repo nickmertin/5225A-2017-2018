@@ -683,6 +683,12 @@ bool gStack = false;
 
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
+case stackNotRunning:
+	if (liftState != liftHold && liftState != liftHoldUp && liftState != liftHoldDown)
+		liftReset();
+	if (armState != armHold)
+		armReset();
+	break;
 case stackPickupGround:
 	{
 		unsigned long armTimeOut;
@@ -708,10 +714,10 @@ case stackPickupGround:
 		setLift(30);
 		armTimeoutWhile(armLowerSimple, armTimeOut, TID1(stackPickupGround, 4));
 
-		configure(armConfig, ARM_BOTTOM + 300, 127, 0);
+		configure(armConfig, ARM_HORIZONTAL, 127, 20);
 		armSet(armRaiseSimple, &armConfig);
 		armTimeOut = nPgmTime + 500;
-		armTimeoutWhile(armRaiseSimple, armTimeOut, TID1(stackPickupGround, 5));
+		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_BOTTOM + 300, armTimeOut, TID1(stackPickupGround, 5));
 
 		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
@@ -731,15 +737,15 @@ case stackStack:
 		if (gNumCones >= MAX_STACK)
 			NEXT_STATE(stackNotRunning)
 
-		configure(liftConfig, gLiftRaiseTarget[gNumCones], 80, -15);
+		configure(liftConfig, gLiftRaiseTarget[gNumCones], 127, -15);
 		liftSet(liftRaiseSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 1500;
-		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftPlaceTarget[gNumCones], liftTimeOut, TID1(stackStack, 1));
+		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 500, liftTimeOut, TID1(stackStack, 1));
 
 		configure(armConfig, ARM_STACK, 127, -12, 20);
 		armSet(armRaiseSimple, &armConfig);
 		armTimeOut = nPgmTime + 1000;
-		liftTimeoutWhile(liftRaiseSimple, liftTimeOut, TID1(stackStack, 2));
+		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
 
 		configure(liftConfig, gLiftPlaceTarget[gNumCones], -70, 0);
