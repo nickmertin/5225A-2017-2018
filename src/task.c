@@ -31,7 +31,7 @@ void tStop(word id)
 	tRelease();
 }
 
-void tStopAll(word id)
+void tStopAll(word id, bool notMe)
 {
 	bool stopCur = false;
 	tHog();
@@ -42,7 +42,7 @@ void tStopAll(word id)
 		updated[tEls[id].child] = true;
 		if (tEls[id].child == nCurrentTask)
 		{
-			stopCur = true;
+			stopCur = !notMe;
 			tUnreg(tEls[id].child);
 		}
 		else tStop(tEls[id].child);

@@ -44,7 +44,6 @@ MAKE_ASYNC_ONLY_MACHINE_3(competition, ;,
 )
 
 bool bStopTasksBetweenModes = true;
-word gMainTask = 255;
 
 task main()
 {

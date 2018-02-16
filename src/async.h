@@ -152,6 +152,7 @@
   _asyncDataVar_##func.arg9 = arg9; \
 }
 
+#define ASYNC_TASK_NAME(func) _asyncTask_##func
 #define STATE_INVOKE_ASYNC(func) _asyncInvoke_##func();
 #define CUR_UNIQUE(func) _asyncUnique_##func
 #define RUNNING(func, unique) (CUR_UNIQUE(func) == unique)

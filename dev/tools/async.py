@@ -19,6 +19,7 @@ for i in range(maxArgc + 1):
     print('}')
     print()
 
+print('#define ASYNC_TASK_NAME(func) _asyncTask_##func')
 print('#define STATE_INVOKE_ASYNC(func) _asyncInvoke_##func();')
 print('#define CUR_UNIQUE(func) _asyncUnique_##func')
 print('#define RUNNING(func, unique) (CUR_UNIQUE(func) == unique)')

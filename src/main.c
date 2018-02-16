@@ -113,7 +113,6 @@ DECLARE_MACHINE(stack, tStackStates)
 
 sCycleData gMainCycle;
 int gNumCones = 0;
-word gUserControlTaskId = -1;
 bool gSetTimedOut = false;
 
 #define DRIVE_TURN_BRAKE 6
@@ -278,6 +277,7 @@ typedef enum _tArmStates {
 #define ARM_CARRY 1500
 #define ARM_STACK 2400
 #define ARM_HORIZONTAL 1150
+#define ARM_STATIONARY 2600
 
 void setArm(word power, bool debug = false)
 {
@@ -621,69 +621,11 @@ bool gLiftTargetReached;
 
 bool gKillDriveOnTimeout = false;
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id)
-{
-	if (nPgmTime > timeOut)
-	{
-		tHog();
-		char description[40];
-		if (id >> 8)
-			snprintf(description, 40, "%s %d-%d", routine, id >> 8, (word) (id & 0xFF));
-		else if (id)
-			snprintf(description, 40, "%s %d", routine, (word) id);
-		else
-			strcpy(description, routine);
-		writeDebugStream("%06d EXCEEDED TIME %d - ", nPgmTime, timeOut);
-		writeDebugStreamLine(description);
-		int current = nCurrentTask;
-		if (current == gUserControlTaskId || current == main)
-		{
-			int child = tEls[current].child;
-			while (child != -1)
-			{
-				tStopAll(child);
-				child = tEls[child].next;
-			}
-		}
-		else
-		{
-			while (true)
-			{
-				int next = tEls[current].parent;
-				if (next == -1 || next == gUserControlTaskId || next == main) break;
-				current = next;
-			}
-		}
-		//setLift(0, true);
-		//setArm(0, true);
-		//setMobile(0, true);
-		//if (gKillDriveOnTimeout) setDrive(0, 0, true);
-		//updateMotors();
-		gTimedOut = gSetTimedOut;
-		for (tMotor x = port1; x <= port10; ++x)
-			gMotor[x].power = motor[x] = 0;
-		armReset();
-		liftReset();
-		mobileReset();
-		gDriveManual = true;
-		if (nCurrentTask == gUserControlTaskId || current == main)
-		{
-			tRelease();
-			startTaskID(current);
-		}
-		else
-			tStopAll(current);
-		return true;
-	}
-	else
-		return false;
-}
-
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
 const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2800 };
-const int gLiftRaiseTargetS[6] = { 1000, 1000, 1000, 1000, 1000, 1000 };
-const int gLiftPlaceTargetS[6] = { 1000, 1000, 1000, 1000, 1000, 1000 };
+const int gLiftRaiseTargetS[6] = { 2150, 2250, 2400, 2650, 2850, LIFT_TOP };
+const int gLiftPlaceTargetS[6] = { 1900, 2000, 2150, 2350, 2550, 2750 };
 
 bool gStack = false;
 
@@ -746,14 +688,21 @@ case stackStationary:
 		sSimpleConfig armConfig;
 		sSimpleConfig liftConfig;
 
-		configure(armConfig, ARM_TOP, 127, 0);
-		armSet(armRaiseSimple, &armConfig);
+		if (gSensor[armPoti].value > ARM_STATIONARY)
+		{
+			configure(armConfig, ARM_STATIONARY, -127, 25);
+		}
+		else
+		{
+			configure(armConfig, ARM_STATIONARY, 127, 25);
+			armSet(armRaiseSimple, &armConfig);
+		}
 		configure(liftConfig, gLiftRaiseTargetS[gNumCones], 127, -15);
 		liftSet(liftRaiseSimple, &liftConfig);
 
 		gDriveManual = false;
 		setDrive(40, 40);
-		driveTimeout = nPgmTime + 1000;
+		driveTimeout = nPgmTime + 2000;
 		sleep(300);
 		while (gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.01 && !TimedOut(driveTimeout, TID1(stackStationary, 1))) sleep(10);
 
@@ -890,6 +839,63 @@ case stackClear:
 		NEXT_STATE(stackNotRunning)
 	}
 })
+
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id)
+{
+	if (nPgmTime > timeOut)
+	{
+		tHog();
+		char description[40];
+		if (id >> 8)
+			snprintf(description, 40, "%s %d-%d", routine, id >> 8, (word) (id & 0xFF));
+		else if (id)
+			snprintf(description, 40, "%s %d", routine, (word) id);
+		else
+			strcpy(description, routine);
+		writeDebugStream("%06d EXCEEDED TIME %d - ", nPgmTime, timeOut);
+		writeDebugStreamLine(description);
+		int current = nCurrentTask;
+		if (current == _asyncTask_competitionInternal || current == main)
+		{
+			int child = tEls[current].child;
+			while (child != -1)
+			{
+				tStopAll(child);
+				child = tEls[child].next;
+			}
+		}
+		else
+		{
+			while (true)
+			{
+				int next = tEls[current].parent;
+				if (next == -1 || next == _asyncTask_competitionInternal || next == main) break;
+				current = next;
+			}
+		}
+		//setLift(0, true);
+		//setArm(0, true);
+		//setMobile(0, true);
+		//if (gKillDriveOnTimeout) setDrive(0, 0, true);
+		//updateMotors();
+		gTimedOut = gSetTimedOut;
+		for (tMotor x = port1; x <= port10; ++x)
+			gMotor[x].power = motor[x] = 0;
+		gDriveManual = true;
+		stackReset();
+		armReset();
+		liftReset();
+		mobileReset();
+		if (current == main)
+			startTask(main);
+		else
+			tStopAll(current, current == _asyncTask_competitionInternal);
+		startTask(_asyncTask_competitionInternal);
+		return true;
+	}
+	else
+		return false;
+}
 
 bool stackRunning()
 {
@@ -1103,8 +1109,6 @@ void autonomous()
 	gAutoTime = nPgmTime;
 	writeDebugStreamLine("Auto start %d", gAutoTime);
 
-	gUserControlTaskId = -1;
-
 	startSensors(); // Initilize the sensors
 
 	gKillDriveOnTimeout = true;
@@ -1134,7 +1138,6 @@ void autonomous()
 // This task gets started at the beginning of the usercontrol period
 void usercontrol()
 {
-	gUserControlTaskId = nCurrentTask;
 	gSetTimedOut = false;
 	gTimedOut = false;
 
@@ -1171,7 +1174,7 @@ void usercontrol()
 	armReset();
 	mobileReset();
 
-	gKillDriveOnTimeout = false;
+	gKillDriveOnTimeout = true;
 	gDriveManual = true;
 	gMobileCheckLift = true;
 

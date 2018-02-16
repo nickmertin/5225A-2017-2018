@@ -15,7 +15,7 @@ unsigned char _hogLevel = 0;
 void tInit();
 void tStart(word id, bool detached = false);
 void tStop(word id);
-void tStopAll(word id);
+void tStopAll(word id, bool notMe = false);
 void tStopRoot();
 void tUnreg(word id);
 word tGetRoot(word id);
