@@ -900,7 +900,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning())
 	{
-		stackSet(stackStack, (gNumCones < 9) ? sfStack | sfReturn : sfStack);
+		stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
 	}
 
 	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
