@@ -99,6 +99,7 @@ typedef enum _stackStates {
 	stackNotRunning,
 	stackPickupGround,
 	stackPickupLoader,
+	stackStationary,
 	stackStack,
 	stackDetach,
 	stackClear,
@@ -681,6 +682,8 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
 const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2800 };
+const int gLiftRaiseTargetS[6] = { 1000, 1000, 1000, 1000, 1000, 1000 };
+const int gLiftPlaceTargetS[6] = { 1000, 1000, 1000, 1000, 1000, 1000 };
 
 bool gStack = false;
 
@@ -691,6 +694,7 @@ case stackNotRunning:
 		liftReset();
 	if (armState != armHold)
 		armReset();
+	gDriveManual = true;
 	break;
 case stackPickupGround:
 	{
@@ -731,6 +735,51 @@ case stackPickupGround:
 case stackPickupLoader:
 	{
 		// NOT IMPLEMENTED
+		NEXT_STATE(stackNotRunning)
+	}
+case stackStationary:
+	{
+		unsigned long driveTimeout;
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+
+		sSimpleConfig armConfig;
+		sSimpleConfig liftConfig;
+
+		configure(armConfig, ARM_TOP, 127, 0);
+		armSet(armRaiseSimple, &armConfig);
+		configure(liftConfig, gLiftRaiseTargetS[gNumCones], 127, -15);
+		liftSet(liftRaiseSimple, &liftConfig);
+
+		gDriveManual = false;
+		setDrive(40, 40);
+		driveTimeout = nPgmTime + 1000;
+		sleep(300);
+		while (gVelocity.x * gVelocity.x + gVelocity.y * gVelocity.y > 0.01 && !TimedOut(driveTimeout, TID1(stackStationary, 1))) sleep(10);
+
+		configure(liftConfig, gLiftPlaceTargetS[gNumCones], -127, 25);
+		liftSet(liftLowerSimple, &liftConfig);
+		liftTimeOut = nPgmTime + 2000;
+		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones] - 200, liftTimeOut, TID1(stackStationary, 2));
+		configure(armConfig, ARM_HORIZONTAL, -127, 25);
+		armSet(armLowerSimple, &armConfig);
+		armTimeOut = nPgmTime + 1500;
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 200, armTimeOut, TID1(stackStationary, 3));
+
+		++gNumCones;
+
+		configure(liftConfig, gLiftRaiseTargetS[gNumCones], 127, -15);
+		liftSet(liftRaiseSimple, &liftConfig);
+		liftTimeOut = nPgmTime + 2000;
+		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTargetS[gNumCones] - 200, liftTimeOut, TID1(stackStationary, 4));
+
+		gDriveManual = true;
+
+		configure(armConfig, ARM_TOP, 127, -15);
+		armSet(armRaiseSimple, &armConfig);
+		armTimeOut = nPgmTime + 2000;
+		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_TOP - 200, armTimeOut, TID1(stackStationary, 5));
+
 		NEXT_STATE(stackNotRunning)
 	}
 case stackStack:
@@ -861,9 +910,6 @@ bool cancel()
 	return false;
 }
 
-bool gStationary = false;
-sSimpleConfig gStationaryConfig;
-
 void handleMacros()
 {
 	if (RISING(BTN_MACRO_STACK))
@@ -881,28 +927,9 @@ void handleMacros()
 		}
 	}
 
-	if (RISING(BTN_MACRO_STATIONARY))
+	if (RISING(BTN_MACRO_STATIONARY) && !stackRunning())
 	{
-		if (gStationary)
-		{
-			configure(gStationaryConfig, ARM_HORIZONTAL, -127, 25, 70);
-			armSet(armLowerSimple, &gStationaryConfig);
-			gStationary = false;
-		}
-		else
-		{
-			if (gSensor[armPoti].value > 2400)
-			{
-				configure(gStationaryConfig, 2400, -127, 25, 70);
-				armSet(armLowerSimple, &gStationaryConfig);
-			}
-			else
-			{
-				configure(gStationaryConfig, 2400, 127, -25, 70);
-				armSet(armRaiseSimple, &gStationaryConfig);
-			}
-			gStationary = true;
-		}
+		stackSet(stackStationary, sfNone);
 	}
 
 	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning())
