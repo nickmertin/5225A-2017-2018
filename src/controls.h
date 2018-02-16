@@ -19,9 +19,10 @@
 /* Macros */
 #define BTN_MACRO_ZERO Btn8U
 #define BTN_MACRO_STACK Btn8D
-#define BTN_MACRO_LOADER Btn8L
+#define BTN_MACRO_LOADER Btn7R
 #define BTN_MACRO_STATIONARY Btn8R
 #define BTN_MACRO_PRELOAD Btn7L
+#define BTN_MACRO_PICKUP Btn8L
 #define BTN_MACRO_CANCEL Btn7D
 #define BTN_MACRO_INC Btn5U
 #define BTN_MACRO_DEC Btn5D

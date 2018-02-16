@@ -1027,9 +1027,10 @@ void startup()
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_STACK);
-	//enableJoystick(BTN_MACRO_LOADER);
+	enableJoystick(BTN_MACRO_LOADER);
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
+	enableJoystick(BTN_MACRO_PICKUP);
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
@@ -1038,6 +1039,7 @@ void startup()
 	MIRROR(BTN_MACRO_ZERO);
 	MIRROR(BTN_MACRO_STACK);
 	MIRROR(BTN_MACRO_PRELOAD);
+	MIRROR(BTN_MACRO_PICKUP);
 	MIRROR(BTN_MACRO_CANCEL);
 	MIRROR(BTN_MACRO_INC);
 	MIRROR(BTN_MACRO_DEC);
