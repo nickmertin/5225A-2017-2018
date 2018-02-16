@@ -677,7 +677,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
-const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2600 };
+const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2800 };
 
 bool gStack = false;
 
@@ -748,7 +748,7 @@ case stackStack:
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
 
-		configure(liftConfig, gLiftPlaceTarget[gNumCones], -70, 0);
+		configure(liftConfig, gLiftPlaceTarget[gNumCones], -70, (arg._long & (sfClear | sfReturn) ? 0 : 25));
 		liftSet(liftLowerSimple, &liftConfig);
 		liftTimeOut = nPgmTime + 800;
 		liftTimeoutWhile(liftLowerSimple, liftTimeOut, TID1(stackStack, 4));
@@ -760,16 +760,25 @@ case stackStack:
 case stackDetach:
 	if (gSensor[liftPoti].value < (gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
 	{
+		sSimpleConfig liftConfig;
+		if ((arg._long & sfReturn) && gNumCones > 3) {
+			configure(liftConfig, 1650, -127, 25);
+			liftSet(liftLowerSimple, &liftConfig);
+		}
 		sSimpleConfig armConfig;
 		configure(armConfig, ARM_PRESTACK - 100, -127, 0);
 		armSet(armLowerSimple, &armConfig);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimple, armTimeOut, TID0(stackDetach));
+		liftReset();
 	}
 	if (gStack) {
 		gStack = false;
-		if (gNumCones < MAX_STACK)
+		if (gNumCones < MAX_STACK) {
+			if (gNumCones == MAX_STACK - 1)
+				arg._long &= ~sfReturn;
 			NEXT_STATE(stackPickupGround)
+		}
 	}
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 case stackClear:
@@ -803,7 +812,7 @@ case stackClear:
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stack, 9));
 
-		if (gNumCones <= 4)
+		if (gNumCones <= 3)
 		{
 			configure(liftConfig, 1350, 80, -25);
 			liftSet(liftRaiseSimple, &liftConfig);
@@ -812,7 +821,7 @@ case stackClear:
 		}
 		else
 		{
-			configure(liftConfig, 1650, -80, 25);
+			configure(liftConfig, 1650, -127, 25);
 			liftSet(liftLowerSimple, &liftConfig);
 			liftTimeOut = nPgmTime + 1000;
 			liftTimeoutWhile(liftLowerSimple, liftTimeOut, TID1(stack, 11));
