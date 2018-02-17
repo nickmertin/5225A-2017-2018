@@ -83,6 +83,7 @@ typedef enum _stackStates {
 	stackNotRunning,
 	stackPickupGround,
 	stackPickupLoader,
+	stackStationaryPrep,
 	stackStationary,
 	stackStack,
 	stackDetach,
@@ -687,9 +688,8 @@ case stackPickupLoader:
 		// NOT IMPLEMENTED
 		NEXT_STATE(stackNotRunning)
 	}
-case stackStationary:
+case stackStationaryPrep:
 	{
-		unsigned long driveTimeout;
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -700,21 +700,27 @@ case stackStationary:
 			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
 		else
 			armRaiseSimpleAsync(ARM_STATIONARY, 127, -25, 50);
-		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, -15);
+		armTimeOut = nPgmTime + 1500;
+		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, (gNumCones >= 5) ? 0 : -10);
+		liftTimeOut = nPgmTime + 1500;
+		armTimeoutUntil(armHold, armTimeOut, TID1(stackStationaryPrep, 1));
+		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackStationaryPrep, 1));
+		NEXT_STATE(stackNotRunning)
+	}
+case stackStationary:
+	{
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
 
-		gDriveManual = false;
-		setDrive(40, 40);
-		driveTimeout = nPgmTime + 2000;
-		sleep(300);
-		while (gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a) > 0.05 && !TimedOut(driveTimeout, TID1(stackStationary, 1))) sleep(10);
-		setDrive(15, 15);
+		if (gNumCones >= 5)
+			NEXT_STATE(stackNotRunning)
 
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones] + 200, liftTimeOut, TID1(stackStationary, 2));
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 50);
+		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 30);
 		armTimeOut = nPgmTime + 1500;
-		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackStationary, 3));
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
 		++gNumCones;
 
@@ -727,7 +733,8 @@ case stackStationary:
 
 		armRaiseSimpleAsync(ARM_TOP, 127, -15);
 		armTimeOut = nPgmTime + 2000;
-		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_TOP - 200, armTimeOut, TID1(stackStationary, 5));
+		armTimeoutWhile(armRaiseSimpleState, armTimeOut, TID1(stackStationary, 5));
+		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackStationary, 6));
 
 		NEXT_STATE(stackNotRunning)
 	}
@@ -901,7 +908,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_STATIONARY) && !stackRunning())
 	{
-		stackSet(stackStationary, sfNone);
+		stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
 	}
 
 	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning())
