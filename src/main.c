@@ -520,13 +520,13 @@ case mobileBottomSlow:
 		velocityClear(mobilePoti);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
-		while (gSensor[mobilePoti].value > MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileBottomSlow, 1))) sleep(10);
+		while (gSensor[mobilePoti].value > MOBILE_HALFWAY + 300 && !TimedOut(timeout, TID1(mobileBottomSlow, 2))) sleep(10);
 		sCycleData cycle;
 		initCycle(cycle, 10, "mobileBottomSlow");
 		//const float kP = 0.02;
 		const float kP_vel = 0.001;
 		const float kP_pwr = 3.0;
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 2)))
+		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3)))
 		{
 			//setMobile((MOBILE_BOTTOM - gSensor[mobilePoti].value) * kP);
 			//pidCalculate(pid, MOBILE_BOTTOM, gSensor[mobilePoti].value);
@@ -535,13 +535,13 @@ case mobileBottomSlow:
 			if (gSensor[mobilePoti].velGood)
 			{
 				float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
-				LIM_TO_VAL_SET(power, 10);
+				LIM_TO_VAL_SET(power, (gSensor[mobilePoti].value < MOBILE_BOTTOM + 700) ? 10 : 20);
 				setMobile((word)power);
 			}
 			endCycle(cycle);
 		}
 		setMobile(0);
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
+		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID1(mobileBottomSlow, 4))) sleep(10);
 		arg._long = 0;
 		NEXT_STATE(mobileBottom)
 	}
@@ -741,7 +741,7 @@ case stackStack:
 
 		liftRaiseSimpleAsync(gLiftRaiseTarget[gNumCones], 127, -15);
 		liftTimeOut = nPgmTime + 1500;
-		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 500, liftTimeOut, TID1(stackStack, 1));
+		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 200, liftTimeOut, TID1(stackStack, 1));
 
 		armRaiseSimpleAsync(ARM_STACK, 127, -12, 20);
 		armTimeOut = nPgmTime + 1000;
