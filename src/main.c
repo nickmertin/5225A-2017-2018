@@ -269,11 +269,11 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define ARM_TOP 3300
+#define ARM_TOP 2900
 #define ARM_BOTTOM 700
-#define ARM_PRESTACK 2300
+#define ARM_PRESTACK 2400
 #define ARM_CARRY 1500
-#define ARM_STACK 2400
+#define ARM_STACK 2300
 #define ARM_HORIZONTAL 1150
 #define ARM_STATIONARY 2600
 
@@ -751,7 +751,7 @@ case stackStack:
 		liftTimeOut = nPgmTime + 1500;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 200, liftTimeOut, TID1(stackStack, 1));
 
-		armRaiseSimpleAsync(ARM_STACK, 127, -12, 20);
+		armRaiseSimpleAsync(ARM_STACK, 127, -12/*, gNumCones < 7 ? 20 : 30*/);
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
