@@ -1,5 +1,5 @@
 /* Functions */
-void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float dropEarly, tStopType stopType, bool slow)
+void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 
@@ -53,26 +53,43 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 
 		if (slow)
 		{
-			pidCalculate(pidY, 0, currentPosVector.y);
-			word finalPower = round(power * abs(pidY.output));
-			if (abs(finalPower) < 30) finalPower = 30 * sgn(finalPower);
+			word finalPower = round(-127.0 / 48.0 * sgn(power) * currentPosVector.y);
+			LIM_TO_VAL_SET(finalPower, abs(power));
+			if (finalPower * sgn(power) < 30)
+				finalPower = 30 * sgn(power);
 			word delta = finalPower - last;
 			LIM_TO_VAL_SET(delta, 5);
 			finalPower = last += delta;
 			setDrive(finalPower, finalPower);
+			writeDebugStreamLine("%d | %.2f %d", nPgmTime, currentPosVector.y, finalPower);
 		}
 
 		vel = _sin * gVelocity.x + _cos * gVelocity.y;
 
 		endCycle(cycle);
-	} while (currentPosVector.y < -dropEarly - (vel * ((stopType & stopSoft) ? 0.138 : 0.098)));
+	} while (currentPosVector.y < -dropEarly - MAX((vel * ((stopType & stopSoft) ? 0.175 : 0.098)), decelEarly));
 
 	writeDebugStreamLine("%f %f", currentPosVector.y, vel);
 
+	setDrive(decelPower, decelPower);
+
+	do
+	{
+		currentPosVector.x = gPosition.x - x;
+		currentPosVector.y = gPosition.y - y;
+		vectorToPolar(currentPosVector, currentPosPolar);
+		currentPosPolar.angle += lineAngle;
+		polarToVector(currentPosPolar, currentPosVector);
+
+		vel = _sin * gVelocity.x + _cos * gVelocity.y;
+
+		endCycle(cycle);
+	} while (currentPosVector.y < -dropEarly - (vel * ((stopType & stopSoft) ? 0.175 : 0.098)));
+
 	if (stopType & stopSoft)
 	{
-		setDrive(-6, -6);
-		while (_sin * gVelocity.x + _cos * gVelocity.y > 15) sleep(1);
+		setDrive(-6 * sgn(power), -6 * sgn(power));
+		while (_sin * gVelocity.x + _cos * gVelocity.y > 7) sleep(1);
 	}
 
 	if (stopType & stopHarsh)
@@ -83,9 +100,9 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTargetSimple(float y, float x, byte power, float dropEarly, tStopType stopType, bool slow) { moveToTargetSimple(y, x, gPosition.y, gPosition.x, power, dropEarly, stopType, slow); }
+void moveToTargetSimple(float y, float x, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow) { moveToTargetSimple(y, x, gPosition.y, gPosition.x, power, decelEarly, decelPower, dropEarly, stopType, slow); }
 
-void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float dropEarly, tStopType stopType, bool slow)
+void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
 {
 	//sPolar polar;
 	//sVector vector;
@@ -93,12 +110,12 @@ void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, flo
 	//polar.magnitude = d;
 	//polarToVector(polar, vector);
 	//moveToTargetSimple(vector.y + ys, vector.x + xs, ys, xs, power, dropEarly, stopType, slow);
-	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, dropEarly, stopType, slow);
+	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, decelEarly, decelPower, dropEarly, stopType, slow);
 }
 
-void moveToTargetDisSimple(float a, float d, byte power, float dropEarly, tStopType stopType, bool slow) { moveToTargetDisSimple(a, d, gPosition.y, gPosition.x, power, dropEarly, stopType, slow); }
+void moveToTargetDisSimple(float a, float d, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow) { moveToTargetDisSimple(a, d, gPosition.y, gPosition.x, power, decelEarly, decelPower, dropEarly, stopType, slow); }
 
-void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
+void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	sTurnState state;
@@ -106,7 +123,10 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	state.lstTime = state.time;
 	state.nextDebug = 0;
 	state.input = gVelocity.a;
-	state.power = state.error = state.integral = 0;
+	state.power = state.error;
+	state.mogo = mogo;
+	state.left = left;
+	state.right = right;
 
 	left = abs(left);
 	right = abs(right);
@@ -120,28 +140,28 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
 		writeDebugStreamLine("%f", a);
 		setDrive(left, -right);
-		while (gPosition.a < a - gVelocity.a * 0.6) sleep(1);
+		while (gPosition.a < a - gVelocity.a * (mogo ? 0.31 : 0.34)) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
 		//
 		state.target = 0.900;
-		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
+		while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
 			turnSimpleInternalCw(a, state);
-		setDrive(-15, 15);
-		sleep(150);
+		setDrive(-30 * sgn(left), 30 * sgn(right));
+		sleep(50);
 		setDrive(0, 0);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		writeDebugStreamLine("%f", a);
+		//writeDebugStreamLine("%f", a);
 		setDrive(-left, right);
-		while (gPosition.a > a - gVelocity.a * 0.6) sleep(1);
+		while (gPosition.a > a - gVelocity.a * (mogo ? 0.31 : 0.34)) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
 		//
 		state.target = -0.900;
-		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
+		while (gPosition.a > a + degToRad(mogo ? 2.2 : 3.5))
 			turnSimpleInternalCcw(a, state);
-		setDrive(15, -15);
-		sleep(150);
+		setDrive(30 * sgn(left), -30 * sgn(right));
+		sleep(50);
 		setDrive(0, 0);
 		break;
 	}
@@ -149,12 +169,12 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right)
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right)
+void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
 {
-	turnToAngleRadSimple(degToRad(a), turnDir, left, right);
+	turnToAngleRadSimple(degToRad(a), turnDir, left, right, mogo);
 }
 
-void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, float offset)
+void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, bool mogo, float offset)
 {
 	writeDebugStreamLine("Turning to %f %f", y, x);
 	sTurnState state;
@@ -162,7 +182,10 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 	state.lstTime = state.time;
 	state.nextDebug = 0;
 	state.input = gVelocity.a;
-	state.power = state.error = state.integral = 0;
+	state.power = state.error = 0;
+	state.mogo = mogo;
+	state.left = left;
+	state.right = right;
 
 	left = abs(left);
 	right = abs(right);
@@ -177,48 +200,48 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 	case cw:
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
 		writeDebugStreamLine("%f", a);
-		setDrive(left, -right, true);
-		while (gPosition.a < a - gVelocity.a * 0.6)
+		setDrive(left, -right);
+		while (gPosition.a < a - gVelocity.a * (mogo ? 0.31 : 0.34))
 		{
-			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2);
+			a = nearAngle(gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2), a);
 			sleep(1);
 		}
 		writeDebugStreamLine("%f", gVelocity.a);
 		//
 		state.target = 0.900;
-		while (gPosition.a < a + degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
+		while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
 		{
 			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2);
 			turnSimpleInternalCw(a, state);
 		}
-		setDrive(-15, 15);
-		sleep(150);
+		setDrive(-30 * sgn(left), 30 * sgn(right));
+		sleep(50);
 		setDrive(0, 0);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
 		writeDebugStreamLine("%f", a);
-		setDrive(-left, right, true);
-		while (gPosition.a > a - gVelocity.a * 0.6)
+		setDrive(-left, right);
+		while (gPosition.a > a - gVelocity.a * (mogo ? 0.31 : 0.34))
 		{
-			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
+			a = nearAngle(gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2), a);
 			sleep(1);
 		}
 		writeDebugStreamLine("%f", gVelocity.a);
 		//
 		state.target = -0.900;
-		while (gPosition.a > a - degToRad(-5.3 + (state.target - gVelocity.a) * 0.3))
+		while (gPosition.a > a + degToRad(mogo ? 2.2 : 3.5))
 		{
 			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
 			turnSimpleInternalCcw(a, state);
 		}
-		setDrive(15, -15);
-		sleep(150);
+		setDrive(30 * sgn(left), -30 * sgn(right));
+		sleep(50);
 		setDrive(0, 0);
 		break;
 	}
 
-	writeDebugStreamLine("Turned to %f %f | %f %f %f", y, x, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+	writeDebugStreamLine("Turned to %f %f %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void turnSimpleInternalCw(float a, sTurnState& state)
@@ -226,7 +249,7 @@ void turnSimpleInternalCw(float a, sTurnState& state)
 	unsigned long deltaTime = state.time - state.lstTime;
 	float vel = gVelocity.a;
 
-	const float kP = 17, kI = 0.05;
+	const float kP = 18;
 
 	if (deltaTime >= 1)
 	{
@@ -235,25 +258,24 @@ void turnSimpleInternalCw(float a, sTurnState& state)
 		state.lstError = state.error;
 		state.error = state.target - state.input;
 
-		state.integral += state.error * deltaTime;
-		if (state.integral < -8) state.integral = 0;
+		if (state.error < -0.8)
+			state.power = -5;
+		else
+		{
+			state.power = state.error * kP;
 
-		state.power = state.error * kP + state.integral * kI;
+			state.power += 26;
 
-		state.power += 26;
+			if (state.power > 32) state.power = 32;
+			if (state.power < 24) state.power = 24;
+		}
 
-		if (state.power < 0) state.power /= 6.0;
-
-		if (state.power > 50) state.power = 50;
-		if (state.power < -5) state.power = -5;
-
-		setDrive(state.power, -state.power);
+		setDrive(LIM_TO_VAL(state.power, state.left), -LIM_TO_VAL(state.power, state.right));
 
 		if (state.time >= state.nextDebug)
 		{
-			writeDebugStreamLine("%f %f %f", state.power, state.error, state.integral);
+			writeDebugStreamLine("%f %f", state.power, state.error);
 			state.nextDebug = state.time + 20;
-
 		}
 
 		state.lstTime = state.time;
@@ -269,7 +291,7 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 	unsigned long deltaTime = state.time - state.lstTime;
 	float vel = gVelocity.a;
 
-	const float kP = 17, kI = 0.05;
+	const float kP = 18;
 
 	if (deltaTime >= 1)
 	{
@@ -278,25 +300,24 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 		state.lstError = state.error;
 		state.error = state.target - state.input;
 
-		state.integral += state.error * deltaTime;
-		if (state.integral > 8) state.integral = 0;
+		if (state.error > 0.8)
+			state.power = -5;
+		else
+		{
+			state.power = state.error * kP;
 
-		state.power = state.error * kP + state.integral * kI;
+			state.power -= 26;
 
-		state.power -= 26;
+			if (state.power < -32) state.power = -32;
+			if (state.power > -24) state.power = -24;
+		}
 
-		if (state.power > 0) state.power /= 6.0;
-
-		if (state.power < -50) state.power = -50;
-		if (state.power > 5) state.power = 5;
-
-		setDrive(state.power, -state.power);
+		setDrive(LIM_TO_VAL(state.power, state.left), -LIM_TO_VAL(state.power, state.right));
 
 		if (state.time >= state.nextDebug)
 		{
-			writeDebugStreamLine("%f %f %f", state.power, state.error, state.integral);
+			writeDebugStreamLine("%f %f", state.power, state.error);
 			state.nextDebug = state.time + 20;
-
 		}
 
 		state.lstTime = state.time;
@@ -306,7 +327,7 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 
 	state.time = nPgmTime;
 }
-
+/*
 void turnToAngleStupid(float a, tTurnDir turnDir)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
@@ -558,7 +579,7 @@ void turnNewInternal(float a, sTurnNewState& state)
 			setDrive(output, -output);
 	}
 }
-
+*/
 void resetBlueLeft()
 {
 	setDrive(-30, -30);
