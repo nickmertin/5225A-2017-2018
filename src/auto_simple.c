@@ -89,7 +89,18 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	if (stopType & stopSoft)
 	{
 		setDrive(-6 * sgn(power), -6 * sgn(power));
-		while (_sin * gVelocity.x + _cos * gVelocity.y > 7) sleep(1);
+		do
+		{
+			currentPosVector.x = gPosition.x - x;
+			currentPosVector.y = gPosition.y - y;
+			vectorToPolar(currentPosVector, currentPosPolar);
+			currentPosPolar.angle += lineAngle;
+			polarToVector(currentPosPolar, currentPosVector);
+
+			vel = _sin * gVelocity.x + _cos * gVelocity.y;
+
+			endCycle(cycle);
+		} while (vel > 7 && currentPosVector.y < 0);
 	}
 
 	if (stopType & stopHarsh)

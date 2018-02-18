@@ -237,7 +237,7 @@ void resetPositionFull(sPos& position, float y, float x, float a) { resetPositio
 
 void resetPositionFullRad(sPos& position, float y, float x, float a)
 {
-	writeDebugStreamLine("Resetting position %f %f %f | %f %f %f", position.y, position.x, radToDeg(position.a), y, x, radToDeg(a));
+	writeDebugStreamLine("Resetting position %f %f %f | %f %f %f", position.y, position.x, radToDeg(fmod(gPosition.a, PI * 2)), y, x, radToDeg(fmod(a, PI * 2)));
 	resetPosition(position);
 
 	resetQuadratureEncoder(trackL);
