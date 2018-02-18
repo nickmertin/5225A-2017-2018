@@ -18,7 +18,7 @@ void selectAuto()
 
 void runAuto()
 {
-	autoTest();/*
+	autoSkills();/*
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
@@ -1238,7 +1238,7 @@ void autoStationaryRight2()
 	coneTimeout = nPgmTime + 1200;
 	liftTimeoutWhile(liftLowerSimpleState, coneTimeout, TID2(rs+2, 5, 4));
 }
-*/
+
 void autoTest()
 {
 	unsigned long driveAsync;
@@ -1263,3 +1263,4 @@ void autoTest()
 	//	sleep(1000);
 	//}
 }
+*/
