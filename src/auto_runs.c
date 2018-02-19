@@ -25,13 +25,13 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: autoSkills(); break;
-			case 1: auto20BlueRight(); break;
-			case 2: auto20BlueLeft(); break;
-			case 3: autoStationaryRightBlock(); break;
-			case 4: autoStationaryLeftBlock(); break;
-			case 5: autoStationaryRight5(); break;
-			case 6: autoStationaryLeft5(); break;
-			case 7: autoStationaryLeft2(); break;
+			//case 1: auto20BlueRight(); break;
+			//case 2: auto20BlueLeft(); break;
+			//case 3: autoStationaryRightBlock(); break;
+			//case 4: autoStationaryLeftBlock(); break;
+			//case 5: autoStationaryRight5(); break;
+			//case 6: autoStationaryLeft5(); break;
+			//case 7: autoStationaryLeft2(); break;
 		}
 	}
 	else
