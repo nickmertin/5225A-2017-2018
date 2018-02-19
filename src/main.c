@@ -632,9 +632,14 @@ void handleMobile()
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				gMobileSlow = false;
-				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom));
-				mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
+				if (gNumCones > 4)
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow));
+				else
+				{
+					gMobileSlow = false;
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom));
+					mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
+				}
 			}
 			else
 				mobileSet(mobileTop, -1);
