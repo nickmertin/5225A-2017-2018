@@ -464,7 +464,7 @@ typedef enum _tMobileStates {
 #define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 400)
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 500
-#define MOBILE_AUTO_TIMEOUT 1000
+#define MOBILE_AUTO_TIMEOUT 500
 
 bool gMobileCheckLift;
 bool gMobileSlow = false;
@@ -505,8 +505,8 @@ case mobileTop:
 		setMobile(15);
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 2))) sleep(10);
 		setMobile(MOBILE_UP_HOLD_POWER);
-		if (gSensor[jmpSkills].value)
-			liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		//if (gSensor[jmpSkills].value)
+		//	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		break;
 	}
 case mobileBottom:
