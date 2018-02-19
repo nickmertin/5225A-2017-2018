@@ -77,7 +77,8 @@ typedef enum _stackFlags {
 	sfStack = 1,
 	sfClear = 2,
 	sfReturn = 4,
-	sfMobile = 5
+	sfMobile = 8,
+	sfLoader = 16
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -166,6 +167,8 @@ void setLift(word power,bool debug=false)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
+#define LIFT_LOADER (LIFT_BOTTOM + 650)
+#define LIFT_PERIMETER (LIFT_BOTTOM + 500)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -460,7 +463,7 @@ typedef enum _tMobileStates {
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
 #define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 400)
 
-#define MOBILE_SLOW_HOLD_TIMEOUT 250
+#define MOBILE_SLOW_HOLD_TIMEOUT 500
 
 bool gMobileCheckLift;
 bool gMobileSlow = false;
@@ -646,6 +649,8 @@ const int gLiftRaiseTargetS[5] = { 2250, 2350, 2500, 2750, LIFT_TOP };
 const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 };
 
 bool gStack = false;
+bool gLoader = false;
+unsigned long gPrepStart = 0;
 
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
@@ -683,16 +688,31 @@ case stackPickupGround:
 		armTimeOut = nPgmTime + 500;
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
 
-		if (arg._long & sfStack)
-			NEXT_STATE(stackStack)
-		liftSet(liftHold);
-		armSet(armHold);
-		NEXT_STATE(stackNotRunning)
+		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
 case stackPickupLoader:
 	{
-		// NOT IMPLEMENTED
-		NEXT_STATE(stackNotRunning)
+		if (gNumCones >= MAX_STACK)
+			NEXT_STATE(stackNotRunning)
+
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+
+		if (gSensor[liftPoti].value < LIFT_LOADER + 200)
+		{
+			liftRaiseSimpleAsync(LIFT_LOADER + 300, 127, -5);
+			liftTimeOut = nPgmTime + 600;
+			liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackPickupLoader, 1));
+		}
+
+		armLowerSimpleAsync(ARM_HORIZONTAL + 300, -127, 0);
+		armTimeOut = nPgmTime + 800;
+		liftLowerSimpleAsync(LIFT_LOADER, -127, 0);
+		liftTimeOut = nPgmTime + 600;
+		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackPickupLoader, 2));
+		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupLoader, 3));
+
+		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
 case stackStationaryPrep:
 	{
@@ -705,7 +725,7 @@ case stackStationaryPrep:
 		if (gSensor[armPoti].value > ARM_STATIONARY)
 			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
 		else
-			armRaiseSimpleAsync(ARM_STATIONARY, 127, -25, 50);
+			armRaiseSimpleAsync(ARM_STATIONARY, 127, gNumCones < 4 ? -25 : 0, 50);
 		armTimeOut = nPgmTime + 1500;
 		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, (gNumCones >= 5) ? 0 : -10);
 		liftTimeOut = nPgmTime + 1500;
@@ -724,7 +744,7 @@ case stackStationary:
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
 		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 30);
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35);
 		armTimeOut = nPgmTime + 1500;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
@@ -773,7 +793,7 @@ case stackDetach:
 	if (gSensor[liftPoti].value < (gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones]) && gNumCones > 0)
 	{
 		if ((arg._long & sfReturn) && gNumCones > 3) {
-			liftLowerSimpleAsync(gStack ? LIFT_BOTTOM : 1650, -127, 25);
+			liftLowerSimpleAsync((arg._long & sfLoader) ? 2600 : gStack ? LIFT_BOTTOM : 1650, -127, 25);
 		}
 		armLowerSimpleAsync(ARM_PRESTACK - 100, -127, 0);
 		unsigned long armTimeOut = nPgmTime + 800;
@@ -785,7 +805,17 @@ case stackDetach:
 		if (gNumCones < MAX_STACK) {
 			if (gNumCones == MAX_STACK - 1)
 				arg._long &= ~sfReturn;
-			NEXT_STATE(stackPickupGround)
+			if (gLoader) {
+				if (gNumCones > 6) {
+					arg._long |= sfLoader;
+					gLoader = false;
+					NEXT_STATE(stackPickupLoader)
+				}
+			}
+			else {
+				arg._long &= ~sfLoader;
+				NEXT_STATE(stackPickupGround)
+			}
 		}
 	}
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
@@ -815,22 +845,28 @@ case stackReturn:
 
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 70);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stack, 9));
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 1));
 
 		if (gNumCones <= 3)
 		{
 			liftRaiseSimpleAsync(1350, 80, -25);
 			liftTimeOut = nPgmTime + 800;
-			liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stack, 10));
+			liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackReturn, 2));
+		}
+		else if (gNumCones <= 7 && (arg._long & sfLoader))
+		{
+			liftRaiseSimpleAsync(2000, 80, -15);
+			liftTimeOut = nPgmTime + 600;
+			liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackReturn, 3));
 		}
 		else
 		{
-			liftLowerSimpleAsync(1650, -127, 25);
+			liftLowerSimpleAsync((arg._long & sfLoader) ? 2500 : 1650, -127, 25);
 			liftTimeOut = nPgmTime + 1000;
-			liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stack, 11));
+			liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackReturn, 4));
 		}
 
-		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stack, 12));
+		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackReturn, 5));
 		NEXT_STATE(stackNotRunning)
 	}
 })
@@ -897,9 +933,16 @@ bool cancel()
 
 void handleMacros()
 {
-	if (RISING(BTN_MACRO_STACK))
+	if (RISING(BTN_MACRO_STACK) && gNumCones < MAX_STACK)
 	{
 		gStack = true;
+		gLoader = false;
+	}
+
+	if (RISING(BTN_MACRO_LOADER) && gNumCones < MAX_STACK)
+	{
+		gStack = true;
+		gLoader = true;
 	}
 
 	if (gStack == true && gNumCones < MAX_STACK)
@@ -907,8 +950,12 @@ void handleMacros()
 		if (!stackRunning())
 		{
 			writeDebugStreamLine("Stacking");
-			stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack);
+			if (gLoader)
+				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack);
+			else
+				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack);
 			gStack = false;
+			gLoader = false;
 		}
 	}
 
@@ -927,17 +974,32 @@ void handleMacros()
 		stackSet(stackPickupGround, sfNone);
 	}
 
-	//if (RISING(BTN_MACRO_LOADER))
-	//{
-	//	if (!cancel())
-	//	{
-	//		writeDebugStreamLine("Stacking from loader");
-	//		stackFromLoaderAsync(11, true, gMobileState == mobileHold && gMobileTarget == MOBILE_TOP);
-	//		playSound(soundUpwardTones);
-	//	}
-	//}
+	if (RISING(BTN_MACRO_PREP) && !stackRunning())
+	{
+		gPrepStart = nPgmTime;
+	}
 
-	//if (FALLING(BTN_MACRO_LOADER)) notify(gStackFromLoaderNotifier);
+	if (FALLING(BTN_MACRO_PREP) && !stackRunning())
+	{
+		if (nPgmTime - gPrepStart > 500)
+		{
+			if (gSensor[liftPoti].value < LIFT_PERIMETER)
+				liftRaiseSimpleAsync(LIFT_PERIMETER - 100, 80, -15);
+			else
+				liftLowerSimpleAsync(LIFT_PERIMETER + 200, -80, 15);
+		}
+		else
+		{
+			if (gSensor[liftPoti].value < LIFT_LOADER)
+				liftRaiseSimpleAsync(LIFT_LOADER, 80, -15);
+			else
+				liftLowerSimpleAsync(2400, -80, 15);
+		}
+		if (gSensor[armPoti].value < ARM_HORIZONTAL)
+			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35);
+		else
+			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35);
+	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
@@ -1052,6 +1114,7 @@ void startup()
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_STACK);
 	enableJoystick(BTN_MACRO_LOADER);
+	enableJoystick(BTN_MACRO_PREP);
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MACRO_PICKUP);
@@ -1062,7 +1125,6 @@ void startup()
 	MIRROR(BTN_MOBILE_MIDDLE);
 	MIRROR(BTN_MACRO_ZERO);
 	MIRROR(BTN_MACRO_STACK);
-	MIRROR(BTN_MACRO_PRELOAD);
 	MIRROR(BTN_MACRO_PICKUP);
 	MIRROR(BTN_MACRO_CANCEL);
 	MIRROR(BTN_MACRO_INC);
