@@ -166,6 +166,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
+#define LIFT_LOADER (LIFT_BOTTOM + 500)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -683,16 +684,31 @@ case stackPickupGround:
 		armTimeOut = nPgmTime + 500;
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
 
-		if (arg._long & sfStack)
-			NEXT_STATE(stackStack)
-		liftSet(liftHold);
-		armSet(armHold);
-		NEXT_STATE(stackNotRunning)
+		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
 case stackPickupLoader:
 	{
-		// NOT IMPLEMENTED
-		NEXT_STATE(stackNotRunning)
+		if (gNumCones < 4 || gNumCones >= MAX_STACK)
+			NEXT_STATE(stackNotRunning)
+
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+
+		if (gSensor[liftPoti].value < LIFT_LOADER + 300)
+		{
+			liftRaiseSimpleAsync(LIFT_LOADER + 300, 127, -15);
+			liftTimeOut = nPgmTime + 600;
+			liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackPickupLoader, 1));
+		}
+
+		armLowerSimpleAsync(ARM_HORIZONTAL + 300, -127, 0);
+		armTimeOut = nPgmTime + 800;
+		liftLowerSimpleAsync(LIFT_LOADER, -127, 0);
+		liftTimeOut = nPgmTime + 600;
+		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackPickupLoader, 2));
+		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupLoader, 3));
+
+		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
 case stackStationaryPrep:
 	{
@@ -927,17 +943,10 @@ void handleMacros()
 		stackSet(stackPickupGround, sfNone);
 	}
 
-	//if (RISING(BTN_MACRO_LOADER))
-	//{
-	//	if (!cancel())
-	//	{
-	//		writeDebugStreamLine("Stacking from loader");
-	//		stackFromLoaderAsync(11, true, gMobileState == mobileHold && gMobileTarget == MOBILE_TOP);
-	//		playSound(soundUpwardTones);
-	//	}
-	//}
-
-	//if (FALLING(BTN_MACRO_LOADER)) notify(gStackFromLoaderNotifier);
+	if (RISING(BTN_MACRO_LOADER) && !stackRunning() && gNumCones < MAX_STACK)
+	{
+		stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack);
+	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
