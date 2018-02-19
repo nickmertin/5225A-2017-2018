@@ -281,7 +281,7 @@ void autoSkills()
 
 	// 2
 	turnToTargetSimpleAsync(6.5, 28, cw, 60, 60, true, 0);
-	driveTimeout = nPgmTime + 2000;
+	driveTimeout = nPgmTime + 2300;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 2, 1));
 	moveToTargetSimpleAsync(6.5, 28, gPosition.y, gPosition.x, 127, 0, 0, 17, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
@@ -356,7 +356,7 @@ void autoSkills()
 
 	// 7
 	moveToTargetSimpleAsync(49, 25, gPosition.y, gPosition.x, 70, 0, 0, -3, stopHarsh, true);
-	driveTimeout = nPgmTime + 1500;
+	driveTimeout = nPgmTime + 1800;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 7, 1));
 	turnToTargetSimpleAsync(70, 48, cw, 60, 60, false, 0);
 	driveTimeout = nPgmTime + 2000;
@@ -379,7 +379,7 @@ void autoSkills()
 
 	// 9
 	turnToTargetSimpleAsync(28, 6, cw, 60, 60, true, 0);
-	driveTimeout = nPgmTime + 2000;
+	driveTimeout = nPgmTime + 2200;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 9, 1));
 	moveToTargetSimpleAsync(28, 6, gPosition.y, gPosition.x, 75, 20, 30, 13, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
@@ -455,7 +455,7 @@ void autoSkills()
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 11, 2));
 	moveToTargetSimpleAsync(95, 120, gPosition.y, gPosition.x, 70, 24, 35, 0, stopHarsh, true);
-	driveTimeout = nPgmTime + 1500;
+	driveTimeout = nPgmTime + 1800;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 11, 3));
 	turnToTargetSimpleAsync(71, 94, cw, 60, 60, false, 0);
 	driveTimeout = nPgmTime + 2000;
@@ -503,7 +503,7 @@ void autoSkills()
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 14, 2));
 	//return;
 	moveToTargetSimpleAsync(35, 127, gPosition.y, gPosition.x, 127, 24, 30, 12, stopNone, true);
-	driveTimeout = nPgmTime + 1500;
+	driveTimeout = nPgmTime + 1800;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 14, 3));
 	setDrive(30, 30);
 	driveTimeout = nPgmTime + 1000;
