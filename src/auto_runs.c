@@ -39,13 +39,13 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: autoBlock(); break;
-			case 1: auto20RedLeft(); break;
-			case 2: auto20RedRight(); break;
-			case 3: autoStationaryLeftBlock(); break;
-			case 4: autoStationaryRightBlock(); break;
-			case 5: autoStationaryLeft5(); break;
-			case 6: autoStationaryRight5(); break;
-			case 7: autoStationaryRight2(); break;
+			//case 1: auto20RedLeft(); break;
+			//case 2: auto20RedRight(); break;
+			//case 3: autoStationaryLeftBlock(); break;
+			//case 4: autoStationaryRightBlock(); break;
+			//case 5: autoStationaryLeft5(); break;
+			//case 6: autoStationaryRight5(); break;
+			//case 7: autoStationaryRight2(); break;
 		}
 	}
 }
@@ -863,14 +863,14 @@ void autoSkills()
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 12, 2));
 	*/
 }
-/*
+
 void autoBlock()
 {
 	setDrive(-127, -127);
 	sleep(2000);
 	setDrive(7, 7);
 }
-
+/*
 void auto20RedLeft()
 {
 	unsigned long driveAsync;
