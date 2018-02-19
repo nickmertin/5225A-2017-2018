@@ -168,6 +168,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 650)
+#define LIFT_PERIMETER (LIFT_BOTTOM + 500)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -649,6 +650,7 @@ const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 };
 
 bool gStack = false;
 bool gLoader = false;
+unsigned long gPrepStart = 0;
 
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
@@ -723,7 +725,7 @@ case stackStationaryPrep:
 		if (gSensor[armPoti].value > ARM_STATIONARY)
 			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
 		else
-			armRaiseSimpleAsync(ARM_STATIONARY, 127, -25, 50);
+			armRaiseSimpleAsync(ARM_STATIONARY, 127, gNumCones < 4 ? -25 : 0, 50);
 		armTimeOut = nPgmTime + 1500;
 		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, (gNumCones >= 5) ? 0 : -10);
 		liftTimeOut = nPgmTime + 1500;
@@ -972,9 +974,31 @@ void handleMacros()
 		stackSet(stackPickupGround, sfNone);
 	}
 
-	if (RISING(BTN_MACRO_LOADERPREP) && !stackRunning())
+	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
-		stackSet(stackReturn, sfLoader);
+		gPrepStart = nPgmTime;
+	}
+
+	if (FALLING(BTN_MACRO_PREP) && !stackRunning())
+	{
+		if (nPgmTime - gPrepStart > 500)
+		{
+			if (gSensor[liftPoti].value < LIFT_PERIMETER)
+				liftRaiseSimpleAsync(LIFT_PERIMETER - 100, 80, -15);
+			else
+				liftLowerSimpleAsync(LIFT_PERIMETER + 200, -80, 15);
+		}
+		else
+		{
+			if (gSensor[liftPoti].value < LIFT_LOADER)
+				liftRaiseSimpleAsync(LIFT_LOADER, 80, -15);
+			else
+				liftLowerSimpleAsync(2400, -80, 15);
+		}
+		if (gSensor[armPoti].value < ARM_HORIZONTAL)
+			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35);
+		else
+			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
@@ -1090,7 +1114,7 @@ void startup()
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_STACK);
 	enableJoystick(BTN_MACRO_LOADER);
-	enableJoystick(BTN_MACRO_LOADERPREP);
+	enableJoystick(BTN_MACRO_PREP);
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MACRO_PICKUP);
