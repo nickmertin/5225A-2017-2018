@@ -464,9 +464,13 @@ typedef enum _tMobileStates {
 #define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 400)
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 500
+#define MOBILE_AUTO_TIMEOUT 1000
 
 bool gMobileCheckLift;
 bool gMobileSlow = false;
+bool gMobileAutoEnabled = true;
+unsigned long gMobileAutoTimeout = 0;
+unsigned long gMobileAutoIgnore = 0;
 
 void setMobile(word power, bool debug = false)
 {
@@ -492,6 +496,7 @@ case mobileIdle:
 	break;
 case mobileTop:
 	{
+		gMobileAutoEnabled = false;
 		if (arg._long)
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
@@ -500,11 +505,14 @@ case mobileTop:
 		setMobile(15);
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 2))) sleep(10);
 		setMobile(MOBILE_UP_HOLD_POWER);
+		if (gSensor[jmpSkills].value)
+			liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		break;
 	}
 case mobileBottom:
 	{
 		gNumCones = 0;
+		gMobileAutoIgnore = nPgmTime + 1500;
 		if (gMobileSlow)
 			NEXT_STATE(mobileBottomSlow)
 		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
@@ -594,8 +602,18 @@ NEW_ASYNC_VOID_1(mobileWaitForSlowHold, TVexJoysticks);
 
 void handleMobile()
 {
-	if (mobileState == mobileManaged)
+	if (mobileState == mobileManaged || nPgmTime < gMobileAutoTimeout)
 		return;
+
+	if (!gSensor[limMobile].value && gSensor[mobilePoti].value < MOBILE_BOTTOM + 200 && nPgmTime > gMobileAutoIgnore)
+		gMobileAutoEnabled = true;
+	if (gMobileAutoEnabled && gSensor[limMobile].value && gSensor[jmpSkills].value)
+	{
+		mobileSet(mobileTop, -1);
+		gMobileAutoTimeout = nPgmTime + MOBILE_AUTO_TIMEOUT;
+		playSound(soundUpwardTones);
+		return;
+	}
 
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
@@ -1218,6 +1236,9 @@ void usercontrol()
 	gKillDriveOnTimeout = true;
 	gDriveManual = true;
 	gMobileCheckLift = true;
+	gMobileAutoEnabled = true;
+	gStack = false;
+	gLoader = false;
 
 	while (true)
 	{
