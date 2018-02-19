@@ -804,7 +804,7 @@ case stackDetach:
 			if (gNumCones == MAX_STACK - 1)
 				arg._long &= ~sfReturn;
 			if (gLoader) {
-				if (gNumCones > 7) {
+				if (gNumCones > 6) {
 					arg._long |= sfLoader;
 					gLoader = false;
 					NEXT_STATE(stackPickupLoader)
@@ -972,6 +972,11 @@ void handleMacros()
 		stackSet(stackPickupGround, sfNone);
 	}
 
+	if (RISING(BTN_MACRO_LOADERPREP) && !stackRunning())
+	{
+		stackSet(stackReturn, sfLoader);
+	}
+
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
 	if (RISING(BTN_MACRO_INC) && gNumCones < 11) {
@@ -1085,6 +1090,7 @@ void startup()
 	enableJoystick(BTN_MACRO_ZERO);
 	enableJoystick(BTN_MACRO_STACK);
 	enableJoystick(BTN_MACRO_LOADER);
+	enableJoystick(BTN_MACRO_LOADERPREP);
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MACRO_PICKUP);
