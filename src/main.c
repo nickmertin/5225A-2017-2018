@@ -945,7 +945,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_LOADER) && !stackRunning() && gNumCones < MAX_STACK)
 	{
-		stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack);
+		stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones > 4) ? sfStack | sfReturn : sfNone : sfStack);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
