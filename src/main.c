@@ -743,9 +743,9 @@ case stackStationaryPrep:
 		if (gSensor[armPoti].value > ARM_STATIONARY)
 			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
 		else
-			armRaiseSimpleAsync(ARM_STATIONARY, 127, gNumCones < 4 ? -25 : 0, 50);
+			armRaiseSimpleAsync(ARM_STATIONARY, 127, 0, 50);
 		armTimeOut = nPgmTime + 1500;
-		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, (gNumCones >= 5) ? 0 : -10);
+		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, (gNumCones >= 4) ? 0 : -10);
 		liftTimeOut = nPgmTime + 1500;
 		armTimeoutUntil(armHold, armTimeOut, TID1(stackStationaryPrep, 1));
 		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackStationaryPrep, 1));
@@ -769,7 +769,7 @@ case stackStationary:
 		++gNumCones;
 
 		long target = (gNumCones >= 5) ? LIFT_TOP : gLiftRaiseTargetS[gNumCones];
-		liftRaiseSimpleAsync(target, 127, -15);
+		liftRaiseSimpleAsync(target, 127, (gNumCones >= 4) ? 0 : -15);
 		liftTimeOut = nPgmTime + 2000;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
 
