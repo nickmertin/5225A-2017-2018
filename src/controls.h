@@ -5,11 +5,15 @@
 #define DZ_THROTTLE 15
 
 /* Lift */
-#define JOY_LIFT Ch2
+#define JOY_LIFT_GAME Ch2
+#define JOY_LIFT_SKILLS Ch2Xmtr2
+#define JOY_LIFT (gSensor[jmpSkills].value ? JOY_LIFT_SKILLS : JOY_LIFT_GAME)
 #define DZ_LIFT 70
 
 /* Arm */
-#define JOY_ARM Ch1
+#define JOY_ARM_GAME Ch1
+#define JOY_ARM_SKILLS Ch1Xmtr2
+#define JOY_ARM (gSensor[jmpSkills].value ? JOY_ARM_SKILLS : JOY_ARM_GAME)
 #define DZ_ARM 70
 
 /* Mobile */

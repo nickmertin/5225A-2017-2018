@@ -1126,13 +1126,17 @@ void startup()
 
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
-	gJoy[JOY_LIFT].deadzone = DZ_LIFT;
-	gJoy[JOY_ARM].deadzone = DZ_ARM;
+	gJoy[JOY_LIFT_GAME].deadzone = DZ_LIFT;
+	gJoy[JOY_LIFT_SKILLS].deadzone = DZ_LIFT;
+	gJoy[JOY_ARM_GAME].deadzone = DZ_ARM;
+	gJoy[JOY_ARM_SKILLS].deadzone = DZ_ARM;
 
 	enableJoystick(JOY_TURN);
 	enableJoystick(JOY_THROTTLE);
-	enableJoystick(JOY_LIFT);
-	enableJoystick(JOY_ARM);
+	enableJoystick(JOY_LIFT_GAME);
+	enableJoystick(JOY_LIFT_SKILLS);
+	enableJoystick(JOY_ARM_GAME);
+	enableJoystick(JOY_ARM_SKILLS);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MACRO_ZERO);
