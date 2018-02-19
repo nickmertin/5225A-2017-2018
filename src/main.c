@@ -462,7 +462,7 @@ typedef enum _tMobileStates {
 #define MOBILE_LIFT_CHECK_THRESHOLD 1700
 #define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 400)
 
-#define MOBILE_SLOW_HOLD_TIMEOUT 250
+#define MOBILE_SLOW_HOLD_TIMEOUT 500
 
 bool gMobileCheckLift;
 bool gMobileSlow = false;
