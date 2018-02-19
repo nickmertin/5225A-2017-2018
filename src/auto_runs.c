@@ -163,7 +163,7 @@ void resetSonarYOnly(unsigned long time, float xInt, float a, long min, long max
 
 	float u = 0;
 	int c = 0;
-	while (nPgmTime < time || c < 20)
+	while (nPgmTime < time || c < 10)
 	{
 		long l = gSensor[sonarL].value;
 		if (l >= min && l <= max)
@@ -206,7 +206,7 @@ void resetSonarXOnly(unsigned long time, float yInt, float a, long min, long max
 
 	float u = 0;
 	int c = 0;
-	while (nPgmTime < time || c < 20)
+	while (nPgmTime < time || c < 10)
 	{
 		long r = gSensor[sonarR].value;
 		if (r >= min && r <= max)
