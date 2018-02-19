@@ -18,7 +18,6 @@ void selectAuto()
 
 void runAuto()
 {
-	autoSkills();/*
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
@@ -48,7 +47,7 @@ void runAuto()
 			case 6: autoStationaryRight5(); break;
 			case 7: autoStationaryRight2(); break;
 		}
-	}*/
+	}
 }
 
 void normalize(float& x, float& y, float m, float b)
