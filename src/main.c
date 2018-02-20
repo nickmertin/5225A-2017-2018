@@ -242,18 +242,19 @@ void handleLift()
 {
 	if (liftState == liftManaged || stackRunning()) return;
 
-	if (RISING(JOY_LIFT))
+	if (RISING(JOY_LIFT_DRIVER) || RISING(JOY_LIFT_PARTNER))
 	{
 		liftSet(liftManual);
 	}
-	if (FALLING(JOY_LIFT))
+	if (liftState == liftManual && !gJoy[JOY_LIFT_DRIVER].cur && !gJoy[JOY_LIFT_PARTNER].cur)
 	{
 		liftSet(liftHold, -1);
 	}
 
 	if (liftState == liftManual)
 	{
-		word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
+		word value = gJoy[JOY_LIFT_DRIVER].cur ? gJoy[JOY_LIFT_DRIVER].cur : gJoy[JOY_ARM_PARTNER].cur;
+		value = value * 2 - 128 * sgn(value);
 		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -15) value = -15;
 		if (gSensor[liftPoti].value >= LIFT_TOP && value > 15) value = 15;
 		setLift(value);
@@ -415,18 +416,19 @@ void handleArm()
 {
 	if (armState == armManaged || stackRunning()) return;
 
-	if (RISING(JOY_ARM))
+	if (RISING(JOY_ARM_DRIVER) || RISING(JOY_ARM_PARTNER))
 	{
 		armSet(armManual);
 	}
-	if (FALLING(JOY_ARM) && armState == armManual)
+	if (armState == armManual && !gJoy[JOY_ARM_DRIVER].cur && !gJoy[JOY_ARM_PARTNER].cur)
 	{
 		armSet(armHold, -1);
 	}
 
 	if (armState == armManual)
 	{
-		word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
+		word value = gJoy[JOY_ARM_DRIVER].cur ? gJoy[JOY_ARM_DRIVER].cur : gJoy[JOY_ARM_PARTNER].cur;
+		value = value * 2 - 128 * sgn(value);
 		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
 		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
 		setArm(value);
@@ -1126,17 +1128,17 @@ void startup()
 
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
-	gJoy[JOY_LIFT_GAME].deadzone = DZ_LIFT;
-	gJoy[JOY_LIFT_SKILLS].deadzone = DZ_LIFT;
-	gJoy[JOY_ARM_GAME].deadzone = DZ_ARM;
-	gJoy[JOY_ARM_SKILLS].deadzone = DZ_ARM;
+	gJoy[JOY_LIFT_DRIVER].deadzone = DZ_LIFT;
+	gJoy[JOY_LIFT_PARTNER].deadzone = DZ_LIFT;
+	gJoy[JOY_ARM_DRIVER].deadzone = DZ_ARM;
+	gJoy[JOY_ARM_PARTNER].deadzone = DZ_ARM;
 
 	enableJoystick(JOY_TURN);
 	enableJoystick(JOY_THROTTLE);
-	enableJoystick(JOY_LIFT_GAME);
-	enableJoystick(JOY_LIFT_SKILLS);
-	enableJoystick(JOY_ARM_GAME);
-	enableJoystick(JOY_ARM_SKILLS);
+	enableJoystick(JOY_LIFT_DRIVER);
+	enableJoystick(JOY_LIFT_PARTNER);
+	enableJoystick(JOY_ARM_DRIVER);
+	enableJoystick(JOY_ARM_PARTNER);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MACRO_ZERO);
