@@ -36,11 +36,13 @@ void disabled();
 void startup();
 void autonomous();
 void usercontrol();
+void testLift(long state);
 
-MAKE_ASYNC_ONLY_MACHINE_3(competition, ;,
+MAKE_ASYNC_ONLY_MACHINE_4(competition, ;,
 0, (disabled), ;,
 0, (autonomous), ;,
-0, (usercontrol), ;
+0, (usercontrol), ;,
+1, (testLift, long), ;
 )
 
 bool bStopTasksBetweenModes = true;

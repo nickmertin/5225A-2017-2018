@@ -50,3 +50,58 @@ void handleLcd()
 
 	gLastLcdButtons = buttons;
 }
+
+void testLift(long state)
+{
+	for (tMotor mtr = port1; mtr <= port10; ++mtr)
+		gMotor[mtr].power = 0;
+	updateMotors();
+
+	displayLCDCenteredString(0, "8R:Test 8U:Exit");
+
+	unsigned long time = 0;
+
+	bool up = false;
+
+	while (true)
+	{
+		updateSensorInput(liftPoti);
+		updateJoystick(Btn8R);
+		updateJoystick(Btn8U);
+
+		clearLCDLine(1);
+		displayLCDNumber(1, 0, gSensor[liftPoti].value);
+		displayLCDNumber(1, 8, time);
+
+		if (RISING(Btn8R))
+		{
+			time = nPgmTime;
+
+			if (up)
+			{
+				setLift(-127);
+				updateMotors();
+				while (gSensor[liftPoti].value > LIFT_BOTTOM) sleep(10);
+				setLift(-15);
+				updateMotors();
+			}
+			else
+			{
+				setLift(127);
+				updateMotors();
+				while (gSensor[liftPoti].value < LIFT_TOP) sleep(10);
+				setLift(15);
+				updateMotors();
+			}
+
+			time = nPgmTime - time;
+			up = !up;
+		}
+
+		if (RISING(Btn8U))
+		{
+			competitionSet(state);
+			return;
+		}
+	}
+}
