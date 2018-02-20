@@ -63,8 +63,8 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "auto.h"
 #include "auto_simple.h"
 #include "auto_runs.h"
+#include "diagnostics.h"
 
-//#define DEBUG_TRACKING
 #define TRACK_IN_DRIVER
 #define SKILLS_RESET_AT_START
 //#define ULTRASONIC_RESET
@@ -1049,37 +1049,7 @@ void handleMacros()
 #include "auto.c"
 #include "auto_simple.c"
 #include "auto_runs.c"
-
-
-/* LCD */
-
-void handleLcd()
-{
-	string line;
-
-#ifdef DEBUG_TRACKING
-	sprintf(line, "%3.2f %3.2f", gPosition.y, gPosition.x);
-	clearLCDLine(0);
-	displayLCDString(0, 0, line);
-
-	sprintf(line, "%3.2f", radToDeg(gPosition.a));
-	clearLCDLine(1);
-	displayLCDString(1, 0, line);
-
-	if (nLCDButtons) resetPositionFull(gPosition, 0, 0, 0);
-#else
-	sprintf(line, "%4d %4d %2d", gSensor[armPoti].value, gSensor[liftPoti].value, gNumCones);
-	clearLCDLine(0);
-	displayLCDString(0, 0, line);
-
-	velocityCheck(trackL);
-	velocityCheck(trackR);
-
-	sprintf(line, "%2.1f %2.1f %s%c", gSensor[trackL].velocity, gSensor[trackR].velocity, gAlliance == allianceRed ? "Red  " : "Blue ", '0' + gCurAuto);
-	clearLCDLine(1);
-	displayLCDString(1, 0, line);
-#endif
-}
+#include "diagnostics.c"
 
 #ifndef SKILLS_RESET_AT_START
 void waitForSkillsReset()
@@ -1211,7 +1181,7 @@ void usercontrol()
 	gTimedOut = false;
 
 	startSensors(); // Initilize the sensors
-#if defined(DEBUG_TRACKING) || defined(TRACK_IN_DRIVER)
+#ifdef TRACK_IN_DRIVER
 	initCycle(gMainCycle, 15, "main");
 #else
 	initCycle(gMainCycle, 10, "main");
@@ -1219,7 +1189,7 @@ void usercontrol()
 
 	updateSensorInput(jmpSkills);
 
-#if defined(DEBUG_TRACKING) || defined(TRACK_IN_DRIVER)
+#ifdef TRACK_IN_DRIVER
 	trackPositionTaskAsync();
 #endif
 
