@@ -47,24 +47,28 @@ void machine##Setup() \
 } \
 void machine##Set(states state) \
 { \
-  machine##InternalKill(); \
+  if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
+    machine##InternalKill(); \
   machine##InternalAsync(state); \
 } \
 void machine##Set(states state, long arg) \
 { \
-  machine##InternalKill(); \
+  if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
+    machine##InternalKill(); \
   machine##Arg._long = arg; \
   machine##InternalAsync(state); \
 } \
 void machine##Set(states state, float arg) \
 { \
-  machine##InternalKill(); \
+  if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
+    machine##InternalKill(); \
   machine##Arg._float = arg; \
   machine##InternalAsync(state); \
 } \
 void machine##Set(states state, void *arg) \
 { \
-  machine##InternalKill(); \
+  if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
+    machine##InternalKill(); \
   machine##Arg._ptr = arg; \
   machine##InternalAsync(state); \
 } \
