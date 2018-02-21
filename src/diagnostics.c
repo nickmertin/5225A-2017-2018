@@ -34,6 +34,12 @@ void handleLcd()
 		clearLCDLine(1);
 		displayLCDString(1, 0, line);
 		break;
+	case lcdBattery:
+		sprintf(line, "%1.1f V   %1.1f V   ", (float)nImmediateBatteryLevel / 1000.0, getExpanderVoltage(expander, true));
+		displayLCDString(0, 0, line);
+		sprintf(line, "%1.1f V   Batt V. ", (float)BackupBatteryLevel / 1000.0);
+		displayLCDString(1, 0, line);
+		break;
 	case lcdTracking:
 		if (LCD_RISING(btnCenter))
 			resetPositionFull(gPosition, 0, 0, 0);
@@ -55,6 +61,12 @@ void handleLcd()
 	}
 
 	gLastLcdButtons = buttons;
+}
+
+float getExpanderVoltage(tSensors sen, bool isRevA2)
+{
+	updateSensorInput(sen);
+	return (float)gSensor[sen].value / (isRevA2 ? 280 : 182.4);
 }
 
 void testLift()

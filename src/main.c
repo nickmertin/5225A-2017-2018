@@ -2,6 +2,7 @@
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
 #pragma config(Sensor, in3,    liftPoti,       sensorPotentiometer)
 #pragma config(Sensor, in4,    armPoti,        sensorPotentiometer)
+#pragma config(Sensor, in5,    expander,       sensorAnalog)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
