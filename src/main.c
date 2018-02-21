@@ -671,7 +671,7 @@ bool gKillDriveOnTimeout = false;
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
-const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 1900, 2000, 2250, 2400, 2700 };
+const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 1800, 2000, 2100, 2350, 2500, 2600 };
 const int gLiftRaiseTargetS[5] = { 2250, 2350, 2500, 2750, LIFT_TOP };
 const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 };
 
