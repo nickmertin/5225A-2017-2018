@@ -3,6 +3,7 @@
 #define DZ_TURN 15
 #define JOY_THROTTLE Ch3
 #define DZ_THROTTLE 15
+#define BTN_DRIVE_FAST Btn8R
 
 /* Lift */
 #define JOY_LIFT_DRIVER Ch2
@@ -24,7 +25,7 @@
 #define BTN_MACRO_LOADER Btn7D
 #define BTN_MACRO_PREP Btn7R
 #define BTN_MACRO_STATIONARY (gSensor[jmpSkills].value ? Btn7D : Btn8R)
-#define BTN_MACRO_PRELOAD (gSensor[jmpSkills].value ? Btn8R : Btn7D)
+#define BTN_MACRO_PRELOAD (gSensor[jmpSkills].value ? Btn8RXmtr2 : Btn7D)
 #define BTN_MACRO_PICKUP Btn8L
 #define BTN_MACRO_CANCEL Btn8U
 #define BTN_MACRO_INC Btn5U

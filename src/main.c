@@ -136,6 +136,12 @@ void handleDrive()
 		word l = y + a;
 		word r = y - a;
 
+		if (gSensor[jmpSkills].value && !gJoy[BTN_DRIVE_FAST].cur)
+		{
+			LIM_TO_VAL_SET(l, 70);
+			LIM_TO_VAL_SET(r, 70);
+		}
+
 		//if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
 		//{
 		//	LIM_TO_VAL_SET(l, 40);
@@ -1126,7 +1132,7 @@ void startup()
 	MIRROR(BTN_MOBILE_MIDDLE);
 	MIRROR(BTN_MACRO_ZERO);
 	MIRROR(BTN_MACRO_STACK);
-	MIRROR(BTN_MACRO_PICKUP);
+	//MIRROR(BTN_MACRO_PICKUP);
 	MIRROR(BTN_MACRO_CANCEL);
 	MIRROR(BTN_MACRO_INC);
 	MIRROR(BTN_MACRO_DEC);
