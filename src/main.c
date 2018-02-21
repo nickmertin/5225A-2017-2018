@@ -125,6 +125,12 @@ void handleDrive()
 		short y = gJoy[JOY_THROTTLE].cur;
 		short a = gJoy[JOY_TURN].cur;
 
+		if (gSensor[jmpSkills].value && !gJoy[BTN_DRIVE_FAST].cur)
+		{
+			LIM_TO_VAL_SET(y, 70);
+		}
+		LIM_TO_VAL_SET(a, 40);
+
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
 #ifndef TRACK_IN_DRIVER
 #error "Turn braking requires track in driver!"
@@ -135,12 +141,6 @@ void handleDrive()
 
 		word l = y + a;
 		word r = y - a;
-
-		if (gSensor[jmpSkills].value && !gJoy[BTN_DRIVE_FAST].cur)
-		{
-			LIM_TO_VAL_SET(l, 70);
-			LIM_TO_VAL_SET(r, 70);
-		}
 
 		//if (gSensor[liftPoti].value > LIFT_SLOW_DRIVE_THRESHOLD)
 		//{
