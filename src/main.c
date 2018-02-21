@@ -122,8 +122,21 @@ void handleDrive()
 	if (gDriveManual)
 	{
 		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
-		short y = gJoy[JOY_THROTTLE].cur;
-		short a = gJoy[JOY_TURN].cur;
+		word y, a;
+		if (gSensor[jmpSkills].value)
+		{
+			gJoy[JOY_LEFT].deadzone = DZ_THROTTLE;
+			gJoy[JOY_RIGHT].deadzone = DZ_THROTTLE;
+			word l = gJoy[JOY_LEFT].cur;
+			word r = gJoy[JOY_RIGHT].cur;
+			y = (l + r) / 2;
+			a = (l - r) / 2;
+		}
+		else
+		{
+			y = gJoy[JOY_THROTTLE].cur;
+			a = gJoy[JOY_TURN].cur;
+		}
 
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
 #ifndef TRACK_IN_DRIVER
@@ -254,6 +267,8 @@ void handleLift()
 
 	if (liftState == liftManual)
 	{
+		if (!gSensor[jmpSkills].value)
+			gJoy[JOY_LIFT_GAME].deadzone = DZ_LIFT;
 		word value = gJoy[JOY_LIFT].cur * 2 - 128 * sgn(gJoy[JOY_LIFT].cur);
 		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -15) value = -15;
 		if (gSensor[liftPoti].value >= LIFT_TOP && value > 15) value = 15;
@@ -427,6 +442,8 @@ void handleArm()
 
 	if (armState == armManual)
 	{
+		if (!gSensor[jmpSkills].value)
+			gJoy[JOY_ARM_GAME].deadzone = DZ_THROTTLE;
 		word value = gJoy[JOY_ARM].cur * 2 - 128 * sgn(gJoy[JOY_ARM].cur);
 		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
 		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
