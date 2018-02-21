@@ -46,12 +46,18 @@ void handleLcd()
 		clearLCDLine(1);
 		displayLCDString(1, 0, line);
 		break;
+	case lcdLiftTest:
+		if (LCD_RISING(btnCenter))
+			testLiftAsync();
+		clearLCDLine(1);
+		displayLCDCenteredString(0, "Lift Test");
+		break;
 	}
 
 	gLastLcdButtons = buttons;
 }
 
-void testLift(long state)
+void testLift()
 {
 	for (tMotor mtr = port1; mtr <= port10; ++mtr)
 		gMotor[mtr].power = 0;
@@ -100,7 +106,10 @@ void testLift(long state)
 
 		if (RISING(Btn8U))
 		{
-			competitionSet(state);
+			if (DISABLED)
+				disabledAsync();
+			else
+				usercontrolAsync();
 			return;
 		}
 	}

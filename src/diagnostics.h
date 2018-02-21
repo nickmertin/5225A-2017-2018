@@ -3,6 +3,7 @@ typedef enum _lcdScreen
 {
 	lcdMain,
 	lcdTracking,
+	lcdLiftTest,
 	kNumbLcdScreens
 } tLcdScreen;
 
