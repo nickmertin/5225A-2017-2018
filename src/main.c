@@ -609,15 +609,15 @@ void handleMobile()
 	if (mobileState == mobileManaged || nPgmTime < gMobileAutoTimeout)
 		return;
 
-	if (!gSensor[limMobile].value && gSensor[mobilePoti].value < MOBILE_BOTTOM + 200 && nPgmTime > gMobileAutoIgnore)
-		gMobileAutoEnabled = true;
-	if (gMobileAutoEnabled && gSensor[limMobile].value && gSensor[jmpSkills].value)
-	{
-		mobileSet(mobileTop, -1);
-		gMobileAutoTimeout = nPgmTime + MOBILE_AUTO_TIMEOUT;
-		playSound(soundUpwardTones);
-		return;
-	}
+	//if (!gSensor[limMobile].value && gSensor[mobilePoti].value < MOBILE_BOTTOM + 200 && nPgmTime > gMobileAutoIgnore)
+	//	gMobileAutoEnabled = true;
+	//if (gMobileAutoEnabled && gSensor[limMobile].value && gSensor[jmpSkills].value)
+	//{
+	//	mobileSet(mobileTop, -1);
+	//	gMobileAutoTimeout = nPgmTime + MOBILE_AUTO_TIMEOUT;
+	//	playSound(soundUpwardTones);
+	//	return;
+	//}
 
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
