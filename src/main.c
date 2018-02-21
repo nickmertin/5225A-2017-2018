@@ -636,7 +636,7 @@ void handleMobile()
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				if (gNumCones > 4)
+				if (gNumCones > 3)
 					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow));
 				else
 				{
