@@ -129,7 +129,9 @@ void handleDrive()
 		{
 			LIM_TO_VAL_SET(y, 70);
 		}
-		LIM_TO_VAL_SET(a, 40);
+		LIM_TO_VAL_SET(a, 50);
+		if (abs(y) < a / 6)
+			y = 0;
 
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
 #ifndef TRACK_IN_DRIVER
