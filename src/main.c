@@ -1159,6 +1159,8 @@ void startup()
 	MIRROR(BTN_MACRO_CANCEL);
 	MIRROR(BTN_MACRO_INC);
 	MIRROR(BTN_MACRO_DEC);
+	MIRROR(Btn7L);
+	MIRROR(Btn8R);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
