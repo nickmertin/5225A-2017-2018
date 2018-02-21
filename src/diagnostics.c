@@ -4,18 +4,18 @@ void handleLcd()
 
 	if (LCD_RISING(btnLeft))
 	{
-		if (gLcdScreen == kNumbLcdScreens)
-			gLcdScreen = 0;
-		else
-			++gLcdScreen;
-	}
-
-	if (LCD_RISING(btnRight))
-	{
 		if (gLcdScreen)
 			--gLcdScreen;
 		else
 			gLcdScreen = kNumbLcdScreens - 1;
+	}
+
+	if (LCD_RISING(btnRight))
+	{
+		if (gLcdScreen == kNumbLcdScreens - 1)
+			gLcdScreen = 0;
+		else
+			++gLcdScreen;
 	}
 
 	string line;
