@@ -99,7 +99,11 @@ void testLift()
 			{
 				setLift(-127);
 				updateMotors();
-				while (gSensor[liftPoti].value > LIFT_BOTTOM) sleep(10);
+				while (gSensor[liftPoti].value > LIFT_BOTTOM)
+				{
+					updateSensorInput(liftPoti);
+					sleep(10);
+				}
 				setLift(-15);
 				updateMotors();
 			}
@@ -107,7 +111,11 @@ void testLift()
 			{
 				setLift(127);
 				updateMotors();
-				while (gSensor[liftPoti].value < LIFT_TOP) sleep(10);
+				while (gSensor[liftPoti].value < LIFT_TOP)
+				{
+					updateSensorInput(liftPoti);
+					sleep(10);
+				}
 				setLift(15);
 				updateMotors();
 			}
