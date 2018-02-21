@@ -253,7 +253,7 @@ void handleLift()
 
 	if (liftState == liftManual)
 	{
-		word value = gJoy[JOY_LIFT_DRIVER].cur ? gJoy[JOY_LIFT_DRIVER].cur : gJoy[JOY_ARM_PARTNER].cur;
+		word value = gJoy[JOY_LIFT_DRIVER].cur ? gJoy[JOY_LIFT_DRIVER].cur : gJoy[JOY_LIFT_PARTNER].cur;
 		value = value * 2 - 128 * sgn(value);
 		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -15) value = -15;
 		if (gSensor[liftPoti].value >= LIFT_TOP && value > 15) value = 15;
