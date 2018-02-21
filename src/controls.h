@@ -3,6 +3,10 @@
 #define DZ_TURN 15
 #define JOY_THROTTLE Ch3
 #define DZ_THROTTLE 15
+#define JOY_LEFT Ch3
+#define JOY_RIGHT Ch2
+#define DZ_LEFT 15
+#define DZ_RIGHT 15
 
 /* Lift */
 #define JOY_LIFT_GAME Ch2
