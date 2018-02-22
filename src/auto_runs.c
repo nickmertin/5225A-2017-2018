@@ -318,14 +318,14 @@ void autoSkills()
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 2, 1));
 	moveToTargetSimpleAsync(6.5, 28, gPosition.y, gPosition.x, 127, 0, 0, 13, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
-	timeoutWhileGreaterThanF(&gPosition.y, 34, driveTimeout, TID2(skills, 2, 2));
+	timeoutWhileGreaterThanF(&gPosition.y, 30, driveTimeout, TID2(skills, 2, 2));
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 2, 3));
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 2, 4));
 
 	// 3
-	moveToTargetDisSimpleAsync(gPosition.a, -6, gPosition.y, gPosition.x, -70, 0, 0, 0, stopHarsh, true);
+	moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -70, 0, 0, 0, stopHarsh, true);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(skills, 3, 1));
 	turnToTargetSimpleAsync(11, 107, ccw, 60, 60, false, 0);
