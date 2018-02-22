@@ -1093,6 +1093,7 @@ void startup()
 	mobileSetup();
 	liftSetup();
 	stackSetup();
+	autoSimpleSetup();
 
 	setupInvertedSen(jmpSkills);
 
@@ -1180,7 +1181,8 @@ void autonomous()
 	stackReset();
 	liftReset();
 	armReset();
-	liftReset();
+	mobileReset();
+	autoSimpleReset();
 
 	return_t;
 }
