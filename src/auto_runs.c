@@ -470,10 +470,16 @@ void autoSkills()
 	driveTimeout = nPgmTime + 1000;
 	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 10, 6));
 	setDrive(0, 0);
+	mobileSet(mobileUpToMiddle, 0);
+	coneTimeout = nPgmTime + 1000;
+	mobileTimeoutWhile(mobileUpToMiddle, coneTimeout, TID2(skills, 10, -1));
+	turnToAngleSimpleAsync(15, ccw, 40, 40, true);
+	driveTimeout = nPgmTime + 2000;
+	autoSimpleTimeoutWhile(turnToAngleSimpleState, driveTimeout, TID2(skills, 10, -2));
 	mobileSet(mobileTop, -1);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 10, 7));
-	turnToTargetSimpleAsync(109, 80, ch, 60, 60, true, 0);
+	turnToTargetSimpleAsync(109, 80, cw, 60, 60, true, 0);
 	driveTimeout = nPgmTime + 1500;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 10, 8));
 	moveToTargetSimpleAsync(109, 80, gPosition.y, gPosition.x, 90, 4, 30, 4, stopSoft, true);
