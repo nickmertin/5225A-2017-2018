@@ -429,10 +429,10 @@ void autoSkills()
 	stackSet(stackPickupGround, sfStack | sfClear);
 	while (stackState == stackPickupGround) sleep(10);
 
-	turnToTargetSimpleAsync(28, 6, cw, 127, 127, true, 0);
+	turnToTargetSimpleAsync(27, 7, cw, 127, 127, true, 0);
 	driveTimeout = nPgmTime + 2200;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 9, 3));
-	moveToTargetSimpleAsync(28, 6, gPosition.y, gPosition.x, 75, 20, 30, 13, stopSoft, true);
+	moveToTargetSimpleAsync(27, 7, gPosition.y, gPosition.x, 75, 20, 30, 13, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 80, 0);
 	timeoutWhileGreaterThanF(&gPosition.x, 22, driveTimeout, TID2(skils, 9, 4));
