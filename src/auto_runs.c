@@ -539,10 +539,10 @@ void autoSkills()
 	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 12, 3));
 
 	// 13
-	turnToTargetSimpleAsync(112.5, 136.5, ccw, 60, 60, true, 0);
+	turnToTargetSimpleAsync(113, 136, ccw, 60, 60, true, 0);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 13, 1));
-	moveToTargetSimpleAsync(112.5, 136.5, gPosition.y, gPosition.x, 127, 25, 30, 13, stopSoft, true);
+	moveToTargetSimpleAsync(113, 136, gPosition.y, gPosition.x, 127, 25, 30, 15, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanF(&gPosition.x, 116, driveTimeout, TID2(skills, 13, 2));
 	mobileSet(mobileBottom, -1);
