@@ -993,7 +993,8 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_STATIONARY) && !stackRunning())
 	{
-		stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
+		if (gNumCones < ARR_LEN(gLiftRaiseTargetS))
+			stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
 	}
 
 	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning())
