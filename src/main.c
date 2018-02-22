@@ -228,7 +228,7 @@ case liftHold:
 		NEXT_STATE(liftHoldDown);
 	if (target > LIFT_HOLD_UP_THRESHOLD)
 		NEXT_STATE(liftHoldUp);
-	setLift(target > LIFT_MID ? 9 : 5);
+	setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
 	break;
 }
 case liftHoldDown:
