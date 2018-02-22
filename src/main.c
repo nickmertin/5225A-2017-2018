@@ -107,6 +107,7 @@ bool gSetTimedOut = false;
 #define DRIVE_TURN_BRAKE 6
 
 bool gDriveManual;
+short gOldTurn = 0;
 
 /* Drive */
 void setDrive(word left, word right, bool debug = false)
@@ -125,18 +126,23 @@ void handleDrive()
 		word y, a;
 		if (gSensor[jmpSkills].value)
 		{
-			gJoy[JOY_LEFT].deadzone = DZ_THROTTLE;
-			gJoy[JOY_RIGHT].deadzone = DZ_THROTTLE;
-			word l = gJoy[JOY_LEFT].cur;
-			word r = gJoy[JOY_RIGHT].cur;
-			y = (l + r) / 2;
-			a = (l - r) / 2;
+			gJoy[JOY_TURN_SKILLS].deadzone = DZ_THROTTLE;
+			a = gJoy[JOY_TURN_SKILLS].cur;
 		}
 		else
 		{
-			y = gJoy[JOY_THROTTLE].cur;
 			a = gJoy[JOY_TURN].cur;
 		}
+		y = gJoy[JOY_THROTTLE].cur;
+		//a = sgn(a) * (word) (60.0 * pow(1.02, (float) abs(a)) / pow(1.02, 127.0));
+		LIM_TO_VAL_SET(a, 60);
+		if (abs(a) > abs(gOldTurn))
+		{
+			a -= gOldTurn;
+			LIM_TO_VAL_SET(a, 4);
+			a += gOldTurn;
+		}
+		gOldTurn = a;
 
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
 #ifndef TRACK_IN_DRIVER
