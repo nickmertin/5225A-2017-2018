@@ -316,7 +316,7 @@ void autoSkills()
 	turnToTargetSimpleAsync(6.5, 28, cw, 127, 127, true, 0);
 	driveTimeout = nPgmTime + 2300;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 2, 1));
-	moveToTargetSimpleAsync(6.5, 28, gPosition.y, gPosition.x, 127, 0, 0, 17, stopSoft, true);
+	moveToTargetSimpleAsync(6.5, 28, gPosition.y, gPosition.x, 127, 0, 0, 13, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileGreaterThanF(&gPosition.y, 34, driveTimeout, TID2(skills, 2, 2));
 	mobileSet(mobileBottom, -1);
