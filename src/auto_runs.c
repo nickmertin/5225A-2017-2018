@@ -301,7 +301,7 @@ void autoSkills()
 	// 1
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 3000;
-	moveToTargetSimple(47, 71, 16, 40, 40, 12, stopNone, true);
+	moveToTargetSimpleAsync(47, 71, 16, 40, 40, 0, 0, 12, stopNone, true);
 	driveTimeout = nPgmTime + 3000;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 1, 1));
 	setDrive(30, 30);
