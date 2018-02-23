@@ -854,7 +854,7 @@ case stackDetach:
 case stackClear:
 	{
 		int target = gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones];
-		liftRaiseSimpleAsync(target, 127, 0);
+		liftRaiseSimpleAsync(target, 127, gNumCones <= 4 ? -15 : 0);
 		unsigned long timeout = nPgmTime + 1500;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, target, timeout, TID1(stackClear, 1));
 
