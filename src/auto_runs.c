@@ -385,7 +385,8 @@ void autoSkills()
 	// 6
 	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, -7, _y, _x, -60, 0, 0, 0, stopHarsh, false);
 	driveTimeout = nPgmTime + 1500;
-	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
+	sleep(300);
 	mobileSet(mobileBottom, 0);
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(skills, 6, 1));
 	turnToTargetSimpleAsync(49, 25, cw, 80, 80, false, 0);
