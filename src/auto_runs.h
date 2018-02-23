@@ -8,7 +8,7 @@ typedef enum _tAlliance
 /* Functions */
 void selectAuto();
 void runAuto();
-void autoSkills();
+void autoSkills(int segment = -1);
 void autoBlock();
 void auto20RedLeft();
 void auto20RedRight();

@@ -188,7 +188,37 @@ void testSkills()
 
 		if (RISING(Btn8R))
 		{
-			//TODO: run selected skills segment
+			gAutoTime = nPgmTime;
+			writeDebugStreamLine("Auto start %d", gAutoTime);
+
+			startSensors();
+
+			stackReset();
+			liftReset();
+			armReset();
+			mobileReset();
+			autoSimpleReset();
+
+			gKillDriveOnTimeout = true;
+			gSetTimedOut = true;
+			gTimedOut = false;
+
+			autoMotorSensorUpdateTaskAsync();
+			trackPositionTaskAsync();
+
+			autoSkills(index);
+
+			autoMotorSensorUpdateTaskKill();
+			trackPositionTaskKill();
+
+			writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
+
+			setDrive(0, 0);
+			stackReset();
+			liftReset();
+			armReset();
+			mobileReset();
+			autoSimpleReset();
 		}
 
 		if (RISING(Btn8U))
