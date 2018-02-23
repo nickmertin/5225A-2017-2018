@@ -58,6 +58,11 @@ void handleLcd()
 		clearLCDLine(1);
 		displayLCDCenteredString(0, "Lift Test");
 		break;
+	case lcdSkillsTest:
+		if (LCD_RISING(btnCenter))
+			testSkillsAsync();
+		clearLCDLine(1);
+		displayLCDCenteredString(0, "Skills Test");
 	}
 
 	gLastLcdButtons = buttons;
@@ -122,6 +127,68 @@ void testLift()
 
 			time = nPgmTime - time;
 			up = !up;
+		}
+
+		if (RISING(Btn8U))
+		{
+			if (DISABLED)
+				disabledAsync();
+			else
+				usercontrolAsync();
+			return;
+		}
+	}
+}
+
+void testSkills()
+{
+	for (tMotor mtr = port1; mtr <= port10; ++mtr)
+		gMotor[mtr].power = 0;
+	updateMotors();
+
+	const string descriptions[5] =
+	{
+		"Start->Reset 1",
+		"Reset 1->Reset 2",
+		"Reset 2->Reset 3",
+		"Reset 3->Reset 4",
+		"Reset 4->End"
+	};
+
+	displayLCDCenteredString(0, "8R:Test 8U:Exit");
+
+	int index = 0;
+
+	while (true)
+	{
+		displayLCDCenteredString(1, descriptions[index]);
+
+		tLcdButtons buttons = nLCDButtons;
+
+		if (LCD_RISING(btnLeft))
+		{
+			if (index)
+				--index;
+			else
+				index = 4;
+		}
+
+		if (LCD_RISING(btnRight))
+		{
+			if (index == 4)
+				index = 0;
+			else
+				++index;
+		}
+
+		gLastLcdButtons = buttons;
+
+		updateJoystick(Btn8R);
+		updateJoystick(Btn8U);
+
+		if (RISING(Btn8R))
+		{
+			//TODO: run selected skills segment
 		}
 
 		if (RISING(Btn8U))
