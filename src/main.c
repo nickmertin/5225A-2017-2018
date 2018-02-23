@@ -31,7 +31,7 @@
 #define TID1(routine, id) #routine, id
 #define TID2(routine, major, minor) #routine, ((major << 8) | minor)
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id);
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true);
 
 // Year-independent libraries
 
@@ -280,6 +280,7 @@ typedef enum _tArmStates {
 #define ARM_TOP 2400
 #define ARM_BOTTOM 950
 #define ARM_PRESTACK 2000
+#define ARM_RELEASE 1900
 #define ARM_CARRY 1500
 #define ARM_STACK 2350
 #define ARM_HORIZONTAL 1150
@@ -293,7 +294,7 @@ void setArm(word power, bool debug = false)
 
 DECLARE_MACHINE(arm, tArmStates)
 
-void armRaiseSimple(int target, word mainPower, word brakePower, float earlyDrop)
+void armRaiseSimple(int target, word mainPower, word brakePower, float earlyDrop, unsigned long brakeDelay)
 {
 	setArm(mainPower);
 	int pos;
@@ -309,19 +310,20 @@ void armRaiseSimple(int target, word mainPower, word brakePower, float earlyDrop
 	if (brakePower)
 	{
 		setArm(brakePower);
-		sleep(200);
+		sleep(brakeDelay);
+		setArm(0);
 	}
 	writeDebugStreamLine("Arm moved up to %d | %d", target, pos);
 }
 
-NEW_ASYNC_VOID_STATE_4(arm, armRaiseSimpleState, armRaiseSimple, int, word, word, float);
+NEW_ASYNC_VOID_STATE_5(arm, armRaiseSimpleState, armRaiseSimple, int, word, word, float, unsigned long);
 
 unsigned long armRaiseSimpleAsync(int target, word mainPower, word brakePower)
 {
-	return armRaiseSimpleAsync(target, mainPower, brakePower, 0);
+	return armRaiseSimpleAsync(target, mainPower, brakePower, 0, 200);
 }
 
-void armLowerSimple(int target, word mainPower, word brakePower, float earlyDrop)
+void armLowerSimple(int target, word mainPower, word brakePower, float earlyDrop, unsigned long brakeDelay)
 {
 	setArm(mainPower);
 	int pos;
@@ -337,22 +339,22 @@ void armLowerSimple(int target, word mainPower, word brakePower, float earlyDrop
 	if (brakePower)
 	{
 		setArm(brakePower);
-		sleep(200);
+		sleep(brakeDelay);
 	}
 	writeDebugStreamLine("Arm moved down to %d | %d", target, pos);
 }
 
-NEW_ASYNC_VOID_STATE_4(arm, armLowerSimpleState, armLowerSimple, int, word, word, float);
+NEW_ASYNC_VOID_STATE_5(arm, armLowerSimpleState, armLowerSimple, int, word, word, float, unsigned long);
 
 unsigned long armLowerSimpleAsync(int target, word mainPower, word brakePower)
 {
-	return armLowerSimpleAsync(target, mainPower, brakePower, 0);
+	return armLowerSimpleAsync(target, mainPower, brakePower, 0, 200);
 }
 
 MAKE_MACHINE(arm, tArmStates, armIdle,
 {
 case armIdle:
-	setArm (0);
+	setArm(0);
 	break;
 case armToTarget:
 	{
@@ -711,9 +713,9 @@ case stackPickupGround:
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4), false);
 
-		armRaiseSimpleAsync(ARM_PRESTACK - 400, 127, -20, 30);
+		armRaiseSimpleAsync(ARM_PRESTACK - 400, 127, -20, 30, 200);
 		armTimeOut = nPgmTime + 500;
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
 
@@ -771,7 +773,7 @@ case stackStationary:
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
 		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35);
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 		armTimeOut = nPgmTime + 1500;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
@@ -826,7 +828,10 @@ case stackDetach:
 			liftSet(liftManaged);
 			setLift(-10);
 		}
-		armLowerSimpleAsync(ARM_PRESTACK - 100, -127, 0);
+		if (!gStack && gNumCones <= 3)
+			armLowerSimpleAsync((gNumCones == 3) ? ARM_RELEASE - 100 : ARM_RELEASE, -127, 45, 100, 80);
+		else
+			armLowerSimpleAsync(ARM_RELEASE, -127, 0);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID0(stackDetach));
 		liftReset();
@@ -874,14 +879,19 @@ case stackReturn:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 70);
-		armTimeOut = nPgmTime + 1000;
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 1));
-
 		if (gNumCones <= 3)
 		{
 			liftRaiseSimpleAsync(1350, 80, -25);
 			liftTimeOut = nPgmTime + 800;
+			timeoutWhileLessThanL(&gSensor[liftPoti].value, LIFT_BOTTOM + 150, liftTimeOut, TID1(stackReturn, 1));
+		}
+
+		armLowerSimpleAsync(ARM_HORIZONTAL + 100, -127, 25, 50, 200);
+		armTimeOut = nPgmTime + 1000;
+
+		if (gNumCones <= 3)
+		{
+
 			liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackReturn, 2));
 		}
 		else if (gNumCones <= 7 && (arg._long & sfLoader))
@@ -897,7 +907,9 @@ case stackReturn:
 			liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackReturn, 4));
 		}
 
-		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackReturn, 5));
+		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
+
+		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackReturn, 6));
 		NEXT_STATE(stackNotRunning)
 	}
 })
@@ -913,7 +925,7 @@ task failTimeout()
 		competitionSet(competitionState);
 }
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id)
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill)
 {
 	if (nPgmTime > timeOut)
 	{
@@ -927,16 +939,19 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 			strcpy(description, routine);
 		writeDebugStream("%06d EXCEEDED TIME %d - ", nPgmTime, timeOut);
 		writeDebugStreamLine(description);
-		for (tMotor x = port1; x <= port10; ++x)
-			gMotor[x].power = motor[x] = 0;
-		int current = nCurrentTask;
-		if (current == main)
+		if (kill)
 		{
-			stopAllButCurrentTasks();
-			startTask(main);
+			for (tMotor x = port1; x <= port10; ++x)
+				gMotor[x].power = motor[x] = 0;
+			int current = nCurrentTask;
+			if (current == main)
+			{
+				stopAllButCurrentTasks();
+				startTask(main);
+			}
+			tStart(failTimeout);
+			tStop(nCurrentTask);
 		}
-		tStart(failTimeout);
-		tStop(nCurrentTask);
 		return true;
 	}
 	else
@@ -1028,9 +1043,9 @@ void handleMacros()
 				liftLowerSimpleAsync(2400, -80, 15);
 		}
 		if (gSensor[armPoti].value < ARM_HORIZONTAL)
-			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35);
+			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
 		else
-			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35);
+			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
