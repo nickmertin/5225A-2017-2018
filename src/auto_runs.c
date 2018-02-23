@@ -39,7 +39,7 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: autoBlock(); break;
-			//case 1: auto20RedLeft(); break;
+			case 1: auto20RedLeft(); break;
 			//case 2: auto20RedRight(); break;
 			case 3: autoStationaryLeftBlock(); break;
 			case 4: autoStationaryRightBlock(); break;
@@ -367,7 +367,7 @@ void autoSkills()
 	setDrive(30, 30);
 	driveTimeout = nPgmTime + 1500;
 	timeoutWhileLessThanF(&gVelocity.y, -0.05, driveTimeout, TID2(skills, 5, 2));
-	setDrive(7, 7);
+	setDrive(25, 25);
 	sleep(500);
 	//skip:
 	if (!resetSonarFull(100, 500, -0.75 * PI, 230, 470, 180, 650, false))
@@ -605,7 +605,7 @@ void autoSkills()
 	while (gVelocity.x > 0.05 && nPgmTime < driveTimeout) sleep(10);
 	//timeoutWhileGreaterThanF(&gVelocity.x, 0.05, driveTimeout, TID2(skills, 16, 2));
 
-	setDrive(7, 7);
+	setDrive(25, 25);
 	sleep(300);
 	//resetSonarFull(300, 0.25 * PI, true);
 	//return;
@@ -878,7 +878,7 @@ void autoBlock()
 	sleep(2000);
 	setDrive(7, 7);
 }
-/*
+
 void auto20RedLeft()
 {
 	unsigned long driveAsync;
@@ -898,59 +898,72 @@ void auto20RedLeft()
 	coneTimeout = nPgmTime + 1400;
 
 	// 1
-	moveToTargetDisSimpleAsync(PI / 4, 10, gPosition.y, gPosition.x, 60, 0, stopSoft | stopHarsh, true);
-	driveTimeout = nPgmTime + 1500;
-	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(rl20, 1, 1));
-	turnToTargetCustomAsync(107, 13, ccw, 0, 40, 0.2);
-	driveTimeout = nPgmTime + 3000;
-	liftRaiseSimpleAsync(gLiftRaiseTarget[0], 70, -15);
-	autoSimpleTimeoutWhile(turnToTargetCustomState, driveTimeout, TID2(rl20, 1, 3));
-	moveToTargetSimpleAsync(107, 13, gPosition.y, gPosition.x, 127, 4, stopSoft, false);
-	driveTimeout = nPgmTime + 3000;
+	moveToTargetDisSimpleAsync(gPosition.a, 8, gPosition.y, gPosition.x, 70, 0, 0, 0, stopHarsh, true);
+	driveTimeout = nPgmTime + 2000;
 	mobileSet(mobileBottom, -1);
-	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(rl20, 1, 4));
+	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(br20, 1, 1));
+	turnToTargetSimpleAsync(107, 11, ccw, 60, 60, false, 0);
+	driveTimeout = nPgmTime + 2000;
+	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(br20, 1, 2));
+	moveToTargetSimpleAsync(107, 11, gPosition.y, gPosition.x, 127, 0, 0, 12, stopNone, true);
+	driveTimeout = nPgmTime + 2500;
+	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+	timeoutWhileLessThanF(&gPosition.y, 72, driveTimeout, TID2(br20, 1, 3));
+	liftRaiseSimpleAsync(gLiftRaiseTarget[0], 80, 0);
+	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(br20, 1, 3));
+	setDrive(30, 30);
+	driveTimeout = nPgmTime + 1000;
+	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(br20, 1, 4));
+	setDrive(0, 0);
 	mobileSet(mobileTop, -1);
 	coneTimeout = nPgmTime + 2000;
-	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(rl20, 1, 5));
+	timeoutWhileLessThanL(&gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(br20, 1, 5));
 
 	// 2
-	turnToTargetStupidAsync(45, 25, ch, PI);
-	driveTimeout = nPgmTime + 3000;
-	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
-	coneTimeout = nPgmTime + 1500;
-	autoSimpleTimeoutWhile(turnToTargetStupidState, driveTimeout, TID2(rl20, 2, 1));
-	moveToTargetSimpleAsync(45, 25, gPosition.y, gPosition.x, -127, 4, stopSoft | stopHarsh, true);
-	driveTimeout = nPgmTime + 3000;
-	liftTimeoutWhile(liftLowerSimpleState, coneTimeout, TID2(rl20, 2, 2));
-	armLowerSimpleAsync(ARM_PRESTACK - 100, -127, 20);
-	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(rl20, 2, 3));
-	turnToAngleCustomAsync(-0.75 * PI, ccw, 70, 0.3);
-	driveTimeout = nPgmTime + 3000;
-	autoSimpleTimeoutWhile(turnToAngleCustomState, driveTimeout, TID2(rl20, 2, 4));
+	turnToTargetSimpleAsync(27, 33, ch, 40, 40, true, PI);
+	driveTimeout = nPgmTime + 2000;
+	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(br20, 2, 1));
+	moveToTargetSimpleAsync(27, 33, gPosition.y, gPosition.x, -127, 30, -30, 4, stopHarsh, true);
+	driveTimeout = nPgmTime + 2500;
+	stackSet(stackStack, sfClear);
+	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(br20, 2, 2));
+	turnToAngleSimpleAsync(-135, ccw, 127, 127, true);
+	driveTimeout = nPgmTime + 2000;
+	autoSimpleTimeoutWhile(turnToAngleSimpleState, driveTimeout, TID2(br20, 2, 3));
+
+	// 3
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, -1, 56);
-	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 10.5, _y, _x, 60, 0, stopNone, false);
+	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 9, _y, _x, 60, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1500;
-	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(rl20, 2, 5));
+	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(br20, 3, 1));
 	setDrive(30, 30);
 	driveTimeout = nPgmTime + 1500;
-	timeoutWhileLessThanF(&gVelocity.y, -0.05, driveTimeout, TID2(rl20, 2, 6));
-	setDrive(7, 7);
-	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD + 10, 127, 0);
-	coneTimeout = nPgmTime + 1500;
-	liftTimeoutWhile(liftRaiseSimpleState, coneTimeout, TID2(rl20, 2, 7));
+	timeoutWhileLessThanF(&gVelocity.y, -0.05, driveTimeout, TID2(br20, 3, 2));
+	setDrive(25, 25);
+	sleep(500);
+	//skip:
+	if (!resetSonarFull(100, 500, -0.75 * PI, 230, 470, 180, 650, false))
+		resetPositionFull(gPosition, gPosition.y, gPosition.x, 225);
+	_x = gPosition.x;
+	_y = gPosition.y;
+	normalize(_x, _y, -1, 56);
 	mobileSet(mobileDownToMiddle, -1);
 	coneTimeout = nPgmTime + 1500;
-	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(rl20, 2, 8));
+	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(br20, 3, 3));
+	mobileSet(mobileIdle);
 	sleep(300);
-	moveToTargetDisSimpleAsync(PI / 4, 17, gPosition.y, gPosition.x, -60, 0, stopSoft | stopHarsh, true);
-	driveTimeout = nPgmTime + 3000;
-	setMobile(-7);
-	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(rl20, 2, 9));
-	mobileSet(mobileManaged, 0);
-}
 
+	// 4
+	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, -7, _y, _x, -60, 0, 0, 0, stopHarsh, false);
+	driveTimeout = nPgmTime + 1500;
+	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
+	sleep(300);
+	mobileSet(mobileBottom, 0);
+	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(br20, 4, 1));
+}
+/*
 void auto20RedRight()
 {
 	unsigned long driveAsync;
