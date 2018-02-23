@@ -394,7 +394,7 @@ void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
-
+*/
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
@@ -449,7 +449,7 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
-
+/*
 void turnToAngleNewRad(float a, tTurnDir turnDir)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));

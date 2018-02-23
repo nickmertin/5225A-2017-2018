@@ -275,13 +275,12 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define ARM_TOP 2350
+#define ARM_TOP 2400
 #define ARM_BOTTOM 950
 #define ARM_PRESTACK 2000
 #define ARM_CARRY 1500
 #define ARM_STACK 2350
 #define ARM_HORIZONTAL 1150
-#define ARM_STATIONARY 2350
 
 void setArm(word power, bool debug = false)
 {
@@ -750,10 +749,7 @@ case stackStationaryPrep:
 		if (gNumCones >= 5)
 			NEXT_STATE(stackNotRunning)
 
-		if (gSensor[armPoti].value > ARM_STATIONARY)
-			armLowerSimpleAsync(ARM_STATIONARY, -127, 25, 50);
-		else
-			armRaiseSimpleAsync(ARM_STATIONARY, 127, 0, 50);
+		armRaiseSimpleAsync(ARM_TOP, 127, 0);
 		armTimeOut = nPgmTime + 1500;
 		liftRaiseSimpleAsync(gLiftRaiseTargetS[gNumCones], 127, (gNumCones >= 4) ? 0 : -10);
 		liftTimeOut = nPgmTime + 1500;
@@ -769,6 +765,7 @@ case stackStationary:
 		if (gNumCones >= 5)
 			NEXT_STATE(stackNotRunning)
 
+		armRaiseSimpleAsync(ARM_TOP, 127, 0);
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
 		timeoutWhileGreaterThanL(&gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
@@ -1160,7 +1157,13 @@ void autonomous()
 	gAutoTime = nPgmTime;
 	writeDebugStreamLine("Auto start %d", gAutoTime);
 
-	startSensors(); // Initilize the sensors
+	startSensors();
+
+	stackReset();
+	liftReset();
+	armReset();
+	mobileReset();
+	autoSimpleReset();
 
 	gKillDriveOnTimeout = true;
 	gSetTimedOut = true;
@@ -1178,6 +1181,7 @@ void autonomous()
 
 	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
+	setDrive(0, 0);
 	stackReset();
 	liftReset();
 	armReset();
