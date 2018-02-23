@@ -255,6 +255,21 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 	return true;
 }
 
+void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlow, unsigned long timeout)
+{
+	if (timeout)
+		timeout += nPgmTime;
+	while ((!gSensor[limBarL].value || !gSensor[limBarR].value) && (!timeout || nPgmTime < timeout))
+	{
+		if (gSensor[limBarL].value)
+			left = leftSlow;
+		if (gSensor[limBarR].value)
+			right = rightSlow;
+		setDrive(left, right);
+		sleep(10);
+	}
+}
+
 //#define DIST_FROM
 
 //void resetOnBase(float y, float x)
