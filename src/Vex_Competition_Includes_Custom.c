@@ -37,12 +37,14 @@ void startup();
 void autonomous();
 void usercontrol();
 void testLift();
+void testSkills();
 
-MAKE_ASYNC_ONLY_MACHINE_4(competition, ;,
+MAKE_ASYNC_ONLY_MACHINE_5(competition, ;,
 0, (disabled), ;,
 0, (autonomous), ;,
 0, (usercontrol), ;,
-0, (testLift), ;
+0, (testLift), ;,
+0, (testSkills), ;
 )
 
 bool bStopTasksBetweenModes = true;
