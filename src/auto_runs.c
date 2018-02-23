@@ -626,7 +626,7 @@ void autoSkills()
 	setDrive(-127, 7);
 	while (gPosition.a > targetA) sleep(10);
 	setDrive(0, 0);
-	moveToTargetDisSimpleAsync(gPosition.a, -72, gPosition.y, gPosition.x, -127, 24, -127, 0, stopNone, true);
+	moveToTargetDisSimpleAsync(gPosition.a, -68, gPosition.y, gPosition.x, -127, 24, -127, 0, stopNone, true);
 	driveTimeout = nPgmTime + 2500;
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(skills, 17, 3));
 	playSound(soundDownwardTones);
