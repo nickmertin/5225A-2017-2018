@@ -88,6 +88,8 @@ void testLift()
 
 	while (true)
 	{
+		sleep(10);
+
 		updateSensorInput(liftPoti);
 		updateJoystick(Btn8R);
 		updateJoystick(Btn8U);
@@ -161,6 +163,8 @@ void testSkills()
 
 	while (true)
 	{
+		sleep(10);
+
 		displayLCDCenteredString(1, descriptions[index]);
 
 		tLcdButtons buttons = nLCDButtons;
