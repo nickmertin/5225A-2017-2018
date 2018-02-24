@@ -52,6 +52,12 @@ void handleLcd()
 		clearLCDLine(1);
 		displayLCDString(1, 0, line);
 		break;
+	case lcdLightSensors:
+		displayLCDCenteredString(0, "Light Sensors");
+		sprintf(line, "%04d    %04d    ", SensorValue[lsBarL], SensorValue[lsBarR]);
+		clearLCDLine(1);
+		displayLCDString(1, 0, line);
+		break;
 	case lcdLiftTest:
 		if (LCD_RISING(btnCenter))
 			testLiftAsync();
