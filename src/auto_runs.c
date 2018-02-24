@@ -18,6 +18,8 @@ void selectAuto()
 
 void runAuto()
 {
+	autoTest();
+	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
@@ -259,12 +261,22 @@ void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlo
 {
 	if (timeout)
 		timeout += nPgmTime;
-	while ((!gSensor[limBarL].value || !gSensor[limBarR].value) && (!timeout || nPgmTime < timeout))
+	byte val = 0;
+	while (val != 3 && (!timeout || nPgmTime < timeout))
 	{
-		if (gSensor[limBarL].value)
+		writeDebugStreamLine("%d | %d %d | %d %d", nPgmTime, gSensor[limBarL].value, SensorValue[limBarL], gSensor[limBarR].value, SensorValue[limBarR]);
+		if (!(val & 1) && gSensor[limBarL].value)
+		{
+			writeDebugStreamLine("%d Saw left", nPgmTime);
 			left = leftSlow;
-		if (gSensor[limBarR].value)
+			val |= 1;
+		}
+		if (!(val & 2) && gSensor[limBarR].value)
+		{
+			writeDebugStreamLine("%d Saw right", nPgmTime);
 			right = rightSlow;
+			val |= 2;
+		}
 		setDrive(left, right);
 		sleep(10);
 	}
@@ -469,9 +481,7 @@ skip1:
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 9, 5));
-	setDrive(25, 25);
-	driveTimeout = nPgmTime + 1000;
-	timeoutWhileLessThanF(&gVelocity.y, -0.05, driveTimeout, TID2(skills, 9, 6));
+	driveAgainstStartingBar(25, 25, 12, 12, 1000);
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 9, 7));
 	sleep(500);
 	if (segment > -1)
@@ -1626,29 +1636,10 @@ void autoStationaryRight2()
 	coneTimeout = nPgmTime + 1200;
 	liftTimeoutWhile(liftLowerSimpleState, coneTimeout, TID2(rs+2, 5, 4));
 }
-
+*/
 void autoTest()
 {
-	unsigned long driveAsync;
-	unsigned long coneAsync;
-	unsigned long driveTimeout;
-	unsigned long coneTimeout;
-	float _x;
-	float _y;
-
-	//resetPositionFull(gPosition, 0, 0, 0);
-	//moveToTargetSimple(-48, 0, -127, 0, stopSoft | stopHarsh, true);
-
-	resetSonarYOnly(300, START_BAR_RESET_INTERCEPT, -0.75 * PI, true);
-	resetSonarFull(300, -0.75 * PI, true);
-
-	//while (true)
-	//{
-	//	resetPositionFull(gPosition, 0, 0, 0);
-	//	moveToTargetSimple(48, 0, 127, 8, stopSoft | stopHarsh, true);
-	//	sleep(1000);
-	//	moveToTargetSimple(0, 0, -127, 8, stopSoft | stopHarsh, true);
-	//	sleep(1000);
-	//}
+	driveAgainstStartingBar(30, 30, 12, 12, 2000);
+	writeDebugStreamLine("%d", nPgmTime);
+	sleep(10000);
 }
-*/
