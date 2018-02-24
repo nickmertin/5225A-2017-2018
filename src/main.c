@@ -77,10 +77,11 @@ bool stackRunning();
 typedef enum _stackFlags {
 	sfNone = 0,
 	sfStack = 1,
-	sfClear = 2,
-	sfReturn = 4,
-	sfMobile = 8,
-	sfLoader = 16
+	sfDetach = 2,
+	sfClear = 4,
+	sfReturn = 8,
+	sfMobile = 16,
+	sfLoader = 32
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -814,7 +815,7 @@ case stackStack:
 
 		++gNumCones;
 
-		NEXT_STATE((arg._long & (sfClear | sfReturn)) ? stackDetach : stackNotRunning)
+		NEXT_STATE((arg._long & (sfDetach | sfClear | sfReturn)) ? stackDetach : stackNotRunning)
 	}
 case stackDetach:
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[gNumCones - 1])
@@ -997,7 +998,7 @@ void handleMacros()
 			if (gLoader)
 				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack);
 			else
-				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack);
+				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach);
 			gStack = false;
 			gLoader = false;
 		}
