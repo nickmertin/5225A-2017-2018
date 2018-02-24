@@ -271,7 +271,7 @@ void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlo
 			left = leftSlow;
 			val |= 1;
 		}
-		if (!(val & 2) && gSensor[lsBarL].value)
+		if (!(val & 2) && gSensor[lsBarR].value)
 		{
 			writeDebugStreamLine("%d Saw right", nPgmTime);
 			right = rightSlow;
