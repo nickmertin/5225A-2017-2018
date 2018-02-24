@@ -264,14 +264,14 @@ void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlo
 	byte val = 0;
 	while (val != 3 && (!timeout || nPgmTime < timeout))
 	{
-		writeDebugStreamLine("%d | %d %d | %d %d", nPgmTime, gSensor[limBarL].value, SensorValue[limBarL], gSensor[limBarR].value, SensorValue[limBarR]);
-		if (!(val & 1) && gSensor[limBarL].value)
+		writeDebugStreamLine("%d | %d %d | %d %d", nPgmTime, gSensor[lsBarL].value, SensorValue[lsBarL], gSensor[lsBarR].value, SensorValue[lsBarR]);
+		if (!(val & 1) && gSensor[lsBarL].value)
 		{
 			writeDebugStreamLine("%d Saw left", nPgmTime);
 			left = leftSlow;
 			val |= 1;
 		}
-		if (!(val & 2) && gSensor[limBarR].value)
+		if (!(val & 2) && gSensor[lsBarL].value)
 		{
 			writeDebugStreamLine("%d Saw right", nPgmTime);
 			right = rightSlow;
