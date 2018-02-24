@@ -376,7 +376,7 @@ void autoSkills(int segment)
 	turnToTargetSimpleAsync(33, 27, ch, 40, 40, true, PI);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 4, 1));
-	moveToTargetSimpleAsync(33, 27, gPosition.y, gPosition.x, -127, 30, -30, 4, stopHarsh, true);
+	moveToTargetSimpleAsync(33, 27, gPosition.y, gPosition.x, -127, 30, -30, 6, stopHarsh, true);
 	driveTimeout = nPgmTime + 2500;
 	stackSet(stackStack, sfClear);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 4, 2));
@@ -460,10 +460,10 @@ skip1:
 	stackSet(stackPickupGround, sfStack | sfClear);
 	while (stackState == stackPickupGround) sleep(10);
 
-	turnToTargetSimpleAsync(27, 7, cw, 127, 127, true, 0);
+	turnToTargetSimpleAsync(26, 8, cw, 127, 127, true, 0);
 	driveTimeout = nPgmTime + 2200;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 9, 3));
-	moveToTargetSimpleAsync(27, 7, gPosition.y, gPosition.x, 75, 20, 30, 13, stopSoft, true);
+	moveToTargetSimpleAsync(26, 8, gPosition.y, gPosition.x, 75, 12, 30, 13, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 80, 0);
 	timeoutWhileGreaterThanF(&gPosition.x, 22, driveTimeout, TID2(skils, 9, 4));
