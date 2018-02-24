@@ -255,6 +255,31 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 	return true;
 }
 
+void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlow, unsigned long timeout)
+{
+	if (timeout)
+		timeout += nPgmTime;
+	byte val = 0;
+	while (val != 3 && (!timeout || nPgmTime < timeout))
+	{
+		writeDebugStreamLine("%d | %d %d | %d %d", nPgmTime, gSensor[lsBarL].value, SensorValue[lsBarL], gSensor[lsBarR].value, SensorValue[lsBarR]);
+		if (!(val & 1) && gSensor[lsBarL].value)
+		{
+			writeDebugStreamLine("%d Saw left", nPgmTime);
+			left = leftSlow;
+			val |= 1;
+		}
+		if (!(val & 2) && gSensor[lsBarR].value)
+		{
+			writeDebugStreamLine("%d Saw right", nPgmTime);
+			right = rightSlow;
+			val |= 2;
+		}
+		setDrive(left, right);
+		sleep(10);
+	}
+}
+
 //#define DIST_FROM
 
 //void resetOnBase(float y, float x)
@@ -454,9 +479,7 @@ skip1:
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 9, 5));
-	setDrive(25, 25);
-	driveTimeout = nPgmTime + 1000;
-	timeoutWhileLessThanF(&gVelocity.y, -0.05, driveTimeout, TID2(skills, 9, 6));
+	driveAgainstStartingBar(30, 30, 15, 15, 2000);
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 9, 7), false);
 	sleep(500);
 	if (segment > -1)
@@ -509,17 +532,14 @@ skip2:
 	turnToTargetSimpleAsync(135.5, 114, ch, 40, 40, true, 0);
 	driveTimeout = nPgmTime + 1500;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 10, 10));
-	moveToTargetSimpleAsync(135.5, 114, gPosition.y, gPosition.x, 127, 0, 0, 10, stopSoft, true);
+	moveToTargetSimpleAsync(135.5, 114, gPosition.y, gPosition.x, 127, 0, 0, 12, stopSoft, true);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanF(&gPosition.y, 116, driveTimeout, TID2(skills, 10, 11));
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 10, 12));
-	setDrive(30, 30);
-	driveTimeout = nPgmTime + 1000;
-	timeoutWhileGreaterThanF(&gVelocity.x, 0.05, driveTimeout, TID2(skills, 10, 14));
+	driveAgainstStartingBar(30, 30, 15, 15, 2000);
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 10, 15), false);
-	setDrive(30, 40);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -574,12 +594,8 @@ skip3:
 	mobileSet(mobileBottom, -1);
 	coneTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 13, 3));
-	//timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 13, 11), false);
-	setDrive(30, 30);
-	driveTimeout = nPgmTime + 1500;
-	timeoutWhileGreaterThanF(&gVelocity.y, 0.05, driveTimeout, TID2(skills, 13, 4));
+	driveAgainstStartingBar(30, 30, 20, 15, 2000);
 	timeoutWhileGreaterThanL(&gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 13, 5), false);
-	setDrive(35, 25);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -645,13 +661,13 @@ skip4:
 
 	// 17
 	resetPositionFull(gPosition, gPosition.y, gPosition.x, 45);
-	moveToTargetDisSimpleAsync(0.25 * PI, -2, _y, _x, -60, 0, 0, 0, stopNone, false);
+	moveToTargetDisSimpleAsync(0.25 * PI, -1, _y, _x, -60, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(skills, 17, 1));
-	float targetA = nearAngle(degToRad(5), gPosition.a);
+	float targetA = nearAngle(degToRad(15), gPosition.a);
 	mobileSet(mobileBottom, 0);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
-	setDrive(-127, 7);
+	setDrive(-127, 25);
 	while (gPosition.a > targetA) sleep(10);
 	setDrive(0, 0);
 	moveToTargetDisSimpleAsync(gPosition.a, -68, gPosition.y, gPosition.x, -127, 24, -127, 0, stopNone, true);
