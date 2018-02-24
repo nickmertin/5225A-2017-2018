@@ -323,7 +323,7 @@ void autoSkills(int segment)
 		goto skip4;
 	}
 
-	killAutoAsync(gAutoTime + 60000);
+	//killAutoAsync(gAutoTime + 60000);
 
 	// 1
 	mobileSet(mobileBottom, -1);
