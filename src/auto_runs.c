@@ -290,11 +290,14 @@ void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlo
 void killAuto(unsigned long timeout)
 {
 	sleep(timeout - nPgmTime);
-	writeDebugStreamLine("KILL AUTO");
-	competitionSet(competitionNotRunning);
-	autoSimpleSet(autoSimpleNotRunning);
-	stackSet(stackNotRunning);
-	setDrive(0, 0);
+	if (competitionState == autonomousState)
+	{
+		writeDebugStreamLine("KILL AUTO");
+		competitionSet(competitionNotRunning);
+		autoSimpleSet(autoSimpleNotRunning);
+		stackSet(stackNotRunning);
+		setDrive(0, 0);
+	}
 }
 
 NEW_ASYNC_VOID_1(killAuto, unsigned long);
@@ -318,8 +321,6 @@ void autoSkills(int segment)
 	trackPositionTaskAsync();
 #endif
 
-	killAutoAsync(gAutoTime + 60000);
-
 	//resetQuadratureEncoder(liftEnc);
 
 	switch (segment)
@@ -333,6 +334,8 @@ void autoSkills(int segment)
 	case 4:
 		goto skip4;
 	}
+
+	killAutoAsync(gAutoTime + 60000);
 
 	// 1
 	mobileSet(mobileBottom, -1);
