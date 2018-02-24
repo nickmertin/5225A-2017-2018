@@ -3,8 +3,6 @@
 #pragma config(Sensor, in3,    liftPoti,       sensorPotentiometer)
 #pragma config(Sensor, in4,    armPoti,        sensorPotentiometer)
 #pragma config(Sensor, in5,    expander,       sensorAnalog)
-#pragma config(Sensor, in6,    limBarL,        sensorAnalog)
-#pragma config(Sensor, in7,    limBarR,        sensorAnalog)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
@@ -1110,8 +1108,6 @@ void startup()
 	autoSimpleSetup();
 
 	setupInvertedSen(jmpSkills);
-	setupDgtIn(limBarL, 0, 150);
-	setupDgtIn(limBarR, 0, 150);
 
 	velocityClear(trackL);
 	velocityClear(trackR);
