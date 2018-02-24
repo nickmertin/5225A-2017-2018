@@ -777,6 +777,7 @@ case stackStationary:
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 		armTimeOut = nPgmTime + 1500;
 		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
+		armSet(armIdle);
 
 		++gNumCones;
 

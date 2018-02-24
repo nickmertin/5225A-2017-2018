@@ -837,7 +837,7 @@ void auto20Right()
 	autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID2(br20, 4, 1));
 }
 
-void stationaryLeftCore()
+void stationaryLeftCore(bool safe = false)
 {
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
@@ -868,13 +868,13 @@ void stationaryLeftCore()
 	sleep(driveTimeout - 1500 - nPgmTime);
 	timeoutWhileGreaterThanF(&gVelocity.x, 0.1, driveTimeout, TID2(ls, 1, 4));
 	setDrive(15, 15);
-	sleep(200);
+	sleep(safe ? 400 : 200);
 	stackSet(stackStationary, sfNone);
 	coneTimeout = nPgmTime + 2000;
 	stackTimeoutWhile(stackStationary, coneTimeout, TID2(ls, 1, 5));
 }
 
-void stationaryRightCore()
+void stationaryRightCore(bool safe = false)
 {
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
@@ -905,7 +905,7 @@ void stationaryRightCore()
 	sleep(driveTimeout - 1500 - nPgmTime);
 	timeoutWhileGreaterThanF(&gVelocity.y, 0.1, driveTimeout, TID2(rs, 1, 4));
 	setDrive(15, 15);
-	sleep(200);
+	sleep(safe ? 400 : 200);
 	stackSet(stackStationary, sfNone);
 	coneTimeout = nPgmTime + 2000;
 	stackTimeoutWhile(stackStationary, coneTimeout, TID2(rs, 1, 5));
@@ -916,7 +916,7 @@ void autoStationaryLeftBlock()
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 
-	stationaryLeftCore();
+	stationaryLeftCore(true);
 
 	// 2
 	turnToTargetCustomAsync(74, 20, ch, PI, 70, 0.2);
@@ -940,7 +940,7 @@ void autoStationaryRightBlock()
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 
-	stationaryRightCore();
+	stationaryRightCore(true);
 
 	// 2
 	turnToTargetCustomAsync(20, 74, ch, PI, 70, 0.2);
@@ -964,7 +964,7 @@ void autoStationaryLeft5()
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 
-	stationaryLeftCore();
+	stationaryLeftCore(true);
 
 	// 2
 	turnToTargetCustomAsync(50, 15, ch, PI, 70, 0.2);
@@ -1016,7 +1016,7 @@ void autoStationaryRight5()
 	unsigned long driveTimeout;
 	unsigned long coneTimeout;
 
-	stationaryRightCore();
+	stationaryRightCore(true);
 
 	// 2
 	turnToTargetCustomAsync(15, 50, ch, PI, 70, 0.2);
