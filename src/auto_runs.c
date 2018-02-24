@@ -543,7 +543,7 @@ skip3:
 	turnToTargetSimpleAsync(89, 118, cw, 80, 80, false, 0);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 11, 2));
-	moveToTargetSimpleAsync(89, 118, gPosition.y, gPosition.x, 70, 24, 35, 0, stopHarsh, true);
+	moveToTargetSimpleAsync(89, 118, gPosition.y, gPosition.x, 70, 24, 30, 0, stopSoft | stopHarsh, true);
 	driveTimeout = nPgmTime + 1800;
 	mobileSet(mobileBottom, 0);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 11, 3));
