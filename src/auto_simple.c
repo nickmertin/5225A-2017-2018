@@ -115,12 +115,6 @@ void moveToTargetSimple(float y, float x, byte power, float decelEarly, byte dec
 
 void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
 {
-	//sPolar polar;
-	//sVector vector;
-	//polar.angle = a;
-	//polar.magnitude = d;
-	//polarToVector(polar, vector);
-	//moveToTargetSimple(vector.y + ys, vector.x + xs, ys, xs, power, dropEarly, stopType, slow);
 	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, decelEarly, decelPower, dropEarly, stopType, slow);
 }
 
@@ -163,7 +157,6 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		//writeDebugStreamLine("%f", a);
 		setDrive(-left, right);
 		while (gPosition.a > a - gVelocity.a * (mogo ? 0.31 : 0.34)) sleep(1);
 		writeDebugStreamLine("%f", gVelocity.a);
@@ -338,63 +331,7 @@ void turnSimpleInternalCcw(float a, sTurnState& state)
 
 	state.time = nPgmTime;
 }
-/*
-void turnToAngleStupid(float a, tTurnDir turnDir)
-{
-	writeDebugStreamLine("Turning to %f", radToDeg(a));
-	if (turnDir == ch)
-		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
-	switch (turnDir)
-	{
-	case cw:
-		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
-		setDrive(30, -30);
-		while (gPosition.a < a - 0.02) sleep(1);
-		break;
-	case ccw:
-		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		setDrive(-30, 30);
-		while (gPosition.a > a + 0.02) sleep(1);
-		break;
-	}
-	applyHarshStop();
-
-	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
-
-void turnToTargetStupid(float y, float x, tTurnDir turnDir, float offset)
-{
-	writeDebugStreamLine("Turning to %f %f + %f", y, x, radToDeg(offset));
-	float a;
-	if (turnDir == ch)
-		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
-
-	switch (turnDir)
-	{
-	case cw:
-		writeDebugStreamLine("CW %d %d | %d", y, x, a);
-		setDrive(25, -25);
-		do
-		{
-			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2);
-			sleep(1);
-		} while (gPosition.a < a - 0.02);
-		break;
-	case ccw:
-		writeDebugStreamLine("CCW %d %d | %d", y, x, a);
-		setDrive(-25, 25);
-		do
-		{
-			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
-			sleep(1);
-		} while (gPosition.a > a + 0.02);
-		break;
-	}
-	applyHarshStop();
-	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
-*/
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
@@ -449,148 +386,7 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
-/*
-void turnToAngleNewRad(float a, tTurnDir turnDir)
-{
-	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
-	if (turnDir == ch)
-		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
-
-	sTurnNewState state;
-
-	state.startPower = 35;
-
-	if (turnDir == cw)
-	{
-		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
-		setDrive(state.startPower, -state.startPower);
-	}
-	else
-	{
-		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		setDrive(-state.startPower, state.startPower);
-	}
-
-	state.isShort = fabs(gPosition.a - a) <= PI / 3;
-	state.isLong = fabs(gPosition.a - a) >= 23.0 / 36.0 * PI;
-	state.firstRun = true;
-
-	state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
-	state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
-	state.kI_pwr = state.isLong ? 0.009 : state.isShort ? 0.007 : 0.0095;
-	state.kD_pwr = state.isShort ? 0.3 : 0.9;
-
-	state.integral = 0;
-	state.lstErr = 0;
-
-	state.startTime = state.lstTime = nPgmTime;
-
-	while (fabs(gPosition.a - a) > 0.02)
-	{
-		turnNewInternal(a, state);
-		sleep(1);
-	}
-
-	applyHarshStop();
-
-	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
-
-void turnToAngleNew(float a, tTurnDir turnDir)
-{
-	turnToAngleNewRad(degToRad(a), turnDir);
-}
-
-void turnToTargetNew(float y, float x, tTurnDir turnDir, float offset)
-{
-	writeDebugStreamLine("Turning to %f %f + %f", y, x, radToDeg(offset));
-
-	if (turnDir == ch)
-		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
-
-	sTurnNewState state;
-
-	state.startPower = 35;
-
-	state.integral = 0;
-	state.lstErr = 0;
-
-	state.startTime = state.lstTime = nPgmTime;
-
-	float a;
-
-	switch (turnDir)
-	{
-	case cw:
-		setDrive(state.startPower, -state.startPower);
-		state.isShort = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) <= PI / 3;
-		state.isLong = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) >= 23.0 / 36.0 * PI;
-		state.firstRun = true;
-
-		state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
-		state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
-		state.kI_pwr = state.isLong ? 0.009 : state.isShort ? 0.007 : 0.0095;
-		state.kD_pwr = state.isShort ? 0.3 : 0.9;
-
-		do
-		{
-			a = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2);
-			turnNewInternal(a, state);
-			sleep(1);
-		} while (fabs(gPosition.a - a) > 0.02);
-		break;
-	case ccw:
-		setDrive(-state.startPower, state.startPower);
-		state.isShort = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) <= PI / 3;
-		state.isLong = fabs(fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a + offset, PI * 2)) >= 23.0 / 36.0 * PI;
-		state.firstRun = true;
-
-		state.kP_vel = state.isLong ? 3.5 : state.isShort ? 5.5 : 4.8;
-		state.kP_pwr = state.isLong ? 29 : state.isShort ? 30 : 26;
-		state.kI_pwr = state.isLong ? 0.009 : state.isShort ? 0.007 : 0.0095;
-		state.kD_pwr = state.isShort ? 0.3 : 0.9;
-
-		do
-		{
-			a = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
-			turnNewInternal(a, state);
-			sleep(1);
-		} while (fabs(gPosition.a - a) > 0.02);
-		break;
-	}
-
-	applyHarshStop();
-
-	writeDebugStreamLine("Turned to %f %f + %f | %f %f %f", y, x, radToDeg(offset), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
-
-void turnNewInternal(float a, sTurnNewState& state)
-{
-	unsigned long time = nPgmTime;
-	unsigned long deltaTime = time - state.lstTime;
-
-	float errPos = a - gPosition.a;
-	errPos = sgn(errPos) * pow(fabs(errPos), 2.0 / 3);
-	float targetVel = state.kP_vel * errPos;
-	LIM_TO_VAL_SET(targetVel, state.isShort ? 2.5 : 4.0);
-
-	if (deltaTime >= 1)
-	{
-		float err = targetVel - gVelocity.a;
-		state.integral += deltaTime * err;
-		float output = state.firstRun ? 0 : state.kP_pwr * err + state.kI_pwr * state.integral + state.kD_pwr * (state.lstErr - err) / deltaTime;
-		LIM_TO_VAL_SET(output, state.isShort ? 50 : 127);
-		state.lstTime = time;
-		state.lstErr = err;
-
-		state.firstRun = false;
-
-		if (time - state.startTime > 100 || fabs(output) > state.startPower)
-			setDrive(output, -output);
-	}
-}
-*/
 void resetBlueLeft()
 {
 	setDrive(-30, -30);
