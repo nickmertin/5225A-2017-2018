@@ -244,7 +244,7 @@ case liftToTarget:
 			setLift((word) power);
 		}
 		datalogDataGroupStart();
-		datalogAddValue(0, cur);
+		datalogAddValue(0, gSensor[liftPoti].value);
 		datalogAddValue(1, vTarget);
 		datalogAddValue(2, gSensor[liftPoti].velocity);
 		datalogDataGroupEnd();
