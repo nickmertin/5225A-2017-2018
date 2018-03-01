@@ -230,6 +230,7 @@ case liftToTarget:
 	int target = arg._long;
 	int cur;
 	int err;
+	writeDebugStreamLine("%d Moving lift to %d", nPgmTime, target);
 	velocityClear(liftPoti);
 	do
 	{
@@ -241,8 +242,23 @@ case liftToTarget:
 		if (gSensor[liftPoti].velGood)
 		{
 			float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity);
+			setLift((word) power);
 		}
+		datalogDataGroupStart();
+		datalogAddValue(0, cur);
+		datalogAddValue(1, vTarget);
+		datalogAddValue(2, gSensor[liftPoti].velocity);
+		datalogDataGroupEnd();
+		sleep(20);
 	} while (abs(err) > 50);
+	writeDebugStreamLine("%d Stopping lift", nPgmTime);
+	if (gSensor[liftPoti].velGood)
+	{
+		setLift(-20 * sgn(gSensor[liftPoti].velocity));
+		sleep(150);
+		setLift(0);
+	}
+	NEXT_STATE(liftHold);
 }
 case liftHold:
 {
