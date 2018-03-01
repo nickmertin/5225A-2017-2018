@@ -156,6 +156,7 @@ typedef enum _tLiftStates {
 	liftManual,
 	liftRaiseSimpleState,
 	liftLowerSimpleState,
+	liftToTarget,
 	liftHold,
 	liftHoldDown,
 	liftHoldUp,
@@ -223,6 +224,25 @@ case liftLowerSimpleState:
 {
 	STATE_INVOKE_ASYNC(liftLowerSimple);
 	NEXT_STATE(liftHold);
+}
+case liftToTarget:
+{
+	int target = arg._long;
+	int cur;
+	int err;
+	velocityClear(liftPoti);
+	do
+	{
+		err = target - cur;
+		float vTarget = 12 * pow(err, 3.0 / 5.0) - 3 * err / (float) (err * err + 1);
+		const float kB = 0.05;
+		const float kP = 0.03;
+		velocityCheck(liftPoti);
+		if (gSensor[liftPoti].velGood)
+		{
+			float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity);
+		}
+	} while (abs(err) > 50);
 }
 case liftHold:
 {
