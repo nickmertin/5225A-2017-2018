@@ -228,13 +228,12 @@ case liftLowerSimpleState:
 case liftToTarget:
 {
 	int target = arg._long;
-	int cur;
 	int err;
 	writeDebugStreamLine("%d Moving lift to %d", nPgmTime, target);
 	velocityClear(liftPoti);
 	do
 	{
-		err = target - cur;
+		err = target - gSensor[liftPoti].value;
 		float vTarget = 12 * pow(err, 3.0 / 5.0) - 3 * err / (float) (err * err + 1);
 		const float kB = 0.05;
 		const float kP = 0.03;
@@ -258,6 +257,7 @@ case liftToTarget:
 		sleep(150);
 		setLift(0);
 	}
+	writeDebugStreamLine("%d Moved lift to %d | %d", nPgmTime, target, gSensor[liftPoti].value);
 	NEXT_STATE(liftHold);
 }
 case liftHold:
