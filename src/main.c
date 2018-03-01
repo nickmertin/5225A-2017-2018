@@ -1062,31 +1062,36 @@ void handleMacros()
 		stackSet(stackPickupGround, sfNone);
 	}
 
+	//if (RISING(BTN_MACRO_PREP) && !stackRunning())
+	//{
+	//	gPrepStart = nPgmTime;
+	//}
+
+	//if (FALLING(BTN_MACRO_PREP) && !stackRunning())
+	//{
+	//	if (nPgmTime - gPrepStart > 500)
+	//	{
+	//		if (gSensor[liftPoti].value < LIFT_PERIMETER)
+	//			liftRaiseSimpleAsync(LIFT_PERIMETER - 100, 80, -15);
+	//		else
+	//			liftLowerSimpleAsync(LIFT_PERIMETER + 200, -80, 15);
+	//	}
+	//	else
+	//	{
+	//		if (gSensor[liftPoti].value < LIFT_LOADER)
+	//			liftRaiseSimpleAsync(LIFT_LOADER, 80, -15);
+	//		else
+	//			liftLowerSimpleAsync(2400, -80, 15);
+	//	}
+	//	if (gSensor[armPoti].value < ARM_HORIZONTAL)
+	//		armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
+	//	else
+	//		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
+	//}
+
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
-		gPrepStart = nPgmTime;
-	}
-
-	if (FALLING(BTN_MACRO_PREP) && !stackRunning())
-	{
-		if (nPgmTime - gPrepStart > 500)
-		{
-			if (gSensor[liftPoti].value < LIFT_PERIMETER)
-				liftRaiseSimpleAsync(LIFT_PERIMETER - 100, 80, -15);
-			else
-				liftLowerSimpleAsync(LIFT_PERIMETER + 200, -80, 15);
-		}
-		else
-		{
-			if (gSensor[liftPoti].value < LIFT_LOADER)
-				liftRaiseSimpleAsync(LIFT_LOADER, 80, -15);
-			else
-				liftLowerSimpleAsync(2400, -80, 15);
-		}
-		if (gSensor[armPoti].value < ARM_HORIZONTAL)
-			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
-		else
-			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
+		liftSet(liftToTarget, LIFT_MID);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
