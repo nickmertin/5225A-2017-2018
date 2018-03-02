@@ -1094,7 +1094,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
-		liftSet(liftToTarget, LIFT_MID);
+		liftSet(liftToTarget, LIFT_PERIMETER);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
