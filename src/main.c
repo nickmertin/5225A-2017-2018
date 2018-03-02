@@ -31,7 +31,12 @@
 #define TID1(routine, id) #routine, id
 #define TID2(routine, major, minor) #routine, ((major << 8) | minor)
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true);
+//Sensors
+#include "sensors.h"
+#include "sensors.c"
+
+//Timeout function
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tSensors senT = mobilePoti);
 
 // Year-independent libraries
 
@@ -40,7 +45,6 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "async.h"
 #include "timeout.h"
 #include "motors.h"
-#include "sensors.h"
 #include "joysticks.h"
 #include "cycle.h"
 #include "utilities.h"
@@ -52,7 +56,6 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "async.c"
 #include "timeout.c"
 #include "motors.c"
-#include "sensors.c"
 #include "joysticks.c"
 #include "cycle.c"
 #include "utilities.c"
@@ -70,6 +73,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 
 #define TRACK_IN_DRIVER
 #define SKILLS_RESET_AT_START
+
 //#define ULTRASONIC_RESET
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
@@ -215,25 +219,25 @@ case liftIdle:
 	setLift(0);
 	break;
 case liftRaiseSimpleState:
-{
-	STATE_INVOKE_ASYNC(liftRaiseSimple);
-	NEXT_STATE(liftHold);
-}
+	{
+		STATE_INVOKE_ASYNC(liftRaiseSimple);
+		NEXT_STATE(liftHold);
+	}
 case liftLowerSimpleState:
-{
-	STATE_INVOKE_ASYNC(liftLowerSimple);
-	NEXT_STATE(liftHold);
-}
+	{
+		STATE_INVOKE_ASYNC(liftLowerSimple);
+		NEXT_STATE(liftHold);
+	}
 case liftHold:
-{
-	int target = gSensor[liftPoti].value;
-	if (target < LIFT_HOLD_DOWN_THRESHOLD)
-		NEXT_STATE(liftHoldDown);
-	if (target > LIFT_HOLD_UP_THRESHOLD)
-		NEXT_STATE(liftHoldUp);
-	setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
-	break;
-}
+	{
+		int target = gSensor[liftPoti].value;
+		if (target < LIFT_HOLD_DOWN_THRESHOLD)
+			NEXT_STATE(liftHoldDown);
+		if (target > LIFT_HOLD_UP_THRESHOLD)
+			NEXT_STATE(liftHoldUp);
+		setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
+		break;
+	}
 case liftHoldDown:
 	setLift(-15);
 	break;
@@ -378,15 +382,15 @@ case armToTarget:
 		NEXT_STATE(armStopping);
 	}
 case armRaiseSimpleState:
-{
-	STATE_INVOKE_ASYNC(armRaiseSimple);
-	NEXT_STATE(armHold);
-}
+	{
+		STATE_INVOKE_ASYNC(armRaiseSimple);
+		NEXT_STATE(armHold);
+	}
 case armLowerSimpleState:
-{
-	STATE_INVOKE_ASYNC(armLowerSimple);
-	NEXT_STATE(armHold);
-}
+	{
+		STATE_INVOKE_ASYNC(armLowerSimple);
+		NEXT_STATE(armHold);
+	}
 case armStopping:
 	velocityClear(armPoti);
 	velocityCheck(armPoti);
@@ -589,7 +593,7 @@ case mobileDownToMiddle:
 	}
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
-		arg._long = -1;
+	arg._long = -1;
 	NEXT_STATE(mobileTop)
 })
 
@@ -930,9 +934,12 @@ task failTimeout()
 		competitionSet(competitionState);
 }
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill)
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tSensors senT)
 {
-	if (nPgmTime > timeOut)
+	if (senT != -1)
+		velocityCheck(senT);
+
+	if (nPgmTime > timeOut || ( (senT != -1 && gSensor[senT].velGood) ? abs(gSensor[senT].velocity) < 0.5 : 0 ) )
 	{
 		tHog();
 		char description[40];
