@@ -1,3 +1,6 @@
+/* Defines */
+#define SENSOR_VEL_POINT_COUNT 10
+
 /* Enumerations */
 typedef enum _tSensorClass
 {
@@ -15,6 +18,12 @@ typedef enum _tSensorMode
 } tSensorMode;
 
 /* Structures */
+typedef struct _sSensorVelPoint
+{
+	int value;
+	unsigned long timestamp;
+} sSensorVelPoint;
+
 typedef struct _sSensor
 {
 	int value;
@@ -28,12 +37,12 @@ typedef struct _sSensor
 	bool failed;
 	float velocity;
 	float lstVelocity;
-	int valueVelLst;
-	unsigned long timeVelCheck;
+	sSensorVelPoint velData[SENSOR_VEL_POINT_COUNT];
+	ubyte velCount;
+	bool velGood;
 	tSensorMode mode;
 	int dgtMin;
 	int dgtMax;
-	bool velGood;
 
 #ifdef CHECK_POTI_JUMPS
 	ubyte filterAcc;
