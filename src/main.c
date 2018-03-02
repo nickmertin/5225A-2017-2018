@@ -173,7 +173,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
-#define LIFT_LOADER (LIFT_BOTTOM + 650)
+#define LIFT_LOADER (LIFT_BOTTOM + 950)
 #define LIFT_PERIMETER (LIFT_BOTTOM + 500)
 
 DECLARE_MACHINE(lift, tLiftStates)
@@ -234,10 +234,10 @@ case liftToTarget:
 	do
 	{
 		err = target - gSensor[liftPoti].value;
-		float vTarget = sgn(err) * 0.06 * pow(abs(err), 3.0 / 5.0) - 0.015 * err / (err * err + 1);
+		float vTarget = sgn(err) * 0.06 * pow(abs(err), 3.0 / 5.0) - 0.01 * err / (err * err + 1);
 		const float bias = 10;
-		const float kB = 10.0;
-		const float kP = 8.0;
+		const float kB = 15.0;
+		const float kP = 5.0;
 		velocityCheck(liftPoti);
 		datalogDataGroupStart();
 		datalogAddValue(0, err);
@@ -245,7 +245,10 @@ case liftToTarget:
 		if (gSensor[liftPoti].velGood)
 		{
 			float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity) + bias;
-			LIM_TO_VAL_SET(power, 127);
+			if (sgn(power) == -sgn(gSensor[liftPoti].velocity))
+				LIM_TO_VAL_SET(power, 7);
+			else
+				LIM_TO_VAL_SET(power, 127);
 			setLift((word) power);
 			datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
 			datalogAddValue(3, power * 10);
@@ -257,7 +260,7 @@ case liftToTarget:
 	if (gSensor[liftPoti].velGood)
 	{
 		setLift(-15 * sgn(gSensor[liftPoti].velocity));
-		sleep(150);
+		sleep(180);
 		setLift(0);
 	}
 	writeDebugStreamLine("%d Moved lift to %d | %d", nPgmTime, target, gSensor[liftPoti].value);
@@ -1065,36 +1068,25 @@ void handleMacros()
 		stackSet(stackPickupGround, sfNone);
 	}
 
-	//if (RISING(BTN_MACRO_PREP) && !stackRunning())
-	//{
-	//	gPrepStart = nPgmTime;
-	//}
-
-	//if (FALLING(BTN_MACRO_PREP) && !stackRunning())
-	//{
-	//	if (nPgmTime - gPrepStart > 500)
-	//	{
-	//		if (gSensor[liftPoti].value < LIFT_PERIMETER)
-	//			liftRaiseSimpleAsync(LIFT_PERIMETER - 100, 80, -15);
-	//		else
-	//			liftLowerSimpleAsync(LIFT_PERIMETER + 200, -80, 15);
-	//	}
-	//	else
-	//	{
-	//		if (gSensor[liftPoti].value < LIFT_LOADER)
-	//			liftRaiseSimpleAsync(LIFT_LOADER, 80, -15);
-	//		else
-	//			liftLowerSimpleAsync(2400, -80, 15);
-	//	}
-	//	if (gSensor[armPoti].value < ARM_HORIZONTAL)
-	//		armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
-	//	else
-	//		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
-	//}
-
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
-		liftSet(liftToTarget, LIFT_PERIMETER);
+		gPrepStart = nPgmTime;
+	}
+
+	if (FALLING(BTN_MACRO_PREP) && !stackRunning())
+	{
+		if (nPgmTime - gPrepStart > 500)
+		{
+			liftSet(liftToTarget, LIFT_PERIMETER);
+		}
+		else
+		{
+			liftSet(liftToTarget, LIFT_LOADER);
+		}
+		if (gSensor[armPoti].value < ARM_HORIZONTAL)
+			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
+		else
+			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
