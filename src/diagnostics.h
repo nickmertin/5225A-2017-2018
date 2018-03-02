@@ -7,6 +7,8 @@ typedef enum _lcdScreen
 	lcdLightSensors,
 	lcdLiftTest,
 	lcdSkillsTest,
+	lcdTurnAlg,
+	lcdTurnCurve,
 	kNumbLcdScreens
 } tLcdScreen;
 

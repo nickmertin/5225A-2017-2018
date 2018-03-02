@@ -69,6 +69,47 @@ void handleLcd()
 			testSkillsAsync();
 		clearLCDLine(1);
 		displayLCDCenteredString(0, "Skills Test");
+		break;
+	case lcdTurnAlg:
+		if (LCD_RISING(btnCenter))
+		{
+			gTurnAlg = gTurnAlg == turnRed ? turnBlue : turnRed;
+			updateTurnLookup();
+		}
+		displayLCDCenteredString(0, "Turn Algorithm");
+		displayLCDCenteredString(1, gTurnAlg == turnRed ? "RED" : "BLUE");
+		break;
+	case lcdTurnCurve:
+		if (LCD_RISING(btnCenter))
+		{
+			setDrive(0, 0);
+			if (stackState != stackNotRunning)
+				stackSet(stackNotRunning);
+
+			displayLCDString(1, 0, "DEC   SAVE   INC");
+
+			do
+			{
+				gLastLcdButtons = buttons;
+				buttons = nLCDButtons;
+
+				if (LCD_RISING(btnLeft) && gTurnCurvature > TURN_CURVE_MIN)
+					--gTurnCurvature;
+				if (LCD_RISING(btnRight) && gTurnCurvature < TURN_CURVE_MAX)
+					++gTurnCurvature;
+
+				sprintf(line, "%d", gTurnCurvature);
+				displayLCDCenteredString(0, line);
+
+				endCycle(gMainCycle);
+			} while (!LCD_RISING(btnCenter));
+
+			updateTurnLookup();
+		}
+		displayLCDCenteredString(0, "Turn Curvature");
+		sprintf(line, "%d", gTurnCurvature);
+		displayLCDCenteredString(1, line);
+		break;
 	}
 
 	gLastLcdButtons = buttons;
