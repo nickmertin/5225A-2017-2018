@@ -33,7 +33,6 @@
 
 //Sensors
 #include "sensors.h"
-#include "sensors.c"
 
 //Timeout function
 bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tSensors senT = mobilePoti);
@@ -56,6 +55,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "async.c"
 #include "timeout.c"
 #include "motors.c"
+#include "sensors.c"
 #include "joysticks.c"
 #include "cycle.c"
 #include "utilities.c"
