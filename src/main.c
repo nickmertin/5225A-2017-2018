@@ -36,7 +36,7 @@
 #include "sensors.c"
 
 //Timeout function
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tSensors senT = mobilePoti);
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tSensors senT = mobilePoti);
 
 // Year-independent libraries
 
