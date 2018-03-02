@@ -234,29 +234,32 @@ case liftToTarget:
 	do
 	{
 		err = target - gSensor[liftPoti].value;
-		float vTarget = 12 * pow(err, 3.0 / 5.0) - 3 * err / (float) (err * err + 1);
-		const float kB = 0.05;
-		const float kP = 0.03;
+		float vTarget = sgn(err) * 0.012 * pow(abs(err), 3.0 / 5.0) - 0.003 * err / (err * err + 1);
+		const float bias = 12;
+		const float kB = 80.0;
+		const float kP = 5.0;
 		velocityCheck(liftPoti);
+		datalogDataGroupStart();
+		datalogAddValue(0, err);
+		datalogAddValue(1, vTarget * 1000);
 		if (gSensor[liftPoti].velGood)
 		{
-			float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity);
+			float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity) + bias;
+			LIM_TO_VAL_SET(power, 127);
 			setLift((word) power);
+			datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
+			datalogAddValue(3, power * 10);
 		}
-		datalogDataGroupStart();
-		datalogAddValue(0, gSensor[liftPoti].value);
-		datalogAddValue(1, vTarget);
-		datalogAddValue(2, gSensor[liftPoti].velocity);
 		datalogDataGroupEnd();
 		sleep(20);
-	} while (abs(err) > 50);
-	writeDebugStreamLine("%d Stopping lift", nPgmTime);
-	if (gSensor[liftPoti].velGood)
-	{
-		setLift(-20 * sgn(gSensor[liftPoti].velocity));
-		sleep(150);
-		setLift(0);
-	}
+	} while (abs(err) > 100);
+	//writeDebugStreamLine("%d Stopping lift", nPgmTime);
+	//if (gSensor[liftPoti].velGood)
+	//{
+	//	setLift(-20 * sgn(gSensor[liftPoti].velocity));
+	//	sleep(150);
+	//	setLift(0);
+	//}
 	writeDebugStreamLine("%d Moved lift to %d | %d", nPgmTime, target, gSensor[liftPoti].value);
 	NEXT_STATE(liftHold);
 }
