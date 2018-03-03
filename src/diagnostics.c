@@ -93,12 +93,12 @@ void handleLcd()
 				gLastLcdButtons = buttons;
 				buttons = nLCDButtons;
 
-				if (LCD_RISING(btnLeft) && gTurnCurvature > TURN_CURVE_MIN)
-					--gTurnCurvature;
-				if (LCD_RISING(btnRight) && gTurnCurvature < TURN_CURVE_MAX)
-					++gTurnCurvature;
+				if (LCD_RISING(btnLeft) && gTurnCurveLim > 0)
+					--gTurnCurveLim;
+				if (LCD_RISING(btnRight) && gTurnCurveLim < 100)
+					++gTurnCurveLim;
 
-				sprintf(line, "%d", gTurnCurvature);
+				sprintf(line, "%d", gTurnCurveLim);
 				displayLCDCenteredString(0, line);
 
 				endCycle(gMainCycle);
@@ -106,8 +106,8 @@ void handleLcd()
 
 			updateTurnLookup();
 		}
-		displayLCDCenteredString(0, "Turn Curvature");
-		sprintf(line, "%d", gTurnCurvature);
+		displayLCDCenteredString(0, "Turn Curvature Limit");
+		sprintf(line, "%d", gTurnCurveLim);
 		displayLCDCenteredString(1, line);
 		break;
 	}

@@ -11,7 +11,7 @@ sbyte lookupTurn(sbyte joy);
 
 /* Variables */
 tTurnAlg gTurnAlg = turnRed;
-int gTurnCurvature = 0;
+int gTurnCurvature = 5;
 sbyte gTurnLookup[256];
 
 /* Defines */
