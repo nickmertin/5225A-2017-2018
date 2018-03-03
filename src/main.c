@@ -33,6 +33,7 @@
 
 bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true);
 
+int gTurnCurveLim = 0;
 // Year-independent libraries
 
 #include "notify.h"
@@ -127,7 +128,7 @@ void handleDrive()
 	{
 		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
 		short y = gJoy[JOY_THROTTLE].cur;
-		short a = lookupTurn(gJoy[JOY_TURN].cur);
+		short a = abs(y)<gTurnCurveLim? lookupTurn(gJoy[JOY_TURN].cur): gJoy[JOY_TURN].cur;
 
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
 #ifndef TRACK_IN_DRIVER
