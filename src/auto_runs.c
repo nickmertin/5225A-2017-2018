@@ -18,6 +18,8 @@ void selectAuto()
 
 void runAuto()
 {
+	autoTest();
+	return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
@@ -1165,4 +1167,21 @@ void autoStationaryRight2()
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	coneTimeout = nPgmTime + 1200;
 	liftTimeoutWhile(liftLowerSimpleState, coneTimeout, TID2(rs+2, 4, 2));
+}
+
+void autoTest ()
+{
+	mobileSet(mobileTop, -1);
+	unsigned long coneTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanL(mobilePoti, MOBILE_TOP - 200, coneTimeout, TID2(skills, 1, 3));
+
+	//trackPositionTaskKill();
+	//resetPositionFull(gPosition, 60, 60, 90);
+	//resetVelocity(gVelocity, gPosition);
+	//trackPositionTaskAsync();
+
+	//moveToTargetSimpleAsync(0, 0, gPosition.y, gPosition.x, -90, 0, 0, 12, stopHarsh, true);
+	//driveTimeout = nPgmTime + 2500;
+	//liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+	//timeoutWhileLessThanF(&gPosition.x, 72, driveTimeout, TID2(br20, 1, 3));
 }

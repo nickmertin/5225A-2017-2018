@@ -19,6 +19,8 @@ void autoStationaryRight5();
 void autoStationaryLeft2();
 void autoStationaryRight2();
 
+void autoTest();
+
 /* Variables */
 int gCurAuto = 0;
 tAlliance gAlliance = allianceBlue;
