@@ -827,7 +827,7 @@ case stackDetach:
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[gNumCones - 1])
 	{
 		if ((arg._long & sfReturn) && gNumCones > 3) {
-			liftLowerSimpleAsync((arg._long & sfLoader) ? 1700 : gStack ? LIFT_BOTTOM : 1650, -50, 25);
+			liftLowerSimpleAsync((arg._long & sfLoader) ? 2000 : gStack ? LIFT_BOTTOM : 1650, -50, 25);
 		}
 		else {
 			liftSet(liftManaged);
