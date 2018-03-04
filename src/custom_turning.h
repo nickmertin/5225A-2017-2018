@@ -13,7 +13,7 @@ sbyte lookupTurn(sbyte joy);
 tTurnAlg gTurnAlg = turnRed;
 int gTurnCurvature = 5;
 sbyte gTurnLookup[256];
-int gTurnCurveLim = 0;
+int gTurnCurveLim = 15;
 
 /* Defines */
 #define TURN_CURVE_MIN 0

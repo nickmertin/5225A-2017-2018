@@ -9,6 +9,7 @@ typedef enum _lcdScreen
 	lcdSkillsTest,
 	lcdTurnAlg,
 	lcdTurnCurve,
+	lcdTurnCurveLim,
 	lcdDriveAlg,
 	lcdDriveCurve,
 	kNumbLcdScreens
