@@ -33,7 +33,6 @@
 
 bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true);
 
-int gTurnCurveLim = 0;
 // Year-independent libraries
 
 #include "notify.h"
@@ -67,6 +66,7 @@ int gTurnCurveLim = 0;
 #include "auto.h"
 #include "auto_simple.h"
 #include "auto_runs.h"
+#include "custom_drive.h"
 #include "custom_turning.h"
 #include "diagnostics.h"
 
@@ -127,7 +127,7 @@ void handleDrive()
 	if (gDriveManual)
 	{
 		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
-		short y = gJoy[JOY_THROTTLE].cur;
+		short y = lookupDrive(gJoy[JOY_THROTTLE].cur);
 		short a = abs(y)<gTurnCurveLim? lookupTurn(gJoy[JOY_TURN].cur): gJoy[JOY_TURN].cur;
 
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
@@ -217,25 +217,25 @@ case liftIdle:
 	setLift(0);
 	break;
 case liftRaiseSimpleState:
-{
-	STATE_INVOKE_ASYNC(liftRaiseSimple);
-	NEXT_STATE(liftHold);
-}
+	{
+		STATE_INVOKE_ASYNC(liftRaiseSimple);
+		NEXT_STATE(liftHold);
+	}
 case liftLowerSimpleState:
-{
-	STATE_INVOKE_ASYNC(liftLowerSimple);
-	NEXT_STATE(liftHold);
-}
+	{
+		STATE_INVOKE_ASYNC(liftLowerSimple);
+		NEXT_STATE(liftHold);
+	}
 case liftHold:
-{
-	int target = gSensor[liftPoti].value;
-	if (target < LIFT_HOLD_DOWN_THRESHOLD)
-		NEXT_STATE(liftHoldDown);
-	if (target > LIFT_HOLD_UP_THRESHOLD)
-		NEXT_STATE(liftHoldUp);
-	setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
-	break;
-}
+	{
+		int target = gSensor[liftPoti].value;
+		if (target < LIFT_HOLD_DOWN_THRESHOLD)
+			NEXT_STATE(liftHoldDown);
+		if (target > LIFT_HOLD_UP_THRESHOLD)
+			NEXT_STATE(liftHoldUp);
+		setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
+		break;
+	}
 case liftHoldDown:
 	setLift(-15);
 	break;
@@ -380,15 +380,15 @@ case armToTarget:
 		NEXT_STATE(armStopping);
 	}
 case armRaiseSimpleState:
-{
-	STATE_INVOKE_ASYNC(armRaiseSimple);
-	NEXT_STATE(armHold);
-}
+	{
+		STATE_INVOKE_ASYNC(armRaiseSimple);
+		NEXT_STATE(armHold);
+	}
 case armLowerSimpleState:
-{
-	STATE_INVOKE_ASYNC(armLowerSimple);
-	NEXT_STATE(armHold);
-}
+	{
+		STATE_INVOKE_ASYNC(armLowerSimple);
+		NEXT_STATE(armHold);
+	}
 case armStopping:
 	velocityClear(armPoti);
 	velocityCheck(armPoti);
@@ -600,7 +600,7 @@ case mobileDownToMiddle:
 	}
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
-		arg._long = -1;
+	arg._long = -1;
 	NEXT_STATE(mobileTop)
 })
 
@@ -698,12 +698,14 @@ unsigned long gPrepStart = 0;
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
+	writeDebugStreamLine("%06d Start stackNotRunning. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 	liftSet(liftHold);
 	armSet(armHold);
 	gDriveManual = true;
 	break;
 case stackPickupGround:
 	{
+		writeDebugStreamLine("%06d Start stackPickupGround. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -735,6 +737,7 @@ case stackPickupGround:
 	}
 case stackPickupLoader:
 	{
+		writeDebugStreamLine("%06d Start stackPickupLoader. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		if (gNumCones >= MAX_STACK)
 			NEXT_STATE(stackNotRunning)
 
@@ -759,6 +762,7 @@ case stackPickupLoader:
 	}
 case stackStationaryPrep:
 	{
+		writeDebugStreamLine("%06d Start stackStationaryPrep. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -775,6 +779,7 @@ case stackStationaryPrep:
 	}
 case stackStationary:
 	{
+		writeDebugStreamLine("%06d Start stackStationary. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -811,6 +816,7 @@ case stackStationary:
 	}
 case stackStack:
 	{
+		writeDebugStreamLine("%06d Start stackStack. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -835,6 +841,7 @@ case stackStack:
 		NEXT_STATE((arg._long & (sfDetach | sfClear | sfReturn)) ? stackDetach : stackNotRunning)
 	}
 case stackDetach:
+	writeDebugStreamLine("%06d Start stackDetach. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[gNumCones - 1])
 	{
 		if ((arg._long & sfReturn) && gNumCones > 3) {
@@ -851,6 +858,7 @@ case stackDetach:
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID0(stackDetach));
 		//TODO: Add lift timeout to make sure it lowers fully
+		writeDebugStreamLine("%06d Detached lift at height: %d", npgmTime, gSensor[liftPoti].value);
 		liftReset();
 	}
 	if (gStack) {
@@ -874,6 +882,7 @@ case stackDetach:
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 case stackClear:
 	{
+		writeDebugStreamLine("%06d Start stackClear. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		int target = gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones];
 		liftRaiseSimpleAsync(target, 127, gNumCones <= 4 ? -15 : 0);
 		unsigned long timeout = nPgmTime + 1500;
@@ -893,6 +902,7 @@ case stackClear:
 	}
 case stackReturn:
 	{
+		writeDebugStreamLine("%06d Start stackReturn. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -1089,6 +1099,7 @@ void handleMacros()
 #include "auto.c"
 #include "auto_simple.c"
 #include "auto_runs.c"
+#include "custom_drive.c"
 #include "custom_turning.c"
 #include "diagnostics.c"
 
