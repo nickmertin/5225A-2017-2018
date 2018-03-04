@@ -511,12 +511,12 @@ case mobileTop:
 		if (arg._long)
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
-		unsigned long timeout = nPgmTime + 1500;
+		unsigned long timeout = nPgmTime + 1100;
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 1))) sleep(10);
 		setMobile(15);
-		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 2))) sleep(10);
+		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 2), False)) sleep(10);
 		//Coast if timedout
-		if ( TimedOut(timeout, TID1(mobileTop, 2)) )
+		if ( TimedOut(timeout, TID1(mobileTop, 2), False) )
 			NEXT_STATE(mobileIdle)
 		else
 			setMobile(MOBILE_UP_HOLD_POWER);
@@ -534,10 +534,10 @@ case mobileBottom:
 		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
-		unsigned long timeout = nPgmTime + 1500;
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID0(mobileBottom))) sleep(10);
+		unsigned long timeout = nPgmTime + 1100;
+		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID0(mobileBottom), False)) sleep(10);
 		//Coast if timedout
-		if ( TimedOut(timeout, TID0(mobileBottom)) )
+		if ( TimedOut(timeout, TID0(mobileBottom), False) )
 			NEXT_STATE(mobileIdle)
 		else
 			setMobile(MOBILE_DOWN_HOLD_POWER);
