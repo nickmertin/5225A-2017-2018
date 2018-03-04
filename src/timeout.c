@@ -26,7 +26,7 @@ void timeoutWhileLessThanL(tSensors sen, long threshold, unsigned long timeout, 
 {
 	velocityClear(sen);
 	unsigned long startTime = nPgmTime;
-	while (gSensor[sen].value < threshold && !TimedOut(timeout, routine, id, kill, sen, npgmTime-startTime)) sleep(10);
+	while (gSensor[sen].value < threshold && !TimedOut(timeout, routine, id, kill, sen, 1, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
@@ -34,7 +34,7 @@ void timeoutWhileGreaterThanL(tSensors sen, long threshold, unsigned long timeou
 {
 	velocityClear(sen);
 	unsigned long startTime = nPgmTime;
-	while (gSensor[sen].value > threshold && !TimedOut(timeout, routine, id, kill, sen, npgmTime-startTime)) sleep(10);
+	while (gSensor[sen].value > threshold && !TimedOut(timeout, routine, id, kill, sen, -1, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
@@ -42,7 +42,7 @@ void timeoutWhileLessThanF(float *val, float threshold, unsigned long timeout, c
 {
 	velocityClear(trackL);
 	unsigned long startTime = nPgmTime;
-	while (*val < threshold && !TimedOut(timeout, routine, id, kill, trackL, npgmTime-startTime)) sleep(10);
+	while (*val < threshold && !TimedOut(timeout, routine, id, kill, trackL, 1, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
@@ -50,7 +50,7 @@ void timeoutWhileGreaterThanF(float *val, float threshold, unsigned long timeout
 {
 	velocityClear(trackL);
 	unsigned long startTime = nPgmTime;
-	while (*val > threshold && !TimedOut(timeout, routine, id, kill, trackL, npgmTime-startTime)) sleep(10);
+	while (*val > threshold && !TimedOut(timeout, routine, id, kill, trackL, -1, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 

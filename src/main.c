@@ -939,7 +939,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	if (senT != -1)
 		velocityCheck(senT);
 
-	if (nPgmTime > timeOut || ( (senT != -1 && gSensor[senT].velGood && elpsdTime > 100) ? abs(gSensor[senT].velocity) < 0.5 : 0 ) )
+	if (nPgmTime > timeOut || ( (senT != -1 && gSensor[senT].velGood && elpsdTime > 100) ? ( abs(gSensor[senT].velocity) < 0.5 || dir != sgn(gSensor[senT].velocity) ) : 0 ) )
 	{
 		tHog();
 		char description[40];
