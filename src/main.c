@@ -511,14 +511,16 @@ case mobileTop:
 		if (arg._long)
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
-		unsigned long timeout = nPgmTime + 2000;
+		unsigned long timeout = nPgmTime + 1500;
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 1))) sleep(10);
 		setMobile(15);
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 2))) sleep(10);
+		//Coast if timedout
 		if ( TimedOut(timeout, TID1(mobileTop, 2)) )
 			NEXT_STATE(mobileIdle)
 		else
 			setMobile(MOBILE_UP_HOLD_POWER);
+
 		//if (gSensor[jmpSkills].value)
 		//	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		break;
@@ -533,8 +535,8 @@ case mobileBottom:
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1500;
-		//TODO: Add timeout
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID0(mobileBottom))) sleep(10);
+		//Coast if timedout
 		if ( TimedOut(timeout, TID0(mobileBottom)) )
 			NEXT_STATE(mobileIdle)
 		else
