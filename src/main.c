@@ -33,7 +33,6 @@
 
 bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true);
 
-int gTurnCurveLim = 0;
 // Year-independent libraries
 
 #include "notify.h"
@@ -67,6 +66,7 @@ int gTurnCurveLim = 0;
 #include "auto.h"
 #include "auto_simple.h"
 #include "auto_runs.h"
+#include "custom_drive.h"
 #include "custom_turning.h"
 #include "diagnostics.h"
 
@@ -127,7 +127,7 @@ void handleDrive()
 	if (gDriveManual)
 	{
 		//gJoy[JOY_TURN].deadzone = MAX(abs(gJoy[JOY_THROTTLE].cur) / 2, DZ_ARM);
-		short y = gJoy[JOY_THROTTLE].cur;
+		short y = lookupDrive(gJoy[JOY_THROTTLE].cur);
 		short a = abs(y)<gTurnCurveLim? lookupTurn(gJoy[JOY_TURN].cur): gJoy[JOY_TURN].cur;
 
 #if defined(DRIVE_TURN_BRAKE) && DRIVE_TURN_BRAKE > 0
@@ -1080,6 +1080,7 @@ void handleMacros()
 #include "auto.c"
 #include "auto_simple.c"
 #include "auto_runs.c"
+#include "custom_drive.c"
 #include "custom_turning.c"
 #include "diagnostics.c"
 

@@ -106,7 +106,47 @@ void handleLcd()
 
 			updateTurnLookup();
 		}
-		displayLCDCenteredString(0, "Turn Curvature Limit");
+		displayLCDCenteredString(0, "TurnCurvLimit");
+		sprintf(line, "%d", gTurnCurveLim);
+		displayLCDCenteredString(1, line);
+		break;
+	case lcdDriveAlg:
+		if (LCD_RISING(btnCenter))
+		{
+			gDriveAlg = gDriveAlg == driveRed ? driveBlue : driveRed;
+			updateDriveLookup();
+		}
+		displayLCDCenteredString(0, "Drive Algorithm");
+		displayLCDCenteredString(1, gDriveAlg == driveRed ? "RED" : "BLUE");
+		break;
+	case lcdDriveCurve:
+		if (LCD_RISING(btnCenter))
+		{
+			setDrive(0, 0);
+			if (stackState != stackNotRunning)
+				stackSet(stackNotRunning);
+
+			displayLCDString(1, 0, "DEC   SAVE   INC");
+
+			do
+			{
+				gLastLcdButtons = buttons;
+				buttons = nLCDButtons;
+
+				if (LCD_RISING(btnLeft) && gDriveCurvature > DRIVE_CURVE_MIN)
+					--gDriveCurvature;
+				if (LCD_RISING(btnRight) && gDriveCurvature < DRIVE_CURVE_MAX)
+					++gDriveCurvature;
+
+				sprintf(line, "%d", gDriveCurvature);
+				displayLCDCenteredString(0, line);
+
+				endCycle(gMainCycle);
+			} while (!LCD_RISING(btnCenter));
+
+			updateDriveLookup();
+		}
+		displayLCDCenteredString(0, "Drive Curve");
 		sprintf(line, "%d", gTurnCurveLim);
 		displayLCDCenteredString(1, line);
 		break;
