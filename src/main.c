@@ -217,25 +217,25 @@ case liftIdle:
 	setLift(0);
 	break;
 case liftRaiseSimpleState:
-	{
-		STATE_INVOKE_ASYNC(liftRaiseSimple);
-		NEXT_STATE(liftHold);
-	}
+{
+	STATE_INVOKE_ASYNC(liftRaiseSimple);
+	NEXT_STATE(liftHold);
+}
 case liftLowerSimpleState:
-	{
-		STATE_INVOKE_ASYNC(liftLowerSimple);
-		NEXT_STATE(liftHold);
-	}
+{
+	STATE_INVOKE_ASYNC(liftLowerSimple);
+	NEXT_STATE(liftHold);
+}
 case liftHold:
-	{
-		int target = gSensor[liftPoti].value;
-		if (target < LIFT_HOLD_DOWN_THRESHOLD)
-			NEXT_STATE(liftHoldDown);
-		if (target > LIFT_HOLD_UP_THRESHOLD)
-			NEXT_STATE(liftHoldUp);
-		setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
-		break;
-	}
+{
+	int target = gSensor[liftPoti].value;
+	if (target < LIFT_HOLD_DOWN_THRESHOLD)
+		NEXT_STATE(liftHoldDown);
+	if (target > LIFT_HOLD_UP_THRESHOLD)
+		NEXT_STATE(liftHoldUp);
+	setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
+	break;
+}
 case liftHoldDown:
 	setLift(-15);
 	break;
@@ -380,15 +380,15 @@ case armToTarget:
 		NEXT_STATE(armStopping);
 	}
 case armRaiseSimpleState:
-	{
-		STATE_INVOKE_ASYNC(armRaiseSimple);
-		NEXT_STATE(armHold);
-	}
+{
+	STATE_INVOKE_ASYNC(armRaiseSimple);
+	NEXT_STATE(armHold);
+}
 case armLowerSimpleState:
-	{
-		STATE_INVOKE_ASYNC(armLowerSimple);
-		NEXT_STATE(armHold);
-	}
+{
+	STATE_INVOKE_ASYNC(armLowerSimple);
+	NEXT_STATE(armHold);
+}
 case armStopping:
 	velocityClear(armPoti);
 	velocityCheck(armPoti);
@@ -600,7 +600,7 @@ case mobileDownToMiddle:
 	}
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
-	arg._long = -1;
+		arg._long = -1;
 	NEXT_STATE(mobileTop)
 })
 
@@ -982,10 +982,6 @@ bool stackRunning()
 
 bool cancel()
 {
-	writeDebugStreamLine("%f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
-	resetQuadratureEncoder(trackL);
-	resetQuadratureEncoder(trackR);
-
 	if (stackState != stackNotRunning)
 	{
 		stackReset();
@@ -1295,12 +1291,12 @@ void usercontrol()
 
 		handleLcd();
 
-		//if (RISING(BTN_MACRO_CANCEL))
-		//{
-		//	writeDebugStreamLine("%f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
-		//	resetQuadratureEncoder(trackL);
-		//	resetQuadratureEncoder(trackR);
-		//}
+		if (RISING(BTN_MACRO_CANCEL))
+		{
+			writeDebugStreamLine("%f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
+			resetQuadratureEncoder(trackL);
+			resetQuadratureEncoder(trackR);
+		}
 
 		updateSensorOutputs();
 		updateMotors();
