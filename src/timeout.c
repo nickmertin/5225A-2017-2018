@@ -25,27 +25,32 @@ void timeoutWhileGreaterThanS(short *val, short threshold, unsigned long timeout
 void timeoutWhileLessThanL(tSensors sen, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
 {
 	velocityClear(sen);
-	while (gSensor[sen].value < threshold && !TimedOut(timeout, routine, id, kill, sen)) sleep(10);
+	unsigned long startTime = nPgmTime;
+	while (gSensor[sen].value < threshold && !TimedOut(timeout, routine, id, kill, sen, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
 void timeoutWhileGreaterThanL(tSensors sen, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
 {
 	velocityClear(sen);
-	while (gSensor[sen].value > threshold && !TimedOut(timeout, routine, id, kill, sen)) sleep(10);
+	unsigned long startTime = nPgmTime;
+	while (gSensor[sen].value > threshold && !TimedOut(timeout, routine, id, kill, sen, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
 void timeoutWhileLessThanF(float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
 {
 	velocityClear(trackL);
-	while (*val < threshold && !TimedOut(timeout, routine, id, kill, trackL)) sleep(10);
+	unsigned long startTime = nPgmTime;
+	while (*val < threshold && !TimedOut(timeout, routine, id, kill, trackL, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
 void timeoutWhileGreaterThanF(float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
 {
-	while (*val > threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
+	velocityClear(trackL);
+	unsigned long startTime = nPgmTime;
+	while (*val > threshold && !TimedOut(timeout, routine, id, kill, trackL, npgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 

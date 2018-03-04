@@ -35,7 +35,7 @@
 #include "sensors.h"
 
 //Timeout function
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tSensors senT = mobilePoti);
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tSensors senT = -1, short dir = 1, unsigned long elpsdTime = 0);
 
 // Year-independent libraries
 
@@ -934,12 +934,12 @@ task failTimeout()
 		competitionSet(competitionState);
 }
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tSensors senT)
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tSensors senT, short dir, unsigned long elpsdTime)
 {
 	if (senT != -1)
 		velocityCheck(senT);
 
-	if (nPgmTime > timeOut || ( (senT != -1 && gSensor[senT].velGood) ? abs(gSensor[senT].velocity) < 0.5 : 0 ) )
+	if (nPgmTime > timeOut || ( (senT != -1 && gSensor[senT].velGood && elpsdTime > 100) ? abs(gSensor[senT].velocity) < 0.5 : 0 ) )
 	{
 		tHog();
 		char description[40];
