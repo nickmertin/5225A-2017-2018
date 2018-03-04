@@ -993,15 +993,17 @@ bool stackRunning()
 
 bool cancel()
 {
+	writeDebugStream("Cancel Stack: ");
 	if (stackState != stackNotRunning)
 	{
 		stackReset();
 		liftReset();
 		armReset();
 		gDriveManual = true;
-		writeDebugStreamLine("Stack cancelled");
+		writeDebugStreamLine("True");
 		return true;
 	}
+	writeDebugStreamLine("False");
 	return false;
 }
 
@@ -1306,7 +1308,7 @@ void usercontrol()
 
 		if (RISING(BTN_MACRO_CANCEL))
 		{
-			writeDebugStreamLine("Cancel (reset encs) %f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
+			writeDebugStreamLine("Cancel Encs %f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
 			resetQuadratureEncoder(trackL);
 			resetQuadratureEncoder(trackR);
 		}
