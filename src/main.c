@@ -866,6 +866,7 @@ case stackDetach:
 		if (gNumCones < MAX_STACK) {
 			if (gNumCones == MAX_STACK - 1)
 				arg._long &= ~sfReturn;
+				arg._long |= sfDetach;
 			if (gLoader) {
 				if (gNumCones > 6) {
 					arg._long |= sfLoader;
@@ -1146,6 +1147,7 @@ void startup()
 	velocityClear(trackR);
 
 	updateTurnLookup();
+	updateDriveLookup();
 
 #ifndef SKILLS_RESET_AT_START
 	waitForSkillsResetAsync();
@@ -1304,7 +1306,7 @@ void usercontrol()
 
 		if (RISING(BTN_MACRO_CANCEL))
 		{
-			writeDebugStreamLine("%f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
+			writeDebugStreamLine("Cancel (reset encs) %f", abs((2.785 * (gSensor[trackL].value - gSensor[trackR].value)) / (360 * 4)));
 			resetQuadratureEncoder(trackL);
 			resetQuadratureEncoder(trackR);
 		}
