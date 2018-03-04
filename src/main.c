@@ -841,6 +841,7 @@ case stackDetach:
 			armLowerSimpleAsync(ARM_RELEASE, -127, 0);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID0(stackDetach));
+		//TODO: Add lift timeout to make sure it lowers fully
 		liftReset();
 	}
 	if (gStack) {
