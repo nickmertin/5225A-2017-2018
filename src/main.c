@@ -864,9 +864,10 @@ case stackDetach:
 	if (gStack) {
 		gStack = false;
 		if (gNumCones < MAX_STACK) {
-			if (gNumCones == MAX_STACK - 1)
+			if (gNumCones == MAX_STACK - 1) {
 				arg._long &= ~sfReturn;
 				arg._long |= sfDetach;
+			}
 			if (gLoader) {
 				if (gNumCones > 6) {
 					arg._long |= sfLoader;
@@ -1027,7 +1028,7 @@ void handleMacros()
 		{
 			writeDebugStreamLine("Stacking");
 			if (gLoader)
-				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack);
+				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack | sfDetach);
 			else
 				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach);
 			gStack = false;
