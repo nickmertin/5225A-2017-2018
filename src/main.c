@@ -234,7 +234,7 @@ case liftToTarget:
 	do
 	{
 		err = target - gSensor[liftPoti].value;
-		float vTarget = sgn(err) * 0.06 * pow(abs(err), 3.0 / 5.0) - 0.01 * err / (err * err + 1);
+		float vTarget = sgn(err) * 4.0 * (1.0 - exp(-0.0025 * abs(err)));
 		const float bias = 10;
 		const float kB = 15.0;
 		const float kP = 5.0;
