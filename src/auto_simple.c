@@ -387,24 +387,24 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void resetBlueLeft()
-{
-	setDrive(-30, -30);
-	unsigned long timeout = nPgmTime + 1500;
-	sleep(500);
-	timeoutWhileLessThanF(&gVelocity.x, -0.1, timeout, TID0(rbl));
-	setDrive(-7, -7);
-	sleep(500);
-	resetPositionFull(gPosition, gPosition.y, 8.25, 90);
-}
+//void resetBlueLeft()
+//{
+//	setDrive(-30, -30);
+//	unsigned long timeout = nPgmTime + 1500;
+//	sleep(500);
+//	timeoutWhileLessThanF(&gVelocity.x, -0.1, timeout, TID0(rbl));
+//	setDrive(-7, -7);
+//	sleep(500);
+//	resetPositionFull(gPosition, gPosition.y, 8.25, 90);
+//}
 
-void resetBlueRight()
-{
-	setDrive(-30, -30);
-	unsigned long timeout = nPgmTime + 1500;
-	sleep(500);
-	timeoutWhileLessThanF(&gVelocity.y, -0.1, timeout, TID0(rbr));
-	setDrive(-7, -7);
-	sleep(500);
-	resetPositionFull(gPosition, 8.25, gPosition.x, 0);
-}
+//void resetBlueRight()
+//{
+//	setDrive(-30, -30);
+//	unsigned long timeout = nPgmTime + 1500;
+//	sleep(500);
+//	timeoutWhileLessThanF(&gVelocity.y, -0.1, timeout, TID0(rbr));
+//	setDrive(-7, -7);
+//	sleep(500);
+//	resetPositionFull(gPosition, 8.25, gPosition.x, 0);
+//}

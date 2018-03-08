@@ -38,16 +38,14 @@ void turnSimpleInternalCcw(float a, sTurnState& state);
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon);
 void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte power, float epsilon);
 
-void resetBlueLeft();
-void resetBlueRight();
+//void resetBlueLeft();
+//void resetBlueRight();
 
-MAKE_ASYNC_ONLY_MACHINE_8(autoSimple, ;,
+MAKE_ASYNC_ONLY_MACHINE_6(autoSimple, ;,
 10, (moveToTargetSimple, float, float, float, float, byte, float, byte, float, tStopType, bool), ;,
 10, (moveToTargetDisSimple, float, float, float, float, byte, float, byte, float, tStopType, bool), ;,
 5,  (turnToAngleSimple, float, tTurnDir, byte, byte, bool), ;,
 7,  (turnToTargetSimple, float, float, tTurnDir, byte, byte, bool, float), ;,
 4, (turnToAngleCustom, float, tTurnDir, byte, float), ;,
-6, (turnToTargetCustom, float, float, tTurnDir, float, byte, float), ;,
-0, (resetBlueLeft), ;,
-0, (resetBlueRight), ;
+6, (turnToTargetCustom, float, float, tTurnDir, float, byte, float), ;
 )

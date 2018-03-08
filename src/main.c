@@ -31,24 +31,25 @@
 #define TID1(routine, id) #routine, id
 #define TID2(routine, major, minor) #routine, ((major << 8) | minor)
 
-//Sensors
-#include "sensors.h"
-
-//Timeout function
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tSensors senT = -1, float vel = 0, unsigned long elpsdTime = 0);
-
-// Year-independent libraries
+// Year-independent libraries (headers)
 
 #include "notify.h"
 #include "task.h"
 #include "async.h"
 #include "timeout.h"
 #include "motors.h"
+#include "sensors.h"
 #include "joysticks.h"
 #include "cycle.h"
 #include "utilities.h"
 #include "pid.h"
 #include "state.h"
+
+// Timeout function
+
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tTimeoutVelSourceType velSourceType = velNone, unsigned long velSourceData = 0, float vel = 0, unsigned long elpsdTime = 0);
+
+// Year-independent libraries (source)
 
 #include "notify.c"
 #include "task.c"
@@ -61,6 +62,8 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "utilities.c"
 #include "pid.c"
 #include "state.c"
+
+// Other includes
 
 #include "Vex_Competition_Includes_Custom.c"
 
@@ -704,7 +707,7 @@ case stackPickupGround:
 		{
 			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
 			armTimeOut = nPgmTime + 1000;
-			timeoutWhileGreaterThanL(armPoti, 0.5, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
+			timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
 		}
 		else if (gSensor[armPoti].value < ARM_BOTTOM + 300)
 		{
@@ -713,16 +716,16 @@ case stackPickupGround:
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(liftPoti, 0.5, LIFT_BOTTOM + 300, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 300, liftTimeOut, TID1(stackPickupGround, 2));
 
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
-		timeoutWhileGreaterThanL(armPoti, 0.5, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4), false);
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4), false);
 
 		armRaiseSimpleAsync(ARM_PRESTACK - 400, 127, -20, 30, 200);
 		armTimeOut = nPgmTime + 500;
-		timeoutWhileLessThanL(armPoti, 0.5, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
+		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
 
 		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
@@ -776,22 +779,22 @@ case stackStationary:
 
 		armRaiseSimpleAsync(ARM_TOP, 127, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(armPoti, 0.5, ARM_TOP - 100, armTimeOut, TID1(stackStationary, 1));
+		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_TOP - 100, armTimeOut, TID1(stackStationary, 1));
 		armSet(armManaged);
 		setArm(-20);
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileGreaterThanL(liftPoti, 0.5, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 		armTimeOut = nPgmTime + 1500;
-		timeoutWhileGreaterThanL(armPoti, 0.5, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
 		++gNumCones;
 
 		long target = (gNumCones >= 5) ? LIFT_TOP : gLiftRaiseTargetS[gNumCones];
 		liftRaiseSimpleAsync(target, 127, (gNumCones >= 4) ? 0 : -15);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileLessThanL(liftPoti, 0.5, target, liftTimeOut, TID1(stackStationary, 4));
+		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
 
 		gDriveManual = true;
 
@@ -812,12 +815,12 @@ case stackStack:
 
 		liftRaiseSimpleAsync(gLiftRaiseTarget[gNumCones], 127, (gNumCones < MAX_STACK - 1) ? -25 : 0);
 		liftTimeOut = nPgmTime + 1500;
-		timeoutWhileLessThanL(liftPoti, 0.5, gLiftRaiseTarget[gNumCones] - 400, liftTimeOut, TID1(stackStack, 1));
+		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 400, liftTimeOut, TID1(stackStack, 1));
 
 		armRaiseSimpleAsync(ARM_STACK, 127, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(liftPoti, 0.5, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
-		timeoutWhileLessThanL(armPoti, 0.5, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
+		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
+		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
 
 		liftLowerSimpleAsync(gLiftPlaceTarget[gNumCones], -70, (arg._long & (sfClear | sfReturn) ? 0 : 5));
 		liftTimeOut = nPgmTime + 800;
@@ -869,7 +872,7 @@ case stackClear:
 		int target = gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones];
 		liftRaiseSimpleAsync(target, 127, gNumCones <= 4 ? -15 : 0);
 		unsigned long timeout = nPgmTime + 1500;
-		timeoutWhileLessThanL(liftPoti, 0.5, target, timeout, TID1(stackClear, 1));
+		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, target, timeout, TID1(stackClear, 1));
 
 		if (gSensor[armPoti].value < ARM_STACK)
 		{
@@ -892,7 +895,7 @@ case stackReturn:
 		{
 			liftRaiseSimpleAsync(1350, 80, -25);
 			liftTimeOut = nPgmTime + 800;
-			timeoutWhileLessThanL(liftPoti, 0.5, LIFT_BOTTOM + 150, liftTimeOut, TID1(stackReturn, 1));
+			timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 150, liftTimeOut, TID1(stackReturn, 1));
 		}
 
 		armLowerSimpleAsync(ARM_HORIZONTAL + 100, -127, 25, 50, 200);
@@ -916,7 +919,7 @@ case stackReturn:
 			liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackReturn, 4));
 		}
 
-		timeoutWhileGreaterThanL(armPoti, 0.5, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
 
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID1(stackReturn, 6));
 		NEXT_STATE(stackNotRunning)
@@ -934,12 +937,37 @@ task failTimeout()
 		competitionSet(competitionState);
 }
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tSensors senT, float vel, unsigned long elpsdTime)
+bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float& out)
 {
-	if (senT != -1)
-		velocityCheck(senT);
+	switch (velSourceType)
+	{
+		case velSensor:
+			velocityCheck(velSourceData);
+			if (gSensor[velSourceData].velGood)
+			{
+				gSensor[velSourceData].velocity;
+				return true;
+			}
+			return false;
+		case velPtr:
+			out = *(float *)velSourceData;
+			return true;
+		case velLocalY:
+			out = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a);
+			return true;
+		case velTurn:
+			out = gVelocity.a;
+			return true;
+		default:
+			return false;
+	}
+}
 
-	if (nPgmTime > timeOut || ( (senT != -1 && gSensor[senT].velGood && elpsdTime > 100) ? ( abs(gSensor[senT].velocity) < abs(vel) || sgn(vel) != sgn(gSensor[senT].velocity) ) : 0 ) )
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, unsigned long elpsdTime)
+{
+	float curVel;
+
+	if (nPgmTime > timeOut || ( (elpsdTime > 100 && getVelocity(velSourceType, velSourceData, curVel)) ? ( abs(curVel) < abs(vel) || sgn(vel) != sgn(curVel) ) : 0 ) )
 	{
 		tHog();
 		char description[40];
