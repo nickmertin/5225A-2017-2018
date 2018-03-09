@@ -237,9 +237,9 @@ case liftToTarget:
 		{
 			err = target - gSensor[liftPoti].value;
 			float vTarget = sgn(err) * 4.0 * (1.0 - exp(-0.0025 * abs(err)));
-			const float bias = 10;
+			const float bias = 8;
 			const float kB = 15.0;
-			const float kP = 5.0;
+			const float kP = 10.0;
 			velocityCheck(liftPoti);
 			datalogDataGroupStart();
 			datalogAddValue(0, err);
@@ -247,7 +247,10 @@ case liftToTarget:
 			if (gSensor[liftPoti].velGood)
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity) + bias;
-				if (sgn(power) == -sgn(gSensor[liftPoti].velocity))
+
+				if (power * sgn(err) < 25 && gSensor[liftPoti].velocity * sgn(err) < abs(vTarget))
+					power = 25 * sgn(err);
+				else if (sgn(power) == -sgn(gSensor[liftPoti].velocity))
 					LIM_TO_VAL_SET(power, 7);
 				else
 					LIM_TO_VAL_SET(power, 127);
@@ -261,8 +264,8 @@ case liftToTarget:
 		writeDebugStreamLine("%d Stopping lift", nPgmTime);
 		if (gSensor[liftPoti].velGood)
 		{
-			setLift(-15 * sgn(gSensor[liftPoti].velocity));
-			sleep(180);
+			setLift(sgn(gSensor[liftPoti].velocity) > 0 ? -20 : 10);
+			sleep(150);
 			setLift(0);
 		}
 		writeDebugStreamLine("%d Moved lift to %d | %d", nPgmTime, target, gSensor[liftPoti].value);
@@ -275,7 +278,7 @@ case liftHold:
 			NEXT_STATE(liftHoldDown);
 		if (target > LIFT_HOLD_UP_THRESHOLD)
 			NEXT_STATE(liftHoldUp);
-		setLift(6 + (word)(6 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
+		setLift(6 + (word)(3 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
 		break;
 	}
 case liftHoldDown:
