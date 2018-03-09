@@ -607,6 +607,7 @@ case mobileBottom:
 			NEXT_STATE(mobileBottomSlow)
 		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
+		writeDebugStreamLine("Fast dropping stack of %d", gNumCones);
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1100;
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID0(mobileBottom), False)) sleep(10);
@@ -624,6 +625,7 @@ case mobileBottomSlow:
 			mobileClearLift();
 		//sPID pid;
 		//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
+		writeDebugStreamLine("Slow dropping stack of %d", gNumCones);
 		velocityClear(mobilePoti);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
