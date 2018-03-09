@@ -946,11 +946,12 @@ case stackDetach:
 				arg._long |= sfDetach;
 			}
 			if (gLoader) {
-				if (gNumCones > 6) {
+				if (gNumCones > 5) {
 					arg._long |= sfLoader;
 					gLoader = false;
 					NEXT_STATE(stackPickupLoader)
 				}
+				gStack = true;
 			}
 			else {
 				arg._long &= ~sfLoader;
