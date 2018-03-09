@@ -241,9 +241,10 @@ case liftToTarget:
 			const float kB = 15.0;
 			const float kP = 10.0;
 			velocityCheck(liftPoti);
-			//datalogDataGroupStart();
-			//datalogAddValue(0, err);
-			//datalogAddValue(1, vTarget * 1000);
+			tHog();
+			datalogDataGroupStart();
+			datalogAddValue(0, err);
+			datalogAddValue(1, vTarget * 1000);
 			if (gSensor[liftPoti].velGood)
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity) + bias;
@@ -255,10 +256,11 @@ case liftToTarget:
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setLift((word) power);
-				//datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
-				//datalogAddValue(3, power * 10);
+				datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
+				datalogAddValue(3, power * 10);
 			}
-			//datalogDataGroupEnd();
+			datalogDataGroupEnd();
+			tRelease();
 			sleep(20);
 		} while (abs(err) > 100);
 		writeDebugStreamLine("%d Stopping lift", nPgmTime);
@@ -418,9 +420,10 @@ case armToTarget:
 			const float kB = 15.0;
 			const float kP = 3.0;
 			velocityCheck(armPoti);
+			tHog();
 			datalogDataGroupStart();
-			datalogAddValue(0, err);
-			datalogAddValue(1, vTarget * 1000);
+			datalogAddValue(4, err);
+			datalogAddValue(5, vTarget * 1000);
 			if (gSensor[armPoti].velGood)
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity) + bias;
@@ -432,10 +435,11 @@ case armToTarget:
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setArm((word) power);
-				datalogAddValue(2, gSensor[armPoti].velocity * 1000);
-				datalogAddValue(3, power * 10);
+				datalogAddValue(6, gSensor[armPoti].velocity * 1000);
+				datalogAddValue(7, power * 10);
 			}
 			datalogDataGroupEnd();
+			tRelease();
 			sleep(20);
 		} while (abs(err) > 100);
 		writeDebugStreamLine("%d Stopping arm", nPgmTime);
