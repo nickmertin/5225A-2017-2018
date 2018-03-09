@@ -241,9 +241,9 @@ case liftToTarget:
 			const float kB = 15.0;
 			const float kP = 10.0;
 			velocityCheck(liftPoti);
-			datalogDataGroupStart();
-			datalogAddValue(0, err);
-			datalogAddValue(1, vTarget * 1000);
+			//datalogDataGroupStart();
+			//datalogAddValue(0, err);
+			//datalogAddValue(1, vTarget * 1000);
 			if (gSensor[liftPoti].velGood)
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity) + bias;
@@ -255,10 +255,10 @@ case liftToTarget:
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setLift((word) power);
-				datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
-				datalogAddValue(3, power * 10);
+				//datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
+				//datalogAddValue(3, power * 10);
 			}
-			datalogDataGroupEnd();
+			//datalogDataGroupEnd();
 			sleep(20);
 		} while (abs(err) > 100);
 		writeDebugStreamLine("%d Stopping lift", nPgmTime);
@@ -406,23 +406,47 @@ case armIdle:
 	break;
 case armToTarget:
 	{
-		if (arg._long != -1)
+		int target = arg._long;
+		int err;
+		writeDebugStreamLine("%d Moving arm to %d", nPgmTime, target);
+		velocityClear(armPoti);
+		do
 		{
-			const float kP = 0.1;
-			int err;
-			sCycleData cycle;
-			initCycle(cycle, 10, "armToTarget");
-			do
+			err = target - gSensor[armPoti].value;
+			float vTarget = sgn(err) * 5.5 * (1.0 - exp(-0.0005 * abs(err)));
+			const float bias = 3;
+			const float kB = 7.0;
+			const float kP = 5.0;
+			velocityCheck(armPoti);
+			datalogDataGroupStart();
+			datalogAddValue(0, err);
+			datalogAddValue(1, vTarget * 1000);
+			if (gSensor[armPoti].velGood)
 			{
-				err = arg._long - gSensor[armPoti].value;
-				float power = kP * err;
-				LIM_TO_VAL_SET(power, 127);
-				setArm((word)power);
-				endCycle(cycle);
-			} while (abs(err) > 100);
+				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity) + bias;
+
+				if (power * sgn(err) < 25 && gSensor[armPoti].velocity * sgn(err) < abs(vTarget))
+					power = 25 * sgn(err);
+				else if (sgn(power) == -sgn(gSensor[armPoti].velocity))
+					LIM_TO_VAL_SET(power, 7);
+				else
+					LIM_TO_VAL_SET(power, 127);
+				setArm((word) power);
+				datalogAddValue(2, gSensor[armPoti].velocity * 1000);
+				datalogAddValue(3, power * 10);
+			}
+			datalogDataGroupEnd();
+			sleep(20);
+		} while (abs(err) > 100);
+		writeDebugStreamLine("%d Stopping arm", nPgmTime);
+		if (gSensor[armPoti].velGood)
+		{
+			setArm(sgn(gSensor[armPoti].velocity) > 0 ? -10 : 20);
+			sleep(150);
+			setArm(0);
 		}
-		writeDebugStreamLine("Arm at target: %d %d", arg, gSensor[armPoti].value);
-		NEXT_STATE(armStopping);
+		writeDebugStreamLine("%d Moved arm to %d | %d", nPgmTime, target, gSensor[armPoti].value);
+		NEXT_STATE(armHold);
 	}
 case armRaiseSimpleState:
 	{
@@ -1112,10 +1136,11 @@ void handleMacros()
 		{
 			liftSet(liftToTarget, LIFT_LOADER);
 		}
-		if (gSensor[armPoti].value < ARM_HORIZONTAL)
-			armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
-		else
-			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
+		armSet(armToTarget, ARM_HORIZONTAL);
+		//if (gSensor[armPoti].value < ARM_HORIZONTAL)
+		//	armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
+		//else
+		//	armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
