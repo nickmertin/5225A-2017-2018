@@ -542,7 +542,7 @@ typedef enum _tMobileStates {
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
-#define MOBILE_UP_HOLD_POWER 10
+#define MOBILE_UP_HOLD_POWER 12
 #define MOBILE_DOWN_HOLD_POWER -10
 #define MOBILE_DOWN_SLOW_POWER_1 -60
 #define MOBILE_DOWN_SLOW_POWER_2 6
@@ -588,9 +588,7 @@ case mobileTop:
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 1100;
-		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 1))) sleep(10);
-		setMobile(15);
-		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 2), False)) sleep(10);
+		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 1), false)) sleep(10);
 		//Coast if timedout
 		if ( TimedOut(timeout, TID1(mobileTop, 2), False) )
 			NEXT_STATE(mobileIdle)
