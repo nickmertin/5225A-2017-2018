@@ -269,7 +269,7 @@ case liftToTarget:
 		writeDebugStreamLine("%d Stopping lift", nPgmTime);
 		if (gSensor[liftPoti].velGood)
 		{
-			setLift(sgn(gSensor[liftPoti].velocity) > 0 ? -20 : 10);
+			setLift(sgn(gSensor[liftPoti].velocity) > 0 ? -15 : 10);
 			sleep(150);
 			setLift(0);
 		}
