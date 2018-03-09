@@ -251,8 +251,10 @@ case liftToTarget:
 
 				if (power * sgn(err) < 25 && gSensor[liftPoti].velocity * sgn(err) < abs(vTarget))
 					power = 25 * sgn(err);
-				else if (sgn(power) == -sgn(gSensor[liftPoti].velocity))
+				else if (sgn(power) == -sgn(vTarget))
 					LIM_TO_VAL_SET(power, 7);
+				else if (sgn(power) == -sgn(gSensor[liftPoti].velocity))
+					LIM_TO_VAL_SET(power, 25);
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setLift((word) power);
