@@ -415,8 +415,8 @@ case armToTarget:
 			err = target - gSensor[armPoti].value;
 			float vTarget = sgn(err) * 5.5 * (1.0 - exp(-0.0005 * abs(err)));
 			const float bias = 3;
-			const float kB = 7.0;
-			const float kP = 5.0;
+			const float kB = 15.0;
+			const float kP = 3.0;
 			velocityCheck(armPoti);
 			datalogDataGroupStart();
 			datalogAddValue(0, err);
