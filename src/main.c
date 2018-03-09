@@ -177,7 +177,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 1150)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 750)
-#define LIFT_PERIMETER (LIFT_BOTTOM + 500)
+#define LIFT_PERIMETER (LIFT_BOTTOM + 400)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
