@@ -1133,24 +1133,14 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
-		gPrepStart = nPgmTime;
+		liftSet(liftToTarget, LIFT_LOADER);
+		armSet(armToTarget, ARM_HORIZONTAL);
 	}
 
-	if (FALLING(BTN_MACRO_PREP) && !stackRunning())
+	if (RISING(BTN_MACRO_WALL) && !stackRunning())
 	{
-		if (nPgmTime - gPrepStart > 500)
-		{
-			liftSet(liftToTarget, LIFT_PERIMETER);
-		}
-		else
-		{
-			liftSet(liftToTarget, LIFT_LOADER);
-		}
+		liftSet(liftToTarget, LIFT_PERIMETER);
 		armSet(armToTarget, ARM_HORIZONTAL);
-		//if (gSensor[armPoti].value < ARM_HORIZONTAL)
-		//	armRaiseSimpleAsync(ARM_HORIZONTAL, 127, -25, 35, 200);
-		//else
-		//	armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
@@ -1249,6 +1239,7 @@ void startup()
 	enableJoystick(BTN_MACRO_STACK);
 	enableJoystick(BTN_MACRO_LOADER);
 	enableJoystick(BTN_MACRO_PREP);
+	enableJoystick(BTN_MACRO_WALL);
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MACRO_PICKUP);
@@ -1257,14 +1248,15 @@ void startup()
 	enableJoystick(BTN_MACRO_DEC);
 	MIRROR(BTN_MOBILE_TOGGLE);
 	MIRROR(BTN_MOBILE_MIDDLE);
-	MIRROR(BTN_MACRO_ZERO);
 	MIRROR(BTN_MACRO_STACK);
-	MIRROR(BTN_MACRO_PICKUP);
+	MIRROR(BTN_MACRO_PREP);
+	MIRROR(BTN_MACRO_WALL);
 	MIRROR(BTN_MACRO_CANCEL);
 	MIRROR(BTN_MACRO_INC);
 	MIRROR(BTN_MACRO_DEC);
 	MIRROR(Btn7L);
 	MIRROR(Btn8R);
+	mirrorJoystick(BTN_MACRO_ZERO, BTN_MACRO_ZERO_PARTNER);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
