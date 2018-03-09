@@ -431,10 +431,10 @@ case armToTarget:
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity) + bias;
 
-				if (power * sgn(err) < 25 && gSensor[armPoti].velocity * sgn(err) < abs(vTarget))
-					power = 25 * sgn(err);
+				if (power * sgn(err) < 20 && gSensor[armPoti].velocity * sgn(err) < abs(vTarget))
+					power = 20 * sgn(err);
 				else if (sgn(power) == -sgn(gSensor[armPoti].velocity))
-					LIM_TO_VAL_SET(power, 7);
+					LIM_TO_VAL_SET(power, 10);
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setArm((word) power);
