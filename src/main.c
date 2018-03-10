@@ -553,6 +553,8 @@ typedef enum _tMobileStates {
 #define MOBILE_SLOW_HOLD_TIMEOUT 500
 #define MOBILE_AUTO_TIMEOUT 500
 
+int gMobileSlowDown[11]  = {0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3};
+
 bool gMobileCheckLift;
 bool gMobileSlow = false;
 bool gMobileAutoEnabled = true;
@@ -644,6 +646,7 @@ case mobileBottomSlow:
 			if (gSensor[mobilePoti].velGood)
 			{
 				float power = ((MOBILE_BOTTOM + 200 - gSensor[mobilePoti].value) * kP_vel - gSensor[mobilePoti].velocity) * kP_pwr;
+				power -= gMobileSlowDown[gNumCones];
 				LIM_TO_VAL_SET(power, (gSensor[mobilePoti].value < MOBILE_BOTTOM + 700) ? 10 : 20);
 				setMobile((word)power);
 			}
