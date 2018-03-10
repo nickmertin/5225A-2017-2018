@@ -131,23 +131,33 @@ void safetySet(tSensors sen)
 void velocityCheck(tSensors sen)
 {
 	unsigned long time = nPgmTime;
-	if (time - gSensor[sen].timeVelCheck >= 20)
+	if (!gSensor[sen].velCount || time - gSensor[sen].velData[gSensor[sen].velCount - 1].timestamp >= 20)
 	{
 		int sensor = gSensor[sen].value;
-		gSensor[sen].lstVelocity = gSensor[sen].velocity;
-		gSensor[sen].velocity = (float)(sensor - gSensor[sen].valueVelLst) / (float)(time - gSensor[sen].timeVelCheck);
-		gSensor[sen].valueVelLst = sensor;
-		gSensor[sen].timeVelCheck = time;
-		gSensor[sen].velGood = true;
+		if (gSensor[sen].velCount == SENSOR_VEL_POINT_COUNT)
+		{
+			gSensor[sen].velCount = SENSOR_VEL_POINT_COUNT - 1;
+			memmove(&gSensor[sen].velData[0], &gSensor[sen].velData[1], sizeof(sSensorVelPoint) * (SENSOR_VEL_POINT_COUNT - 1));
+		}
+		sSensorVelPoint& data = gSensor[sen].velData[gSensor[sen].velCount++];
+		data.value = sensor;
+		data.timestamp = time;
+		if (gSensor[sen].velCount > 1)
+		{
+			gSensor[sen].lstVelocity = gSensor[sen].velocity;
+			sSensorVelPoint& old = gSensor[sen].velData[0];
+			gSensor[sen].velocity = (float)(sensor - old.value) / (float)(time - old.timestamp);
+			gSensor[sen].velGood = true;
+		}
 	}
 }
 
 void velocityClear(tSensors sen)
 {
-	gSensor[sen].timeVelCheck = nPgmTime;
-	gSensor[sen].valueVelLst = gSensor[sen].value;
+	gSensor[sen].velCount = 0;
 	gSensor[sen].velocity = gSensor[sen].lstVelocity = 0;
 	gSensor[sen].velGood = false;
+	velocityCheck(sen);
 }
 
 void startSensor(tSensors sen)
@@ -172,9 +182,8 @@ void setupSensors()
 
 		gSensor[i].lstVelocity = 0;
 		gSensor[i].velocity = 0;
-		gSensor[i].valueVelLst = 0;
-		gSensor[i].timeVelCheck = 0;
 		gSensor[i].velGood = false;
+		gSensor[i].velCount = 0;
 
 #ifdef CHECK_POTI_JUMPS
 		gSensor[i].filterAcc = 0;
