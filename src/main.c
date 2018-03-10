@@ -113,6 +113,8 @@ bool gSetTimedOut = false;
 
 bool gDriveManual;
 
+bool isMobileSlow();
+
 /* Drive */
 void setDrive(word left, word right, bool debug = false)
 {
@@ -472,7 +474,7 @@ case armFollowMobile:
 	{
 		velocityClear(armPoti);
 		velocityClear(mobilePoti);
-		while (true)
+		while (isMobileSlow())
 		{
 			velocityCheck(armPoti);
 			velocityCheck(mobilePoti);
@@ -486,6 +488,7 @@ case armFollowMobile:
 				LIM_TO_VAL_SET(power, 127);
 				setArm((word)power);
 			}
+			sleep(20);
 		}
 		NEXT_STATE(armHold);
 	}
@@ -655,6 +658,8 @@ case mobileBottomSlow:
 		//sPID pid;
 		//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
 		writeDebugStreamLine("Slow dropping stack of %d", gNumCones);
+		if (arg._long & mfFollow)
+			armSet(armFollowMobile);
 		velocityClear(mobilePoti);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
@@ -779,6 +784,11 @@ void handleMobile()
 				mobileSet(mobileUpToMiddle, mfClear);
 		}
 	}
+}
+
+bool isMobileSlow()
+{
+	return mobileState == mobileBottomSlow;
 }
 
 
