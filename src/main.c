@@ -102,7 +102,7 @@ typedef enum _stackStates {
 
 DECLARE_MACHINE(stack, tStackStates)
 
-#define STACK_CLEAR_CONFIG(flags, mobileState) ((flags) | sfClear | sfMobile | ((mobileState) << 16))
+#define STACK_CLEAR_CONFIG(flags, mobileState, mobileFlags) ((flags) | sfClear | sfMobile | ((mobileState) << 16) | ((mobileFlags) << 24))
 #define MAX_STACK 11
 
 sCycleData gMainCycle;
@@ -545,6 +545,12 @@ void handleArm()
 
 /* Mobile */
 
+typedef enum _tMobileFlags {
+	mfNone = 0,
+	mfClear = 1,
+	mfFollow = 2
+} tMobileFlags;
+
 typedef enum _tMobileStates {
 	mobileManaged,
 	mobileIdle,
@@ -607,7 +613,7 @@ case mobileIdle:
 case mobileTop:
 	{
 		gMobileAutoEnabled = false;
-		if (arg._long)
+		if (arg._long & mfClear)
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 1100;
@@ -628,7 +634,7 @@ case mobileBottom:
 		gMobileAutoIgnore = nPgmTime + 1500;
 		if (gMobileSlow)
 			NEXT_STATE(mobileBottomSlow)
-		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
+		if ((arg._long & mfClear) && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		writeDebugStreamLine("Fast dropping stack of %d", gNumCones);
 		setMobile(MOBILE_DOWN_POWER);
@@ -644,7 +650,7 @@ case mobileBottom:
 case mobileBottomSlow:
 	{
 		gMobileSlow = false;
-		if (arg._long && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
+		if ((arg._long & mfClear) && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		//sPID pid;
 		//pidInit(pid, 0.04, 0, 3.5, -1, -1, -1, 60);
@@ -688,7 +694,7 @@ case mobileUpToMiddle:
 	}
 case mobileDownToMiddle:
 	{
-		if (arg._long)
+		if (arg._long & mfClear)
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1000;
@@ -737,11 +743,11 @@ void handleMobile()
 	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
 	{
 		if (RISING(BTN_MOBILE_MIDDLE))
-			mobileSet(mobileTop, -1);
+			mobileSet(mobileTop, mfClear);
 		if (RISING(BTN_MOBILE_TOGGLE))
 		{
 			gMobileSlow = false;
-			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom));
+			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom, mfClear));
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
 		}
 	}
@@ -752,25 +758,25 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > 3)
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow));
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, gNumCones > 6 ? mfClear | mfFollow : mfClear));
 				else
 				{
 					gMobileSlow = false;
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom));
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom, mfClear));
 					mobileWaitForSlowHoldAsync(BTN_MOBILE_TOGGLE);
 				}
 			}
 			else
-				mobileSet(mobileTop, -1);
+				mobileSet(mobileTop, mfClear);
 		}
 		if (RISING(BTN_MOBILE_MIDDLE))
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileDownToMiddle));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileDownToMiddle, mfClear));
 			}
 			else
-				mobileSet(mobileUpToMiddle, -1);
+				mobileSet(mobileUpToMiddle, mfClear);
 		}
 	}
 }
@@ -1001,7 +1007,7 @@ case stackClear:
 		}
 
 		if (arg._long & sfMobile)
-			mobileSet(arg._long >> 16);
+			mobileSet(((arg._long >> 16) & 0xFF) | (arg._long >> 24));
 
 		NEXT_STATE(stackNotRunning)
 	}
