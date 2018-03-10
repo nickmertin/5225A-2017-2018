@@ -344,13 +344,13 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define ARM_TOP 2550
-#define ARM_BOTTOM 1100
-#define ARM_PRESTACK 2150
-#define ARM_RELEASE 2050
-#define ARM_CARRY 1650
-#define ARM_STACK 2500
-#define ARM_HORIZONTAL 1300
+#define ARM_TOP 2600
+#define ARM_BOTTOM 1150
+#define ARM_PRESTACK 2200
+#define ARM_RELEASE 2100
+#define ARM_CARRY 1700
+#define ARM_STACK 2550
+#define ARM_HORIZONTAL 1350
 
 #define ARM_MOBILE_RATIO 0.714
 
@@ -861,9 +861,9 @@ case stackPickupGround:
 			armTimeOut = nPgmTime + 1000;
 			timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
 		}
-		else if (gSensor[armPoti].value < ARM_BOTTOM + 300)
+		else if (gSensor[armPoti].value < ARM_HORIZONTAL)
 		{
-			armRaiseSimpleAsync(ARM_BOTTOM + 300, 127, -10);
+			armSet(armToTarget, ARM_HORIZONTAL);
 		}
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
