@@ -326,6 +326,7 @@ typedef enum _tArmStates {
 	armToTarget,
 	armRaiseSimpleState,
 	armLowerSimpleState,
+	armFollowMobile,
 	armStopping,
 	armHold
 } tArmStates;
@@ -337,6 +338,8 @@ typedef enum _tArmStates {
 #define ARM_CARRY 1500
 #define ARM_STACK 2350
 #define ARM_HORIZONTAL 1150
+
+#define ARM_MOBILE_RATIO 0.714
 
 void setArm(word power, bool debug = false)
 {
@@ -465,9 +468,29 @@ case armLowerSimpleState:
 		STATE_INVOKE_ASYNC(armLowerSimple);
 		NEXT_STATE(armHold);
 	}
+case armFollowMobile:
+	{
+		velocityClear(armPoti);
+		velocityClear(mobilePoti);
+		while (true)
+		{
+			velocityCheck(armPoti);
+			velocityCheck(mobilePoti);
+			if (gSensor[mobilePoti].velGood && gSensor[armPoti].velGood)
+			{
+				const float kP_vel = 0.01;
+				const float kB = 4.0;
+				const float kP = 0.0;
+				float vTarget = gSensor[mobilePoti].velocity * ARM_MOBILE_RATIO + kP_vel * (ARM_HORIZONTAL + (gSensor[mobilePoti].value - 500) * ARM_MOBILE_RATIO - gSensor[armPoti].value);
+				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity);
+				LIM_TO_VAL_SET(power, 127);
+				setArm((word)power);
+			}
+		}
+		NEXT_STATE(armHold);
+	}
 case armStopping:
 	velocityClear(armPoti);
-	velocityCheck(armPoti);
 	do
 	{
 		sleep(5);

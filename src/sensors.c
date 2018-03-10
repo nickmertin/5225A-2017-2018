@@ -130,6 +130,7 @@ void safetySet(tSensors sen)
 
 void velocityCheck(tSensors sen)
 {
+	tHog();
 	unsigned long time = nPgmTime;
 	if (!gSensor[sen].velCount || time - gSensor[sen].velData[gSensor[sen].velCount - 1].timestamp >= 20)
 	{
@@ -150,14 +151,17 @@ void velocityCheck(tSensors sen)
 			gSensor[sen].velGood = true;
 		}
 	}
+	tRelease();
 }
 
 void velocityClear(tSensors sen)
 {
+	tHog();
 	gSensor[sen].velCount = 0;
 	gSensor[sen].velocity = gSensor[sen].lstVelocity = 0;
 	gSensor[sen].velGood = false;
 	velocityCheck(sen);
+	tRelease();
 }
 
 void startSensor(tSensors sen)
