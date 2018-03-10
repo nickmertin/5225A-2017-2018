@@ -330,13 +330,13 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define ARM_TOP 2400
-#define ARM_BOTTOM 950
-#define ARM_PRESTACK 2000
-#define ARM_RELEASE 1900
-#define ARM_CARRY 1500
-#define ARM_STACK 2350
-#define ARM_HORIZONTAL 1150
+#define ARM_TOP 2550
+#define ARM_BOTTOM 1100
+#define ARM_PRESTACK 2150
+#define ARM_RELEASE 2050
+#define ARM_CARRY 1650
+#define ARM_STACK 2500
+#define ARM_HORIZONTAL 1300
 
 void setArm(word power, bool debug = false)
 {
