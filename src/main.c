@@ -74,6 +74,10 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #define SKILLS_RESET_AT_START
 //#define ULTRASONIC_RESET
 
+#define DATALOG_LIFT -1
+#define DATALOG_ARM -1
+#define DATALOG_FOLLOW 0
+
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
 bool stackRunning();
@@ -245,9 +249,12 @@ case liftToTarget:
 			const float kP = 10.0;
 			velocityCheck(liftPoti);
 			tHog();
-			datalogDataGroupStart();
-			datalogAddValue(0, err);
-			datalogAddValue(1, vTarget * 1000);
+			if (DATALOG_LIFT != -1)
+			{
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_LIFT + 0, err);
+				datalogAddValue(DATALOG_LIFT + 1, vTarget * 1000);
+			}
 			if (gSensor[liftPoti].velGood)
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[liftPoti].velocity) + bias;
@@ -261,10 +268,14 @@ case liftToTarget:
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setLift((word) power);
-				datalogAddValue(2, gSensor[liftPoti].velocity * 1000);
-				datalogAddValue(3, power * 10);
+				if (DATALOG_LIFT != -1)
+				{
+					datalogAddValue(DATALOG_LIFT + 2, gSensor[liftPoti].velocity * 1000);
+					datalogAddValue(DATALOG_LIFT + 3, power * 10);
+				}
 			}
-			datalogDataGroupEnd();
+			if (DATALOG_LIFT != -1)
+				datalogDataGroupEnd();
 			tRelease();
 			sleep(20);
 		} while (abs(err) > 100);
@@ -429,9 +440,12 @@ case armToTarget:
 			const float kP = 3.0;
 			velocityCheck(armPoti);
 			tHog();
-			datalogDataGroupStart();
-			datalogAddValue(4, err);
-			datalogAddValue(5, vTarget * 1000);
+			if (DATALOG_ARM != -1)
+			{
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_ARM + 0, err);
+				datalogAddValue(DATALOG_ARM + 1, vTarget * 1000);
+			}
 			if (gSensor[armPoti].velGood)
 			{
 				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity) + bias;
@@ -443,10 +457,14 @@ case armToTarget:
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setArm((word) power);
-				datalogAddValue(6, gSensor[armPoti].velocity * 1000);
-				datalogAddValue(7, power * 10);
+				if (DATALOG_ARM != -1)
+				{
+					datalogAddValue(DATALOG_ARM + 2, gSensor[armPoti].velocity * 1000);
+					datalogAddValue(DATALOG_ARM + 3, power * 10);
+				}
 			}
-			datalogDataGroupEnd();
+			if (DATALOG_ARM != -1)
+				datalogDataGroupEnd();
 			tRelease();
 			sleep(20);
 		} while (abs(err) > 100);
@@ -483,9 +501,22 @@ case armFollowMobile:
 				const float kP_vel = 0.01;
 				const float kB = 4.0;
 				const float kP = 0.0;
+				tHog();
+				if (DATALOG_FOLLOW != -1)
+				{
+					datalogDataGroupStart();
+					datalogAddValue(DATALOG_FOLLOW + 0, gSensor[mobilePoti].velocity);
+				}
 				float vTarget = gSensor[mobilePoti].velocity * ARM_MOBILE_RATIO + kP_vel * (ARM_HORIZONTAL + (gSensor[mobilePoti].value - 500) * ARM_MOBILE_RATIO - gSensor[armPoti].value);
 				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity);
 				LIM_TO_VAL_SET(power, 127);
+				if (DATALOG_FOLLOW != -1)
+				{
+					datalogAddValue(DATALOG_FOLLOW + 1, gSensor[armPoti].velocity);
+					datalogAddValue(DATALOG_FOLLOW + 2, vTarget);
+					datalogAddValue(DATALOG_FOLLOW + 3, power);
+					datalogDataGroupEnd();
+				}
 				setArm((word)power);
 			}
 			sleep(20);
