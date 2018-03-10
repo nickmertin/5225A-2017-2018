@@ -1017,7 +1017,7 @@ case stackClear:
 		}
 
 		if (arg._long & sfMobile)
-			mobileSet(((arg._long >> 16) & 0xFF) | (arg._long >> 24));
+			mobileSet((tMobileStates)((arg._long >> 16) & 0xFF), (long)(arg._long >> 24));
 
 		NEXT_STATE(stackNotRunning)
 	}
