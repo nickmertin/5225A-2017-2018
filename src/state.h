@@ -43,7 +43,7 @@ void machine##Setup() \
     machine##InternalKill(); \
   machine##Arg._long = 0; \
   machine##InternalAsync(base); \
-  writeDebugStreamLine("Initialized state machine " #machine " in base state " #base); \
+  writeDebugStreamLine("Init " #machine " - " #base); \
 } \
 void machine##Set(states state) \
 { \
