@@ -1171,17 +1171,12 @@ void autoStationaryRight2()
 
 void autoTest ()
 {
-	mobileSet(mobileTop, -1);
-	unsigned long coneTimeout = nPgmTime + 2000;
-	timeoutWhileLessThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 1, 3));
+	trackPositionTaskKill();
+	resetPositionFull(gPosition, 60, 60, 0);
+	resetVelocity(gVelocity, gPosition);
+	trackPositionTaskAsync();
 
-	//trackPositionTaskKill();
-	//resetPositionFull(gPosition, 60, 60, 90);
-	//resetVelocity(gVelocity, gPosition);
-	//trackPositionTaskAsync();
-
-	//moveToTargetSimpleAsync(0, 0, gPosition.y, gPosition.x, -90, 0, 0, 12, stopHarsh, true);
-	//driveTimeout = nPgmTime + 2500;
-	//liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
-	//timeoutWhileLessThanF(VEL_LOCAL_Y, 1.0, &gPosition.x, 72, driveTimeout, TID2(br20, 1, 3), true, false);
+	moveToLineSimpleAsync(PI / 2, 100, gPosition.y, gPosition.x, 127, 0, 0, 12, stopSoft | stopHarsh, true);
+	unsigned long driveTimeout = nPgmTime + 2500;
+	autoSimpleTimeoutWhile(moveToLineSimpleState, driveTimeout, TID0(autoTest));
 }

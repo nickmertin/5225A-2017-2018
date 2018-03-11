@@ -149,7 +149,7 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 		_sin = sin(gPosition.a);
 		_cos = cos(gPosition.a);
 
-		l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / _sin;
+		l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a);
 
 		gTargetLast.x = gPosition.x + l * _sin;
 		gTargetLast.y = gPosition.y + l * _cos;
@@ -170,7 +170,7 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 		vel = _sin * gVelocity.x + _cos * gVelocity.y;
 
 		endCycle(cycle);
-	} while (l < dropEarly + MAX((vel * ((stopType & stopSoft) ? 0.175 : 0.098)), decelEarly));
+	} while (l > dropEarly + MAX((vel * ((stopType & stopSoft) ? 0.175 : 0.098)), decelEarly));
 
 	writeDebugStreamLine("%f %f", l, vel);
 
@@ -184,7 +184,7 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 		_sin = sin(gPosition.a);
 		_cos = cos(gPosition.a);
 
-		l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / _sin;
+		l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a);
 
 		gTargetLast.x = gPosition.x + l * _sin;
 		gTargetLast.y = gPosition.y + l * _cos;
@@ -199,7 +199,7 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 		setDrive(-6 * sgn(power), -6 * sgn(power));
 		do
 		{
-			l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / _sin;
+			l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a);
 
 			gTargetLast.x = gPosition.x + l * _sin;
 			gTargetLast.y = gPosition.y + l * _cos;
