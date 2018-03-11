@@ -193,7 +193,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 1150)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 600)
-#define LIFT_PERIMETER (LIFT_BOTTOM + 400)
+#define LIFT_PERIMETER (LIFT_BOTTOM + 350)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -1066,7 +1066,10 @@ case stackReturn:
 			timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 150, liftTimeOut, TID1(stackReturn, 1));
 		}
 
-		armSet(armToTarget, ARM_HORIZONTAL);
+		if (arg._long & sfLoader)
+			armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		else
+			armSet(armToTarget, ARM_HORIZONTAL);
 		armTimeOut = nPgmTime + 1500;
 
 		if (gNumCones <= 3)
@@ -1082,7 +1085,7 @@ case stackReturn:
 		//}
 		else
 		{
-			liftSet(liftToTarget, (arg._long & sfLoader) ? 2200 : 1550);
+			liftSet(liftToTarget, (arg._long & sfLoader) ? LIFT_LOADER : LIFT_PERIMETER);
 			//liftLowerSimpleAsync((arg._long & sfLoader) ? 2500 : 1650, -127, 25);
 			liftTimeOut = nPgmTime + 1300;
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackReturn, 4));
@@ -1239,7 +1242,7 @@ void handleMacros()
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
 		liftSet(liftToTarget, LIFT_LOADER);
-		armSet(armToTarget, ARM_HORIZONTAL);
+		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 	}
 
 	if (RISING(BTN_MACRO_WALL) && !stackRunning())
