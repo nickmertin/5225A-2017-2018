@@ -84,7 +84,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #define DATALOG_LIFT -1
 #define DATALOG_ARM -1
 #define DATALOG_FOLLOW 0
-#define DATALOG_TIMEOUT 0
+#define DATALOG_TIMEOUT 4
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
@@ -361,8 +361,9 @@ typedef enum _tArmStates {
 #define ARM_CARRY 1700
 #define ARM_STACK 2550
 #define ARM_HORIZONTAL 1350
+#define ARM_FOLLOW_TARGET 1950
 
-#define ARM_MOBILE_RATIO 0.714
+#define ARM_MOBILE_RATIO 0.371
 
 void setArm(word power, bool debug = false)
 {
@@ -509,22 +510,22 @@ case armFollowMobile:
 			if (gSensor[mobilePoti].velGood && gSensor[armPoti].velGood)
 			{
 				const float kP_vel = 0.01;
-				const float kB = 4.0;
-				const float kP = 0.0;
+				const float kB = 5.0;
+				const float kP = 4.0;
 				tHog();
 				if (DATALOG_FOLLOW != -1)
 				{
 					datalogDataGroupStart();
-					datalogAddValue(DATALOG_FOLLOW + 0, gSensor[mobilePoti].velocity);
+					datalogAddValue(DATALOG_FOLLOW + 0, gSensor[mobilePoti].velocity * 1000);
 				}
-				float vTarget = gSensor[mobilePoti].velocity * ARM_MOBILE_RATIO + kP_vel * (ARM_HORIZONTAL + (gSensor[mobilePoti].value - 500) * ARM_MOBILE_RATIO - gSensor[armPoti].value);
+				float vTarget = gSensor[mobilePoti].velocity * ARM_MOBILE_RATIO + kP_vel * (ARM_FOLLOW_TARGET + (gSensor[mobilePoti].value - 500) * ARM_MOBILE_RATIO - gSensor[armPoti].value);
 				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity);
 				LIM_TO_VAL_SET(power, 127);
 				if (DATALOG_FOLLOW != -1)
 				{
-					datalogAddValue(DATALOG_FOLLOW + 1, gSensor[armPoti].velocity);
-					datalogAddValue(DATALOG_FOLLOW + 2, vTarget);
-					datalogAddValue(DATALOG_FOLLOW + 3, power);
+					datalogAddValue(DATALOG_FOLLOW + 1, gSensor[armPoti].velocity * 1000);
+					datalogAddValue(DATALOG_FOLLOW + 2, vTarget * 1000);
+					datalogAddValue(DATALOG_FOLLOW + 3, power * 10);
 					datalogDataGroupEnd();
 				}
 				setArm((word)power);
@@ -704,7 +705,7 @@ case mobileBottomSlow:
 			armSet(armFollowMobile);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
-		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.25, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
 		setMobile(0);
