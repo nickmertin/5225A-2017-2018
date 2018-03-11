@@ -382,3 +382,92 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
+
+void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
+{
+	writeDebugStreamLine("Turning to %f", radToDeg(a));
+
+	unsigned long time = nPgmTime;
+	unsigned long lstTime = time;
+	unsigned long nextDebug = 0;
+	float input = gVelocity.a;
+	float power = 0;
+	float velTarget = 0;
+	unsigned long deltaTime;
+	float vel;
+	float error;
+
+	const float kB = 15.0;
+	const float kP = 10.0;
+	float vTarget;
+
+	if (turnDir == ch)
+		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+
+	switch (turnDir)
+	{
+	case cw:
+		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
+		writeDebugStreamLine("%f", a);
+		writeDebugStreamLine("%f", gVelocity.a);
+		//
+		velTarget = 0.900;
+
+		while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
+		{
+			deltaTime = time - lstTime;
+			vel = gVelocity.a;
+
+			if (deltaTime >= 1)
+			{
+				input = gPosition.a;
+
+				//lstError = error;
+				error = a - input;
+
+				vTarget = sgn(error) * (1.0 - exp(-1 * abs(error)));
+
+				power = kB * vTarget + kP * (vTarget - gVelocity.a);
+
+				if (power < 5 && error > 0.8)
+					power = 5;
+				else if (power > 127)
+					power = 127;
+
+				if (DATALOG_TURN != -1)
+				{
+					datalogDataGroupStart();
+					datalogAddValue(DATALOG_TURN + 0, error);
+					datalogAddValue(DATALOG_TURN + 1, a);
+					datalogAddValue(DATALOG_TURN + 2, input);
+					datalogAddValue(DATALOG_TURN + 3, vTarget * 1000);
+					datalogAddValue(DATALOG_TURN + 4, gVelocity.a * 1000);
+					datalogAddValue(DATALOG_TURN + 5, power);
+				}
+
+				setDrive(power, -power);
+
+				lstTime = time;
+			}
+
+			sleep(1);
+
+			time = nPgmTime;
+		}
+
+		setDrive(-30, 30);
+		sleep(50);
+		setDrive(0, 0);
+		break;
+	case ccw:
+		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
+		velTarget = -0.900;
+		while (gPosition.a > a + degToRad(mogo ? 2.2 : 3.5))
+			//turnSimpleInternalCcw(a, state);
+		setDrive(30, -30);
+		sleep(50);
+		setDrive(0, 0);
+		break;
+	}
+	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}

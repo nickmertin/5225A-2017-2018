@@ -33,6 +33,7 @@ void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right, bool mo
 void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, bool mogo = false, float offset = 0);
 void turnSimpleInternalCw(float a, sTurnState& state);
 void turnSimpleInternalCcw(float a, sTurnState& state);
+void turnToAngleRadNewAlg(float a, tTurnDir turnDir, bool mogo = false);
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon);
 void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte power, float epsilon);
 
