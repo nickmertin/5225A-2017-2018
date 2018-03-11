@@ -703,8 +703,11 @@ case mobileBottomSlow:
 		writeDebugStreamLine("Slow dropping stack of %d", gNumCones);
 		if (arg._long & mfFollow)
 			armSet(armFollowMobile);
-		unsigned long timeout = nPgmTime + 3000;
+		setMobile(-127);
+		unsigned long timeout = nPgmTime + 500;
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, timeout, TID1(mobileBottomSlow, 1));
 		setMobile(-60);
+		timeout = nPgmTime + 2500;
 		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.05, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
@@ -788,7 +791,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > 3)
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 6 ? mfClear | mfFollow : mfClear));
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
 				else
 				{
 					gMobileSlow = false;
