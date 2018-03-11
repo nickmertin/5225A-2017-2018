@@ -1004,7 +1004,7 @@ case stackReturn:
 		}
 
 		armSet(armToTarget, ARM_HORIZONTAL);
-		armTimeOut = nPgmTime + 1000;
+		armTimeOut = nPgmTime + 1500;
 
 		if (gNumCones <= 3)
 		{
@@ -1025,7 +1025,7 @@ case stackReturn:
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackReturn, 4));
 		}
 
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
+		//timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
 
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
 		NEXT_STATE(stackNotRunning)
