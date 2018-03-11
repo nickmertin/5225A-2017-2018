@@ -111,14 +111,10 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTargetSimple(float y, float x, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow) { moveToTargetSimple(y, x, gPosition.y, gPosition.x, power, decelEarly, decelPower, dropEarly, stopType, slow); }
-
 void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
 {
 	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, decelEarly, decelPower, dropEarly, stopType, slow);
 }
-
-void moveToTargetDisSimple(float a, float d, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow) { moveToTargetDisSimple(a, d, gPosition.y, gPosition.x, power, decelEarly, decelPower, dropEarly, stopType, slow); }
 
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
 {
@@ -386,25 +382,3 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	applyHarshStop();
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
-
-//void resetBlueLeft()
-//{
-//	setDrive(-30, -30);
-//	unsigned long timeout = nPgmTime + 1500;
-//	sleep(500);
-//	timeoutWhileLessThanF(&gVelocity.x, -0.1, timeout, TID0(rbl));
-//	setDrive(-7, -7);
-//	sleep(500);
-//	resetPositionFull(gPosition, gPosition.y, 8.25, 90);
-//}
-
-//void resetBlueRight()
-//{
-//	setDrive(-30, -30);
-//	unsigned long timeout = nPgmTime + 1500;
-//	sleep(500);
-//	timeoutWhileLessThanF(&gVelocity.y, -0.1, timeout, TID0(rbr));
-//	setDrive(-7, -7);
-//	sleep(500);
-//	resetPositionFull(gPosition, 8.25, gPosition.x, 0);
-//}
