@@ -83,7 +83,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 
 #define DATALOG_LIFT -1
 #define DATALOG_ARM -1
-#define DATALOG_FOLLOW 0
+#define DATALOG_TIMEOUT 0
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
@@ -1101,7 +1101,11 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 		return true;
 	}
 	else
+	{
+		if (DATALOG_TIMEOUT != -1)
+			datalogAddValueWithTimeStamp(DATALOG_TIMEOUT, curVel);
 		return false;
+	}
 }
 
 bool stackRunning()
