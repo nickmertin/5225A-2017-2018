@@ -705,7 +705,7 @@ case mobileBottomSlow:
 			armSet(armFollowMobile);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
-		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.25, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.05, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
 		setMobile(0);
