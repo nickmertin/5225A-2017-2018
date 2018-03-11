@@ -1051,7 +1051,7 @@ bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceDat
 			velocityCheck(velSourceData);
 			if (gSensor[velSourceData].velGood)
 			{
-				gSensor[velSourceData].velocity;
+				out = gSensor[velSourceData].velocity;
 				return true;
 			}
 			return false;
@@ -1073,7 +1073,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 {
 	float curVel;
 
-	if (nPgmTime > timeOut || ( (elpsdTime > 100 && getVelocity(velSourceType, velSourceData, curVel)) ? ( abs(curVel) < abs(vel) || sgn(vel) != sgn(curVel) ) : 0 ) )
+	if (nPgmTime > timeOut || ( (elpsdTime > 400 && getVelocity(velSourceType, velSourceData, curVel)) ? ( abs(curVel) < abs(vel) || sgn(vel) != sgn(curVel) ) : 0 ) )
 	{
 		tHog();
 		char description[40];
@@ -1103,7 +1103,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	else
 	{
 		if (DATALOG_TIMEOUT != -1)
-			datalogAddValueWithTimeStamp(DATALOG_TIMEOUT, curVel);
+			datalogAddValueWithTimeStamp(DATALOG_TIMEOUT, curVel * 1000);
 		return false;
 	}
 }
