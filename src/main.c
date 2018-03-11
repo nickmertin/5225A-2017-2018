@@ -638,7 +638,7 @@ case mobileBottom:
 		writeDebugStreamLine("Fast dropping stack of %d", gNumCones);
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1100;
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID0(mobileBottom), False)) sleep(10);
+		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID0(mobileBottom), false);
 		//Coast if timedout
 		if ( TimedOut(timeout, TID0(mobileBottom), False) )
 			NEXT_STATE(mobileIdle)
@@ -654,7 +654,7 @@ case mobileBottomSlow:
 		writeDebugStreamLine("Slow dropping stack of %d", gNumCones);
 		unsigned long timeout = nPgmTime + 3000;
 		setMobile(-60);
-		while (gSensor[mobilePoti].value > MOBILE_HALFWAY + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 2))) sleep(10);
+		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
 		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
 		setMobile(0);
