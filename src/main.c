@@ -824,7 +824,7 @@ case stackPickupLoader:
 		armTimeOut = nPgmTime + 1200;
 		liftLowerSimpleAsync(LIFT_LOADER_PICKUP, -127, 0);
 		liftTimeOut = nPgmTime + 600;
-		timeoutWhileGreaterThanL(&gSensor[armPoti].value, ARM_HORIZONTAL + 100, armTimeOut, TID1(stackPickupLoader, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL + 100, armTimeOut, TID1(stackPickupLoader, 2));
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupLoader, 3));
 
 		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
