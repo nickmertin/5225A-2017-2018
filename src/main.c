@@ -97,7 +97,9 @@ typedef enum _stackFlags {
 	sfClear = 4,
 	sfReturn = 8,
 	sfMobile = 16,
-	sfLoader = 32
+	sfLoader = 32,
+	sfNoResetArm = 64,
+	sfNoResetLift = 128
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -785,7 +787,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > 3)
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, gNumCones > 6 ? mfClear | mfFollow : mfClear));
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 6 ? mfClear | mfFollow : mfClear));
 				else
 				{
 					gMobileSlow = false;
@@ -836,8 +838,10 @@ MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
 	writeDebugStreamLine("%06d Start stackNotRunning. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
-	liftSet(liftHold);
-	armSet(armHold);
+	if (!(arg._long & sfNoResetLift))
+		liftSet(liftHold);
+	if (!(arg._long && sfNoResetArm))
+		armSet(armHold);
 	gDriveManual = true;
 	break;
 case stackPickupGround:
