@@ -22,27 +22,47 @@ void timeoutWhileGreaterThanS(short *val, short threshold, unsigned long timeout
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
-void timeoutWhileLessThanL(long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
+void timeoutWhileLessThanL(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill, bool correctSign)
 {
-	while (*val < threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
+	if (correctSign)
+		vel = abs(vel);
+	if (velSourceType == velSensor)
+		velocityClear(velSourceData);
+	unsigned long startTime = nPgmTime;
+	while (*val < threshold && !TimedOut(timeout, routine, id, kill, velSourceType, velSourceData, vel, nPgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
-void timeoutWhileGreaterThanL(long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
+void timeoutWhileGreaterThanL(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill, bool correctSign)
 {
-	while (*val > threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
+	if (correctSign)
+		vel = -abs(vel);
+	if (velSourceType == velSensor)
+		velocityClear(velSourceData);
+	unsigned long startTime = nPgmTime;
+	while (*val > threshold && !TimedOut(timeout, routine, id, kill, velSourceType, velSourceData, vel, nPgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
-void timeoutWhileLessThanF(float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
+void timeoutWhileLessThanF(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill, bool correctSign)
 {
-	while (*val < threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
+	if (correctSign)
+		vel = abs(vel);
+	if (velSourceType == velSensor)
+		velocityClear(velSourceData);
+	unsigned long startTime = nPgmTime;
+	while (*val < threshold && !TimedOut(timeout, routine, id, kill, velSourceType, velSourceData, vel, nPgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
-void timeoutWhileGreaterThanF(float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
+void timeoutWhileGreaterThanF(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill, bool correctSign)
 {
-	while (*val > threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
+	if (correctSign)
+		vel = -abs(vel);
+	if (velSourceType == velSensor)
+		velocityClear(velSourceData);
+	unsigned long startTime = nPgmTime;
+	while (*val > threshold && !TimedOut(timeout, routine, id, kill, velSourceType, velSourceData, vel, nPgmTime-startTime)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 

@@ -157,6 +157,7 @@ void velocityCheck(tSensors sen)
 void velocityClear(tSensors sen)
 {
 	tHog();
+	writeDebugStreamLine("%d velocityClear %d", nPgmTime, sen);
 	gSensor[sen].velCount = 0;
 	gSensor[sen].velocity = gSensor[sen].lstVelocity = 0;
 	gSensor[sen].velGood = false;
