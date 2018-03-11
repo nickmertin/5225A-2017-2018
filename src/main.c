@@ -889,7 +889,7 @@ case stackStack:
 		liftTimeOut = nPgmTime + 1500;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 400, liftTimeOut, TID1(stackStack, 1));
 
-		armRaiseSimpleAsync(ARM_STACK, 127, 0);
+		armRaiseSimpleAsync(ARM_STACK, 127, 0, 100, 0);
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileLessThanL(&gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
 		timeoutWhileLessThanL(&gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
