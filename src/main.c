@@ -354,8 +354,13 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
+//New Actual ARM_TOP = 3200
+//#define ARM_TOP 3050
 #define ARM_TOP 2600
+//New Actual ARM_BOTTOM = 1420
+//#define ARM_BOTTOM 1570
 #define ARM_BOTTOM 1150
+
 #define ARM_PRESTACK 2200
 #define ARM_RELEASE 2100
 #define ARM_CARRY 1700
