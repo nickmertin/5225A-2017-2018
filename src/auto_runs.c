@@ -1171,5 +1171,13 @@ void autoStationaryRight2()
 
 void autoTest ()
 {
-	turnToAngleRadNewAlg(1.0, CW);
+	writeDebugStreamLine("%006d Start test: resetting", nPgmTime);
+	trackPositionTaskKill();
+	resetPositionFull(gPosition, 16, 40, 45);
+	resetVelocity(gVelocity, gPosition);
+	trackPositionTaskAsync();
+
+	writeDebugStreamLine("%006d Start test: turn", nPgmTime);
+	turnToAngleRadNewAlg(PI, CW);
+	writeDebugStreamLine("%006d Stop time", nPgmTime);
 }

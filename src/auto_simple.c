@@ -397,8 +397,8 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 	float vel;
 	float error;
 
-	const float kB = 15.0;
-	const float kP = 10.0;
+	const float kB = 30.0;
+	const float kP = 18;
 	float vTarget;
 
 	if (turnDir == ch)
@@ -411,9 +411,10 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 		writeDebugStreamLine("%f", a);
 		writeDebugStreamLine("%f", gVelocity.a);
 		//
-		velTarget = 0.900;
+		//velTarget = 0.900;
+		//while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
 
-		while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
+		while (gPosition.a < a)
 		{
 			deltaTime = time - lstTime;
 			vel = gVelocity.a;
@@ -424,14 +425,14 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 
 				//lstError = error;
 				error = a - input;
-
-				vTarget = sgn(error) * (1.0 - exp(-1 * abs(error)));
+				//vTarget =  0.9 rad/ms
+				vTarget = sgn(error) * (1.0 - exp(-0.4 * abs(error)));
 
 				power = kB * vTarget + kP * (vTarget - gVelocity.a);
 
-				if (power < 5 && error > 0.8)
-					power = 5;
-				else if (power > 127)
+				//if (power < 5 && error > 0.8)
+				//	power = 5;
+				if (power > 127)
 					power = 127;
 
 				if (DATALOG_TURN != -1)
