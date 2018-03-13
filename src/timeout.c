@@ -10,18 +10,6 @@ void timeoutWhileNotEqual(void *val1, void *val2, unsigned int size, unsigned lo
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 
-void timeoutWhileLessThanS(short *val, short threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
-{
-	while (*val < threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
-	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
-}
-
-void timeoutWhileGreaterThanS(short *val, short threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill)
-{
-	while (*val > threshold && !TimedOut(timeout, routine, id, kill)) sleep(10);
-	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
-}
-
 void timeoutWhileLessThanL(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill, bool correctSign)
 {
 	if (correctSign)

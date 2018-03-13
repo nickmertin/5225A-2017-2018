@@ -85,49 +85,6 @@ void resetQuadratureEncoder(tSensors sen)
 	SensorValue[sen] = 0;
 }
 
-bool safetyCheck(tSensors sen, unsigned long failedTime, float failedVal, unsigned long safetyMovingTime)
-{
-	unsigned long curTime = nPgmTime;
-	tHog();
-	if (curTime - gSensor[sen].failedCheckTime > 0)
-	{
-		if (curTime - gSensor[sen].failedCheckTime == 0) return gSensor[sen].failed && curTime - gSensor[sen].failedStartTime >= failedTime;
-		int senVal = gSensor[sen].value;
-		float val = abs((float)(senVal - gSensor[sen].safetyVal) / (float)(curTime - gSensor[sen].failedCheckTime));
-		gSensor[sen].failedCheckTime = nPgmTime;
-		if (val < failedVal && curTime - gSensor[sen].safetyStartTime > safetyMovingTime)
-		{
-			if (!gSensor[sen].failed)
-			{
-				gSensor[sen].failed = true;
-				gSensor[sen].failedStartTime = curTime;
-			}
-		}
-		else
-			gSensor[sen].failed = false;
-		gSensor[sen].safetyVal = senVal;
-	}
-	tRelease();
-	return gSensor[sen].failed && curTime - gSensor[sen].failedStartTime >= failedTime;
-}
-
-void safetyClear(tSensors sen)
-{
-	gSensor[sen].failed = false;
-	gSensor[sen].failedCheckTime = nPgmTime;
-	gSensor[sen].safetyStartTime = nPgmTime;
-}
-
-void safetySet(tSensors sen)
-{
-	if (!gSensor[sen].failed)
-	{
-		gSensor[sen].failed = true;
-		gSensor[sen].failedStartTime = nPgmTime;
-	}
-	gSensor[sen].failedCheckTime = nPgmTime;
-}
-
 void velocityCheck(tSensors sen)
 {
 	tHog();

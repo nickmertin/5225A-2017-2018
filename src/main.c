@@ -33,7 +33,6 @@
 
 // Year-independent libraries (headers)
 
-#include "notify.h"
 #include "task.h"
 #include "async.h"
 #include "timeout.h"
@@ -42,7 +41,6 @@
 #include "joysticks.h"
 #include "cycle.h"
 #include "utilities.h"
-#include "pid.h"
 #include "state.h"
 
 // Timeout function
@@ -51,7 +49,6 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 
 // Year-independent libraries (source)
 
-#include "notify.c"
 #include "task.c"
 #include "async.c"
 #include "timeout.c"
@@ -60,7 +57,6 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "joysticks.c"
 #include "cycle.c"
 #include "utilities.c"
-#include "pid.c"
 #include "state.c"
 
 // Other includes

@@ -3,9 +3,6 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 
-	sPID pidY;
-	pidInit(pidY, 0.12, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
-
 	gTargetLast.y = y;
 	gTargetLast.x = x;
 
@@ -144,9 +141,6 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 	float cosA = cos(a);
 
 	writeDebugStreamLine("Moving to y=%fx+%f from %f %f at %d", cosA / sinA, yInt, ys, xs, power);
-
-	sPID pidY;
-	pidInit(pidY, 0.12, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
 
 	float y, x;
 

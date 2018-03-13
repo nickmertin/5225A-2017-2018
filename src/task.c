@@ -56,11 +56,6 @@ void tStopAll(word id, bool notMe)
 	tRelease();
 }
 
-void tStopRoot()
-{
-	tStopAll(tGetRoot(nCurrentTask));
-}
-
 void tUnreg(word id)
 {
 	tHog();
@@ -93,13 +88,6 @@ void tUnreg(word id)
 	tEls[id].parent = -1;
 	tEls[id].next = -1;
 	tRelease();
-}
-
-word tGetRoot(word id)
-{
-	word _id = id;
-	while (tEls[_id].parent != -1 && _id != id) _id = tEls[_id].parent;
-	return _id;
 }
 
 void tHog()
