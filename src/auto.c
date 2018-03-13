@@ -192,13 +192,3 @@ void resetPositionFullRad(sPos& position, float y, float x, float a)
 	position.a = a;
 	tStart(_asyncTask_trackPositionTask);
 }
-
-float getTargetAngle(float y, float x, float ys, float xs)
-{
-	sLine line;
-	line.p1.y = ys;
-	line.p1.x = xs;
-	line.p2.y = y;
-	line.p2.x = x;
-	return getAngleOfLine(line);
-}

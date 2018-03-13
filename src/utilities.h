@@ -29,8 +29,6 @@
 
 /* Functions */
 float fmod(float x, float y); // Floating point mod operation
-float sq(float x); // Square a value
-int sq(int x); // Square a value
 float degToRad(float degrees); // Convert degrees to radians
 float radToDeg(float radians); // Convert radians to degrees
 float nearAngle(float angle, float reference); // Get an equivalent angle close to reference

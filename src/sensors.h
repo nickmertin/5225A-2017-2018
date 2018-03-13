@@ -60,9 +60,6 @@ bool correctBtnIn(tSensors sen); // Call this function to interpret a sensor set
 void setupDgtIn(tSensors sen, int min, int max); // Setup a sensor to be interpreted as a boolean using a custom range
 void setupInvertedSen(tSensors sen); // Setup a sensor to be interpreted as a boolean and inverted
 void resetQuadratureEncoder(tSensors sen); // Reset a quadrature encoder
-bool safetyCheck(tSensors sen, unsigned long failedTime, float failedVal, unsigned long safetyMovingTime); // Check if a rotary sensor has failed
-void safetyClear(tSensors sen); // Clear the error flag on a rotary sensor
-void safetySet(tSensors sen); // Set the error flag on a rotary sensor
 void velocityCheck(tSensors sen); // Check the velocity of a sensor
 void velocityClear(tSensors sen); // Clear the velocity of a sensor
 void startSensor(tSensors sen); // Set a sensors starting value
