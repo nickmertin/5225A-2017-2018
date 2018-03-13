@@ -1172,11 +1172,11 @@ void autoStationaryRight2()
 void autoTest ()
 {
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 60, 60, 0);
+	resetPositionFull(gPosition, 60, 100, -90);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
-	moveToLineSimpleAsync(PI / 2, 100, gPosition.y, gPosition.x, 127, 0, 0, 12, stopSoft | stopHarsh, true);
+	moveToLineSimpleAsync(PI / 4, 0, gPosition.y, gPosition.x, 127, 12, 30, 0, stopSoft | stopHarsh, true);
 	unsigned long driveTimeout = nPgmTime + 2500;
 	autoSimpleTimeoutWhile(moveToLineSimpleState, driveTimeout, TID0(autoTest));
 }
