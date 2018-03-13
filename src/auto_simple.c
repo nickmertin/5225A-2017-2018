@@ -1,5 +1,5 @@
 /* Functions */
-void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
+void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 
@@ -111,9 +111,9 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
+void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
 {
-	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, decelEarly, decelPower, dropEarly, stopType, slow);
+	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, maxErrX, decelEarly, decelPower, dropEarly, stopType, slow);
 }
 
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
