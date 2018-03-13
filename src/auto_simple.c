@@ -624,10 +624,14 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, boo
 
 		a += 2 * PI * floor((a - gPosition.a) / (2 * PI));
 
-		const float kR = 1.0;
-		const float kA = 0.1;
-		const float kB = 20.0;
-		const float kP = 5.0;
+		writeDebugStreamLine("Sweep to %f", a);
+
+		localA = atan2(gPosition.x - xOrigin, gPosition.y - yOrigin);
+
+		const float kR = 15.0;
+		const float kA = 3.0;
+		const float kB = 60.0;
+		const float kP = 15.0;
 
 		do
 		{
@@ -635,19 +639,37 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, boo
 			linearV = gVelocity.x * sin(aGlobal) + gVelocity.y * cos(aGlobal);
 			angularV = gVelocity.a;
 
-			float _y = y - yOrigin;
-			float _x = x - xOrigin;
+			float _y = gPosition.y - yOrigin;
+			float _x = gPosition.x - xOrigin;
 			localR = sqrt(_y * _y + _x * _x);
-			localA = atan2(_x, _y);
+			localA = nearAngle(atan2(_x, _y), localA);
 
-			float target = linearV / localR + kR * log(r / localR) + kA * (atan2(_x, _y) - aGlobal);
-			float turn = kB * target + kP * (target - angularV);
+			float target = MAX(linearV, 15) / localR + kR * log(localR / r) + kA * (localA + PI / 2 - aGlobal);
+			word turn = round(kB * target + kP * (target - angularV));
 
-			LIM_TO_VAL_SET(turn, 50);
+			//LIM_TO_VAL_SET(turn, 80);
+			if (turn < 0)
+				turn = 0;
+			else if (turn > 150)
+				turn = 150;
 			setDrive(127, 127 - turn);
 
-			sleep(1);
-		} while (localA - a < (slow ? 0.01 : 0.03) * r);
+			if (DATALOG_SWEEP != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_SWEEP + 0, localR);
+				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA));
+				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 1000);
+				datalogAddValue(DATALOG_SWEEP + 3, turn * 100);
+				datalogAddValue(DATALOG_SWEEP + 4, linearV * 10);
+				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 1000);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+
+			sleep(10);
+		} while (gPosition.a - a < (slow ? -0.01 : -0.03));
 
 		break;
 	}

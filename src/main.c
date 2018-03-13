@@ -24,6 +24,7 @@
 
 #define CHECK_POTI_JUMPS
 //#define FORCE_AUTO
+//#define IGNORE_DISABLE
 
 // Necessary definitions
 
@@ -80,8 +81,9 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #define DATALOG_LIFT -1
 #define DATALOG_ARM -1
 #define DATALOG_FOLLOW -1
-#define DATALOG_TURN 0
+#define DATALOG_TURN -1
 #define DATALOG_TIMEOUT -1
+#define DATALOG_SWEEP 0
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
