@@ -38,9 +38,12 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 	float _cos = cos(lineAngle);
 
 	word last = 0;
+	float correction = 0;
 
 	if (!slow)
 		setDrive(power, power);
+
+	word finalPower = power;
 
 	unsigned long timeStart = nPgmTime;
 	do
@@ -51,17 +54,36 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 		currentPosPolar.angle += lineAngle;
 		polarToVector(currentPosPolar, currentPosVector);
 
+		if (maxErrX)
+		{
+			float errA = gPosition.a - pidAngle;
+			float errX = currentPosVector.x + currentPosVector.y * sin(errA) / cos(errA);
+			correction = fabs(errX) > maxErrX ? -5.0 * errA : 0;
+		}
+
 		if (slow)
 		{
-			word finalPower = round(-127.0 / 48.0 * sgn(power) * currentPosVector.y);
+			finalPower = round(-127.0 / 48.0 * sgn(power) * currentPosVector.y);
 			LIM_TO_VAL_SET(finalPower, abs(power));
 			if (finalPower * sgn(power) < 30)
 				finalPower = 30 * sgn(power);
 			word delta = finalPower - last;
 			LIM_TO_VAL_SET(delta, 5);
 			finalPower = last += delta;
-			setDrive(finalPower, finalPower);
 			writeDebugStreamLine("%d | %.2f %d", nPgmTime, currentPosVector.y, finalPower);
+		}
+
+		switch (sgn(correction))
+		{
+			case 0:
+				setDrive(finalPower, finalPower);
+				break;
+			case 1:
+				setDrive(finalPower, finalPower * exp(-correction));
+				break;
+			case -1:
+				setDrive(finalPower * exp(correction), finalPower);
+				break;
 		}
 
 		vel = _sin * gVelocity.x + _cos * gVelocity.y;
