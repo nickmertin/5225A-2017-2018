@@ -18,8 +18,8 @@ void selectAuto()
 
 void runAuto()
 {
-	autoTest();
-	return;
+	//autoTest();
+	//return;
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
@@ -361,7 +361,7 @@ void autoSkills(int segment)
 	driveTimeout = nPgmTime + 2000;
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 3, 2));
-	moveToTargetSimpleAsync(11, 107, gPosition.y, gPosition.x, 127, 0, 0, 0, 12, stopNone, true);
+	moveToTargetSimpleAsync(11, 107, gPosition.y, gPosition.x, 127, 1.5, 0, 0, 12, stopNone, true);
 	driveTimeout = nPgmTime + 2500;
 	timeoutWhileLessThanF(VEL_LOCAL_Y, 1.0, &gPosition.x, 72, driveTimeout, TID2(skills, 3, 3), true, false);
 	liftRaiseSimpleAsync(gLiftRaiseTarget[0], 80, 0);
@@ -378,7 +378,7 @@ void autoSkills(int segment)
 	turnToTargetSimpleAsync(33, 27, ch, 40, 40, true, PI);
 	driveTimeout = nPgmTime + 2000;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 4, 1));
-	moveToTargetSimpleAsync(33, 27, gPosition.y, gPosition.x, -127, 0, 30, -30, 6, stopHarsh, true);
+	moveToLineSimpleAsync(PI / 4, -2, gPosition.y, gPosition.x, -127, 30, -30, 6, stopHarsh, true);
 	driveTimeout = nPgmTime + 2500;
 	stackSet(stackStack, sfClear);
 	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 4, 2));
