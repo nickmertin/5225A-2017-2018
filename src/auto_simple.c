@@ -116,6 +116,108 @@ void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, flo
 	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, decelEarly, decelPower, dropEarly, stopType, slow);
 }
 
+void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
+{
+	float sinA = sin(a);
+	float cosA = cos(a);
+
+	writeDebugStreamLine("Moving to y=%fx+%f from %f %f at %d", cosA / sinA, yInt, ys, xs, power);
+
+	sPID pidY;
+	pidInit(pidY, 0.12, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
+
+	float y, x;
+
+	sCycleData cycle;
+	initCycle(cycle, 10, "moveToTarget");
+
+	float vel, l;
+
+	float _sin, _cos;
+
+	word last = 0;
+
+	if (!slow)
+		setDrive(power, power);
+
+	unsigned long timeStart = nPgmTime;
+	do
+	{
+		if (nearAngle(gPosition.a, a) == a || nearAngle(gPosition.a + PI, a) == a)
+			break;
+
+		_sin = sin(gPosition.a);
+		_cos = cos(gPosition.a);
+
+		l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a);
+
+		gTargetLast.x = gPosition.x + l * _sin;
+		gTargetLast.y = gPosition.y + l * _cos;
+
+		if (slow)
+		{
+			word finalPower = round(127.0 / 48.0 * sgn(power) * l);
+			LIM_TO_VAL_SET(finalPower, abs(power));
+			if (finalPower * sgn(power) < 30)
+				finalPower = 30 * sgn(power);
+			word delta = finalPower - last;
+			LIM_TO_VAL_SET(delta, 5);
+			finalPower = last += delta;
+			setDrive(finalPower, finalPower);
+			writeDebugStreamLine("%d | %.2f %d", nPgmTime, l, finalPower);
+		}
+
+		vel = _sin * gVelocity.x + _cos * gVelocity.y;
+
+		endCycle(cycle);
+	} while (l > dropEarly + MAX((vel * ((stopType & stopSoft) ? 0.175 : 0.098)), decelEarly));
+
+	writeDebugStreamLine("%f %f", l, vel);
+
+	setDrive(decelPower, decelPower);
+
+	do
+	{
+		if (nearAngle(gPosition.a, a) == a || nearAngle(gPosition.a + PI, a) == a)
+			break;
+
+		_sin = sin(gPosition.a);
+		_cos = cos(gPosition.a);
+
+		l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a);
+
+		gTargetLast.x = gPosition.x + l * _sin;
+		gTargetLast.y = gPosition.y + l * _cos;
+
+		vel = _sin * gVelocity.x + _cos * gVelocity.y;
+
+		endCycle(cycle);
+	} while (l > dropEarly + (vel * ((stopType & stopSoft) ? 0.175 : 0.098)));
+
+	if (stopType & stopSoft)
+	{
+		setDrive(-6 * sgn(power), -6 * sgn(power));
+		do
+		{
+			l = ((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a);
+
+			gTargetLast.x = gPosition.x + l * _sin;
+			gTargetLast.y = gPosition.y + l * _cos;
+
+			vel = _sin * gVelocity.x + _cos * gVelocity.y;
+
+			endCycle(cycle);
+		} while (vel > 7 && l > 0);
+	}
+
+	if (stopType & stopHarsh)
+		applyHarshStop();
+	else
+		setDrive(0, 0);
+
+	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
+
 void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
