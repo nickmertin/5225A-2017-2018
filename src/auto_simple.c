@@ -596,3 +596,65 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 	}
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
+
+void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, bool slow)
+{
+	sVector vector;
+	sPolar polar;
+
+	if (turnDir == ch)
+	{
+		vector.x = gPosition.x - x;
+		vector.y = gPosition.y - y;
+		vectorToPolar(vector, polar);
+		polar.angle += a;
+		polarToVector(polar, vector);
+
+		turnDir = vector.x > 0 ? cw : ccw;
+	}
+
+	float yOrigin, xOrigin;
+	float linearV, angularV;
+	float localR, localA;
+
+	switch (turnDir)
+	{
+	case cw:
+		vector.y = 0;
+		vector.x = r;
+		vectorToPolar(vector, polar);
+		polar.angle -= a;
+		polarToVector(polar, vector);
+		yOrigin = y + vector.y;
+		xOrigin = x + vector.x;
+
+		a += 2 * PI * floor((a - gPosition.a) / (2 * PI));
+
+		const float kR = 1.0;
+		const float kA = 0.1;
+		const float kB = 20.0;
+		const float kP = 5.0;
+
+		do
+		{
+			float aGlobal = gPosition.a;
+			linearV = gVelocity.x * sin(aGlobal) + gVelocity.y * cos(aGlobal);
+			angularV = gVelocity.a;
+
+			float _y = y - yOrigin;
+			float _x = x - xOrigin;
+			localR = sqrt(_y * _y + _x * _x);
+			localA = atan2(_x, _y);
+
+			float target = linearV / localR + kR * log(r / localR) + kA * (atan2(_x, _y) - aGlobal);
+			float turn = kB * target + kP * (target - angularV);
+
+			LIM_TO_VAL_SET(turn, 50);
+			setDrive(127, 127 - turn);
+
+			sleep(1);
+		} while (localA - a < (slow ? 0.01 : 0.03) * r);
+
+		break;
+	}
+}
