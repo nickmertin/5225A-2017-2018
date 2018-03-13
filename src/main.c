@@ -1156,7 +1156,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 			snprintf(description, 40, "%s %d", routine, (word) id);
 		else
 			strcpy(description, routine);
-		writeDebugStream("%06d EXCEEDED TIME %d - ", nPgmTime, timeOut);
+		writeDebugStream("%06d EXCEEDED TIME %d - , %f", nPgmTime, timeOut, curVel);
 		writeDebugStreamLine(description);
 		if (kill)
 		{
