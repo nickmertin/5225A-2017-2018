@@ -65,8 +65,8 @@ void normalize(float& x, float& y, float m, float b)
 
 float calcYCoord(float u, float _a)
 {
-	const float x = 7.8;
-	const float y = 1.5;
+	const float x = 7.5;
+	const float y = 3.8;
 	const float b = atan2(y, x);
 	const float d2 = x * x + y * y;
 	const float d = sqrt(d2);
