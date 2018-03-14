@@ -180,13 +180,14 @@ typedef enum _tLiftStates {
 	liftHoldUp,
 } tLiftStates;
 
-void setLift(word power,bool debug=false)
+void setLift(word power,bool debug=true)
 {
-	if( debug )	writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
+	if( debug ) writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
+	writeDebugStreamLine("%d", power);
 }
 
-#define LIFT_BOTTOM 1050
+#define LIFT_BOTTOM 1000
 #define LIFT_TOP (LIFT_BOTTOM + 2150)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
@@ -880,6 +881,7 @@ case stackPickupGround:
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
+		liftSet(liftHoldDown);
 		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 50, armTimeOut, TID1(stackPickupGround, 4), false);
 
 		writeDebugStreamLine("ARM %d", gSensor[armPoti].value);
