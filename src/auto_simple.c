@@ -72,15 +72,15 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 
 		switch (sgn(correction))
 		{
-			case 0:
-				setDrive(finalPower, finalPower);
-				break;
-			case 1:
-				setDrive(finalPower, finalPower * exp(-correction));
-				break;
-			case -1:
-				setDrive(finalPower * exp(correction), finalPower);
-				break;
+		case 0:
+			setDrive(finalPower, finalPower);
+			break;
+		case 1:
+			setDrive(finalPower, finalPower * exp(-correction));
+			break;
+		case -1:
+			setDrive(finalPower * exp(correction), finalPower);
+			break;
 		}
 
 		vel = _sin * gVelocity.x + _cos * gVelocity.y;
@@ -544,24 +544,28 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 				//lstError = error;
 				error = a - input;
 				//vTarget =  0.9 rad/ms
-				vTarget = sgn(error) * (1.0 - exp(-0.4 * abs(error)));
+				vTarget = 7 * sgn(error) * (1.0 - exp(-0.4 * abs(error)));
 
-				power = kB * vTarget + kP * (vTarget - gVelocity.a);
+				power = kB * vTarget + kP * (vTarget - vel);
 
 				//if (power < 5 && error > 0.8)
 				//	power = 5;
-				if (power > 127)
-					power = 127;
+				LIM_TO_VAL_SET(power, 127);
 
 				if (DATALOG_TURN != -1)
 				{
+					tHog();
 					datalogDataGroupStart();
+
 					datalogAddValue(DATALOG_TURN + 0, error);
 					datalogAddValue(DATALOG_TURN + 1, a);
 					datalogAddValue(DATALOG_TURN + 2, input);
 					datalogAddValue(DATALOG_TURN + 3, vTarget * 1000);
-					datalogAddValue(DATALOG_TURN + 4, gVelocity.a * 1000);
+					datalogAddValue(DATALOG_TURN + 4, vel * 1000);
 					datalogAddValue(DATALOG_TURN + 5, power);
+
+					datalogDataGroupEnd();
+					tRelease();
 				}
 
 				setDrive(power, -power);
