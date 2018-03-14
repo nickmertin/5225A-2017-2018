@@ -98,7 +98,7 @@ void tUnreg(word id)
 word tGetRoot(word id)
 {
 	word _id = id;
-	while (tEls[_id].parent != -1 && _id != id) _id = tEls[_id].parent;
+	while (tEls[_id].parent != -1 && tEls[_id].parent != id) _id = tEls[_id].parent;
 	return _id;
 }
 
