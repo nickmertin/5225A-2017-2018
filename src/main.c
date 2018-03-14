@@ -5,6 +5,7 @@
 #pragma config(Sensor, in5,    expander,       sensorAnalog)
 #pragma config(Sensor, in6,    lsBarL,         sensorReflection)
 #pragma config(Sensor, in7,    lsBarR,         sensorReflection)
+#pragma config(Sensor, in8,    gyro,           sensorGyro)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
@@ -194,7 +195,7 @@ void setLift(word power,bool debug=true)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 1150)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 600)
-#define LIFT_PERIMETER (LIFT_BOTTOM + 350)
+#define LIFT_PERIMETER (LIFT_BOTTOM + 500)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -355,7 +356,7 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-#define RL_ARM_TOP 2760
+#define RL_ARM_TOP 2830
 #define ARM_TOP (RL_ARM_TOP - 160)
 
 //Actual ARM_BOTTOM = 1020
@@ -364,7 +365,8 @@ typedef enum _tArmStates {
 #define ARM_PRESTACK (RL_ARM_TOP - 560)
 #define ARM_RELEASE (RL_ARM_TOP - 660)
 #define ARM_CARRY (RL_ARM_TOP - 1060)
-#define ARM_STACK (RL_ARM_TOP - 210)
+//#define ARM_STACK (RL_ARM_TOP - 210)
+#define ARM_STACK (RL_ARM_TOP - 500)
 #define ARM_HORIZONTAL (RL_ARM_TOP - 1410)
 #define ARM_FOLLOW_TARGET (RL_ARM_TOP - 810)
 
@@ -873,16 +875,20 @@ case stackPickupGround:
 		{
 			armSet(armToTarget, ARM_HORIZONTAL);
 		}
+		writeDebugStreamLine("First arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 300, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 200, liftTimeOut, TID1(stackPickupGround, 2));
+
+		writeDebugStreamLine("Lift reached %06d lift at %d", npgmTime, gSensor[liftPoti].value);
 
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
 		liftSet(liftHoldDown);
 		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 50, armTimeOut, TID1(stackPickupGround, 4), false);
+		writeDebugStreamLine("Second arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
 
 		writeDebugStreamLine("ARM %d", gSensor[armPoti].value);
 
@@ -1100,7 +1106,7 @@ case stackReturn:
 			liftTimeOut = nPgmTime + 1300;
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackReturn, 4));
 		}
-
+		writeDebugStreamLine("Lift height %d vs %d", gSensor[liftPoti].value, LIFT_PERIMETER);
 		//timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
 
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
