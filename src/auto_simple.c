@@ -3,9 +3,6 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 
-	sPID pidY;
-	pidInit(pidY, 0.12, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
-
 	gTargetLast.y = y;
 	gTargetLast.x = x;
 
@@ -58,7 +55,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 		{
 			float errA = gPosition.a - pidAngle;
 			float errX = currentPosVector.x + currentPosVector.y * sin(errA) / cos(errA);
-			correction = fabs(errX) > maxErrX ? -5.0 * errA : 0;
+			correction = fabs(errX) > maxErrX ? 5.0 * (atan2(x - gPosition.x, y - gPosition.y) - gPosition.a) : 0;
 		}
 
 		if (slow)
@@ -75,15 +72,15 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 
 		switch (sgn(correction))
 		{
-			case 0:
-				setDrive(finalPower, finalPower);
-				break;
-			case 1:
-				setDrive(finalPower, finalPower * exp(-correction));
-				break;
-			case -1:
-				setDrive(finalPower * exp(correction), finalPower);
-				break;
+		case 0:
+			setDrive(finalPower, finalPower);
+			break;
+		case 1:
+			setDrive(finalPower, finalPower * exp(-correction));
+			break;
+		case -1:
+			setDrive(finalPower * exp(correction), finalPower);
+			break;
 		}
 
 		vel = _sin * gVelocity.x + _cos * gVelocity.y;
@@ -144,9 +141,6 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 	float cosA = cos(a);
 
 	writeDebugStreamLine("Moving to y=%fx+%f from %f %f at %d", cosA / sinA, yInt, ys, xs, power);
-
-	sPID pidY;
-	pidInit(pidY, 0.12, 0.005, 0.0, 0.5, 1.5, -1, 1.0);
 
 	float y, x;
 
@@ -550,24 +544,28 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 				//lstError = error;
 				error = a - input;
 				//vTarget =  0.9 rad/ms
-				vTarget = sgn(error) * (1.0 - exp(-0.4 * abs(error)));
+				vTarget = 7 * sgn(error) * (1.0 - exp(-0.4 * abs(error)));
 
-				power = kB * vTarget + kP * (vTarget - gVelocity.a);
+				power = kB * vTarget + kP * (vTarget - vel);
 
 				//if (power < 5 && error > 0.8)
 				//	power = 5;
-				if (power > 127)
-					power = 127;
+				LIM_TO_VAL_SET(power, 127);
 
 				if (DATALOG_TURN != -1)
 				{
+					tHog();
 					datalogDataGroupStart();
+
 					datalogAddValue(DATALOG_TURN + 0, error);
 					datalogAddValue(DATALOG_TURN + 1, a);
 					datalogAddValue(DATALOG_TURN + 2, input);
 					datalogAddValue(DATALOG_TURN + 3, vTarget * 1000);
-					datalogAddValue(DATALOG_TURN + 4, gVelocity.a * 1000);
+					datalogAddValue(DATALOG_TURN + 4, vel * 1000);
 					datalogAddValue(DATALOG_TURN + 5, power);
+
+					datalogDataGroupEnd();
+					tRelease();
 				}
 
 				setDrive(power, -power);
@@ -595,4 +593,88 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 		break;
 	}
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
+}
+
+void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, bool slow)
+{
+	sVector vector;
+	sPolar polar;
+
+	if (turnDir == ch)
+	{
+		vector.x = gPosition.x - x;
+		vector.y = gPosition.y - y;
+		vectorToPolar(vector, polar);
+		polar.angle += a;
+		polarToVector(polar, vector);
+
+		turnDir = vector.x > 0 ? cw : ccw;
+	}
+
+	float yOrigin, xOrigin;
+	float linearV, angularV;
+	float localR, localA;
+
+	switch (turnDir)
+	{
+	case cw:
+		vector.y = 0;
+		vector.x = r;
+		vectorToPolar(vector, polar);
+		polar.angle -= a;
+		polarToVector(polar, vector);
+		yOrigin = y + vector.y;
+		xOrigin = x + vector.x;
+
+		a += 2 * PI * floor((a - gPosition.a) / (2 * PI));
+
+		writeDebugStreamLine("Sweep to %f", a);
+
+		localA = atan2(gPosition.x - xOrigin, gPosition.y - yOrigin);
+
+		const float kR = 15.0;
+		const float kA = 3.0;
+		const float kB = 60.0;
+		const float kP = 15.0;
+
+		do
+		{
+			float aGlobal = gPosition.a;
+			linearV = gVelocity.x * sin(aGlobal) + gVelocity.y * cos(aGlobal);
+			angularV = gVelocity.a;
+
+			float _y = gPosition.y - yOrigin;
+			float _x = gPosition.x - xOrigin;
+			localR = sqrt(_y * _y + _x * _x);
+			localA = nearAngle(atan2(_x, _y), localA);
+
+			float target = MAX(linearV, 15) / localR + kR * log(localR / r) + kA * (localA + PI / 2 - aGlobal);
+			word turn = round(kB * target + kP * (target - angularV));
+
+			//LIM_TO_VAL_SET(turn, 80);
+			if (turn < 0)
+				turn = 0;
+			else if (turn > 150)
+				turn = 150;
+			setDrive(127, 127 - turn);
+
+			if (DATALOG_SWEEP != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_SWEEP + 0, localR);
+				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA));
+				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 1000);
+				datalogAddValue(DATALOG_SWEEP + 3, turn * 100);
+				datalogAddValue(DATALOG_SWEEP + 4, linearV * 10);
+				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 1000);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+
+			sleep(10);
+		} while (gPosition.a - a < (slow ? -0.01 : -0.03));
+
+		break;
+	}
 }

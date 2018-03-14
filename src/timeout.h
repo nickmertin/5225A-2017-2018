@@ -18,8 +18,6 @@ typedef enum _timeoutVelSourceType
 /* Functions */
 void timeoutWhileEqual(void *val1, void *val2, unsigned int size, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true);
 void timeoutWhileNotEqual(void *val1, void *val2, unsigned int size, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true);
-void timeoutWhileLessThanS(short *val, short threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true);
-void timeoutWhileGreaterThanS(short *val, short threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true);
 void timeoutWhileLessThanL(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true, bool correctSign = true);
 void timeoutWhileGreaterThanL(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, long *val, long threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true, bool correctSign = true);
 void timeoutWhileLessThanF(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, float *val, float threshold, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill = true, bool correctSign = true);

@@ -4,16 +4,6 @@ float fmod(float x, float y)
 	return x - (float)q * y;
 }
 
-float sq(float x)
-{
-	return x * x;
-}
-
-int sq(int x)
-{
-	return x * x;
-}
-
 float degToRad(float degrees)
 {
 	return degrees * PI / 180;
