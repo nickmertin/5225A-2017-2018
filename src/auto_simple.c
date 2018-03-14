@@ -55,7 +55,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 		{
 			float errA = gPosition.a - pidAngle;
 			float errX = currentPosVector.x + currentPosVector.y * sin(errA) / cos(errA);
-			correction = fabs(errX) > maxErrX ? -5.0 * errA : 0;
+			correction = fabs(errX) > maxErrX ? 5.0 * (atan2(x - gPosition.x, y - gPosition.y) - gPosition.a) : 0;
 		}
 
 		if (slow)
