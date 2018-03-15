@@ -1185,7 +1185,11 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	else
 	{
 		if (DATALOG_TIMEOUT != -1)
+		{
+			tHog();
 			datalogAddValueWithTimeStamp(DATALOG_TIMEOUT, curVel * 1000);
+			tRelease();
+		}
 		return false;
 	}
 }
