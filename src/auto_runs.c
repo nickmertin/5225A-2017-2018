@@ -1173,11 +1173,7 @@ void autoTest ()
 {
 	writeDebugStreamLine("%006d Start test: resetting", nPgmTime);
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 16, 40, 45);
+	resetPositionFull(gPosition, 0, 0, 0);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
-
-	writeDebugStreamLine("%006d Start test: turn", nPgmTime);
-	turnToAngleRadNewAlg(PI, CW);
-	writeDebugStreamLine("%006d Stop time", nPgmTime);
 }

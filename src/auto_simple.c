@@ -501,146 +501,88 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
+void turnToAngleRadNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
-	unsigned long time = nPgmTime;
-	unsigned long lstTime = time;
-	unsigned long nextDebug = 0;
-	float input = gVelocity.a;
-	float power = 0;
-	float velTarget = 0;
-	unsigned long deltaTime;
-	float vel;
-	float error;
-
-	const float kB = 40.0;
-	const float kP = 25;
-	float vTarget;
-
 	if (turnDir == ch)
-		if (a < gPosition.a) turnDir = ccw; else turnDir = cw;
+		if (fmod(a - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
+
+	float endFull;
 
 	switch (turnDir)
 	{
 	case cw:
 		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
-		writeDebugStreamLine("%f", a);
-		writeDebugStreamLine("%f", gVelocity.a);
-		//
-		//velTarget = 0.900;
-		//while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
-
-		while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
+		endFull = gPosition.a * (1 - fullRatio) + a * fullRatio;
+		setDrive(127, -127);
+		while (gPosition.a < endFull)
 		{
-			deltaTime = time - lstTime;
-			vel = gVelocity.a;
-
-			if (deltaTime >= 1)
+			if (DATALOG_TURN != -1)
 			{
-				input = gPosition.a;
-
-				//lstError = error;
-				error = a - input;
-				//vTarget =  0.9 rad/ms
-				vTarget = 9 * sgn(error) * (1.0 - exp(-0.4 * abs(error)));
-
-				power = kB * vTarget + kP * (vTarget - vel);
-
-				//if (power < 5 && error > 0.8)
-				//	power = 5;
-				LIM_TO_VAL_SET(power, 127);
-
-				if (DATALOG_TURN != -1)
-				{
-					tHog();
-					datalogDataGroupStart();
-					datalogAddValue(DATALOG_TURN + 0, error * 100);
-					datalogAddValue(DATALOG_TURN + 1, a * 100);
-					datalogAddValue(DATALOG_TURN + 2, input * 100);
-					datalogAddValue(DATALOG_TURN + 3, vTarget * 100);
-					datalogAddValue(DATALOG_TURN + 4, vel * 100);
-					datalogAddValue(DATALOG_TURN + 5, power * 2);
-					//writeDebugStreamLine("power = %d", power);
-
-
-					datalogDataGroupEnd();
-					tRelease();
-				}
-				setDrive(power, -power);
-
-
-				lstTime = time;
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
 			}
-
-			sleep(1);
-
-			time = nPgmTime;
+			sleep(10);
+		}
+		setDrive(coastPower, -coastPower);
+		while (gPosition.a < a - degToRad(stopOffsetDeg))
+		{
+			if (DATALOG_TURN != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+			sleep(10);
 		}
 		writeDebugStreamLine("Turn done: %d",  gPosition.a);
-		setDrive(-30, 30);
-		sleep(50);
+		setDrive(-20, 20);
+		sleep(150);
 		setDrive(0, 0);
 		writeDebugStreamLine("Break done: %d",  gPosition.a);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
-		writeDebugStreamLine("%f", a);
-		writeDebugStreamLine("%f", gVelocity.a);
-		//
-		//velTarget = 0.900;
-		//while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
-
-		while (gPosition.a > a + degToRad(mogo ? 2.2 : 3.5))
+		endFull = gPosition.a * (1 - fullRatio) + a * fullRatio;
+		setDrive(-127, 127);
+		while (gPosition.a > endFull)
 		{
-			deltaTime = time - lstTime;
-			vel = gVelocity.a;
-
-			if (deltaTime >= 1)
+			if (DATALOG_TURN != -1)
 			{
-				input = gPosition.a;
-
-				//lstError = error;
-				error = a - input;
-				//vTarget =  0.9 rad/ms
-				vTarget = 9 * sgn(error) * (1.0 - exp(-0.4 * abs(error)));
-
-				power = kP * (vTarget - vel) - kB * vTarget ;
-
-				//if (power < 5 && error > 0.8)
-				//	power = 5;
-				LIM_TO_VAL_SET(power, 127);
-
-				if (DATALOG_TURN != -1)
-				{
-					tHog();
-					datalogDataGroupStart();
-					datalogAddValue(DATALOG_TURN + 0, error * 100);
-					datalogAddValue(DATALOG_TURN + 1, a * 100);
-					datalogAddValue(DATALOG_TURN + 2, input * 100);
-					datalogAddValue(DATALOG_TURN + 3, vTarget * 100);
-					datalogAddValue(DATALOG_TURN + 4, vel * 100);
-					datalogAddValue(DATALOG_TURN + 5, power * 2);
-					//writeDebugStreamLine("power = %d", power);
-
-
-					datalogDataGroupEnd();
-					tRelease();
-				}
-				setDrive(-abs(power), abs(power));
-
-
-				lstTime = time;
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
 			}
-
-			sleep(1);
-
-			time = nPgmTime;
+			sleep(10);
+		}
+		setDrive(-coastPower, coastPower);
+		while (gPosition.a > a + degToRad(stopOffsetDeg))
+		{
+			if (DATALOG_TURN != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+			sleep(10);
 		}
 		writeDebugStreamLine("Turn done: %d",  gPosition.a);
-		setDrive(30, -30);
-		sleep(50);
+		setDrive(20, -20);
+		sleep(150);
 		setDrive(0, 0);
 		writeDebugStreamLine("Break done: %d",  gPosition.a);
 		break;
