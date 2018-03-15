@@ -454,8 +454,8 @@ case armToTarget:
 			err = target - gSensor[armPoti].value;
 			float vTarget = sgn(err) * 5.5 * (1.0 - exp(-0.0005 * abs(err)));
 			const float bias = 3;
-			const float kB = 15.0;
-			const float kP = 3.0;
+			const float kB = 30.0;
+			const float kP = 8.0;
 			velocityCheck(armPoti);
 			tHog();
 			if (DATALOG_ARM != -1)
@@ -471,7 +471,7 @@ case armToTarget:
 				if (power * sgn(err) < 20 && gSensor[armPoti].velocity * sgn(err) < abs(vTarget))
 					power = 20 * sgn(err);
 				else if (sgn(power) == -sgn(gSensor[armPoti].velocity))
-					LIM_TO_VAL_SET(power, 15);
+					LIM_TO_VAL_SET(power, 20);
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setArm((word) power);
