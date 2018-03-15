@@ -896,7 +896,7 @@ case stackPickupGround:
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
 		liftSet(liftHoldDown);
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 50, armTimeOut, TID1(stackPickupGround, 4), false);
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
 		writeDebugStreamLine("Second arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
 
 		writeDebugStreamLine("ARM %d", gSensor[armPoti].value);
