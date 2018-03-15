@@ -1173,7 +1173,13 @@ void autoTest ()
 {
 	writeDebugStreamLine("%006d Start test: resetting", nPgmTime);
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 0, 0, 0);
+	resetPositionFull(gPosition, 0, 0, 180);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
+
+	//liftSet(liftHoldDown);
+	moveToTargetSimple(48, 0, 0, 0, -127, 0, 0, 0, 0, stopNone, true);
+	//mobileSet(mobileBottom, mfClear);
+	sweepTurnToTarget(65, 7, 0.25 * PI, 24, cw, -127, false);
+	moveToTargetSimple(89, 31, 65, 7, -127, 1.5, 0, 0, 0, stopSoft, true);
 }
