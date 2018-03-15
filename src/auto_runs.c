@@ -156,7 +156,7 @@ bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long min
 		x = 140.5 - x;
 		a -= PI;
 	}
-	resetPositionFullRad(gPosition, y, x, a);
+	resetPositionFull(gPosition, y, x, a);
 	resetVelocity(gVelocity, gPosition);
 	return true;
 }
@@ -204,7 +204,7 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 		x = 140.5 - x;
 		a -= PI;
 	}
-	resetPositionFullRad(gPosition, y, x, a);
+	resetPositionFull(gPosition, y, x, a);
 	resetVelocity(gVelocity, gPosition);
 	return true;
 }
@@ -252,7 +252,7 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 		x = 140.5 - x;
 		a -= PI;
 	}
-	resetPositionFullRad(gPosition, y, x, a);
+	resetPositionFull(gPosition, y, x, a);
 	resetVelocity(gVelocity, gPosition);
 	return true;
 }

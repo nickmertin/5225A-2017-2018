@@ -237,7 +237,7 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
+void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 	sTurnState state;
@@ -288,11 +288,6 @@ void turnToAngleRadSimple(float a, tTurnDir turnDir, byte left, byte right, bool
 	}
 
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
-}
-
-void turnToAngleSimple(float a, tTurnDir turnDir, byte left, byte right, bool mogo)
-{
-	turnToAngleRadSimple(degToRad(a), turnDir, left, right, mogo);
 }
 
 void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte right, bool mogo, float offset)
@@ -504,7 +499,7 @@ void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte p
 	writeDebugStreamLine("Turned to %f %f | %f | %f %f %f", y, x, radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void turnToAngleRadNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo)
+void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo)
 {
 	writeDebugStreamLine("Turning to %f", radToDeg(a));
 
