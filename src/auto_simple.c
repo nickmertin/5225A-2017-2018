@@ -556,19 +556,20 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 				{
 					tHog();
 					datalogDataGroupStart();
+					datalogAddValue(DATALOG_TURN + 0, error * 100);
+					datalogAddValue(DATALOG_TURN + 1, a * 100);
+					datalogAddValue(DATALOG_TURN + 2, input * 100);
+					datalogAddValue(DATALOG_TURN + 3, vTarget * 100);
+					datalogAddValue(DATALOG_TURN + 4, vel * 100);
+					datalogAddValue(DATALOG_TURN + 5, power * 2);
 
-					datalogAddValue(DATALOG_TURN + 0, error);
-					datalogAddValue(DATALOG_TURN + 1, a);
-					datalogAddValue(DATALOG_TURN + 2, input);
-					datalogAddValue(DATALOG_TURN + 3, vTarget * 1000);
-					datalogAddValue(DATALOG_TURN + 4, vel * 1000);
-					datalogAddValue(DATALOG_TURN + 5, power);
 
 					datalogDataGroupEnd();
 					tRelease();
 				}
-
+				writeDebugStreamLine("Turn done: %d",  gPosition.a);
 				setDrive(power, -power);
+				writeDebugStreamLine("Break done: %d",  gPosition.a);
 
 				lstTime = time;
 			}
