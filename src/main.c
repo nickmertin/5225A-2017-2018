@@ -195,7 +195,8 @@ void setLift(word power,bool debug=true)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 1150)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 600)
-#define LIFT_PERIMETER (LIFT_BOTTOM + 500)
+#define LIFT_RETURN (LIFT_BOTTOM + 500)
+#define LIFT_PERIMETER (LIFT_BOTTOM + 350)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -1109,12 +1110,12 @@ case stackReturn:
 		//}
 		else
 		{
-			liftSet(liftToTarget, (arg._long & sfLoader) ? LIFT_LOADER : LIFT_PERIMETER);
+			liftSet(liftToTarget, (arg._long & sfLoader) ? LIFT_LOADER : LIFT_RETURN);
 			//liftLowerSimpleAsync((arg._long & sfLoader) ? 2500 : 1650, -127, 25);
 			liftTimeOut = nPgmTime + 1300;
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackReturn, 4));
 		}
-		writeDebugStreamLine("Lift height %d vs %d", gSensor[liftPoti].value, LIFT_PERIMETER);
+		writeDebugStreamLine("Lift height %d vs %d", gSensor[liftPoti].value, LIFT_RETURN);
 		//timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
 
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
