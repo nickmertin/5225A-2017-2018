@@ -1132,7 +1132,7 @@ task failTimeout()
 	mobileReset();
 	gDriveManual = true;
 	if (competitionState == usercontrolState)
-		competitionSet(competitionState);
+		competitionSet(usercontrolState);
 }
 
 bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float& out)
@@ -1175,7 +1175,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 			snprintf(description, 40, "%s %d", routine, (word) id);
 		else
 			strcpy(description, routine);
-		writeDebugStream("%06d EXCEEDED TIME %d - , %f", nPgmTime, timeOut, curVel);
+		writeDebugStream("%06d EXCEEDED TIME %d, %f - ", nPgmTime, timeOut, curVel);
 		writeDebugStreamLine(description);
 		if (kill)
 		{

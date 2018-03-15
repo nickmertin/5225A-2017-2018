@@ -588,6 +588,10 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
+void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo, float offset)
+{
+}
+
 void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byte power, bool slow)
 {
 	sVector vector;

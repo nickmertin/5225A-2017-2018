@@ -10,7 +10,7 @@ void selectAuto();
 void runAuto();
 void autoSkills(int segment = -1);
 void autoBlock();
-void auto20Left();
+//void auto20Left();
 //void auto20Right();
 //void autoStationaryLeftBlock();
 //void autoStationaryRightBlock();

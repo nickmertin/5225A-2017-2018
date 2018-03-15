@@ -34,17 +34,19 @@ void turnToTargetSimple(float y, float x, tTurnDir turnDir, byte left, byte righ
 void turnSimpleInternalCw(float a, sTurnState& state);
 void turnSimpleInternalCcw(float a, sTurnState& state);
 void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo = false);
+void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo = false, float offset = 0);
 void turnToAngleCustom(float a, tTurnDir turnDir, byte power, float epsilon);
 void turnToTargetCustom(float y, float x, tTurnDir turnDir, float offset, byte power, float epsilon);
 void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byte power, bool slow = true);
 
-MAKE_ASYNC_ONLY_MACHINE_9(autoSimple, ;,
+MAKE_ASYNC_ONLY_MACHINE_10(autoSimple, ;,
 11, (moveToTargetSimple, float, float, float, float, byte, float, float, byte, float, tStopType, bool), ;,
 11, (moveToTargetDisSimple, float, float, float, float, byte, float, float, byte, float, tStopType, bool), ;,
 10, (moveToLineSimple, float, float, float, float, byte, float, byte, float, tStopType, bool), ;,
 5,  (turnToAngleSimple, float, tTurnDir, byte, byte, bool), ;,
 7,  (turnToTargetSimple, float, float, tTurnDir, byte, byte, bool, float), ;,
 6, (turnToAngleNewAlg, float, tTurnDir, float, byte, float, bool), ;,
+8, (turnToTargetNewAlg, float, float, tTurnDir, float, byte, float, bool, float), ;,
 4, (turnToAngleCustom, float, tTurnDir, byte, float), ;,
 6, (turnToTargetCustom, float, float, tTurnDir, float, byte, float), ;,
 7, (sweepTurnToTarget, float, float, float, float, tTurnDir, byte, bool), ;
