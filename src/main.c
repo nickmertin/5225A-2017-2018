@@ -855,7 +855,7 @@ case stackNotRunning:
 	writeDebugStreamLine("%06d Start stackNotRunning. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 	if (!(arg._long & sfNoResetLift))
 		liftSet(liftHold);
-	if (!(arg._long && sfNoResetArm))
+	if (!(arg._long & sfNoResetArm))
 		armSet(armHold);
 	gDriveManual = true;
 	break;
