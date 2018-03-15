@@ -901,9 +901,11 @@ case stackPickupGround:
 
 		writeDebugStreamLine("ARM %d", gSensor[armPoti].value);
 
-		armRaiseSimpleAsync(ARM_PRESTACK - 500, 127, -20, 30, 200, armHold);
+		armSet(armManaged);
+		setArm(127);
 		armTimeOut = nPgmTime + 500;
 		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
+		armSet(armToTarget, ARM_PRESTACK - 500);
 
 		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
