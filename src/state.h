@@ -687,4 +687,3 @@ case __ASYNC_STATE_NAME_##argc11 argv11 : \
   { after11 } \
   NEXT_STATE(machine##NotRunning) \
 })
-

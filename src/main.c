@@ -5,6 +5,7 @@
 #pragma config(Sensor, in5,    expander,       sensorAnalog)
 #pragma config(Sensor, in6,    lsBarL,         sensorReflection)
 #pragma config(Sensor, in7,    lsBarR,         sensorReflection)
+#pragma config(Sensor, in8,    gyro,           sensorGyro)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
@@ -179,19 +180,21 @@ typedef enum _tLiftStates {
 	liftHoldUp,
 } tLiftStates;
 
-void setLift(word power,bool debug=false)
+void setLift(word power,bool debug=true)
 {
-	if( debug )	writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
+	if( debug ) writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
+	writeDebugStreamLine("%d", power);
 }
 
-#define LIFT_BOTTOM 1050
+#define LIFT_BOTTOM 1030
 #define LIFT_TOP (LIFT_BOTTOM + 2150)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
-#define LIFT_LOADER (LIFT_BOTTOM + 1150)
+#define LIFT_LOADER (LIFT_BOTTOM + 1250)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 600)
+#define LIFT_RETURN (LIFT_BOTTOM + 500)
 #define LIFT_PERIMETER (LIFT_BOTTOM + 350)
 
 DECLARE_MACHINE(lift, tLiftStates)
@@ -353,19 +356,23 @@ typedef enum _tArmStates {
 	armHold
 } tArmStates;
 
-//New Actual ARM_TOP = 3200
-#define ARM_TOP 3000
-//New Actual ARM_BOTTOM = 1420
-#define ARM_BOTTOM 1520
+#define RL_ARM_TOP 2830
+#define ARM_TOP (RL_ARM_TOP - 160)
 
-#define ARM_PRESTACK 2600
-#define ARM_RELEASE 2470
-#define ARM_CARRY 2070
-#define ARM_STACK 2920
-#define ARM_HORIZONTAL 1720
-#define ARM_FOLLOW_TARGET 2320
+//Actual ARM_BOTTOM = 1020
+#define ARM_BOTTOM (RL_ARM_TOP - 1610)
+
+#define ARM_PRESTACK (RL_ARM_TOP - 560)
+#define ARM_RELEASE (RL_ARM_TOP - 660)
+#define ARM_CARRY (RL_ARM_TOP - 1060)
+//#define ARM_STACK (RL_ARM_TOP - 210)
+#define ARM_STACK (RL_ARM_TOP - 500)
+#define ARM_HORIZONTAL (RL_ARM_TOP - 1410)
+#define ARM_FOLLOW_TARGET (RL_ARM_TOP - 810)
 
 #define ARM_MOBILE_RATIO 0.371
+
+tArmStates gArmSimpleNextState = armIdle;
 
 void setArm(word power, bool debug = false)
 {
@@ -376,7 +383,7 @@ void setArm(word power, bool debug = false)
 
 DECLARE_MACHINE(arm, tArmStates)
 
-void armRaiseSimple(int target, word mainPower, word brakePower, float earlyDrop, unsigned long brakeDelay)
+void armRaiseSimple(int target, word mainPower, word brakePower, float earlyDrop, unsigned long brakeDelay, tArmStates next)
 {
 	setArm(mainPower);
 	int pos;
@@ -396,16 +403,17 @@ void armRaiseSimple(int target, word mainPower, word brakePower, float earlyDrop
 		setArm(0);
 	}
 	writeDebugStreamLine("Arm moved up to %d | %d", target, pos);
+	gArmSimpleNextState = next;
 }
 
-NEW_ASYNC_VOID_STATE_5(arm, armRaiseSimpleState, armRaiseSimple, int, word, word, float, unsigned long);
+NEW_ASYNC_VOID_STATE_6(arm, armRaiseSimpleState, armRaiseSimple, int, word, word, float, unsigned long, tArmStates);
 
 unsigned long armRaiseSimpleAsync(int target, word mainPower, word brakePower)
 {
-	return armRaiseSimpleAsync(target, mainPower, brakePower, 0, 200);
+	return armRaiseSimpleAsync(target, mainPower, brakePower, 0, 200, armHold);
 }
 
-void armLowerSimple(int target, word mainPower, word brakePower, float earlyDrop, unsigned long brakeDelay)
+void armLowerSimple(int target, word mainPower, word brakePower, float earlyDrop, unsigned long brakeDelay, tArmStates next)
 {
 	setArm(mainPower);
 	int pos;
@@ -424,13 +432,14 @@ void armLowerSimple(int target, word mainPower, word brakePower, float earlyDrop
 		sleep(brakeDelay);
 	}
 	writeDebugStreamLine("Arm moved down to %d | %d", target, pos);
+	gArmSimpleNextState = next;
 }
 
-NEW_ASYNC_VOID_STATE_5(arm, armLowerSimpleState, armLowerSimple, int, word, word, float, unsigned long);
+NEW_ASYNC_VOID_STATE_6(arm, armLowerSimpleState, armLowerSimple, int, word, word, float, unsigned long, tArmStates);
 
 unsigned long armLowerSimpleAsync(int target, word mainPower, word brakePower)
 {
-	return armLowerSimpleAsync(target, mainPower, brakePower, 0, 200);
+	return armLowerSimpleAsync(target, mainPower, brakePower, 0, 200, armHold);
 }
 
 MAKE_MACHINE(arm, tArmStates, armIdle,
@@ -449,8 +458,8 @@ case armToTarget:
 			err = target - gSensor[armPoti].value;
 			float vTarget = sgn(err) * 5.5 * (1.0 - exp(-0.0005 * abs(err)));
 			const float bias = 3;
-			const float kB = 15.0;
-			const float kP = 3.0;
+			const float kB = 30.0;
+			const float kP = 8.0;
 			velocityCheck(armPoti);
 			tHog();
 			if (DATALOG_ARM != -1)
@@ -466,7 +475,7 @@ case armToTarget:
 				if (power * sgn(err) < 20 && gSensor[armPoti].velocity * sgn(err) < abs(vTarget))
 					power = 20 * sgn(err);
 				else if (sgn(power) == -sgn(gSensor[armPoti].velocity))
-					LIM_TO_VAL_SET(power, 15);
+					LIM_TO_VAL_SET(power, 20);
 				else
 					LIM_TO_VAL_SET(power, 127);
 				setArm((word) power);
@@ -494,12 +503,12 @@ case armToTarget:
 case armRaiseSimpleState:
 	{
 		STATE_INVOKE_ASYNC(armRaiseSimple);
-		NEXT_STATE(armHold);
+		NEXT_STATE(gArmSimpleNextState);
 	}
 case armLowerSimpleState:
 	{
 		STATE_INVOKE_ASYNC(armLowerSimple);
-		NEXT_STATE(armHold);
+		NEXT_STATE(gArmSimpleNextState);
 	}
 case armFollowMobile:
 	{
@@ -530,6 +539,7 @@ case armFollowMobile:
 					datalogAddValue(DATALOG_FOLLOW + 3, power * 10);
 					datalogDataGroupEnd();
 				}
+				tRelease();
 				setArm((word)power);
 			}
 			sleep(20);
@@ -850,7 +860,7 @@ case stackNotRunning:
 	writeDebugStreamLine("%06d Start stackNotRunning. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
 	if (!(arg._long & sfNoResetLift))
 		liftSet(liftHold);
-	if (!(arg._long && sfNoResetArm))
+	if (!(arg._long & sfNoResetArm))
 		armSet(armHold);
 	gDriveManual = true;
 	break;
@@ -862,29 +872,39 @@ case stackPickupGround:
 
 		if (gSensor[armPoti].value > ARM_PRESTACK - 300)
 		{
-			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
+			if (gSensor[armPoti].value > LIFT_BOTTOM + 200)
+				armSet(armToTarget, ARM_HORIZONTAL);
+			else
+				armLowerSimpleAsync(ARM_HORIZONTAL, -80, 0);
 			armTimeOut = nPgmTime + 1000;
 			timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
 		}
-		else if (gSensor[armPoti].value < ARM_HORIZONTAL)
+		else if (gSensor[liftPoti].value > LIFT_BOTTOM + 200)
 		{
 			armSet(armToTarget, ARM_HORIZONTAL);
 		}
+		writeDebugStreamLine("First arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 300, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 200, liftTimeOut, TID1(stackPickupGround, 2));
+
+		writeDebugStreamLine("Lift reached %06d lift at %d", npgmTime, gSensor[liftPoti].value);
 
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 50, armTimeOut, TID1(stackPickupGround, 4), false);
+		liftSet(liftHoldDown);
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
+		writeDebugStreamLine("Second arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
 
 		writeDebugStreamLine("ARM %d", gSensor[armPoti].value);
 
-		armRaiseSimpleAsync(ARM_PRESTACK - 500, 127, -20, 30, 200);
+		armSet(armManaged);
+		setArm(127);
 		armTimeOut = nPgmTime + 500;
-		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 150, armTimeOut, TID1(stackPickupGround, 5));
+		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 200, armTimeOut, TID1(stackPickupGround, 5));
+		armSet(armToTarget, ARM_PRESTACK - 500);
 
 		NEXT_STATE((arg._long & sfStack) ? stackStack : stackNotRunning)
 	}
@@ -950,7 +970,7 @@ case stackStationary:
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
 		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200);
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200, armHold);
 		armTimeOut = nPgmTime + 1500;
 		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
@@ -1008,9 +1028,9 @@ case stackDetach:
 			setLift(-10);
 		}
 		if (!gStack && gNumCones <= 3)
-			armLowerSimpleAsync((gNumCones == 3) ? ARM_RELEASE - 100 : ARM_RELEASE, -127, 45, 100, 80);
+			armLowerSimpleAsync((gNumCones == 3) ? ARM_RELEASE - 100 : ARM_RELEASE, -127, 45, 100, 80, armIdle);
 		else
-			armLowerSimpleAsync(ARM_RELEASE, -127, 0);
+			armLowerSimpleAsync(ARM_RELEASE, -127, 0, 0, 0, armIdle);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID0(stackDetach));
 		//TODO: Add lift timeout to make sure it lowers fully
@@ -1091,12 +1111,12 @@ case stackReturn:
 		//}
 		else
 		{
-			liftSet(liftToTarget, (arg._long & sfLoader) ? LIFT_LOADER : LIFT_PERIMETER);
+			liftSet(liftToTarget, (arg._long & sfLoader) ? LIFT_LOADER : LIFT_RETURN);
 			//liftLowerSimpleAsync((arg._long & sfLoader) ? 2500 : 1650, -127, 25);
 			liftTimeOut = nPgmTime + 1300;
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackReturn, 4));
 		}
-
+		writeDebugStreamLine("Lift height %d vs %d", gSensor[liftPoti].value, LIFT_RETURN);
 		//timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackReturn, 5));
 
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
@@ -1175,7 +1195,11 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	else
 	{
 		if (DATALOG_TIMEOUT != -1)
+		{
+			tHog();
 			datalogAddValueWithTimeStamp(DATALOG_TIMEOUT, curVel * 1000);
+			tRelease();
+		}
 		return false;
 	}
 }
