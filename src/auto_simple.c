@@ -532,7 +532,7 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 		//velTarget = 0.900;
 		//while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
 
-		while (gPosition.a < a)
+		while (gPosition.a < a - degToRad(mogo ? 2.2 : 3.5))
 		{
 			deltaTime = time - lstTime;
 			vel = gVelocity.a;
@@ -544,7 +544,7 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 				//lstError = error;
 				error = a - input;
 				//vTarget =  0.9 rad/ms
-				vTarget = 7 * sgn(error) * (1.0 - exp(-0.4 * abs(error)));
+				vTarget = 9 * sgn(error) * (1.0 - exp(-0.4 * abs(error)));
 
 				power = kB * vTarget + kP * (vTarget - vel);
 
@@ -562,14 +562,14 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 					datalogAddValue(DATALOG_TURN + 3, vTarget * 100);
 					datalogAddValue(DATALOG_TURN + 4, vel * 100);
 					datalogAddValue(DATALOG_TURN + 5, power * 2);
+					//writeDebugStreamLine("power = %d", power);
 
 
 					datalogDataGroupEnd();
 					tRelease();
 				}
-				writeDebugStreamLine("Turn done: %d",  gPosition.a);
 				setDrive(power, -power);
-				writeDebugStreamLine("Break done: %d",  gPosition.a);
+
 
 				lstTime = time;
 			}
@@ -578,10 +578,11 @@ void turnToAngleRadNewAlg (float a, tTurnDir turnDir, bool mogo)
 
 			time = nPgmTime;
 		}
-
+		writeDebugStreamLine("Turn done: %d",  gPosition.a);
 		setDrive(-30, 30);
 		sleep(50);
 		setDrive(0, 0);
+		writeDebugStreamLine("Break done: %d",  gPosition.a);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);

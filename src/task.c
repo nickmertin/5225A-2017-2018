@@ -90,16 +90,16 @@ void tUnreg(word id)
 	tRelease();
 }
 
-<<<<<<< HEAD
-=======
-word tGetRoot(word id)
-{
-	word _id = id;
-	while (tEls[_id].parent != -1 && tEls[_id].parent != id) _id = tEls[_id].parent;
-	return _id;
-}
+//<<<<<<< HEAD
+//=======
+//word tGetRoot(word id)
+//{
+//	word _id = id;
+//	while (tEls[_id].parent != -1 && tEls[_id].parent != id) _id = tEls[_id].parent;
+//	return _id;
+//}
 
->>>>>>> master
+//>>>>>>> master
 void tHog()
 {
 	if (!_hogLevel++)
