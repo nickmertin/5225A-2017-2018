@@ -872,7 +872,10 @@ case stackPickupGround:
 
 		if (gSensor[armPoti].value > ARM_PRESTACK - 300)
 		{
-			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
+			if (gSensor[armPoti].value > LIFT_BOTTOM + 200)
+				armSet(armToTarget, ARM_HORIZONTAL);
+			else
+				armLowerSimpleAsync(ARM_HORIZONTAL, -80, 0);
 			armTimeOut = nPgmTime + 1000;
 			timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
 		}
