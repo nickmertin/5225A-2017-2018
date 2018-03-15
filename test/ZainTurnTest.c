@@ -129,7 +129,7 @@ void GyroTurnTargetDegrees(float gyroTarget)
 }
 void gyroTurn()
 {
-	while(getGyro<abs(g_turnTarget/10)-10)
+	while(getGyro<abs(g_turnTarget*0.5))
 	{
 		setLeftDrive(g_turnSpeed);
 		setRightDrive(-g_turnSpeed);
@@ -137,14 +137,16 @@ void gyroTurn()
 
 	while(getGyro<abs(g_turnTarget))
 	{
-		if((abs(g_turnTarget) - getGyro) < 50)
+		if((abs(g_turnTarget) - getGyro) < 100)
 		{
 			hardStop();
+			sleep(150);
+			break;
 		}
 		else
 		{
-		setLeftDrive(40);
-		setRightDrive(-40);
+		setLeftDrive(28);
+		setRightDrive(-28);
 		}
 	}
 }
@@ -162,8 +164,10 @@ task main()
 {
 	gyroCalibration();
 	GyroTurnSpeed(127);
-	GyroTurnTargetDegrees(915);
+	GyroTurnTargetDegrees(1800);
+	unsigned long time = nPgmTime;
 	gyroTurn();
+	writeDebugStreamLine("%d", nPgmTime - time);
 	//	gyroCalibration();
 	//	gyroPID(0,7,40,1.5,0,360);
 }
