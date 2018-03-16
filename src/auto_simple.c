@@ -593,6 +593,89 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 
 void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo, float offset)
 {
+	writeDebugStreamLine("Turning to %f %f", y, x);
+
+	if (turnDir == ch)
+		if (fmod(atan2(y - gPosition.y, x - gPosition.x) - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
+
+	float endFull;
+
+	switch (turnDir)
+	{
+	case cw:
+		endFull = gPosition.a * (1 - fullRatio) + (gPosition.a + fmod(atan2(y - gPosition.y, x - gPosition.x) - gPosition.a, PI * 2)) * fullRatio;
+		setDrive(127, -127);
+		while (gPosition.a < endFull)
+		{
+			if (DATALOG_TURN != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+			sleep(10);
+		}
+		setDrive(coastPower, -coastPower);
+		while (gPosition.a < nearAngle(atan2(y - gPosition.y, x - gPosition.x), gPosition.a) - degToRad(stopOffsetDeg))
+		{
+			if (DATALOG_TURN != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+			sleep(10);
+		}
+		writeDebugStreamLine("Turn done: %d",  gPosition.a);
+		setDrive(-20, 20);
+		sleep(150);
+		setDrive(0, 0);
+		writeDebugStreamLine("Break done: %d",  gPosition.a);
+		break;
+	case ccw:
+		endFull = gPosition.a * (1 - fullRatio) + (gPosition.a - fmod(gPosition.a - atan2(y - gPosition.y, x - gPosition.x), PI * 2)) * fullRatio;
+		setDrive(-127, 127);
+		while (gPosition.a > endFull)
+		{
+			if (DATALOG_TURN != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+			sleep(10);
+		}
+		setDrive(-coastPower, coastPower);
+		while (gPosition.a > nearAngle(atan2(y - gPosition.y, x - gPosition.x), gPosition.a) + degToRad(stopOffsetDeg))
+		{
+			if (DATALOG_TURN != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
+				datalogAddValue(DATALOG_TURN + 1, 127);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+			sleep(10);
+		}
+		writeDebugStreamLine("Turn done: %d",  gPosition.a);
+		setDrive(20, -20);
+		sleep(150);
+		setDrive(0, 0);
+		writeDebugStreamLine("Break done: %d",  gPosition.a);
+		break;
+	}
+	writeDebugStreamLine("Turned to %f %f | %f %f %f", y, x, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byte power, bool slow)
