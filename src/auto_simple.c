@@ -143,6 +143,9 @@ void moveToLineSimple(float a, float yInt, float ys, float xs, byte power, float
 	float sinA = sin(a);
 	float cosA = cos(a);
 
+	if (((gPosition.y - yInt) * sinA - gPosition.x * cosA) / sin(gPosition.a - a) < 0)
+		a += PI;
+
 	writeDebugStreamLine("Moving to y=%fx+%f from %f %f at %d", cosA / sinA, yInt, ys, xs, power);
 
 	float y, x;
