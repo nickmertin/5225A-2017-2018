@@ -678,6 +678,7 @@ case mobileTop:
 			mobileClearLift();
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 1100;
+
 		while (gSensor[mobilePoti].value < MOBILE_TOP - 600 && !TimedOut(timeout, TID1(mobileTop, 1), false)) sleep(10);
 		//Coast if timedout
 		if ( TimedOut(timeout, TID1(mobileTop, 2), False) )
@@ -723,9 +724,11 @@ case mobileBottomSlow:
 		timeout = nPgmTime + 2500;
 		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.05, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, timeout, TID1(mobileBottomSlow, 3));
+		//while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
 		setMobile(0);
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID1(mobileBottomSlow, 4))) sleep(10);
+		timeOutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID1(mobileBottomSlow, 4));
+		//while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID1(mobileBottomSlow, 4))) sleep(10);
 		arg._long = 0;
 		NEXT_STATE(mobileBottom)
 	}
@@ -733,7 +736,8 @@ case mobileUpToMiddle:
 	{
 		setMobile(MOBILE_UP_POWER);
 		unsigned long timeout = nPgmTime + 1000;
-		while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, TID0(mobileUpToMiddle))) sleep(10);
+		timeOutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_MIDDLE_UP, timeout, TID0(mobileUpToMiddle));
+		//while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, TID0(mobileUpToMiddle))) sleep(10);
 		setMobile(15);
 		arg._long = -1;
 		NEXT_STATE(mobileMiddle)
@@ -744,7 +748,8 @@ case mobileDownToMiddle:
 			mobileClearLift();
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1000;
-		while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, TID0(mobileUpToMiddle))) sleep(10);
+		timeOutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_MIDDLE_DOWN, timeout, TID0(mobileUpToMiddle));
+		//while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, TID0(mobileUpToMiddle))) sleep(10);
 		setMobile(15);
 		arg._long = -1;
 		NEXT_STATE(mobileMiddle)
