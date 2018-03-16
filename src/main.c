@@ -1179,16 +1179,21 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 		writeDebugStreamLine(description);
 		if (kill)
 		{
+			hogCPU();
 			for (tMotor x = port1; x <= port10; ++x)
 				gMotor[x].power = motor[x] = 0;
-			int current = nCurrentTask;
-			if (current == main)
+			word p = nCurrentTask, t;
+			do {
+				t = p;
+				p = tEls[t].parent;
+			} while (p != -1 && p != nCurrentTask && (competitionState != usercontrolState || p != _asyncTask_competitionInternal));
+			if (t == main)
 			{
 				stopAllButCurrentTasks();
 				startTask(main);
 			}
-			tStart(failTimeout);
-			tStop(nCurrentTask);
+			tStart(failTimeout, true);
+			tStopAll(t);
 		}
 		return true;
 	}
