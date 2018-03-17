@@ -105,8 +105,9 @@ float calcXCoord(float u, float _a)
 
 bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long minL, long maxL, long minR, long maxR, bool crossField)
 {
-	time += nPgmTime;
-	maxTime += nPgmTime;
+	unsigned long st = nPgmTime;
+	time += st;
+	maxTime += st;
 
 	playSound(soundShortBlip);
 
@@ -163,8 +164,10 @@ bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long min
 
 bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, float a, long min, long max, bool crossField)
 {
-	time += nPgmTime;
-	maxTime += nPgmTime;
+	writeDebugStreamLine("%d Start reset Y", nPgmTime);
+	unsigned long st = nPgmTime;
+	time += st;
+	maxTime += st;
 
 	playSound(soundShortBlip);
 
@@ -173,7 +176,10 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 	while (nPgmTime < time || c < 10)
 	{
 		if (nPgmTime > maxTime)
+		{
+			writeDebugStreamLine("%d MAX TIME %d", nPgmTime, maxTime);
 			return false;
+		}
 
 		long l = gSensor[sonarL].value;
 		if (l >= min && l <= max)
@@ -211,8 +217,10 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 
 bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, float a, long min, long max, bool crossField)
 {
-	time += nPgmTime;
-	maxTime += nPgmTime;
+	writeDebugStreamLine("%d Start reset X", nPgmTime);
+	unsigned long st = nPgmTime;
+	time += st;
+	maxTime += st;
 
 	playSound(soundShortBlip);
 
@@ -221,7 +229,10 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 	while (nPgmTime < time || c < 10)
 	{
 		if (nPgmTime > maxTime)
+		{
+			writeDebugStreamLine("%d MAX TIME %d", nPgmTime, maxTime);
 			return false;
+		}
 
 		long r = gSensor[sonarR].value;
 		if (r >= min && r <= max)
@@ -330,29 +341,30 @@ void autoSkills(int segment)
 	//killAutoAsync(gAutoTime + 60000);
 
 	// 1
-	moveToTargetSimpleAsync(107, 15, 47, 15, 80, 1, 6, 30, 8, stopNone, true);
+	moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0.5, 6, 55, 14, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	mobileSet(mobileBottom, mfClear);
 	DRIVE_AWAIT(skills, 1, 1);
-	setDrive(30, 30);
-	driveTimeout = nPgmTime + 1000;
-	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 1, 2));
+	setDrive(55, 55);
+	driveTimeout = nPgmTime + 700;
+	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 1, 2), false);
 	setDrive(0, 0);
 	mobileSet(mobileTop, mfClear);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 1, 3));
 
 	// 2
-	moveToTargetSimpleAsync(60, 15, gPosition.y, gPosition.x, -127, 0, 8, -30, 0, stopSoft | stopHarsh, true);
+	moveToTargetSimpleAsync(59, 14, gPosition.y, gPosition.x, -127, 0.5, 4, -50, 0, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	stackSet(stackStack, sfClear);
 	DRIVE_AWAIT(skills, 2, 1);
 	//turnToTargetNewAlgAsync(33, 33, ccw, 0.27, 23, 12, true, PI);
-	turnToTargetSimpleAsync(33, 33, ccw, 60, 60, true, PI);
+	//turnToTargetSimpleAsync(33, 33, ccw, 60, 60, true, PI);
+	sweepTurnToTargetAsync(42, 21, 0.75 * PI, 24, ccw, -80, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 2, 2);
-	//moveToLineSimpleAsync(PI / 4, 0, gPosition.y, gPosition.x, -127, 8, -30, 0, stopSoft | stopHarsh, true);
-	moveToTargetSimpleAsync(33, 33, gPosition.y, gPosition.x, -127, 0, 8, -30, 1, stopSoft | stopHarsh, true);
+	//moveToLineSimpleAsync(PI / 4, 0, gPosition.y, gPosition.x, -127, 6, -30, 1, stopSoft, true);
+	moveToTargetSimpleAsync(33, 33, gPosition.y, gPosition.x, -127, 1, 6, -30, 0, stopSoft | stopHarsh, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 2, 3);
 	turnToAngleNewAlgAsync(-0.75 * PI, ccw, 0.35, 26, 12, true);
@@ -361,13 +373,14 @@ void autoSkills(int segment)
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, -1, 56);
-	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 9, _y, _x, 60, 0, 0, 0, 0, stopNone, false);
+	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 8, _y, _x, 60, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 2, 5);
-	setDrive(30, 30);
-	driveTimeout = nPgmTime + 1500;
-	timeoutWhileLessThanF(VEL_NONE, 0, &gVelocity.y, -0.05, driveTimeout, TID2(skills, 2, 6), true, false);
 	setDrive(25, 25);
+	driveTimeout = nPgmTime + 1500;
+	sleep(500);
+	timeoutWhileLessThanF(VEL_NONE, 0, &gVelocity.y, -0.05, driveTimeout, TID2(skills, 2, 6), true, false);
+	setDrive(15, 15);
 	sleep(500);
 	if (!resetSonarFull(100, 500, -0.75 * PI, 230, 470, 180, 650, false))
 		resetPositionFull(gPosition, gPosition.y, gPosition.x, -0.75 * PI);
@@ -378,13 +391,15 @@ void autoSkills(int segment)
 	coneTimeout = nPgmTime + 1500;
 	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(skills, 2, 7));
 	sleep(300);
+	//return;
 
 	// 3
 	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, -7, _y, _x, -60, 0, 0, 0, 0, stopHarsh, false);
 	driveTimeout = nPgmTime + 1500;
 	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
 	DRIVE_AWAIT(skills, 3, 1);
-	turnToAngleSimpleAsync(-45, cw, 80, 80, false);
+	turnToAngleNewAlgAsync(-0.25 * PI, cw, 0.27, 23, 12, false);
+	//turnToAngleSimpleAsync(-45, cw, 80, 80, false);
 	driveTimeout = nPgmTime + 2000;
 	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 3, 2);
@@ -397,31 +412,32 @@ void autoSkills(int segment)
 	setDrive(-7, 7);
 	sleep(150);
 	setDrive(0, 0);
-	moveToTargetSimpleAsync(71, 47, gPosition.y, gPosition.x, 90, 0, 0, 0, 10, stopNone, true);
-	driveTimeout = nPgmTime + 2000;
+	moveToTargetSimpleAsync(71, 47, gPosition.y, gPosition.x, 90, 1, 0, 0, 14, stopNone, false);
+	driveTimeout = nPgmTime + 1000;
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 80, 0);
 	DRIVE_AWAIT(skills, 3, 4);
-	setDrive(30, 30);
-	driveTimeout = nPgmTime + 1000;
-	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 3, 5));
+	setDrive(55, 55);
+	driveTimeout = nPgmTime + 700;
+	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 3, 5), false);
 	mobileSet(mobileTop, mfClear);
-	setDrive(-7, -7);
+	setDrive(0, 0);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP, coneTimeout, TID2(skills, 3, 6));
 	sleep(100);
 
 	// 4
-	turnToTargetSimpleAsync(26, 8, cw, 127, 127, true, 0);
+	turnToTargetNewAlgAsync(28, 6, ccw, 0.45, 30, 11, true, 0);
+	//turnToTargetSimpleAsync(26, 8, cw, 127, 127, true, 0);
 	driveTimeout = nPgmTime + 2200;
 	DRIVE_AWAIT(skills, 4, 1);
-	moveToTargetSimpleAsync(26, 8, gPosition.y, gPosition.x, 75, 0, 12, 30, 13, stopNone, true);
+	moveToTargetSimpleAsync(28, 6, gPosition.y, gPosition.x, 75, 1.5, 12, 30, 13, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 80, 0);
 	timeoutWhileGreaterThanF(VEL_LOCAL_Y, 1.0, &gPosition.x, 22, driveTimeout, TID2(skils, 4, 2), true, false);
 	mobileSet(mobileBottom, mfClear);
 	coneTimeout = nPgmTime + 2000;
-	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(skills, 4, 3));
-	driveAgainstStartingBar(30, 30, 15, 15, 2000);
+	DRIVE_AWAIT(skills, 4, 3);
+	driveAgainstStartingBar(25, 25, 15, 15, 2000);
 	timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 4, 4), false);
 	sleep(500);
 	if (segment > -1)
@@ -431,7 +447,7 @@ skip2:
 	{
 		if (segment > -1)
 			return;
-		resetPositionFull(gPosition, gPosition.y, gPosition.x, 225);
+		resetPositionFull(gPosition, gPosition.y, gPosition.x, -0.75 * PI);
 	}
 }
 
@@ -942,7 +958,7 @@ void autoTest ()
 {
 	writeDebugStreamLine("%006d Start test: resetting", nPgmTime);
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 0, 0, 0);
+	resetPositionFull(gPosition, 0, 0, PI);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 
@@ -952,7 +968,12 @@ void autoTest ()
 	//sweepTurnToTarget(65, 7, 0.25 * PI, 24, cw, -127, false);
 	//moveToTargetSimple(89, 31, 65, 7, -127, 1.5, 0, 0, 0, stopSoft, true);
 
-	turnToAngleNewAlg(PI / 4, cw, 0.27, 23, 12, true);
-	sleep(1000);
-	writeDebugStreamLine("%.1f", radToDeg(gPosition.a));
+	//turnToAngleNewAlg(PI / 4, cw, 0.27, 23, 12, true);
+	//sleep(1000);
+	//writeDebugStreamLine("%.1f", radToDeg(gPosition.a));
+
+	sweepTurnToTarget(24, -24, PI / -2, 24, ccw, -127, false);
+	setDrive(7, -7);
+	sleep(150);
+	setDrive(0, 0);
 }
