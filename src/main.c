@@ -696,7 +696,7 @@ case mobileBottom:
 			NEXT_STATE(mobileBottomSlow)
 		if ((arg._long & mfClear) && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
-		writeDebugStreamLine("Fast dropping stack of %d", gNumCones);
+		writeDebugStreamLine("mobileBottom %d", gNumCones);
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1100;
 		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID0(mobileBottom), false);
@@ -712,7 +712,7 @@ case mobileBottomSlow:
 		gMobileSlow = false;
 		if ((arg._long & mfClear) && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
-		writeDebugStreamLine("Slow dropping stack of %d", gNumCones);
+		writeDebugStreamLine("mobileBottomSlow %d", gNumCones);
 		if (arg._long & mfFollow)
 			armSet(armFollowMobile);
 		setMobile(-127);
@@ -857,7 +857,7 @@ unsigned long gPrepStart = 0;
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
-	writeDebugStreamLine("%06d Start stackNotRunning. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+	writeDebugStreamLine("%06d stackNotRunning %x %d", npgmTime, arg._long, gNumCones);
 	if (!(arg._long & sfNoResetLift))
 		liftSet(liftHold);
 	if (!(arg._long & sfNoResetArm))
@@ -866,7 +866,7 @@ case stackNotRunning:
 	break;
 case stackPickupGround:
 	{
-		writeDebugStreamLine("%06d Start stackPickupGround. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackPickupGround %x %d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -883,22 +883,21 @@ case stackPickupGround:
 		{
 			armSet(armToTarget, ARM_HORIZONTAL);
 		}
-		writeDebugStreamLine("First arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
+		writeDebugStreamLine("stackPickupGround 1 %06d %d", npgmTime, gSensor[armPoti].value);
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
 		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 200, liftTimeOut, TID1(stackPickupGround, 2));
 
-		writeDebugStreamLine("Lift reached %06d lift at %d", npgmTime, gSensor[liftPoti].value);
+		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
 
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
 		liftSet(liftHoldDown);
 		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
-		writeDebugStreamLine("Second arm lowered %06d arm at %d", npgmTime, gSensor[armPoti].value);
 
-		writeDebugStreamLine("ARM %d", gSensor[armPoti].value);
+		writeDebugStreamLine("stackPickupGround 3 %06d %d", npgmTime, gSensor[armPoti].value);
 
 		armSet(armManaged);
 		setArm(127);
@@ -910,7 +909,7 @@ case stackPickupGround:
 	}
 case stackPickupLoader:
 	{
-		writeDebugStreamLine("%06d Start stackPickupLoader. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackPickupLoader %x %d", npgmTime, arg._long, gNumCones);
 		if (gNumCones >= MAX_STACK)
 			NEXT_STATE(stackNotRunning)
 
@@ -938,7 +937,7 @@ case stackPickupLoader:
 	}
 case stackStationaryPrep:
 	{
-		writeDebugStreamLine("%06d Start stackStationaryPrep. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackStationaryPrep %x %d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -955,7 +954,7 @@ case stackStationaryPrep:
 	}
 case stackStationary:
 	{
-		writeDebugStreamLine("%06d Start stackStationary. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackStationary %x %d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -992,7 +991,7 @@ case stackStationary:
 	}
 case stackStack:
 	{
-		writeDebugStreamLine("%06d Start stackStack. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackStack %x %d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
@@ -1017,7 +1016,7 @@ case stackStack:
 		NEXT_STATE((arg._long & (sfDetach | sfClear | sfReturn)) ? stackDetach : stackNotRunning)
 	}
 case stackDetach:
-	writeDebugStreamLine("%06d Start stackDetach. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+	writeDebugStreamLine("%06d stackDetach %x %d", npgmTime, arg._long, gNumCones);
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[gNumCones - 1])
 	{
 		if ((arg._long & sfReturn) && gNumCones > 3) {
@@ -1061,7 +1060,7 @@ case stackDetach:
 	NEXT_STATE((arg._long & sfClear) ? stackClear : (arg._long & sfReturn) ? stackReturn : stackNotRunning)
 case stackClear:
 	{
-		writeDebugStreamLine("%06d Start stackClear. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackClear %x %d", npgmTime, arg._long, gNumCones);
 		int target = gNumCones == 11 ? LIFT_TOP : gLiftRaiseTarget[gNumCones];
 		liftRaiseSimpleAsync(target, 127, gNumCones <= 4 ? -15 : 0);
 		unsigned long timeout = nPgmTime + 1500;
@@ -1081,7 +1080,7 @@ case stackClear:
 	}
 case stackReturn:
 	{
-		writeDebugStreamLine("%06d Start stackReturn. arg: %ld, cones=%d", npgmTime, arg._long, gNumCones);
+		writeDebugStreamLine("%06d stackReturn %x %d", npgmTime, arg._long, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
