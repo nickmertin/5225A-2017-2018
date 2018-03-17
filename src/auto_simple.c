@@ -699,7 +699,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 	float localR, localA;
 
 	const float kR = 15.0;
-	const float kA = 3.0;
+	const float kA = 1.0;
 	const float kB = 60.0;
 	const float kP = 15.0;
 
@@ -715,29 +715,24 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 		xOrigin = x + vector.x;
 
 		localA = atan2(gPosition.x - xOrigin, gPosition.y - yOrigin);
-		if (power < 0)
-			localA += PI;
 
-		a = gPosition.a + fmod(a - gPosition.a, PI * 2);
-		if (power < 0)
-			a += PI;
+		a = nearAngle(a, power > 0 ? gPosition.a : (gPosition.a + PI));
 
-		writeDebugStreamLine("%d Sweep to %f", nPgmTime, a);
+		writeDebugStreamLine("%d Sweep to %f around %f %f", nPgmTime, radToDeg(a), yOrigin, xOrigin);
 
 		do
 		{
 			float aGlobal = gPosition.a;
-			linearV = gVelocity.x * sin(aGlobal) + gVelocity.y * cos(aGlobal);
 			if (power < 0)
-				linearV = -linearV;
+				aGlobal += PI;
 			angularV = gVelocity.a;
-
 			float _y = gPosition.y - yOrigin;
 			float _x = gPosition.x - xOrigin;
 			localR = sqrt(_y * _y + _x * _x);
-			localA = nearAngle(atan2(_x, _y) + (power > 0 ? 0 : PI), localA);
+			localA = nearAngle(atan2(_x, _y), localA);
+			linearV = gVelocity.x * sin(localA + PI / 2) + gVelocity.y * cos(localA + PI / 2);
 
-			float target = MAX(linearV, 15) / localR + kR * log(localR / r) + kA * (localA + PI / 2 - aGlobal);
+			float target = MAX(linearV, 15) / localR + kR * log(localR / r) + kA * (nearAngle(localA + PI / 2, aGlobal) - aGlobal);
 			word turn = round(kB * target + kP * (target - angularV));
 
 			if (turn < 0)
@@ -765,7 +760,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			}
 
 			sleep(10);
-		} while (gPosition.a - a < (slow ? -0.01 : -0.03));
+		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a < (slow ? -0.01 : -0.03));
 		break;
 	}
 	setDrive(0, 0);
