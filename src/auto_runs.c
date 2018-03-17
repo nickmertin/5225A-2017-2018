@@ -310,7 +310,7 @@ void autoSkills(int segment)
 
 #ifdef SKILLS_RESET_AT_START
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 39, 14, 0);
+	resetPositionFull(gPosition, 40, 15, 45);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
 #endif
@@ -329,27 +329,6 @@ void autoSkills(int segment)
 
 	//killAutoAsync(gAutoTime + 60000);
 
-#ifdef SKILLS_RESET_AT_START
-	trackPositionTaskKill();
-	resetPositionFull(gPosition, 40, 15, 45);
-	resetVelocity(gVelocity, gPosition);
-	trackPositionTaskAsync();
-#endif
-
-	//switch (segment)
-	//{
-	//case 1:
-	//	goto skip1;
-	//case 2:
-	//	goto skip2;
-	//case 3:
-	//	goto skip3;
-	//case 4:
-	//	goto skip4;
-	//}
-
-//	//killAutoAsync(gAutoTime + 60000);
-
 	// 1
 	mobileSet(mobileBottom, mfClear);
 	coneTimeout = nPgmTime + 3000;
@@ -364,7 +343,8 @@ void autoSkills(int segment)
 	mobileSet(mobileTop, mfClear);
 	coneTimeout = nPgmTime + 4000;
 	timeoutWhileLessThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 1, 3));
-	//2
+
+	// 2
 	turnToTargetSimpleAsync(32, 13, cw, 127, 127, true, 0);
 	driveTimeout = nPgmTime + 3000;
 	autoSimpleTimeoutWhile(turnToTargetSimpleState, driveTimeout, TID2(skills, 2, 1));
@@ -379,7 +359,7 @@ void autoSkills(int segment)
 	sleep(250);
 	setDrive(20,20);
 
-	//3
+	// 3
 	if (!resetSonarYOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 600, 900, false) && !resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 130, 330, false))
 	{
 		if (segment > -1)
