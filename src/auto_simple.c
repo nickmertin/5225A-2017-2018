@@ -58,7 +58,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, float 
 			float correctA = atan2(x - gPosition.x, y - gPosition.y);
 			if (power < 0)
 				correctA += PI;
-			correction = fabs(errX) > maxErrX ? 2.0 * (nearAngle(correctA, gPosition.a) - gPosition.a) * sgn(power) : 0;
+			correction = fabs(errX) > maxErrX ? 5.0 * (nearAngle(correctA, gPosition.a) - gPosition.a) * sgn(power) : 0;
 		}
 
 		if (slow)
