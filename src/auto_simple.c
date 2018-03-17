@@ -762,6 +762,63 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			sleep(10);
 		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a < (slow ? -0.01 : -0.03));
 		break;
+	case ccw:
+		vector.y = 0;
+		vector.x = r;
+		vectorToPolar(vector, polar);
+		polar.angle += a;
+		polarToVector(polar, vector);
+		yOrigin = y + vector.y;
+		xOrigin = x + vector.x;
+
+		localA = atan2(gPosition.x - xOrigin, gPosition.y - yOrigin);
+
+		a = nearAngle(a, power > 0 ? gPosition.a : (gPosition.a + PI));
+
+		writeDebugStreamLine("%d Sweep to %f around %f %f", nPgmTime, radToDeg(a), yOrigin, xOrigin);
+
+		do
+		{
+			float aGlobal = gPosition.a;
+			if (power < 0)
+				aGlobal += PI;
+			angularV = gVelocity.a;
+			float _y = gPosition.y - yOrigin;
+			float _x = gPosition.x - xOrigin;
+			localR = sqrt(_y * _y + _x * _x);
+			localA = nearAngle(atan2(_x, _y), localA);
+			linearV = gVelocity.x * sin(localA - PI / 2) + gVelocity.y * cos(localA - PI / 2);
+
+			float target = -MAX(linearV, 15) / localR + kR * log(r / localR) + kA * (nearAngle(localA - PI / 2, aGlobal) - aGlobal);
+			word turn = round(kB * target + kP * (target - angularV));
+
+			if (turn > 0)
+				turn = 0;
+			else if (turn < -150)
+				turn = -150;
+
+			if (power > 0)
+				setDrive(power + turn, power);
+			else
+				setDrive(power, power - turn);
+
+			if (DATALOG_SWEEP != -1)
+			{
+				tHog();
+				datalogDataGroupStart();
+				datalogAddValue(DATALOG_SWEEP + 0, localR);
+				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA) * 1000);
+				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 1000);
+				datalogAddValue(DATALOG_SWEEP + 3, turn * 100);
+				datalogAddValue(DATALOG_SWEEP + 4, linearV * 10);
+				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 1000);
+				datalogDataGroupEnd();
+				tRelease();
+			}
+
+			sleep(10);
+		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a > (slow ? 0.01 : 0.03));
+		break;
 	}
 	setDrive(0, 0);
 	writeDebugStreamLine("%d Done sweep turn", nPgmTime);
