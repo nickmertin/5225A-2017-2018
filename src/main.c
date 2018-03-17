@@ -1186,7 +1186,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 			do {
 				t = p;
 				p = tEls[t].parent;
-			} while (p != -1 && p != nCurrentTask && (competitionState != usercontrolState || p != _asyncTask_competitionInternal));
+			} while (p != -1 && p != nCurrentTask && p != main && (competitionState != usercontrolState || p != _asyncTask_competitionInternal));
 			if (t == main)
 			{
 				stopAllButCurrentTasks();
