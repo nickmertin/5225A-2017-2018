@@ -699,7 +699,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 	float localR, localA;
 
 	const float kR = 15.0;
-	const float kA = 1.0;
+	const float kA = 5.0;
 	const float kB = 60.0;
 	const float kP = 15.0;
 
@@ -760,7 +760,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			}
 
 			sleep(10);
-		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a < (slow ? -0.01 : -0.03));
+		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a < (slow ? -0.1 : -0.15));
 		break;
 	case ccw:
 		vector.y = 0;
@@ -817,7 +817,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			}
 
 			sleep(10);
-		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a > (slow ? 0.01 : 0.03));
+		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a > (slow ? 0.1 : 0.15));
 		break;
 	}
 	setDrive(0, 0);
