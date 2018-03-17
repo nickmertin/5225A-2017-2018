@@ -370,9 +370,9 @@ void autoSkills(int segment)
 	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 8, _y, _x, 60, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 2, 4);
-	setDrive(25, 25);
+	setDrive(40, 40);
 	driveTimeout = nPgmTime + 1500;
-	sleep(300);
+	sleep(400);
 	timeoutWhileLessThanF(VEL_NONE, 0, &gVelocity.y, -0.05, driveTimeout, TID2(skills, 2, 5), true, false);
 	setDrive(15, 15);
 	sleep(500);
