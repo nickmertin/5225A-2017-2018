@@ -349,7 +349,7 @@ void autoSkills(int segment)
 	DRIVE_AWAIT(skills, 1, 1);
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
-	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 1, 2), false);
+	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 1, 2), false);
 	setDrive(0, 0);
 	mobileSet(mobileTop, mfClear);
 	coneTimeout = nPgmTime + 2000;
@@ -409,7 +409,7 @@ void autoSkills(int segment)
 	DRIVE_AWAIT(skills, 3, 4);
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
-	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 3, 5), false);
+	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 3, 5), false);
 	mobileSet(mobileTop, mfClear);
 	setDrive(0, 0);
 	coneTimeout = nPgmTime + 2000;
@@ -455,7 +455,7 @@ skip2:
 	DRIVE_AWAIT(skills, 5, 4);
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
-	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 5, 6), false);
+	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 5, 6), false);
 	mobileSet(mobileUpToMiddle, mfClear);
 	coneTimeout = nPgmTime + 1000;
 
@@ -498,7 +498,7 @@ skip3:
 	DRIVE_AWAIT(skills, 7, 5);
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
-	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(skills, 7, 6), false);
+	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 7, 6), false);
 	mobileSet(mobileTop, mfClear);
 	setDrive(0, 0);
 	coneTimeout = nPgmTime + 2000;
@@ -544,7 +544,7 @@ void autoBlock()
 //	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(br20, 1, 3));
 //	setDrive(30, 30);
 //	driveTimeout = nPgmTime + 1000;
-//	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(br20, 1, 4));
+//	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(br20, 1, 4));
 //	setDrive(0, 0);
 //	mobileSet(mobileTop, mfClear);
 //	coneTimeout = nPgmTime + 2000;
@@ -627,7 +627,7 @@ void autoBlock()
 //	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(br20, 1, 3));
 //	setDrive(30, 30);
 //	driveTimeout = nPgmTime + 1000;
-//	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(br20, 1, 4));
+//	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(br20, 1, 4));
 //	setDrive(0, 0);
 //	mobileSet(mobileTop, mfClear);
 //	coneTimeout = nPgmTime + 2000;
@@ -826,7 +826,7 @@ void autoBlock()
 //	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(ls+5, 2, 5));
 //	setDrive(30, 30);
 //	driveTimeout = nPgmTime + 1500;
-//	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(ls+5, 2, 6));
+//	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(ls+5, 2, 6));
 //	setDrive(0, 0);
 //	mobileSet(mobileTop, mfClear);
 //	coneTimeout = nPgmTime + 2000;
@@ -878,7 +878,7 @@ void autoBlock()
 //	autoSimpleTimeoutWhile(moveToTargetSimpleState, driveTimeout, TID2(rs+5, 2, 5));
 //	setDrive(30, 30);
 //	driveTimeout = nPgmTime + 1500;
-//	timeoutWhileFalse((bool *) &gSensor[limMobile].value, driveTimeout, TID2(rs+5, 2, 6));
+//	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(rs+5, 2, 6));
 //	setDrive(0, 0);
 //	mobileSet(mobileTop, mfClear);
 //	coneTimeout = nPgmTime + 2000;

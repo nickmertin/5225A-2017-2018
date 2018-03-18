@@ -5,12 +5,11 @@
 #pragma config(Sensor, in5,    expander,       sensorAnalog)
 #pragma config(Sensor, in6,    lsBarL,         sensorReflection)
 #pragma config(Sensor, in7,    lsBarR,         sensorReflection)
-#pragma config(Sensor, in8,    gyro,           sensorGyro)
+#pragma config(Sensor, in8,    lsMobile,       sensorReflection)
 #pragma config(Sensor, dgtl1,  trackL,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl7,  sonarL,         sensorSONAR_mm)
-#pragma config(Sensor, dgtl9,  limMobile,      sensorTouch)
 #pragma config(Sensor, dgtl10, jmpSkills,      sensorDigitalIn)
 #pragma config(Sensor, dgtl11, sonarR,         sensorSONAR_mm)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
@@ -1351,6 +1350,7 @@ void startup()
 	setupInvertedSen(jmpSkills);
 	setupDgtIn(lsBarL, 0, 2500);
 	setupDgtIn(lsBarR, 0, 2500);
+	setupDgtIn(lsMobile, 0, 2100);
 
 	velocityClear(trackL);
 	velocityClear(trackR);
