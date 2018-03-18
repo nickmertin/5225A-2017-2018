@@ -356,7 +356,7 @@ void autoSkills(int segment)
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 1, 3));
 
 	// 2
-	moveToTargetSimpleAsync(71, 14.5, gPosition.y, gPosition.x, -127, 0.5, 4, -90, 0, stopNone, true);
+	moveToTargetSimpleAsync(71, 15, gPosition.y, gPosition.x, -127, 0.5, 4, -90, 0, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	stackSet(stackStack, sfClear);
 	DRIVE_AWAIT(skills, 2, 1);
@@ -372,7 +372,7 @@ void autoSkills(int segment)
 	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, 8, _y, _x, 60, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 2, 4);
-	setDrive(40, 40);
+	setDrive(50, 50);
 	driveTimeout = nPgmTime + 1500;
 	sleep(400);
 	timeoutWhileLessThanF(VEL_NONE, 0, &gVelocity.y, -0.05, driveTimeout, TID2(skills, 2, 5), true, false);
@@ -427,7 +427,7 @@ void autoSkills(int segment)
 	coneTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(skills, 4, 3);
 	driveAgainstStartingBar(25, 25, 20, 20, 2000);
-	timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 4, 4), false);
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 4, 4), false);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -443,7 +443,7 @@ skip2:
 	moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 5, 1);
-	turnToTargetNewAlgAsync(60, 36, cw, 0.4, 26, 11, false, 0);
+	turnToTargetNewAlgAsync(60, 36, cw, 0.4, 20, 30, false, 0);
 	driveTimeout = nPgmTime + 1500;
 	liftLowerSimpleAsync(LIFT_BOTTOM, -70, 0);
 	DRIVE_AWAIT(skills, 5, 2);
@@ -467,7 +467,7 @@ skip2:
 	mobileSet(mobileBottom, mfClear);
 	coneTimeout = nPgmTime + 1000;
 	driveAgainstStartingBar(25, 25, 20, 20, 1500);
-	timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 6, 3), false);
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 6, 3), false);
 	sleep(500);
 	if (segment > -1)
 		return;

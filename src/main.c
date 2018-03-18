@@ -619,8 +619,8 @@ typedef enum _tMobileStates {
 } tMobileStates;
 
 #define MOBILE_TOP 2450
-#define MOBILE_BOTTOM 700
-#define MOBILE_MIDDLE_UP 800
+#define MOBILE_BOTTOM 800
+#define MOBILE_MIDDLE_UP 1000
 #define MOBILE_MIDDLE_DOWN 1400
 #define MOBILE_MIDDLE_THRESHOLD 2100
 #define MOBILE_HALFWAY 1400
@@ -698,7 +698,7 @@ case mobileBottom:
 		writeDebugStreamLine("mobileBottom %d", gNumCones);
 		setMobile(MOBILE_DOWN_POWER);
 		unsigned long timeout = nPgmTime + 1100;
-		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.5, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID0(mobileBottom), false);
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID0(mobileBottom), false);
 		//Coast if timedout
 		if ( TimedOut(timeout, TID0(mobileBottom), False) )
 			NEXT_STATE(mobileIdle)
