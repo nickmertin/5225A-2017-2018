@@ -598,12 +598,14 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 	if (turnDir == ch)
 		if (fmod(atan2(y - gPosition.y, x - gPosition.x) - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
-	float endFull;
+	float endFull, target;
 
 	switch (turnDir)
 	{
 	case cw:
-		endFull = gPosition.a * (1 - fullRatio) + (gPosition.a + fmod(atan2(y - gPosition.y, x - gPosition.x) - gPosition.a, PI * 2)) * fullRatio;
+		target = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a, PI * 2);
+		endFull = gPosition.a * (1 - fullRatio) + target * fullRatio;
+		writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
 		setDrive(127, -127);
 		while (gPosition.a < endFull)
 		{
@@ -619,7 +621,7 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 			sleep(10);
 		}
 		setDrive(coastPower, -coastPower);
-		while (gPosition.a < nearAngle(atan2(y - gPosition.y, x - gPosition.x), gPosition.a) - degToRad(stopOffsetDeg))
+		while (gPosition.a < nearAngle(atan2(x - gPosition.x, y - gPosition.y), target) - degToRad(stopOffsetDeg))
 		{
 			if (DATALOG_TURN != -1)
 			{
@@ -639,7 +641,9 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 		writeDebugStreamLine("Break done: %d",  gPosition.a);
 		break;
 	case ccw:
-		endFull = gPosition.a * (1 - fullRatio) + (gPosition.a - fmod(gPosition.a - atan2(y - gPosition.y, x - gPosition.x), PI * 2)) * fullRatio;
+		target = gPosition.a - fmod(gPosition.a - atan2(y - gPosition.y, x - gPosition.x), PI * 2);
+		endFull = gPosition.a * (1 - fullRatio) + (target) * fullRatio;
+		writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
 		setDrive(-127, 127);
 		while (gPosition.a > endFull)
 		{
@@ -655,7 +659,7 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 			sleep(10);
 		}
 		setDrive(-coastPower, coastPower);
-		while (gPosition.a > nearAngle(atan2(y - gPosition.y, x - gPosition.x), gPosition.a) + degToRad(stopOffsetDeg))
+		while (gPosition.a > nearAngle(atan2(y - gPosition.y, x - gPosition.x), target) + degToRad(stopOffsetDeg))
 		{
 			if (DATALOG_TURN != -1)
 			{

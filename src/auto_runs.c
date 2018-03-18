@@ -443,7 +443,7 @@ skip2:
 	moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 5, 1);
-	turnToTargetNewAlgAsync(60, 36, cw, 0.4, 20, 30, false, 0);
+	turnToTargetNewAlgAsync(60, 36, cw, 0.4, 23, 12, false, 0);
 	driveTimeout = nPgmTime + 1500;
 	liftLowerSimpleAsync(LIFT_BOTTOM, -70, 0);
 	DRIVE_AWAIT(skills, 5, 2);
