@@ -610,6 +610,23 @@ skip5:
 	mobileSet(mobileTop, mfNone);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 11, 6));
+
+	// 12
+	turnToTargetNewAlgAsync(112, 136, ccw, 0.4, 26, 11, true, 0);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 12, 1);
+	moveToTargetSimpleAsync(112, 136, gPosition.y, gPosition.x, 127, 1, 8, 30, 13, stopNone, true);
+	driveTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanF(VEL_LOCAL_Y, 0.5, &gPosition.x, 119, driveTimeout, TID2(skills, 12, 2), true, false);
+	mobileSet(mobileBottom, mfClear);
+	DRIVE_AWAIT(skills, 12, 3);
+	driveAgainstStartingBar(30, 30, 15, 15, 1500);
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, driveTimeout, TID2(skills, 12, 4));
+	if (segment > -1)
+		return;
+skip6:
+	if (!resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, 0.25 * PI, 150, 350, true))
+		resetPositionFull(gPosition, gPosition.y, gPosition.x, 0.25 * PI);
 }
 
 void autoBlock()
