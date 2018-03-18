@@ -448,7 +448,7 @@ skip2:
 	moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 5, 1);
-	turnToTargetNewAlgAsync(60, 36, cw, 0.4, 23, 12, false, 0);
+	turnToTargetNewAlgAsync(60, 36, cw, 0.4, 26, 11, false, 0);
 	driveTimeout = nPgmTime + 1500;
 	liftLowerSimpleAsync(LIFT_BOTTOM, -70, 0);
 	DRIVE_AWAIT(skills, 5, 2);
@@ -490,13 +490,13 @@ skip3:
 	moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 700;
 	DRIVE_AWAIT(skills, 7, 1);
-	turnToTargetNewAlgAsync(127.5, 71, ccw, 0.2, 23, 12, false, 0);
+	turnToTargetNewAlgAsync(127, 71, ccw, 0.27, 23, 12, false, 0);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 7, 2);
-	moveToTargetSimpleAsync(127.5, 71, gPosition.y, gPosition.x, 70, 0.5, 0, 0, 15, stopNone, false);
+	moveToTargetSimpleAsync(127, 71, gPosition.y, gPosition.x, 70, 0.5, 0, 0, 16, stopNone, false);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 7, 3);
-	moveToTargetSimpleAsync(128, 35, gPosition.y, gPosition.x, 127, 0.5, 8, 55, 14, stopNone, true);
+	moveToTargetSimpleAsync(127, 35, gPosition.y, gPosition.x, 127, 0.5, 8, 55, 14, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileGreaterThanF(VEL_NONE, 0, &gPosition.x, 58, driveTimeout, TID2(skills, 7, 4));
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
@@ -510,13 +510,14 @@ skip3:
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP, coneTimeout, TID2(skills, 7, 7));
 
 	// 8
-	moveToTargetSimpleAsync(126, 71, gPosition.y, gPosition.x, -127, 0.5, 6, -90, 0, stopNone, true);
+	moveToTargetSimpleAsync(125, 71, gPosition.y, gPosition.x, -127, 0.5, 6, -90, 0, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
+	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(skills, 8, 1);
-	moveToTargetSimpleAsync(106.5, 109.5, gPosition.y, gPosition.x, -127, 1, 0, 0, 0, stopSoft | stopHarsh, false);
+	moveToTargetSimpleAsync(106.5, 109.5, gPosition.y, gPosition.x, -127, 1, 0, 0, 0, stopSoft, false);
 	driveTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(skills, 8, 2);
-	turnToAngleNewAlgAsync(0.25 * PI, cw, 0.35, 26, 12, true);
+	turnToAngleNewAlgAsync(0.25 * PI, cw, 0.35, 26, 11, true);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 8, 3);
 	_x = gPosition.x;
@@ -525,11 +526,12 @@ skip3:
 	moveToTargetDisSimpleAsync(0.25 * PI, 8, _y, _x, 60, 0, 0, 0, 0, stopNone, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 8, 4);
-	setDrive(40, 40);
+	setDrive(45, 45);
 	driveTimeout = nPgmTime + 1500;
-	sleep(200);
+	sleep(300);
 	timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0.05, driveTimeout, TID2(skills, 8, 5), true, false);
 	setDrive(15, 15);
+	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -547,10 +549,10 @@ skip4:
 	// 9
 	moveToTargetDisSimpleAsync(0.25 * PI, -9, _y, _x, -60, 0, 0, 0, 0, stopHarsh, false);
 	driveTimeout = nPgmTime + 1500;
-	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 9, 1);
 	turnToTargetNewAlgAsync(35, 129, cw, 0.27, 23, 13, false, 0);
 	driveTimeout = nPgmTime + 2000;
+	mobileSet(mobileBottom, mfNone);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(skills, 9, 2);
 	moveToTargetSimpleAsync(35, 129, gPosition.y, gPosition.x, 127, 0.5, 12, 55, 14, stopNone, true);
@@ -578,7 +580,7 @@ skip4:
 	setDrive(60, 60);
 	sleep(200);
 	driveAgainstStartingBar(30, 30, 15, 15, 2000);
-	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(skills, 10, 3));
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 10, 3));
 	if (segment > -1)
 		return;
 skip5:
