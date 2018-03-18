@@ -536,22 +536,22 @@ skip4:
 		resetPositionFull(gPosition, gPosition.y, gPosition.x, 0.25 * PI);
 	_x = gPosition.x;
 	_y = gPosition.y;
-	normalize(_x, _y, -1, 227);
+	normalize(_x, _y, -1, 226);
 	mobileSet(mobileDownToMiddle, mfClear);
 	coneTimeout = nPgmTime + 1500;
 	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(skills, 8, 6));
 	sleep(300);
 
 	// 9
-	moveToTargetDisSimpleAsync(0.25 * PI, -7, _y, _x, -60, 0, 0, 0, 0, stopNone, false);
+	moveToTargetDisSimpleAsync(0.25 * PI, -9, _y, _x, -60, 0, 0, 0, 0, stopHarsh, false);
 	driveTimeout = nPgmTime + 1500;
 	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 9, 1);
-	turnToTargetNewAlgAsync(35, 127, cw, 0.27, 23, 11, false, 0);
+	turnToTargetNewAlgAsync(35, 129, cw, 0.27, 23, 13, false, 0);
 	driveTimeout = nPgmTime + 2000;
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(skills, 9, 2);
-	moveToTargetSimpleAsync(35, 127, gPosition.y, gPosition.x, 127, 0.5, 12, 55, 14, stopNone, true);
+	moveToTargetSimpleAsync(35, 129, gPosition.y, gPosition.x, 127, 0.5, 12, 55, 14, stopNone, true);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileGreaterThanF(VEL_NONE, 0, &gPosition.y, 60, driveTimeout - 500, TID2(skills, 9, 3));
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
@@ -563,6 +563,20 @@ skip4:
 	mobileSet(mobileTop, mfNone);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 9, 6));
+
+	// 10
+	moveToTargetSimpleAsync(108, 108, gPosition.y, gPosition.x, -127, 1, 0, 0, 2, stopSoft, true);
+	driveTimeout = nPgmTime + 2500;
+	DRIVE_AWAIT(skills, 10, 1);
+	turnToAngleNewAlgAsync(0.25 * PI, ccw, 0.27, 23, 11, true);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 10, 2);
+	mobileSet(mobileBottom, mfNone);
+	coneTimeout = nPgmTime + 2000;
+	setDrive(60, 60);
+	sleep(200);
+	driveAgainstStartingBar(30, 30, 15, 15, 2000);
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(skills, 10, 3));
 }
 
 void autoBlock()
