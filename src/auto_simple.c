@@ -596,7 +596,7 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 	writeDebugStreamLine("Turning to %f %f", y, x);
 
 	if (turnDir == ch)
-		if (fmod(atan2(y - gPosition.y, x - gPosition.x) - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
+		if (fmod(atan2(x - gPosition.x, y - gPosition.y) - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
 
 	float endFull, target;
 
@@ -641,7 +641,7 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 		writeDebugStreamLine("Break done: %d",  gPosition.a);
 		break;
 	case ccw:
-		target = gPosition.a - fmod(gPosition.a - atan2(y - gPosition.y, x - gPosition.x), PI * 2);
+		target = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y), PI * 2);
 		endFull = gPosition.a * (1 - fullRatio) + (target) * fullRatio;
 		writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
 		setDrive(-127, 127);
@@ -659,7 +659,7 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 			sleep(10);
 		}
 		setDrive(-coastPower, coastPower);
-		while (gPosition.a > nearAngle(atan2(y - gPosition.y, x - gPosition.x), target) + degToRad(stopOffsetDeg))
+		while (gPosition.a > nearAngle(atan2(x - gPosition.x, y - gPosition.y), target) + degToRad(stopOffsetDeg))
 		{
 			if (DATALOG_TURN != -1)
 			{
