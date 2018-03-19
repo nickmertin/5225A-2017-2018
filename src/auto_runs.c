@@ -271,7 +271,10 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlow, unsigned long timeout)
 {
 	if (timeout)
-		timeout += nPgmTime;
+	{
+		unsigned long st = nPgmTime;
+		timeout += st;
+	}
 	byte val = 0;
 	while (val != 3 && (!timeout || nPgmTime < timeout))
 	{
@@ -295,7 +298,8 @@ void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlo
 
 void killAuto(unsigned long timeout)
 {
-	sleep(timeout - nPgmTime);
+	unsigned long st = nPgmTime;
+	sleep(timeout - st);
 	if (competitionState == autonomousState)
 	{
 		writeDebugStreamLine("KILL AUTO");
