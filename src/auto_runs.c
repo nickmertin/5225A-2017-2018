@@ -712,6 +712,23 @@ skip7:
 	mobileSet(mobileTop, mfNone);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 15, 6));
+
+	// 16
+	moveToTargetSimpleAsync(34, 34, gPosition.y, gPosition.x, -127, 1, 0, 0, 0, stopSoft, true);
+	driveTimeout = nPgmTime + 2500;
+	DRIVE_AWAIT(skills, 16, 1);
+	turnToAngleNewAlgAsync(-0.75 * PI, cw, 0.27, 26, 11, true);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 16, 2);
+	moveToTargetSimpleAsync(30, 30, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, stopSoft, false);
+	driveTimeout = nPgmTime + 1500;
+	mobileSet(mobileBottom, mfNone);
+	coneTimeout = nPgmTime + 2000;
+	DRIVE_AWAIT(skills, 16, 3);
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 300, coneTimeout, TID2(skills, 16, 4));
+	moveToTargetDisSimpleAsync(gPosition.a, -5, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, stopNone, false);
+	driveTimeout = nPgmTime + 1000;
+	DRIVE_AWAIT(skills, 16, 5);
 }
 
 void autoBlock()
