@@ -172,6 +172,27 @@
   _asyncDataVar_##func.arg10 = arg10; \
 }
 
+#define __ASYNC_UNIQUE_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) _asyncUnique_##func
+#define __ASYNC_STATE_NAME_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) func##State
+#define __ASYNC_STATE_INVOKE_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) STATE_INVOKE_ASYNC(func)
+#define __ASYNC_HEADER_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) unsigned long func##Async(type0 arg0, type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6, type7 arg7, type8 arg8, type9 arg9, type10 arg10, type11 arg11)
+
+#define __ASYNC_COPYTOVAR_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) \
+{ \
+  _asyncDataVar_##func.arg0 = arg0; \
+  _asyncDataVar_##func.arg1 = arg1; \
+  _asyncDataVar_##func.arg2 = arg2; \
+  _asyncDataVar_##func.arg3 = arg3; \
+  _asyncDataVar_##func.arg4 = arg4; \
+  _asyncDataVar_##func.arg5 = arg5; \
+  _asyncDataVar_##func.arg6 = arg6; \
+  _asyncDataVar_##func.arg7 = arg7; \
+  _asyncDataVar_##func.arg8 = arg8; \
+  _asyncDataVar_##func.arg9 = arg9; \
+  _asyncDataVar_##func.arg10 = arg10; \
+  _asyncDataVar_##func.arg11 = arg11; \
+}
+
 #define ASYNC_TASK_NAME(func) _asyncTask_##func
 #define STATE_INVOKE_ASYNC(func) _asyncInvoke_##func();
 #define CUR_UNIQUE(func) _asyncUnique_##func
@@ -622,6 +643,48 @@ void func##Await(unsigned long timeout, const unsigned char *routine, unsigned s
 }
 
 #define NEW_ASYNC_VOID_STATE_11(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10) __ASYNC_STATE_INTERNAL(machine, state, 11, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10))
+
+#define __ASYNC_TEMPLATE_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) \
+typedef struct _asyncData_##func { \
+  type0 arg0; \
+  type1 arg1; \
+  type2 arg2; \
+  type3 arg3; \
+  type4 arg4; \
+  type5 arg5; \
+  type6 arg6; \
+  type7 arg7; \
+  type8 arg8; \
+  type9 arg9; \
+  type10 arg10; \
+  type11 arg11; \
+} sAsyncData_##func; \
+sAsyncData_##func _asyncDataVar_##func; \
+void _asyncInvoke_##func() { \
+  func(_asyncDataVar_##func.arg0, _asyncDataVar_##func.arg1, _asyncDataVar_##func.arg2, _asyncDataVar_##func.arg3, _asyncDataVar_##func.arg4, _asyncDataVar_##func.arg5, _asyncDataVar_##func.arg6, _asyncDataVar_##func.arg7, _asyncDataVar_##func.arg8, _asyncDataVar_##func.arg9, _asyncDataVar_##func.arg10, _asyncDataVar_##func.arg11); \
+}
+
+#define NEW_ASYNC_VOID_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) \
+__ASYNC_TEMPLATE_12(func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) \
+task _asyncTask_##func() { \
+  _asyncInvoke_##func(); \
+  return_t \
+} \
+__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, 12, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11)) \
+void func##Kill(bool killAll = false) { \
+  if (killAll) \
+    tStopAll(_asyncTask_##func); \
+  else \
+    tStop(_asyncTask_##func); \
+} \
+void func##Await(unsigned long unique, unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  while (RUNNING_STANDALONE(func, unique) && !TimedOut(timeout, routine, id)) sleep(10); \
+} \
+void func##Await(unsigned long timeout, const unsigned char *routine, unsigned short id) { \
+  func##Await(_asyncUnique_##func, timeout, routine, id); \
+}
+
+#define NEW_ASYNC_VOID_STATE_12(machine, state, func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11) __ASYNC_STATE_INTERNAL(machine, state, 12, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11))
 
 unsigned long _asyncUnique = 1;
 
