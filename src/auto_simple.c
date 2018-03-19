@@ -1,5 +1,5 @@
 /* Functions */
-void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
+void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
 {
 	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 
@@ -37,7 +37,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 	word last = startPower;
 	float correction = 0;
 
-	if (!slow)
+	if (mode == mttSimple)
 		setDrive(power, power);
 
 	word finalPower = power;
@@ -61,16 +61,27 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 			correction = fabs(errX) > maxErrX ? 8.0 * (nearAngle(correctA, gPosition.a) - gPosition.a) * sgn(power) : 0;
 		}
 
-		if (slow)
+		if (mode != mttSimple)
 		{
-			finalPower = round(-127.0 / 48.0 * sgn(power) * currentPosVector.y);
+			switch (mode)
+			{
+			case mttProportional:
+				finalPower = round(-127.0 / 48.0 * currentPosVector.y) * sgn(power);
+				break;
+			case mttCascading:
+				const float kB = 2.8;
+				const float kP = 1.4;
+				float vTarget = 45 * (1 - exp(currentPosVector.y + dropEarly));
+				finalPower = round(kB * vTarget + kP * (vTarget - vel)) * sgn(power);
+				break;
+			}
 			LIM_TO_VAL_SET(finalPower, abs(power));
-			if (finalPower * sgn(power) < 30)
-				finalPower = 30 * sgn(power);
+			if (finalPower * sgn(power) < abs(decelPower))
+				finalPower = decelPower;
 			word delta = finalPower - last;
 			LIM_TO_VAL_SET(delta, 5);
 			finalPower = last += delta;
-			writeDebugStreamLine("%d | %.2f %d", nPgmTime, currentPosVector.y, finalPower);
+			writeDebugStreamLine("%d | %.2f %.2f %d", nPgmTime, currentPosVector.y, vel, finalPower);
 		}
 
 		switch (sgn(correction))
@@ -133,9 +144,9 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, bool slow)
+void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
 {
-	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, slow);
+	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, mode);
 }
 
 void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo)
