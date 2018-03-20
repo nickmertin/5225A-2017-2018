@@ -9,30 +9,23 @@
 #define IS_CONFIGURED(machine) (machine##State != -1)
 #define NEXT_STATE(new_state) { state = new_state; goto top; }
 
-typedef union _stateMachineArg {
-  long _long;
-  float _float;
-  void *_ptr;
-} uStateMachineArg;
-
 #define DECLARE_MACHINE(machine, states) \
 void machine##Setup(); \
 void machine##Set(states state); \
 void machine##Set(states state, long arg); \
-void machine##Set(states state, float arg); \
-void machine##Set(states state, void *arg); \
+void machine##Set(states state, long arg, bool detached); \
 void machine##Reset(); \
 void machine##TimeoutWhile(states state, unsigned long timeout, const unsigned char *routine, unsigned short id); \
 void machine##TimeoutUntil(states state, unsigned long timeout, const unsigned char *routine, unsigned short id); \
 
 #define MAKE_MACHINE(machine, states, base, handler) \
 states machine##State = -1; \
-uStateMachineArg machine##Arg; \
+long machine##Arg = 0; \
 void machine##Internal(states state) \
 { \
-  uStateMachineArg &arg = machine##Arg; \
+  long &arg = machine##Arg; \
   top: \
-  writeDebugStreamLine("%d " #machine " %d -> %d, %x", nPgmTime, machine##State, state, arg._long); \
+  writeDebugStreamLine("%d " #machine " %d -> %d, %x", nPgmTime, machine##State, state, arg); \
   switch (machine##State = state) \
   handler \
 } \
@@ -41,7 +34,7 @@ void machine##Setup() \
 { \
   if (IS_CONFIGURED(machine)) \
     machine##InternalKill(); \
-  machine##Arg._long = 0; \
+  machine##Arg = 0; \
   machine##InternalAsync(base); \
   writeDebugStreamLine("Init " #machine " - " #base); \
 } \
@@ -55,22 +48,15 @@ void machine##Set(states state, long arg) \
 { \
   if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
     machine##InternalKill(); \
-  machine##Arg._long = arg; \
+  machine##Arg = arg; \
   machine##InternalAsync(state); \
 } \
-void machine##Set(states state, float arg) \
+void machine##Set(states state, long arg, bool detached) \
 { \
   if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
     machine##InternalKill(); \
-  machine##Arg._float = arg; \
-  machine##InternalAsync(state); \
-} \
-void machine##Set(states state, void *arg) \
-{ \
-  if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
-    machine##InternalKill(); \
-  machine##Arg._ptr = arg; \
-  machine##InternalAsync(state); \
+  machine##Arg = arg; \
+  machine##InternalAsync(state, detached); \
 } \
 void machine##Reset() \
 { \
@@ -687,3 +673,4 @@ case __ASYNC_STATE_NAME_##argc11 argv11 : \
   { after11 } \
   NEXT_STATE(machine##NotRunning) \
 })
+
