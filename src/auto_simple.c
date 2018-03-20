@@ -71,7 +71,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 			case mttCascading:
 				const float kB = 2.8;
 				const float kP = 2.0;
-				float vTarget = 45 * (1 - exp(0.15 * (currentPosVector.y + dropEarly)));
+				float vTarget = 45 * (1 - exp(0.07 * (currentPosVector.y + dropEarly)));
 				finalPower = round(kB * vTarget + kP * (vTarget - vel)) * sgn(power);
 				break;
 			}
