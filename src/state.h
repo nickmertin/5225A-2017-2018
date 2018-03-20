@@ -13,6 +13,7 @@
 void machine##Setup(); \
 void machine##Set(states state); \
 void machine##Set(states state, long arg); \
+void machine##Set(states state, long arg, bool detached); \
 void machine##Reset(); \
 void machine##TimeoutWhile(states state, unsigned long timeout, const unsigned char *routine, unsigned short id); \
 void machine##TimeoutUntil(states state, unsigned long timeout, const unsigned char *routine, unsigned short id); \
@@ -49,6 +50,13 @@ void machine##Set(states state, long arg) \
     machine##InternalKill(); \
   machine##Arg = arg; \
   machine##InternalAsync(state); \
+} \
+void machine##Set(states state, long arg, bool detached) \
+{ \
+  if (nCurrentTask != ASYNC_TASK_NAME(machine##Internal)) \
+    machine##InternalKill(); \
+  machine##Arg = arg; \
+  machine##InternalAsync(state, detached); \
 } \
 void machine##Reset() \
 { \

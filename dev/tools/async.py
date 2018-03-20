@@ -9,7 +9,7 @@ for i in range(maxArgc + 1):
     print('#define __ASYNC_STATE_NAME_%d(%s) func##State' % (i, header))
     print('#define __ASYNC_STATE_INVOKE_%d(%s) STATE_INVOKE_ASYNC(func)' % (i, header))
     print('#define __ASYNC_HEADER_%d(%s) unsigned long func##Async(%s)'
-          % (i, header, ', '.join('type%d arg%d' % (j, j) for j in range(i))))
+          % (i, header, ', '.join([*['type%d arg%d' % (j, j) for j in range(i)], 'bool detached = false'])))
     print()
 
     print('#define __ASYNC_COPYTOVAR_%d(%s) \\' % (i, header))
@@ -43,7 +43,7 @@ print()
 
 print('#define __ASYNC_STATE_INTERNAL(machine, state, n, argv) \\')
 print('__ASYNC_TEMPLATE_##n argv \\')
-print('__ASYNC_API(;, machine##Set(state);, n, argv) \\')
+print('__ASYNC_API(;, machine##Set(state, 0, detached);, n, argv) \\')
 print()
 
 for i in range(maxArgc + 1):
@@ -69,7 +69,7 @@ for i in range(maxArgc + 1):
     print('  _asyncInvoke_##func(); \\')
     print('  return_t \\')
     print('} \\')
-    print('__ASYNC_API(; , tStart(_asyncTask_##func); sleep(20);, %d, (%s)) \\' % (i, header))
+    print('__ASYNC_API(; , tStart(_asyncTask_##func, detached); sleep(20);, %d, (%s)) \\' % (i, header))
     print('void func##Kill(bool killAll = false) { \\')
     print('  if (killAll) \\')
     print('    tStopAll(_asyncTask_##func); \\')
