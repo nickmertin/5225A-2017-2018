@@ -447,7 +447,7 @@ skip1:
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
 	DRIVE_AWAIT(skills, 4, 3);
 	mobileSet(mobileBottom, mfNone);
-	driveAgainstStartingBar(25, 25, 10, 10, 1500);
+	driveAgainstStartingBar(25, 25, 15, 15, 1500);
 	coneTimeout = nPgmTime + 2000;
 	sleep(500);
 	if (segment > -1)
@@ -486,7 +486,7 @@ skip2:
 	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(skills, 6, 1));
 	DRIVE_AWAIT(skills, 6, 2);
 	mobileSet(mobileBottom, mfClear);
-	driveAgainstStartingBar(25, 25, 10, 10, 1500);
+	driveAgainstStartingBar(25, 25, 15, 15, 1500);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -605,7 +605,7 @@ skip4:
 	driveTimeout = nPgmTime + 800;
 	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 10, 3);
-	driveAgainstStartingBar(25, 25, 10, 10, 2000);
+	driveAgainstStartingBar(25, 25, 15, 15, 2000);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -631,7 +631,7 @@ skip5:
 	sweepTurnToTargetAsync(_y - 22, _x, 225 * PI / 180, 16, cw, 127, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 11, 3);
-	moveToTargetSimpleAsync(71, 95, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttSimple);
+	moveToTargetSimpleAsync(72, 94, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(skills, 11, 4);
 	setDrive(55, 55);
@@ -654,7 +654,7 @@ skip5:
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
 	DRIVE_AWAIT(skills, 12, 3);
 	mobileSet(mobileBottom, mfNone);
-	driveAgainstStartingBar(25, 25, 10, 10, 1500);
+	driveAgainstStartingBar(25, 25, 15, 15, 1500);
 	sleep(500);
 	if (segment > -1)
 		return;
@@ -677,7 +677,7 @@ skip6:
 	moveToTargetSimpleAsync(71, 95, gPosition.y, gPosition.x, 127, 0, 0.5, 0, 0, 5, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 13, 3);
-	moveToTargetSimpleAsync(47, 72, gPosition.y, gPosition.x, 127, 127, 1, 0, 0, 14, stopNone, mttProportional);
+	moveToTargetSimpleAsync(46, 73, gPosition.y, gPosition.x, 127, 127, 1, 0, 0, 14, stopNone, mttProportional);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 13, 4);
 	setDrive(70, 70);
@@ -691,7 +691,7 @@ skip6:
 	driveTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(skills, 14, 1);
 	mobileSet(mobileBottom, mfNone);
-	driveAgainstStartingBar(25, 25, 10, 10, 1500);
+	driveAgainstStartingBar(25, 25, 15, 15, 1500);
 	sleep(500);
 	if (segment > -1)
 		return;
