@@ -346,13 +346,17 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 	}
 
 	float yOrigin, xOrigin;
-	float linearV, angularV;
+	float linearV, angularV, angularVLast = 0;
 	float localR, localA;
 
 	const float kR = 15.0;
 	const float kA = 5.0;
-	const float kB = 60.0;
-	const float kP = 15.0;
+	const float kB = 50.0;
+	const float kP = 20.0;
+	const float kD = 2000.0;
+
+	sCycleData cycle;
+	initCycle(cycle, 40, "sweepTurnToTarget");
 
 	switch (turnDir)
 	{
@@ -384,7 +388,8 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			linearV = gVelocity.x * sin(localA + PI / 2) + gVelocity.y * cos(localA + PI / 2);
 
 			float target = MAX(linearV, 15) / localR + kR * log(localR / r) + kA * (nearAngle(localA + PI / 2, aGlobal) - aGlobal);
-			word turn = round(kB * target + kP * (target - angularV));
+			word turn = round(kB * target + kP * (target - angularV) + kD * (angularVLast - angularV) / 40);
+			angularVLast = angularV;
 
 			if (turn < 0)
 				turn = 0;
@@ -400,17 +405,17 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			{
 				tHog();
 				datalogDataGroupStart();
-				datalogAddValue(DATALOG_SWEEP + 0, localR);
-				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA) * 1000);
-				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 1000);
-				datalogAddValue(DATALOG_SWEEP + 3, turn * 100);
+				datalogAddValue(DATALOG_SWEEP + 0, localR * 100);
+				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA) * 10);
+				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 10);
+				datalogAddValue(DATALOG_SWEEP + 3, turn * 10);
 				datalogAddValue(DATALOG_SWEEP + 4, linearV * 10);
-				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 1000);
+				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 10);
 				datalogDataGroupEnd();
 				tRelease();
 			}
 
-			sleep(10);
+			endCycle(cycle);
 		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a < (slow ? -0.1 : -0.15));
 		break;
 	case ccw:
@@ -441,7 +446,8 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			linearV = gVelocity.x * sin(localA - PI / 2) + gVelocity.y * cos(localA - PI / 2);
 
 			float target = -MAX(linearV, 15) / localR + kR * log(r / localR) + kA * (nearAngle(localA - PI / 2, aGlobal) - aGlobal);
-			word turn = round(kB * target + kP * (target - angularV));
+			word turn = round(kB * target + kP * (target - angularV) + kD * (angularVLast - angularV) / 40);
+			angularVLast = angularV;
 
 			if (turn > 0)
 				turn = 0;
@@ -457,17 +463,17 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 			{
 				tHog();
 				datalogDataGroupStart();
-				datalogAddValue(DATALOG_SWEEP + 0, localR);
-				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA) * 1000);
-				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 1000);
-				datalogAddValue(DATALOG_SWEEP + 3, turn * 100);
+				datalogAddValue(DATALOG_SWEEP + 0, localR * 100);
+				datalogAddValue(DATALOG_SWEEP + 1, radToDeg(localA) * 10);
+				datalogAddValue(DATALOG_SWEEP + 2, radToDeg(target) * 10);
+				datalogAddValue(DATALOG_SWEEP + 3, turn * 10);
 				datalogAddValue(DATALOG_SWEEP + 4, linearV * 10);
-				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 1000);
+				datalogAddValue(DATALOG_SWEEP + 5, radToDeg(angularV) * 10);
 				datalogDataGroupEnd();
 				tRelease();
 			}
 
-			sleep(10);
+			endCycle(cycle);
 		} while ((power > 0 ? gPosition.a : (gPosition.a + PI)) - a > (slow ? 0.1 : 0.15));
 		break;
 	}
