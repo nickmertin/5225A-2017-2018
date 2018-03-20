@@ -371,7 +371,7 @@ void autoSkills(int segment)
 	// 2
 	moveToTargetSimpleAsync(71, 15, gPosition.y, gPosition.x, -127, 0, 0.5, 4, -90, 0, stopNone, mttProportional);
 	driveTimeout = nPgmTime + 2000;
-	stackSet(stackStack, sfDetach);
+	stackSet(stackStack, sfDetach, true);
 	DRIVE_AWAIT(skills, 2, 1);
 	moveToTargetSimpleAsync(33, 33, gPosition.y, gPosition.x, -127, -90, 1, 0, 0, 0, stopSoft | stopHarsh, mttSimple);
 	driveTimeout = nPgmTime + 2000;
@@ -525,9 +525,9 @@ skip3:
 	driveTimeout = nPgmTime + 1000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP, coneTimeout, TID2(skills, 7, 7));
 	DRIVE_AWAIT(skills, 7, 8);
-	stackSet(stackPickupGround, sfStack | sfDetach);
+	stackSet(stackPickupGround, sfStack | sfDetach, true);
 	coneTimeout = nPgmTime + 800;
-	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 7, 9));
+	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 7, 9), false);
 
 	// 8
 	moveToTargetSimpleAsync(125, 71, gPosition.y, gPosition.x, -127, 0, 0.5, 4, -90, 0, stopNone, mttProportional);
