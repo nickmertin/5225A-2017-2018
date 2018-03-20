@@ -138,6 +138,18 @@ void autoMotorSensorUpdateTask()
 		updateMotors();
 		updateSensorInputs();
 		updateSensorOutputs();
+
+		if (DATALOG_BATTERY != -1)
+		{
+			tHog();
+			datalogDataGroupStart();
+			datalogAddValue(DATALOG_BATTERY + 0, nImmediateBatteryLevel);
+			datalogAddValue(DATALOG_BATTERY + 1, 1000 * getExpanderVoltage(expander, true));
+			datalogAddValue(DATALOG_BATTERY + 2, BackupBatteryLevel);
+			datalogDataGroupEnd();
+			tRelease();
+		}
+
 		endCycle(cycle);
 	}
 }
