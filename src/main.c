@@ -666,6 +666,8 @@ void mobileClearLift()
 	}
 }
 
+DECLARE_MACHINE(mobile, tMobileStates)
+
 MAKE_MACHINE(mobile, tMobileStates, mobileIdle,
 {
 case mobileIdle:
