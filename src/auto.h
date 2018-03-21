@@ -1,11 +1,11 @@
 /* Defines */
 // The diameter of the tracking wheels in inches
-#define WHEEL_DIAMETER_IN_LR 2.843 //(4.125 / 4)
-#define WHEEL_DIAMETER_IN_S 2.843
+#define WHEEL_DIAMETER_IN_LR 2.783 // 2.843
+#define WHEEL_DIAMETER_IN_S 2.783 // 2.843
 
 // The distance between the tracking wheels and the centre of the robot in inches
-#define L_DISTANCE_IN 4.878 //6.8198
-#define R_DISTANCE_IN 4.878 //6.8198
+#define L_DISTANCE_IN 4.766 //6.8198
+#define R_DISTANCE_IN 4.766 //6.8198
 #define S_DISTANCE_IN 7
 
 // The number of tick per rotation of the tracking wheel

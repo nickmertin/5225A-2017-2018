@@ -59,14 +59,14 @@ void normalize(float& x, float& y, float m, float b)
 	y = m * x + b;
 }
 
-#define START_BAR_INTERCEPT 49.7
-#define START_BAR_ROBOT_OFFSET 7.5
-#define START_BAR_RESET_INTERCEPT (START_BAR_INTERCEPT + START_BAR_ROBOT_OFFSET / sqrt(2))
+#define START_BAR_INTERCEPT 43.7
+#define START_BAR_ROBOT_OFFSET 6.5
+#define START_BAR_RESET_INTERCEPT (START_BAR_INTERCEPT + START_BAR_ROBOT_OFFSET * sqrt(2))
 
 float calcYCoord(float u, float _a)
 {
-	const float x = 7.5;
-	const float y = 3.8;
+	const float x = 7.7;
+	const float y = 2.5;
 	const float b = atan2(y, x);
 	const float d2 = x * x + y * y;
 	const float d = sqrt(d2);
@@ -85,8 +85,8 @@ float calcYCoord(float u, float _a)
 
 float calcXCoord(float u, float _a)
 {
-	const float x = 7.5;
-	const float y = 3.8;
+	const float x = 7.7;
+	const float y = 2.5;
 	const float b = atan2(y, x);
 	const float d2 = x * x + y * y;
 	const float d = sqrt(d2);
@@ -153,8 +153,8 @@ bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long min
 	float x = calcXCoord(ru, a);
 	if (crossField)
 	{
-		y = 140.5 - y;
-		x = 140.5 - x;
+		y = 141.5 - y;
+		x = 141.5 - x;
 		a -= PI;
 	}
 	resetPositionFull(gPosition, y, x, a);
@@ -206,8 +206,8 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 	float x = -y + xInt;
 	if (crossField)
 	{
-		y = 140.5 - y;
-		x = 140.5 - x;
+		y = 141.5 - y;
+		x = 141.5 - x;
 		a -= PI;
 	}
 	resetPositionFull(gPosition, y, x, a);
@@ -259,8 +259,8 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 	float y = -x + yInt;
 	if (crossField)
 	{
-		y = 140.5 - y;
-		x = 140.5 - x;
+		y = 141.5 - y;
+		x = 141.5 - x;
 		a -= PI;
 	}
 	resetPositionFull(gPosition, y, x, a);
