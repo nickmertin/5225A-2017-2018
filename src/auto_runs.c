@@ -343,12 +343,7 @@ void autoSkills(int segment)
 	case 4:
 		goto skip4;
 	case 5:
-		mobileSet(mobileBottom, mfNone);
 		goto skip5;
-	case 6:
-		goto skip6;
-	case 7:
-		goto skip7;
 	}
 
 	//killAutoAsync(gAutoTime + 60000);
@@ -441,7 +436,7 @@ void autoSkills(int segment)
 	sleep(500);
 	if (segment > -1)
 		return;
-skip2:
+skip1:
 	if (!resetSonarYOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 600, 900, false) && !resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 130, 330, false))
 	{
 		if (segment > -1)
@@ -477,7 +472,7 @@ skip2:
 	sleep(500);
 	if (segment > -1)
 		return;
-skip3:
+skip2:
 	mobileSet(mobileBottom, mfNone);
 	setDrive(15, 15);
 	if (!resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, 0.25 * PI, 560, 830, true) && !resetSonarYOnly(100, 500, START_BAR_RESET_INTERCEPT, 0.25 * PI, 130, 330, true))
@@ -541,7 +536,7 @@ skip3:
 	sleep(500);
 	if (segment > -1)
 		return;
-skip4:
+skip3:
 	if (!resetSonarFull(100, 500, 0.25 * PI, 230, 470, 180, 650, true))
 	{
 		if (segment > -1)
@@ -637,7 +632,7 @@ skip4:
 	sleep(500);
 	if (segment > -1)
 		return;
-skip6:
+skip4:
 	if (!resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, 0.25 * PI, 150, 350, true))
 	{
 		if (segment > -1)
@@ -673,7 +668,7 @@ skip6:
 	sleep(500);
 	if (segment > -1)
 		return;
-skip7:
+skip5:
 	if (!resetSonarYOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 130, 330, false))
 	{
 		if (segment > -1)
