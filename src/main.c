@@ -1030,7 +1030,7 @@ case stackDetach:
 		}
 		else {
 			liftSet(liftManaged);
-			setLift(-10);
+			setLift(-15);
 		}
 		if (gNumCones < 3 && !RAPID)
 			armLowerSimpleAsync((gNumCones == 3) ? ARM_RELEASE - 100 : ARM_RELEASE, -127, 45, 100, 80, armIdle);
