@@ -99,7 +99,8 @@ typedef enum _stackFlags {
 	sfMobile = 16,
 	sfLoader = 32,
 	sfNoResetArm = 64,
-	sfNoResetLift = 128
+	sfNoResetLift = 128,
+	sfRapid = 256
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -117,6 +118,7 @@ typedef enum _stackStates {
 DECLARE_MACHINE(stack, tStackStates)
 
 #define STACK_CLEAR_CONFIG(flags, mobileState, mobileFlags) ((flags) | sfClear | sfMobile | ((mobileState) << 16) | ((mobileFlags) << 24))
+#define STACK_RAPID_CONFIG(flags, maxCones) ((flags) | sfStack | sfRapid | ((maxCones) << 12))
 #define MAX_STACK 11
 
 sCycleData gMainCycle;
@@ -856,6 +858,8 @@ bool gStack = false;
 bool gLoader = false;
 unsigned long gPrepStart = 0;
 
+#define RAPID (gStack || ((arg & sfRapid) && gNumCones < ((arg >> 12) & 0xF)))
+
 MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
@@ -1015,20 +1019,20 @@ case stackStack:
 
 		++gNumCones;
 
-		NEXT_STATE((arg & (sfDetach | sfClear | sfReturn)) ? stackDetach : stackNotRunning)
+		NEXT_STATE((arg & (sfDetach | sfClear | sfReturn | sfRapid)) ? stackDetach : stackNotRunning)
 	}
 case stackDetach:
 	writeDebugStreamLine("%06d stackDetach %x %d", npgmTime, arg, gNumCones);
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[gNumCones - 1])
 	{
 		if ((arg & sfReturn) && gNumCones > 3) {
-			liftLowerSimpleAsync((arg & sfLoader) ? MIN(2200, gLiftPlaceTarget[MAX(0, gNumCones - 1)]) : gStack ? LIFT_BOTTOM : 1650, -50, 25);
+			liftLowerSimpleAsync((arg & sfLoader) ? MIN(2200, gLiftPlaceTarget[MAX(0, gNumCones - 1)]) : RAPID ? LIFT_BOTTOM : 1650, -50, 25);
 		}
 		else {
 			liftSet(liftManaged);
 			setLift(-10);
 		}
-		if (!gStack && gNumCones <= 3)
+		if (gNumCones < 3 && !RAPID)
 			armLowerSimpleAsync((gNumCones == 3) ? ARM_RELEASE - 100 : ARM_RELEASE, -127, 45, 100, 80, armIdle);
 		else
 			armLowerSimpleAsync(ARM_RELEASE, -127, 0, 0, 0, armIdle);
@@ -1038,7 +1042,8 @@ case stackDetach:
 		writeDebugStreamLine("%06d Detached lift at height: %d", npgmTime, gSensor[liftPoti].value);
 		liftReset();
 	}
-	if (gStack) {
+	if (RAPID) {
+		bool _gStack = gStack;
 		gStack = false;
 		if (gNumCones < MAX_STACK) {
 			if (gNumCones == MAX_STACK - 1) {
@@ -1051,7 +1056,7 @@ case stackDetach:
 					gLoader = false;
 					NEXT_STATE(stackPickupLoader)
 				}
-				gStack = true;
+				gStack = _gStack;
 			}
 			else {
 				arg &= ~sfLoader;
