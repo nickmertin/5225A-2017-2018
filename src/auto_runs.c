@@ -566,18 +566,24 @@ skip3:
 	moveToTargetSimpleAsync(35, 128, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttProportional);
 	driveTimeout = nPgmTime + 1500;
 	timeoutWhileGreaterThanF(VEL_NONE, 0, &gPosition.y, 60, driveTimeout - 500, TID2(skills, 9, 4));
-	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
+	liftRaiseSimpleAsync(gLiftRaiseTarget[0], 127, 0);
+	armSet(armToTarget, ARM_HORIZONTAL);
 	DRIVE_AWAIT(skills, 9, 5);
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
 	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 9, 6), false);
-	setDrive(0, 0);
+	moveToTargetSimpleAsync(23, 129, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttProportional);
+	driveTimeout = nPgmTime + 1200;
 	mobileSet(mobileTop, mfNone);
 	coneTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 9, 7));
+	DRIVE_AWAIT(skills, 9, 8);
+	stackSet(stackPickupGround, sfStack | sfClear, true);
+	coneTimeout = nPgmTime + 800;
+	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 9, 9), false);
 
 	// 10
-	moveToTargetSimpleAsync(107, 107, gPosition.y, gPosition.x, -127, 0, 1, 0, 0, 2, stopSoft, mttProportional);
+	moveToTargetSimpleAsync(107, 107, gPosition.y, gPosition.x, -127, 0, 1, 0, 0, 2, stopNone, mttCascading);
 	driveTimeout = nPgmTime + 2500;
 	DRIVE_AWAIT(skills, 10, 1);
 	turnToAngleNewAlgAsync(0.25 * PI, ccw, 0.4, 26, 11, true);
@@ -683,7 +689,7 @@ skip5:
 	turnToTargetNewAlgAsync(12, 106, ccw, 0.27, 23, 11, false, 0);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 15, 2);
-	moveToTargetSimpleAsync(12, 106, gPosition.y, gPosition.x, 127, 0, 0.5, 8, 55, 14, stopNone, mttProportional);
+	moveToTargetSimpleAsync(12, 106, gPosition.y, gPosition.x, 127, 0, 0.5, 0, 0, 14, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanF(VEL_NONE, 0, &gPosition.x, 71, driveTimeout, TID2(skills, 15, 3));
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
