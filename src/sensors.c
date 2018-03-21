@@ -89,23 +89,31 @@ void velocityCheck(tSensors sen)
 {
 	tHog();
 	unsigned long time = nPgmTime;
-	if (!gSensor[sen].velCount || time - gSensor[sen].velData[gSensor[sen].velCount - 1].timestamp >= 20)
-	{
-		int sensor = gSensor[sen].value;
-		if (gSensor[sen].velCount == SENSOR_VEL_POINT_COUNT)
+	sSensor& s = gSensor[sen];
+	for (ubyte i = 0; i < s.velCount; ++i)
+		if (s.velData[i].timestamp >= time)
 		{
-			gSensor[sen].velCount = SENSOR_VEL_POINT_COUNT - 1;
-			memmove(&gSensor[sen].velData[0], &gSensor[sen].velData[1], sizeof(sSensorVelPoint) * (SENSOR_VEL_POINT_COUNT - 1));
+			memmove(&s.velData[i], &s.velData[i + 1], s.velCount - i - 1);
+			--i;
+			--s.velCount;
+		}
+	if (!s.velCount || time - s.velData[s.velCount - 1].timestamp >= 20)
+	{
+		int sensor = s.value;
+		if (s.velCount == SENSOR_VEL_POINT_COUNT)
+		{
+			s.velCount = SENSOR_VEL_POINT_COUNT - 1;
+			memmove(&s.velData[0], &s.velData[1], sizeof(sSensorVelPoint) * (SENSOR_VEL_POINT_COUNT - 1));
 		}
 		sSensorVelPoint& data = gSensor[sen].velData[gSensor[sen].velCount++];
 		data.value = sensor;
 		data.timestamp = time;
-		if (gSensor[sen].velCount > 1)
+		if (s.velCount > 1)
 		{
-			gSensor[sen].lstVelocity = gSensor[sen].velocity;
-			sSensorVelPoint& old = gSensor[sen].velData[0];
-			gSensor[sen].velocity = (float)(sensor - old.value) / (float)(time - old.timestamp);
-			gSensor[sen].velGood = true;
+			s.lstVelocity = s.velocity;
+			sSensorVelPoint& old = s.velData[0];
+			s.velocity = (float)(sensor - old.value) / (float)(time - old.timestamp);
+			s.velGood = true;
 		}
 	}
 	tRelease();
