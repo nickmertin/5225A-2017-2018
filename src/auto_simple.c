@@ -81,7 +81,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 			word delta = finalPower - last;
 			LIM_TO_VAL_SET(delta, 5);
 			finalPower = last += delta;
-			writeDebugStreamLine("%d | %.2f %.2f %d", nPgmTime, currentPosVector.y, vel, finalPower);
+			//writeDebugStreamLine("%d | %.2f %.2f %d", nPgmTime, currentPosVector.y, vel, finalPower);
 		}
 
 		switch (sgn(correction))
