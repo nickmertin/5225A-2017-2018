@@ -729,7 +729,7 @@ case mobileBottomSlow:
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, timeout, TID1(mobileBottomSlow, 3));
 		setMobile(0);
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID1(mobileBottomSlow, 4));
-		arg = 0;
+		arg = mfNone;
 		NEXT_STATE(mobileBottom)
 	}
 case mobileUpToMiddle:
@@ -738,7 +738,6 @@ case mobileUpToMiddle:
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[mobilePoti].value < MOBILE_MIDDLE_UP && !TimedOut(timeout, TID0(mobileUpToMiddle))) sleep(10);
 		setMobile(15);
-		arg = -1;
 		NEXT_STATE(mobileMiddle)
 	}
 case mobileDownToMiddle:
@@ -749,12 +748,11 @@ case mobileDownToMiddle:
 		unsigned long timeout = nPgmTime + 1000;
 		while (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN && !TimedOut(timeout, TID0(mobileUpToMiddle))) sleep(10);
 		setMobile(15);
-		arg = -1;
 		NEXT_STATE(mobileMiddle)
 	}
 case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
-	arg = -1;
+	arg = mfClear;
 	NEXT_STATE(mobileTop)
 })
 
