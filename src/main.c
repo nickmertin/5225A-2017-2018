@@ -722,13 +722,13 @@ case mobileBottomSlow:
 		setMobile(-127);
 		unsigned long timeout = nPgmTime + 500;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, timeout, TID1(mobileBottomSlow, 1));
-		setMobile(-60);
+		setMobile(-45);
 		timeout = nPgmTime + 2500;
-		timeoutWhileGreaterThanL(VEL_SENSOR(mobilePoti), 0.05, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 3))) sleep(10);
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, timeout, TID1(mobileBottomSlow, 3));
 		setMobile(0);
-		while (gSensor[mobilePoti].value > MOBILE_BOTTOM && !TimedOut(timeout, TID1(mobileBottomSlow, 4))) sleep(10);
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM, timeout, TID1(mobileBottomSlow, 4));
 		arg = 0;
 		NEXT_STATE(mobileBottom)
 	}
