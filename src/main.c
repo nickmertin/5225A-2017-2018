@@ -112,7 +112,8 @@ typedef enum _stackStates {
 	stackStack,
 	stackDetach,
 	stackClear,
-	stackReturn
+	stackReturn,
+	stackTiltMobile
 } tStackStates;
 
 DECLARE_MACHINE(stack, tStackStates)
@@ -198,6 +199,7 @@ void setLift(word power,bool debug=true)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 600)
 #define LIFT_RETURN (LIFT_BOTTOM + 500)
 #define LIFT_PERIMETER (LIFT_BOTTOM + 350)
+#define LIFT_MOBILE_TILT (LIFT_BOTTOM + 120)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -355,7 +357,8 @@ typedef enum _tArmStates {
 	armLowerSimpleState,
 	armFollowMobile,
 	armStopping,
-	armHold
+	armHold,
+	armHoldMobile
 } tArmStates;
 
 #define RL_ARM_TOP 2830
@@ -371,6 +374,7 @@ typedef enum _tArmStates {
 #define ARM_STACK (RL_ARM_TOP - 500)
 #define ARM_HORIZONTAL (RL_ARM_TOP - 1410)
 #define ARM_FOLLOW_TARGET (RL_ARM_TOP - 810)
+#define ARM_MOBILE_TILT (RL_ARM_TOP - 650)
 
 #define ARM_MOBILE_RATIO 0.371
 
@@ -575,6 +579,13 @@ case armHold:
 		//	endCycle(cycle);
 		//}
 		setArm(7);
+		break;
+	}
+case armHoldMobile:
+	while (true)
+	{
+		setArm(gSensor[armPoti].value < ARM_MOBILE_TILT ? 30 : 15);
+		sleep(20);
 	}
 })
 
@@ -618,7 +629,8 @@ typedef enum _tMobileStates {
 	mobileBottomSlow,
 	mobileUpToMiddle,
 	mobileDownToMiddle,
-	mobileMiddle
+	mobileMiddle,
+	mobileClearLinkage
 } tMobileStates;
 
 #define MOBILE_TOP 2450
@@ -627,6 +639,7 @@ typedef enum _tMobileStates {
 #define MOBILE_MIDDLE_DOWN 1400
 #define MOBILE_MIDDLE_THRESHOLD 2100
 #define MOBILE_HALFWAY 1400
+#define MOBILE_CLEAR_LINKAGE 2350
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
@@ -754,6 +767,13 @@ case mobileMiddle:
 	while (gSensor[mobilePoti].value < MOBILE_MIDDLE_THRESHOLD) sleep(10);
 	arg = mfClear;
 	NEXT_STATE(mobileTop)
+case mobileClearLinkage:
+	{
+		setMobile(-80);
+		unsigned long timeout = nPgmTime + 800;
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_CLEAR_LINKAGE, timeout, TID0(mobileClearLinkage));
+		setMobile(-15);
+	}
 })
 
 void mobileWaitForSlowHold(TVexJoysticks btn)
@@ -787,7 +807,7 @@ void handleMobile()
 	//	return;
 	//}
 
-	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle)
+	if (mobileState == mobileUpToMiddle || mobileState == mobileDownToMiddle || mobileState == mobileMiddle || mobileState = mobileClearLinkage)
 	{
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(mobileTop, mfClear);
@@ -1126,6 +1146,63 @@ case stackReturn:
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
 		NEXT_STATE(stackNotRunning)
 	}
+case stackTiltMobile:
+	{
+		writeDebugStreamLine("%06d stackTiltMobile %x %d", npgmTime, arg, gNumCones);
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+		unsigned long driveTimeout;
+
+		//mobileSet(mobileClearLinkage, mfNone);
+
+		gDriveManual = false;
+		setDrive(80, 80);
+
+		float vel = 0;
+		float maxVel = 0;
+		do
+		{
+			sleep(50);
+			vel = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a);
+			if (vel > maxVel)
+				maxVel = vel;
+		} while (maxVel < 1 || vel / maxVel > 0.8);
+
+		setDrive(7, 7);
+
+		armSet(armToTarget, ARM_HORIZONTAL);
+		armTimeOut = nPgmTime + 1000;
+		if (gSensor[liftPoti].value < LIFT_MOBILE_TILT)
+		{
+			liftRaiseSimpleAsync(LIFT_MOBILE_TILT, 127, 0);
+			liftTimeOut = nPgmTime + 500;
+			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_MOBILE_TILT, liftTimeOut, TID1(stackTiltMobile, 1));
+		}
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_MOBILE_TILT, armTimeOut, TID1(stackTiltMobile, 2));
+		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		liftTimeOut = nPgmTime + 1000;
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackTiltMobile, 3));
+
+		armRaiseSimpleAsync(ARM_MOBILE_TILT, 127, 0, 0, 0, armHoldMobile);
+		armTimeOut = nPgmTime + 800;
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_MOBILE_TILT, armTimeOut, TID1(stackTiltMobile, 4));
+
+		//setDrive(60, 60);
+
+		moveToTargetDisSimpleAsync(gPosition.a, 5.5, gPosition.y, gPosition.x, 80, 0, 0, 0, 0, 0, stopNone, mttSimple);
+		driveTimeout = nPgmTime + 1500;
+		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackTiltMobile, 5));
+
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 0);
+		armTimeOut = nPgmTime + 800;
+		sleep(200);
+		liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
+		liftTimeOut = nPgmTime + 800;
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_MOBILE_THRESHOLD, liftTimeOut, TID1(stackTiltMobile, 6));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackTiltMobile, 7));
+
+		NEXT_STATE(stackNotRunning)
+	}
 })
 
 task failTimeout()
@@ -1284,10 +1361,15 @@ void handleMacros()
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 	}
 
-	if (RISING(BTN_MACRO_WALL) && !stackRunning())
+	//if (RISING(BTN_MACRO_WALL) && !stackRunning())
+	//{
+	//	liftSet(liftToTarget, LIFT_PERIMETER);
+	//	armSet(armToTarget, ARM_HORIZONTAL);
+	//}
+
+	if (RISING(BTN_MACRO_TILT) && !stackRunning())
 	{
-		liftSet(liftToTarget, LIFT_PERIMETER);
-		armSet(armToTarget, ARM_HORIZONTAL);
+		stackSet(stackTiltMobile, sfNone);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
@@ -1387,18 +1469,19 @@ void startup()
 	enableJoystick(BTN_MACRO_STACK);
 	enableJoystick(BTN_MACRO_LOADER);
 	enableJoystick(BTN_MACRO_PREP);
-	enableJoystick(BTN_MACRO_WALL);
+	//enableJoystick(BTN_MACRO_WALL);
 	enableJoystick(BTN_MACRO_STATIONARY);
 	enableJoystick(BTN_MACRO_PRELOAD);
 	enableJoystick(BTN_MACRO_PICKUP);
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
+	enableJoystick(BTN_MACRO_TILT);
 	MIRROR(BTN_MOBILE_TOGGLE);
 	MIRROR(BTN_MOBILE_MIDDLE);
 	MIRROR(BTN_MACRO_STACK);
 	MIRROR(BTN_MACRO_PREP);
-	MIRROR(BTN_MACRO_WALL);
+	//MIRROR(BTN_MACRO_WALL);
 	MIRROR(BTN_MACRO_CANCEL);
 	MIRROR(BTN_MACRO_INC);
 	MIRROR(BTN_MACRO_DEC);
