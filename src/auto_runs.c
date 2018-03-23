@@ -323,12 +323,10 @@ void autoSkills(int segment)
 
 	gMobileCheckLift = true;
 
-#ifdef SKILLS_RESET_AT_START
 	trackPositionTaskKill();
 	resetPositionFull(gPosition, 47, 14.25, 0);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
-#endif
 
 	//segment = 5;
 

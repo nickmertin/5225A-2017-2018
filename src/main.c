@@ -74,7 +74,6 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #include "diagnostics.h"
 
 #define TRACK_IN_DRIVER
-#define SKILLS_RESET_AT_START
 
 //#define ULTRASONIC_RESET
 
@@ -1374,23 +1373,6 @@ void handleMacros()
 #include "custom_drive.c"
 #include "custom_turning.c"
 #include "diagnostics.c"
-
-#ifndef SKILLS_RESET_AT_START
-void waitForSkillsReset()
-{
-	while (!gSensor[btnSetPosition].value)
-	{
-		updateSensorInput(btnSetPosition);
-		sleep(10);
-	}
-	autoMotorSensorUpdateTaskAsync();
-	trackPositionTaskAsync();
-	resetPositionFull(gPosition, 8.25, 61.5, 0);
-	writeDebugStreamLine("RESET");
-}
-
-NEW_ASYNC_VOID_0(waitForSkillsReset);
-#endif
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
