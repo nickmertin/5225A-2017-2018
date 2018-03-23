@@ -2,7 +2,7 @@
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
 #pragma config(Sensor, in3,    liftPoti,       sensorPotentiometer)
 #pragma config(Sensor, in4,    armPoti,        sensorPotentiometer)
-#pragma config(Sensor, in5,    expander,       sensorAnalog)
+#pragma config(Sensor, in5,    lsField,        sensorReflection)
 #pragma config(Sensor, in6,    lsBarL,         sensorReflection)
 #pragma config(Sensor, in7,    lsBarR,         sensorReflection)
 #pragma config(Sensor, in8,    lsMobile,       sensorReflection)
@@ -1436,6 +1436,7 @@ void startup()
 	autoSimpleSetup();
 
 	setupInvertedSen(jmpSkills);
+	setupDgtIn(lsField, 0, 1200);
 	setupDgtIn(lsBarL, 0, 2500);
 	setupDgtIn(lsBarR, 0, 2500);
 	setupDgtIn(lsMobile, 0, 2100);
