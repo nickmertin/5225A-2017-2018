@@ -323,6 +323,8 @@ void autoSkills(int segment)
 
 	gMobileCheckLift = true;
 
+#if SKILLS_ROUTE == 1
+
 	trackPositionTaskKill();
 	resetPositionFull(gPosition, 47, 14.25, 0);
 	resetVelocity(gVelocity, gPosition);
@@ -727,6 +729,15 @@ skip5:
 	moveToTargetDisSimpleAsync(gPosition.a, -5, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 16, 5);
+
+#elif SKILLS_ROUTE == 2
+
+	trackPositionTaskKill();
+	resetPositionFull(gPosition, 47, 14.25, 0);
+	resetVelocity(gVelocity, gPosition);
+	trackPositionTaskAsync();
+
+#endif
 }
 
 void autoBlock()

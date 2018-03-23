@@ -26,6 +26,12 @@
 //#define FORCE_AUTO
 //#define IGNORE_DISABLE
 
+// Programming skills selector
+// 0 - No programming skills
+// 1 - Backup individual goal route (108 points)
+// 2 - Primary double goal route (? points)
+#define SKILLS_ROUTE 2
+
 // Necessary definitions
 
 #define TID0(routine) #routine, 0
