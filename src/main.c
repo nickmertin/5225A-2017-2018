@@ -1410,10 +1410,6 @@ void startup()
 	updateTurnLookup();
 	updateDriveLookup();
 
-#ifndef SKILLS_RESET_AT_START
-	waitForSkillsResetAsync();
-#endif
-
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
 	gJoy[JOY_LIFT_DRIVER].deadzone = DZ_LIFT;
