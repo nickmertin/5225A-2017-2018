@@ -105,7 +105,9 @@ typedef enum _stackFlags {
 	sfLoader = 32,
 	sfNoResetArm = 64,
 	sfNoResetLift = 128,
-	sfRapid = 256
+	sfRapid = 256,
+	sfTiltAutoDrive = 512,
+	sfTilt = 1024
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -118,7 +120,9 @@ typedef enum _stackStates {
 	stackDetach,
 	stackClear,
 	stackReturn,
-	stackTiltMobile
+	stackTiltPrep,
+	stackTiltMobile,
+	stackDetachMobile
 } tStackStates;
 
 DECLARE_MACHINE(stack, tStackStates)
@@ -1138,21 +1142,23 @@ case stackReturn:
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
 		NEXT_STATE(stackNotRunning)
 	}
-case stackTiltMobile:
+case stackTiltPrep:
 	{
-		writeDebugStreamLine("%06d stackTiltMobile %x %d", npgmTime, arg, gNumCones);
+		writeDebugStreamLine("%06d stackTiltPrep %x %d", npgmTime, arg, gNumCones);
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 		unsigned long driveTimeout;
-		//mobileSet(mobileClearLinkage, mfNone);
 
-		gDriveManual = false;
-		setDrive(80, 80);
+		if (arg & sfTiltAutoDrive)
+		{
+			gDriveManual = false;
+			setDrive(80, 80);
 
-		driveTimeout = nPgmTime + 1000;
-		timeoutWhileFalse((bool *)&gSensor[lsField].value, driveTimeout, TID1(stackTiltMobile, 1));
+			driveTimeout = nPgmTime + 1000;
+			timeoutWhileFalse((bool *)&gSensor[lsField].value, driveTimeout, TID1(stackTiltMobile, 1));
 
-		setDrive(7, 7);
+			setDrive(7, 7);
+		}
 
 		armSet(armToTarget, ARM_HORIZONTAL);
 		armTimeOut = nPgmTime + 1000;
@@ -1163,15 +1169,36 @@ case stackTiltMobile:
 			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_MOBILE_TILT, liftTimeOut, TID1(stackTiltMobile, 2));
 		}
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_MOBILE_TILT, armTimeOut, TID1(stackTiltMobile, 3));
+
+		NEXT_STATE((arg & sfTilt) ? stackTiltMobile : stackNotRunning)
+	}
+case stackTiltMobile:
+	{
+		writeDebugStreamLine("%06d stackTiltMobile %x %d", npgmTime, arg, gNumCones);
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+		unsigned long driveTimeout;
+
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1000;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackTiltMobile, 4));
 
 		armSet(armHoldMobile);
 
-		moveToTargetDisSimpleAsync(gPosition.a, 9, gPosition.y, gPosition.x, 80, 0, 0, 0, 0, 0, stopNone, mttSimple);
-		driveTimeout = nPgmTime + 1500;
-		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackTiltMobile, 5));
+		if (arg & sfTiltAutoDrive)
+		{
+			moveToTargetDisSimpleAsync(gPosition.a, 9, gPosition.y, gPosition.x, 80, 0, 0, 0, 0, 0, stopNone, mttSimple);
+			driveTimeout = nPgmTime + 1500;
+			autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackTiltMobile, 5));
+		}
+
+		NEXT_STATE((arg & sfDetach) ? stackDetachMobile : stackNotRunning)
+	}
+case stackDetachMobile:
+	{
+		writeDebugStreamLine("%06d stackDetachMobile %x %d", npgmTime, arg, gNumCones);
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
 
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 0);
 		armTimeOut = nPgmTime + 800;
@@ -1349,7 +1376,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_TILT) && !stackRunning())
 	{
-		stackSet(stackTiltMobile, sfNone);
+		stackSet(stackTiltPrep, sfTilt);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
