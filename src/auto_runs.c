@@ -733,9 +733,58 @@ skip5:
 #elif SKILLS_ROUTE == 2
 
 	trackPositionTaskKill();
-	resetPositionFull(gPosition, 47, 14.25, 0);
+	resetPositionFull(gPosition, 40, 16, PI / 4);
 	resetVelocity(gVelocity, gPosition);
 	trackPositionTaskAsync();
+
+	// 1
+	moveToTargetSimpleAsync(71, 47, 40, 16, 45, 0, 1, 0, 0, 14, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 2000;
+	liftRaiseSimpleAsync(gLiftRaiseTarget[0], 127, 0);
+	sleep(300);
+	mobileSet(mobileBottom, mfNone);
+	DRIVE_AWAIT(skills, 1, 1);
+	setDrive(55, 55);
+	driveTimeout = nPgmTime + 700;
+	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 1, 2), false);
+	mobileSet(mobileTop, mfClear);
+
+	// 2
+	coneTimeout = nPgmTime + 2000;
+	moveToTargetSimpleAsync(95, 71, gPosition.y, gPosition.x, 127, 70, 1, 6, 70, 14, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 2, 1));
+	stackSet(stackStack, sfDetach);
+	coneTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 2, 2);
+	moveToTargetSimpleAsync(136, 112, gPosition.y, gPosition.x, 127, 70, 1, 42, 50, 0, stopNone, mttCascading);
+	driveTimeout = nPgmTime + 1500;
+	stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(skills, 2, 3));
+	//autoSimpleSet(autoSimpleNotRunning);
+	//setDrive(0, 0);
+	//return;
+	stackSet(stackTiltPrep, sfNoResetArm);
+	coneTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanF(VEL_NONE, 0, &gPosition.y, 100, driveTimeout, TID2(skills, 2, 4));
+	while (!gSensor[lsField].value && !TimedOut(driveTimeout, TID2(skills, 2, 5), false, VEL_NONE, 0, 0))
+	{
+		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
+		sleep(10);
+	}
+	_y = gPosition.y;
+	_x = gPosition.x;
+	autoSimpleSet(autoSimpleNotRunning);
+	setDrive(0, 0);
+	stackTimeoutWhile(stackTiltPrep, coneTimeout, TID2(skills, 2, 6));
+	stackSet(stackTiltMobile, sfNoResetArm);
+	coneTimeout = nPgmTime + 1000;
+	stackTimeoutWhile(stackTiltMobile, coneTimeout, TID2(skills, 2, 7));
+	moveToTargetDisSimpleAsync(0.25 * PI, 9.5, _y, _x, 80, 0, 0, 0, 0, 0, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 2, 8);
+	stackSet(stackDetachMobile, sfNone);
+	coneTimeout = nPgmTime + 1000;
+	stackTimeoutWhile(stackDetachMobile, coneTimeout, TID2(skills, 2, 9));
 
 #endif
 }
