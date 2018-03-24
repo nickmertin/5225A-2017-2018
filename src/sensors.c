@@ -23,16 +23,18 @@ void updateSensorInput(tSensors sen)
 {
 	gSensor[sen].lstValue = gSensor[sen].value;
 
+	int raw = gSensor[sen].rawValue = Sensorvalue[sen];
+
 	switch (gSensor[sen].mode)
 	{
 	case snmdDgtIn:
 		gSensor[sen].value = correctBtnIn(sen);
 		break;
 	case snmdInverted:
-		gSensor[sen].value = !SensorValue[sen];
+		gSensor[sen].value = !raw;
 		break;
 	default:
-		gSensor[sen].value = SensorValue[sen];
+		gSensor[sen].value = raw;
 		break;
 	}
 

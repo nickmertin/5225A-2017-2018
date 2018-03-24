@@ -28,6 +28,7 @@ typedef struct _sSensor
 {
 	int value;
 	int lstValue;
+	int rawValue;
 	tSensorClass cls;
 	tSensors port;
 	int safetyVal;
