@@ -1399,7 +1399,7 @@ void startup()
 	autoSimpleSetup();
 
 	setupInvertedSen(jmpSkills);
-	setupDgtIn(lsField, 0, 1200);
+	setupDgtIn(lsField, 0, 1600);
 	setupDgtIn(lsBarL, 0, 2500);
 	setupDgtIn(lsBarR, 0, 2500);
 	setupDgtIn(lsMobile, 0, 2100);
