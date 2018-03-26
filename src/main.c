@@ -884,19 +884,21 @@ case stackPickupGround:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		if (gSensor[armPoti].value > ARM_PRESTACK - 300)
-		{
-			if (gSensor[armPoti].value > LIFT_BOTTOM + 200)
-				armSet(armToTarget, ARM_HORIZONTAL);
-			else
-				armLowerSimpleAsync(ARM_HORIZONTAL, -80, 0);
-			armTimeOut = nPgmTime + 1000;
-			timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
-		}
-		else if (gSensor[liftPoti].value > LIFT_BOTTOM + 200)
-		{
-			armSet(armToTarget, ARM_HORIZONTAL);
-		}
+		//if (gSensor[armPoti].value > ARM_PRESTACK - 300)
+		//{
+		//	if (gSensor[armPoti].value > LIFT_BOTTOM + 200)
+		//		armSet(armToTarget, ARM_HORIZONTAL);
+		//	else
+		//		armLowerSimpleAsync(ARM_HORIZONTAL, -80, 0);
+		//	armTimeOut = nPgmTime + 1000;
+		//	timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
+		//}
+		//else if (gSensor[liftPoti].value > LIFT_BOTTOM + 200)
+		//{
+		//	armSet(armToTarget, ARM_HORIZONTAL);
+		//}
+		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		armTimeOut = nPgmTime + 1200;
 		writeDebugStreamLine("stackPickupGround 1 %06d %d", npgmTime, gSensor[armPoti].value);
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
@@ -905,8 +907,8 @@ case stackPickupGround:
 
 		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
 
-		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
-		armTimeOut = nPgmTime + 1200;
+		//armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		//armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
 		liftSet(liftHoldDown);
 		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
