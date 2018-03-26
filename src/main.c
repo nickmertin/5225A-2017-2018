@@ -903,7 +903,7 @@ case stackPickupGround:
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 200, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackPickupGround, 2));
 
 		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
 
