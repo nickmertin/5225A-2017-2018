@@ -358,6 +358,7 @@ typedef enum _tArmStates {
 	armFollowMobile,
 	armStopping,
 	armHold,
+	armHoldDown,
 	armHoldMobile
 } tArmStates;
 
@@ -373,6 +374,7 @@ typedef enum _tArmStates {
 #define ARM_STACK (RL_ARM_TOP - 580)
 #define ARM_HORIZONTAL (RL_ARM_TOP - 1490)
 #define ARM_FOLLOW_TARGET (RL_ARM_TOP - 890)
+#define ARM_HOLD_DOWN_THRESHOLD (RL_ARM_TOP - 1800)
 #define ARM_MOBILE_TILT (RL_ARM_TOP - 730)
 
 #define ARM_MOBILE_RATIO 0.371
@@ -577,9 +579,14 @@ case armHold:
 		//	}
 		//	endCycle(cycle);
 		//}
+		if (gSensor[armPoti].value < ARM_HOLD_DOWN_THRESHOLD)
+			NEXT_STATE(armHoldDown)
 		setArm(7);
 		break;
 	}
+case armHoldDown:
+	setArm(-15);
+	break;
 case armHoldMobile:
 	setArm(-15);
 	break;
