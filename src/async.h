@@ -234,7 +234,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 0, (func)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 0, (func)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -267,7 +267,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 1, (func, type0)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 1, (func, type0)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -301,7 +301,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 2, (func, type0, type1)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 2, (func, type0, type1)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -336,7 +336,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 3, (func, type0, type1, type2)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 3, (func, type0, type1, type2)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -372,7 +372,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 4, (func, type0, type1, type2, type3)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 4, (func, type0, type1, type2, type3)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -409,7 +409,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 5, (func, type0, type1, type2, type3, type4)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 5, (func, type0, type1, type2, type3, type4)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -447,7 +447,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 6, (func, type0, type1, type2, type3, type4, type5)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 6, (func, type0, type1, type2, type3, type4, type5)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -486,7 +486,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 7, (func, type0, type1, type2, type3, type4, type5, type6)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 7, (func, type0, type1, type2, type3, type4, type5, type6)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -526,7 +526,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 8, (func, type0, type1, type2, type3, type4, type5, type6, type7)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -567,7 +567,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 9, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -609,7 +609,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 10, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -652,7 +652,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 11, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 11, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
@@ -696,7 +696,7 @@ task _asyncTask_##func() { \
   _asyncInvoke_##func(); \
   return_t \
 } \
-__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, 12, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11)) \
+__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, 12, (func, type0, type1, type2, type3, type4, type5, type6, type7, type8, type9, type10, type11)) \
 void func##Kill(bool killAll = false) { \
   if (killAll) \
     tStopAll(_asyncTask_##func); \
