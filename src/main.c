@@ -1411,6 +1411,7 @@ void startup()
 
 	competitionSetup();
 	mobileSetup();
+	armSetup();
 	liftSetup();
 	stackSetup();
 	autoSimpleSetup();
