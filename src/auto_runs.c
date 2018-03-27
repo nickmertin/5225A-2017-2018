@@ -786,6 +786,50 @@ skip5:
 	coneTimeout = nPgmTime + 1000;
 	stackTimeoutWhile(stackDetachMobile, coneTimeout, TID2(skills, 2, 9));
 
+	// 3
+	moveToTargetDisSimpleAsync(gPosition.a, -3, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1000;
+	DRIVE_AWAIT(skills, 3, 1);
+	turnToTargetNewAlgAsync(108, 108, cw, 0.35, 23, 12, true, 0);
+	driveTimeout = nPgmTime + 1500;
+	armSet(armToTarget, ARM_PRESTACK - 500);
+	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+	DRIVE_AWAIT(skills, 3, 2);
+	moveToTargetSimpleAsync(108, 108, gPosition.y, gPosition.x, 127, 50, 0.5, 0, 0, 0, stopNone, mttCascading);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 3, 3);
+	turnToAngleNewAlgAsync(0.25 * PI, ccw, 0.35, 23, 12, true);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 3, 4);
+	_x = gPosition.x;
+	_y = gPosition.y;
+	normalize(_x, _y, -1, 226);
+	moveToTargetDisSimpleAsync(0.25 * PI, 8, _y, _x, 60, 0, 0, 0, 0, 0, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 3, 5);
+	setDrive(45, 45);
+	driveTimeout = nPgmTime + 1500;
+	sleep(300);
+	timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0.05, driveTimeout, TID2(skills, 3, 6));
+	setDrive(15, 15);
+	stackSet(stackClear, STACK_CLEAR_CONFIG(sfNone, mobileDownToMiddle, mfNone));
+	coneTimeout = nPgmTime + 2000;
+	mobileTimeoutUntil(mobileDownToMiddle, coneTimeout - 1000, TID2(skills, 3, 7));
+	if (segment > -1)
+		return;
+skip3:
+	if (!resetSonarFull(100, 500, 0.25 * PI, 230, 470, 180, 650, true))
+	{
+		if (segment > -1)
+			return;
+		resetPositionFull(gPosition, gPosition.y, gPosition.x, 0.25 * PI);
+	}
+	_x = gPosition.x;
+	_y = gPosition.y;
+	normalize(_x, _y, -1, 226);
+	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(skills, 3, 8));
+	sleep(300);
+
 #endif
 }
 
