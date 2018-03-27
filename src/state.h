@@ -60,10 +60,7 @@ void machine##Set(states state, long arg, bool detached) \
 } \
 void machine##Reset() \
 { \
-  if (nCurrentTask == ASYNC_TASK_NAME(machine##Internal)) \
-    machine##State = base; \
-  else \
-    machine##Set(base); \
+  machine##Set(base, 0); \
 } \
 void machine##TimeoutWhile(states state, unsigned long timeout, const unsigned char *routine, unsigned short id, bool kill) \
 { \
