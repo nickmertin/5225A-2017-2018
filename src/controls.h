@@ -24,14 +24,11 @@
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
 #define BTN_MACRO_PREP Btn7R
-#define BTN_MACRO_WALL Btn7L
-#define BTN_MACRO_STATIONARY Btn8R
+//#define BTN_MACRO_WALL Btn7L
+#define BTN_MACRO_STATIONARY (gSensor[jmpSkills].value ? Btn7D : Btn8R)
 #define BTN_MACRO_PRELOAD (gSensor[jmpSkills].value ? Btn8R : Btn7D)
-#define BTN_MACRO_PICKUP (gSensor[jmpSkills].value ? Btn7L : Btn8L)
+#define BTN_MACRO_PICKUP Btn8L
 #define BTN_MACRO_CANCEL Btn8U
 #define BTN_MACRO_INC Btn5U
 #define BTN_MACRO_DEC Btn5D
-
-//Skills only Macros
-#define BTN_MACRO_TILT Btn8L
-#define BTN_MACRO_STACK_NO_PU Btn8R
+#define BTN_MACRO_TILT Btn7L
