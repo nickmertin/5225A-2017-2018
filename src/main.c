@@ -823,9 +823,9 @@ void handleMobile()
 			{
 				if (gNumCones > 3)
 #ifdef ENABLE_FOLLOW
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
 #else
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
 #endif
 				else
 				{
@@ -1207,25 +1207,25 @@ bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceDat
 {
 	switch (velSourceType)
 	{
-		case velSensor:
-			velocityCheck(velSourceData);
-			if (gSensor[velSourceData].velGood)
-			{
-				out = gSensor[velSourceData].velocity;
-				return true;
-			}
-			return false;
-		case velPtr:
-			out = *(float *)velSourceData;
+	case velSensor:
+		velocityCheck(velSourceData);
+		if (gSensor[velSourceData].velGood)
+		{
+			out = gSensor[velSourceData].velocity;
 			return true;
-		case velLocalY:
-			out = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a);
-			return true;
-		case velTurn:
-			out = gVelocity.a;
-			return true;
-		default:
-			return false;
+		}
+		return false;
+	case velPtr:
+		out = *(float *)velSourceData;
+		return true;
+	case velLocalY:
+		out = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a);
+		return true;
+	case velTurn:
+		out = gVelocity.a;
+		return true;
+	default:
+		return false;
 	}
 }
 
@@ -1371,10 +1371,15 @@ void handleMacros()
 
 	if (FALLING(BTN_MACRO_ZERO))	writeDebugStreamLine("%06d MACRO_ZERO Released",nPgmTime,gNumCones);
 
-	if (RISING(BTN_MACRO_ZERO)) {
-
+	if (RISING(BTN_MACRO_ZERO))
+	{
 		gNumCones = 0;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+	}
+	if (RISING(BTN_MACRO_STACK_NO_PU) && gNumCones < MAX_STACK)
+	{
+		stackSet(stackPickupGround, sfReturn);
+		writeDebugStreamLine("%06d Stack w/o pick up. gNumCones= %d",nPgmTime,gNumCones);
 	}
 }
 
