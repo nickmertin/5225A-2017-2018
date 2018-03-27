@@ -367,6 +367,7 @@ typedef enum _tArmStates {
 	armFollowMobile,
 	armStopping,
 	armHold,
+	armHoldDown,
 	armHoldMobile
 } tArmStates;
 
@@ -374,7 +375,7 @@ typedef enum _tArmStates {
 #define ARM_TOP (RL_ARM_TOP - 160)
 
 //Actual ARM_BOTTOM = 1020
-#define ARM_BOTTOM (RL_ARM_TOP - 1690)
+#define ARM_BOTTOM (RL_ARM_TOP - 1600)
 
 #define ARM_PRESTACK (RL_ARM_TOP - 640)
 #define ARM_RELEASE (RL_ARM_TOP - 740)
@@ -382,6 +383,7 @@ typedef enum _tArmStates {
 #define ARM_STACK (RL_ARM_TOP - 580)
 #define ARM_HORIZONTAL (RL_ARM_TOP - 1490)
 #define ARM_FOLLOW_TARGET (RL_ARM_TOP - 890)
+#define ARM_HOLD_DOWN_THRESHOLD (RL_ARM_TOP - 1500)
 #define ARM_MOBILE_TILT (RL_ARM_TOP - 730)
 
 #define ARM_MOBILE_RATIO 0.371
@@ -586,9 +588,14 @@ case armHold:
 		//	}
 		//	endCycle(cycle);
 		//}
+		if (gSensor[armPoti].value < ARM_HOLD_DOWN_THRESHOLD)
+			NEXT_STATE(armHoldDown)
 		setArm(7);
 		break;
 	}
+case armHoldDown:
+	setArm(-15);
+	break;
 case armHoldMobile:
 	setArm(-15);
 	break;
@@ -893,29 +900,31 @@ case stackPickupGround:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		if (gSensor[armPoti].value > ARM_PRESTACK - 300)
-		{
-			if (gSensor[armPoti].value > LIFT_BOTTOM + 200)
-				armSet(armToTarget, ARM_HORIZONTAL);
-			else
-				armLowerSimpleAsync(ARM_HORIZONTAL, -80, 0);
-			armTimeOut = nPgmTime + 1000;
-			timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
-		}
-		else if (gSensor[liftPoti].value > LIFT_BOTTOM + 200)
-		{
-			armSet(armToTarget, ARM_HORIZONTAL);
-		}
+		//if (gSensor[armPoti].value > ARM_PRESTACK - 300)
+		//{
+		//	if (gSensor[armPoti].value > LIFT_BOTTOM + 200)
+		//		armSet(armToTarget, ARM_HORIZONTAL);
+		//	else
+		//		armLowerSimpleAsync(ARM_HORIZONTAL, -80, 0);
+		//	armTimeOut = nPgmTime + 1000;
+		//	timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackPickupGround, 1));
+		//}
+		//else if (gSensor[liftPoti].value > LIFT_BOTTOM + 200)
+		//{
+		//	armSet(armToTarget, ARM_HORIZONTAL);
+		//}
+		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		armTimeOut = nPgmTime + 1200;
 		writeDebugStreamLine("stackPickupGround 1 %06d %d", npgmTime, gSensor[armPoti].value);
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 200, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackPickupGround, 2));
 
 		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
 
-		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
-		armTimeOut = nPgmTime + 1200;
+		//armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		//armTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
 		liftSet(liftHoldDown);
 		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
@@ -946,14 +955,14 @@ case stackPickupLoader:
 		//	liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackPickupLoader, 1));
 		//}
 
-		if (gSensor[armPoti].value < ARM_HORIZONTAL + 200)
-			armSet(armToTarget, ARM_HORIZONTAL);
+		if (gSensor[armPoti].value < ARM_BOTTOM + 200)
+			armSet(armToTarget, ARM_BOTTOM);
 		else
-			armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
-		armTimeOut = nPgmTime + 1200;
+			armLowerSimpleAsync(ARM_BOTTOM, -127, 10);
+		armTimeOut = nPgmTime + 1500;
 		liftLowerSimpleAsync(LIFT_LOADER_PICKUP, -127, 0);
 		liftTimeOut = nPgmTime + 600;
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL + 100, armTimeOut, TID1(stackPickupLoader, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM + 100, armTimeOut, TID1(stackPickupLoader, 2));
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupLoader, 3));
 
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
@@ -1311,8 +1320,6 @@ bool cancel()
 	if (stackState != stackNotRunning)
 	{
 		stackReset();
-		liftReset();
-		armReset();
 		gDriveManual = true;
 		writeDebugStreamLine("True");
 		return true;
@@ -1424,6 +1431,7 @@ void startup()
 
 	competitionSetup();
 	mobileSetup();
+	armSetup();
 	liftSetup();
 	stackSetup();
 	autoSimpleSetup();

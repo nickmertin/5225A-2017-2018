@@ -35,9 +35,9 @@ void handleLcd()
 		displayLCDString(1, 0, line);
 		break;
 	case lcdBattery:
-		//sprintf(line, "%1.2f V  %1.2f V  ", (float)nImmediateBatteryLevel / 1000.0, getExpanderVoltage(expander, true));
+		sprintf(line, "Main:       %1.2f V", (float)nImmediateBatteryLevel / 1000.0);
 		displayLCDString(0, 0, line);
-		sprintf(line, "%1.2f V  Batt V. ", (float)BackupBatteryLevel / 1000.0);
+		sprintf(line, "Backup:     %1.2f V", (float)BackupBatteryLevel / 1000.0);
 		displayLCDString(1, 0, line);
 		break;
 	case lcdTracking:

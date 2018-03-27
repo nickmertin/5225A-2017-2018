@@ -49,6 +49,8 @@ void stopAllButCurrentTasks()
 #define STS(id) case id: startTask(id); break;
 void startTaskID(word id)
 {
+	if (id == nCurrentTask)
+		_hogLevel = 0;
 	switch (id)
 	{
 		case 0:
@@ -81,6 +83,8 @@ void startTaskID(word id)
 #define STS(id) case id: stopTask(id); break;
 void stopTaskID(word id)
 {
+	if (id == nCurrentTask)
+		_hogLevel = 0;
 	switch (id)
 	{
 		case 0:

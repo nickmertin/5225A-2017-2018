@@ -71,7 +71,7 @@ for i in range(maxArgc + 1):
     print('  _asyncInvoke_##func(); \\')
     print('  return_t \\')
     print('} \\')
-    print('__ASYNC_API(; , tStop(_asyncTask_##func); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); while(!_asyncFlag_##func) EndTimeSlice();, %d, (%s)) \\' % (i, header))
+    print('__ASYNC_API(; , tHog(); _asyncFlag_##func = false; tStart(_asyncTask_##func, detached); tRelease(); while(!_asyncFlag_##func) EndTimeSlice();, %d, (%s)) \\' % (i, header))
     print('void func##Kill(bool killAll = false) { \\')
     print('  if (killAll) \\')
     print('    tStopAll(_asyncTask_##func); \\')

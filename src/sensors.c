@@ -95,7 +95,8 @@ void velocityCheck(tSensors sen)
 	for (ubyte i = 0; i < s.velCount; ++i)
 		if (s.velData[i].timestamp >= time)
 		{
-			memmove(&s.velData[i], &s.velData[i + 1], s.velCount - i - 1);
+			if (i < SENSOR_VEL_POINT_COUNT - 1)
+				memmove(&s.velData[i], &s.velData[i + 1], s.velCount - i - 1);
 			--i;
 			--s.velCount;
 		}
