@@ -1288,8 +1288,6 @@ bool cancel()
 	if (stackState != stackNotRunning)
 	{
 		stackReset();
-		liftReset();
-		armReset();
 		gDriveManual = true;
 		writeDebugStreamLine("True");
 		return true;
