@@ -18,20 +18,22 @@
 #define BTN_MOBILE_TOGGLE Btn6U
 #define BTN_MOBILE_MIDDLE Btn6D
 
-/* Macros */
+/* Universal Macros */
 #define BTN_MACRO_ZERO Btn7U
 #define BTN_MACRO_ZERO_PARTNER Btn7UXmtr2
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
 #define BTN_MACRO_PREP Btn7R
-#define BTN_MACRO_WALL Btn7L
-#define BTN_MACRO_STATIONARY Btn8R
-#define BTN_MACRO_PRELOAD (gSensor[jmpSkills].value ? Btn8R : Btn7D)
-#define BTN_MACRO_PICKUP (gSensor[jmpSkills].value ? Btn7L : Btn8L)
 #define BTN_MACRO_CANCEL Btn8U
 #define BTN_MACRO_INC Btn5U
 #define BTN_MACRO_DEC Btn5D
 
-//Skills only Macros
-#define BTN_MACRO_TILT Btn8L
-#define BTN_MACRO_STACK_NO_PU Btn8R
+/* Game Macros */
+#define BTN_GAME_WALL Btn7L
+#define BTN_GAME_STATIONARY Btn8R
+#define BTN_GAME_PICKUP Btn8L
+
+/* Skills Macros */
+#define BTN_SKILLS_TILT Btn8L
+#define BTN_SKILLS_STACKONLY Btn8R
+#define BTN_SKILLS_PICKUP Btn7L

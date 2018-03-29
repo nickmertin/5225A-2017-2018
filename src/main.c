@@ -1324,18 +1324,34 @@ void handleMacros()
 		}
 	}
 
-	if (RISING(BTN_MACRO_STATIONARY) && !stackRunning())
+	if (gSensor[jmpSkills].value)
 	{
-		if (gNumCones < ARR_LEN(gLiftRaiseTargetS))
-			stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
+		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
+		{
+			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
+		}
+
+		if (RISING(BTN_SKILLS_TILT) && !stackRunning())
+		{
+			stackSet(stackTiltMobile, sfNone);
+		}
+	}
+	else
+	{
+		if (RISING(BTN_GAME_WALL) && !stackRunning())
+		{
+			liftSet(liftToTarget, LIFT_PERIMETER);
+			armSet(armToTarget, ARM_HORIZONTAL);
+		}
+
+		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
+		{
+			if (gNumCones < ARR_LEN(gLiftRaiseTargetS))
+				stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
+		}
 	}
 
-	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning())
-	{
-		stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
-	}
-
-	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
+	if (RISING(gSensor[jmpSkills].value ? BTN_SKILLS_PICKUP : BTN_SKILLS_PICKUP) && !stackRunning())
 	{
 		stackSet(stackPickupGround, sfNone);
 	}
@@ -1344,17 +1360,6 @@ void handleMacros()
 	{
 		liftSet(liftToTarget, LIFT_LOADER);
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
-	}
-
-	//if (RISING(BTN_MACRO_WALL) && !stackRunning())
-	//{
-	//	liftSet(liftToTarget, LIFT_PERIMETER);
-	//	armSet(armToTarget, ARM_HORIZONTAL);
-	//}
-
-	if (RISING(BTN_MACRO_TILT) && !stackRunning())
-	{
-		stackSet(stackTiltMobile, sfNone);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
@@ -1375,11 +1380,6 @@ void handleMacros()
 	{
 		gNumCones = 0;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
-	}
-	if (RISING(BTN_MACRO_STACK_NO_PU) && gNumCones < MAX_STACK)
-	{
-		stackSet(stackPickupGround, sfReturn);
-		writeDebugStreamLine("%06d Stack w/o pick up. gNumCones= %d",nPgmTime,gNumCones);
 	}
 }
 
@@ -1462,13 +1462,12 @@ void startup()
 	enableJoystick(BTN_MACRO_LOADER);
 	enableJoystick(BTN_MACRO_PREP);
 	//enableJoystick(BTN_MACRO_WALL);
-	enableJoystick(BTN_MACRO_STATIONARY);
-	enableJoystick(BTN_MACRO_PRELOAD);
-	enableJoystick(BTN_MACRO_PICKUP);
+	enableJoystick(BTN_GAME_STATIONARY);
+	enableJoystick(BTN_GAME_WALL);
+	enableJoystick(BTN_GAME_PICKUP);
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
-	enableJoystick(BTN_MACRO_TILT);
 	MIRROR(BTN_MOBILE_TOGGLE);
 	MIRROR(BTN_MOBILE_MIDDLE);
 	MIRROR(BTN_MACRO_STACK);
