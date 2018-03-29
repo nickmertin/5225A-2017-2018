@@ -199,7 +199,7 @@ void setLift(word power,bool debug=true)
 	writeDebugStreamLine("%d", power);
 }
 
-#define LIFT_BOTTOM 1030
+#define LIFT_BOTTOM 1000
 #define LIFT_TOP (LIFT_BOTTOM + 2150)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
@@ -832,9 +832,9 @@ void handleMobile()
 			{
 				if (gNumCones > 3)
 #ifdef ENABLE_FOLLOW
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
 #else
-					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
+				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
 #endif
 				else
 				{
@@ -1239,25 +1239,25 @@ bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceDat
 {
 	switch (velSourceType)
 	{
-		case velSensor:
-			velocityCheck(velSourceData);
-			if (gSensor[velSourceData].velGood)
-			{
-				out = gSensor[velSourceData].velocity;
-				return true;
-			}
-			return false;
-		case velPtr:
-			out = *(float *)velSourceData;
+	case velSensor:
+		velocityCheck(velSourceData);
+		if (gSensor[velSourceData].velGood)
+		{
+			out = gSensor[velSourceData].velocity;
 			return true;
-		case velLocalY:
-			out = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a);
-			return true;
-		case velTurn:
-			out = gVelocity.a;
-			return true;
-		default:
-			return false;
+		}
+		return false;
+	case velPtr:
+		out = *(float *)velSourceData;
+		return true;
+	case velLocalY:
+		out = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a);
+		return true;
+	case velTurn:
+		out = gVelocity.a;
+		return true;
+	default:
+		return false;
 	}
 }
 
@@ -1356,18 +1356,34 @@ void handleMacros()
 		}
 	}
 
-	if (RISING(BTN_MACRO_STATIONARY) && !stackRunning())
+	if (gSensor[jmpSkills].value)
 	{
-		if (gNumCones < ARR_LEN(gLiftRaiseTargetS))
-			stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
+		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
+		{
+			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
+		}
+
+		if (RISING(BTN_SKILLS_TILT) && !stackRunning())
+		{
+			stackSet(stackTiltMobile, sfNone);
+		}
+	}
+	else
+	{
+		if (RISING(BTN_GAME_WALL) && !stackRunning())
+		{
+			liftSet(liftToTarget, LIFT_PERIMETER);
+			armSet(armToTarget, ARM_HORIZONTAL);
+		}
+
+		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
+		{
+			if (gNumCones < ARR_LEN(gLiftRaiseTargetS))
+				stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
+		}
 	}
 
-	if (RISING(BTN_MACRO_PRELOAD) && !stackRunning())
-	{
-		stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
-	}
-
-	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
+	if (RISING(gSensor[jmpSkills].value ? BTN_SKILLS_PICKUP : BTN_SKILLS_PICKUP) && !stackRunning())
 	{
 		stackSet(stackPickupGround, sfNone);
 	}
@@ -1376,17 +1392,6 @@ void handleMacros()
 	{
 		liftSet(liftToTarget, LIFT_LOADER);
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
-	}
-
-	//if (RISING(BTN_MACRO_WALL) && !stackRunning())
-	//{
-	//	liftSet(liftToTarget, LIFT_PERIMETER);
-	//	armSet(armToTarget, ARM_HORIZONTAL);
-	//}
-
-	if (RISING(BTN_MACRO_TILT) && !stackRunning())
-	{
-		stackSet(stackTiltPrep, sfTilt);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
@@ -1403,8 +1408,8 @@ void handleMacros()
 
 	if (FALLING(BTN_MACRO_ZERO))	writeDebugStreamLine("%06d MACRO_ZERO Released",nPgmTime,gNumCones);
 
-	if (RISING(BTN_MACRO_ZERO)) {
-
+	if (RISING(BTN_MACRO_ZERO))
+	{
 		gNumCones = 0;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
 	}
@@ -1468,13 +1473,12 @@ void startup()
 	enableJoystick(BTN_MACRO_LOADER);
 	enableJoystick(BTN_MACRO_PREP);
 	//enableJoystick(BTN_MACRO_WALL);
-	enableJoystick(BTN_MACRO_STATIONARY);
-	enableJoystick(BTN_MACRO_PRELOAD);
-	enableJoystick(BTN_MACRO_PICKUP);
+	enableJoystick(BTN_GAME_STATIONARY);
+	enableJoystick(BTN_GAME_WALL);
+	enableJoystick(BTN_GAME_PICKUP);
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
-	enableJoystick(BTN_MACRO_TILT);
 	MIRROR(BTN_MOBILE_TOGGLE);
 	MIRROR(BTN_MOBILE_MIDDLE);
 	MIRROR(BTN_MACRO_STACK);
