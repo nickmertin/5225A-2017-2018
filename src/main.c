@@ -130,6 +130,7 @@ bool gSetTimedOut = false;
 #define DRIVE_TURN_BRAKE 6
 
 bool gDriveManual;
+bool gWall;
 
 bool isMobileSlow();
 
@@ -1109,6 +1110,9 @@ case stackReturn:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
+		if (gWall)
+			NEXT_STATE(stackWall);
+
 		if (gNumCones <= 3)
 		{
 			liftSet(liftToTarget, 1450);
@@ -1204,6 +1208,8 @@ case stackWall:
 		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+
+		gWall = false;
 
 		NEXT_STATE(stackNotRunning)
 	}
@@ -1338,6 +1344,7 @@ void handleMacros()
 				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach);
 			gStack = false;
 			gLoader = false;
+			gWall = false;
 		}
 	}
 
@@ -1355,9 +1362,12 @@ void handleMacros()
 	}
 	else
 	{
-		if (RISING(BTN_GAME_WALL) && !stackRunning())
+		if (RISING(BTN_GAME_WALL))
 		{
-			stackSet(stackWall, sfNone);
+			if (stackRunning())
+				gWall = true;
+			else
+				stackSet(stackWall, sfNone);
 		}
 
 		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
