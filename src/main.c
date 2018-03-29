@@ -113,7 +113,8 @@ typedef enum _stackStates {
 	stackDetach,
 	stackClear,
 	stackReturn,
-	stackTiltMobile
+	stackTiltMobile,
+	stackWall
 } tStackStates;
 
 DECLARE_MACHINE(stack, tStackStates)
@@ -1190,6 +1191,22 @@ case stackTiltMobile:
 
 		NEXT_STATE(stackNotRunning)
 	}
+case stackWall:
+	{
+		writeDebugStreamLine("%06d stackWall %x %d", npgmTime, arg, gNumCones);
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+
+		armSet(armToTarget, ARM_PRESTACK - 500);
+		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		liftTimeOut = nPgmTime + 1000;
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackWall, 1));
+		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
+		armTimeOut = nPgmTime + 1000;
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+
+		NEXT_STATE(stackNotRunning)
+	}
 })
 
 task failTimeout()
@@ -1340,8 +1357,7 @@ void handleMacros()
 	{
 		if (RISING(BTN_GAME_WALL) && !stackRunning())
 		{
-			liftSet(liftToTarget, LIFT_PERIMETER);
-			armSet(armToTarget, ARM_HORIZONTAL);
+			stackSet(stackWall, sfNone);
 		}
 
 		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
@@ -1351,7 +1367,7 @@ void handleMacros()
 		}
 	}
 
-	if (RISING(gSensor[jmpSkills].value ? BTN_SKILLS_PICKUP : BTN_SKILLS_PICKUP) && !stackRunning())
+	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
 	{
 		stackSet(stackPickupGround, sfNone);
 	}
@@ -1464,7 +1480,7 @@ void startup()
 	//enableJoystick(BTN_MACRO_WALL);
 	enableJoystick(BTN_GAME_STATIONARY);
 	enableJoystick(BTN_GAME_WALL);
-	enableJoystick(BTN_GAME_PICKUP);
+	enableJoystick(BTN_MACRO_PICKUP);
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
