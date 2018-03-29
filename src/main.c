@@ -190,7 +190,7 @@ void setLift(word power,bool debug=true)
 	writeDebugStreamLine("%d", power);
 }
 
-#define LIFT_BOTTOM 1030
+#define LIFT_BOTTOM 1000
 #define LIFT_TOP (LIFT_BOTTOM + 2150)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
