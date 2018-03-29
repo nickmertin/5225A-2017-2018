@@ -23,17 +23,16 @@
 #define BTN_MACRO_ZERO_PARTNER Btn7UXmtr2
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
+#define BTN_MACRO_PICKUP Btn7L
 #define BTN_MACRO_PREP Btn7R
 #define BTN_MACRO_CANCEL Btn8U
 #define BTN_MACRO_INC Btn5U
 #define BTN_MACRO_DEC Btn5D
 
 /* Game Macros */
-#define BTN_GAME_WALL Btn7L
+#define BTN_GAME_WALL Btn8L
 #define BTN_GAME_STATIONARY Btn8R
-#define BTN_GAME_PICKUP Btn8L
 
 /* Skills Macros */
 #define BTN_SKILLS_TILT Btn8L
 #define BTN_SKILLS_STACKONLY Btn8R
-#define BTN_SKILLS_PICKUP Btn7L
