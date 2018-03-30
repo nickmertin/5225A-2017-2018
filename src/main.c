@@ -210,7 +210,7 @@ void setLift(word power,bool debug=true)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 680)
 #define LIFT_RETURN (LIFT_BOTTOM + 500)
 #define LIFT_PERIMETER (LIFT_BOTTOM + 350)
-#define LIFT_MOBILE_TILT (LIFT_BOTTOM + 100)
+#define LIFT_MOBILE_TILT (LIFT_BOTTOM + 200)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
