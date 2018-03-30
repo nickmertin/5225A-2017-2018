@@ -783,7 +783,7 @@ skip5:
 		{
 			_y = gPosition.y;
 			_x = gPosition.x;
-			normalize(_x, _y, -1, 212);
+			normalize(_x, _y, -1, 209);
 			goto noLine1;
 		}
 		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
@@ -888,7 +888,7 @@ skip1:
 		{
 			_y = gPosition.y;
 			_x = gPosition.x;
-			normalize(_x, _y, -1, 71);
+			normalize(_x, _y, -1, 74);
 			goto noLine2;
 		}
 		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
@@ -936,7 +936,7 @@ noLine2:
 	if (segment > -1)
 		return;
 skip2:
-	if (!resetSonarFull(100, 500, 0.25 * PI, 230, 470, 180, 650, false))
+	if (!resetSonarFull(100, 500, -0.75 * PI, 230, 470, 180, 650, false))
 	{
 		if (segment > -1)
 			return;
