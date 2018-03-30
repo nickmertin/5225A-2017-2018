@@ -1202,6 +1202,7 @@ case stackTiltMobile:
 		//armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armReset();
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackTiltMobile, 1));
+		writeDebugStreamLine("stackTiltMobile %d", gSensor[liftPoti].value);
 		liftSet(liftHoldDown);
 
 		if (arg & sfTiltAutoDrive)
