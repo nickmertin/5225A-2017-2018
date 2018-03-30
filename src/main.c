@@ -201,7 +201,7 @@ void setLift(word power,bool debug=true)
 	writeDebugStreamLine("%d", power);
 }
 
-#define LIFT_BOTTOM 1000
+#define LIFT_BOTTOM 1010
 #define LIFT_TOP (LIFT_BOTTOM + 2150)
 #define LIFT_MID (LIFT_BOTTOM + 900)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
@@ -210,7 +210,7 @@ void setLift(word power,bool debug=true)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 680)
 #define LIFT_RETURN (LIFT_BOTTOM + 500)
 #define LIFT_PERIMETER (LIFT_BOTTOM + 350)
-#define LIFT_MOBILE_TILT (LIFT_BOTTOM + 120)
+#define LIFT_MOBILE_TILT (LIFT_BOTTOM + 100)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -876,7 +876,7 @@ bool gKillDriveOnTimeout = false;
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
-const int gLiftPlaceTarget[11] = { 1050, 1150, 1350, 1500, 1600, 2000, 2100, 2350, 2550, 2800, 2900 };
+const int gLiftPlaceTarget[11] = { 1010, 1150, 1350, 1500, 1600, 2000, 2100, 2350, 2550, 2800, 2900 };
 const int gLiftRaiseTargetS[5] = { 2250, 2350, 2700, 2900, LIFT_TOP };
 const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 };
 
