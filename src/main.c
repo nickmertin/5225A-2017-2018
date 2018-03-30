@@ -1177,8 +1177,8 @@ case stackTiltPrep:
 			setDrive(7, 7);
 		}
 
-		//armLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
-		armSet(armToTarget, ARM_HORIZONTAL);
+		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
+		//armSet(armToTarget, ARM_HORIZONTAL);
 		armTimeOut = nPgmTime + 1000;
 		if (gSensor[liftPoti].value < LIFT_MOBILE_TILT)
 		{
@@ -1186,7 +1186,7 @@ case stackTiltPrep:
 			liftTimeOut = nPgmTime + 500;
 			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_MOBILE_TILT, liftTimeOut, TID1(stackTiltPrep, 2));
 		}
-		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL + 100, armTimeOut, TID1(stackTiltPrep, 3));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL + 200, armTimeOut, TID1(stackTiltPrep, 3));
 
 		NEXT_STATE((arg & sfTilt) ? stackTiltMobile : stackNotRunning)
 	}
@@ -1200,7 +1200,7 @@ case stackTiltMobile:
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1000;
 		//armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
-		//armReset();
+		armReset();
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackTiltMobile, 1));
 		liftSet(liftHoldDown);
 
