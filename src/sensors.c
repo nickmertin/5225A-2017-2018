@@ -39,7 +39,7 @@ void updateSensorInput(tSensors sen)
 	}
 
 #ifdef CHECK_POTI_JUMPS
-	if (SensorType[sen] == sensorPotentiometer && abs(gSensor[sen].value - gSensor[sen].lstValue) > 400 && ++gSensor[sen].filterAcc < 10)
+	if (SensorType[sen] == sensorPotentiometer && ++gSensor[sen].filterAcc < 10 && ( (abs(gSensor[sen].value - gSensor[sen].lstValue) > 400) || (gSensor[sen].velGood && gSensor[sen].potiCheckVel && sgn(gSensor[sen].velocity) == -sgn(gSensor[sen].lstVelocity)) ) )
 	{
 		if (gSensor[sen].filterAcc == 1)
 			writeDebugStreamLine("%d port %d jumped from %d to %d", nPgmTime, sen - port1 + 1, gSensor[sen].lstValue, gSensor[sen].value);
@@ -152,6 +152,7 @@ void setupSensors()
 	{
 		gSensor[i].cls = checkSenClass(i);
 		gSensor[i].port = (tSensors)i;
+		gSensor[i].mode = snmdNormal;
 
 		gSensor[i].lstVelocity = 0;
 		gSensor[i].velocity = 0;
@@ -160,6 +161,7 @@ void setupSensors()
 
 #ifdef CHECK_POTI_JUMPS
 		gSensor[i].filterAcc = 0;
+		gSensor[i].potiCheckVel = false;
 #endif
 
 		startSensor(i);

@@ -31,17 +31,13 @@ typedef struct _sSensor
 	int rawValue;
 	tSensorClass cls;
 	tSensors port;
-	int safetyVal;
-	unsigned long failedStartTime;
-	unsigned long failedCheckTime;
-	unsigned long safetyStartTime;
-	bool failed;
 	float velocity;
 	float lstVelocity;
 	sSensorVelPoint velData[SENSOR_VEL_POINT_COUNT];
 	ubyte velCount;
 	bool velGood;
 	tSensorMode mode;
+	bool potiCheckVel;
 	int dgtMin;
 	int dgtMax;
 
