@@ -405,10 +405,10 @@ void autoSkills(int segment)
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, 1, 0);
-	sweepTurnToTargetAsync(_y + 23, _x, 45 * PI / 180, 16.5, cw, 127, false);
+	sweepTurnToTargetAsync(_y + 23, _x, 35 * PI / 180, 16.5, cw, 127, true);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 3, 3);
-	moveToTargetSimpleAsync(71, 47, gPosition.y, gPosition.x, 127, 127, 1, 0, 0, 14, stopNone, mttSimple);
+	moveToTargetSimpleAsync(71, 47, gPosition.y, gPosition.x, 127, 127, 1, 0, 0, 13, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1000;
 	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 80, 0);
 	DRIVE_AWAIT(skills, 3, 4);
@@ -569,7 +569,7 @@ skip3:
 	moveToTargetSimpleAsync(35, 128, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttProportional);
 	driveTimeout = nPgmTime + 1500;
 	timeoutWhileGreaterThanF(VEL_NONE, 0, &gPosition.y, 60, driveTimeout - 500, TID2(skills, 9, 4));
-	liftRaiseSimpleAsync(gLiftRaiseTarget[0], 127, 0);
+	liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, 0);
 	armSet(armToTarget, ARM_HORIZONTAL);
 	DRIVE_AWAIT(skills, 9, 5);
 	setDrive(55, 55);
@@ -622,10 +622,10 @@ skip3:
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, 1, 0);
-	sweepTurnToTargetAsync(_y - 22, _x, 225 * PI / 180, 16, cw, 127, false);
+	sweepTurnToTargetAsync(_y - 22, _x, 215 * PI / 180, 16, cw, 127, true);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 11, 3);
-	moveToTargetSimpleAsync(72, 94, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttSimple);
+	moveToTargetSimpleAsync(72, 94, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 13, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(skills, 11, 4);
 	setDrive(40, 40);
@@ -706,7 +706,7 @@ skip5:
 	moveToTargetSimpleAsync(12, 106, gPosition.y, gPosition.x, 127, 0, 0.5, 0, 0, 14, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileLessThanF(VEL_NONE, 0, &gPosition.x, 71, driveTimeout, TID2(skills, 15, 3));
-	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
+	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, -15);
 	DRIVE_AWAIT(skills, 15, 4);
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
