@@ -89,7 +89,8 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #define DATALOG_TURN -1
 #define DATALOG_TIMEOUT -1
 #define DATALOG_SWEEP -1
-#define DATALOG_BATTERY 0
+#define DATALOG_BATTERY -1
+#define DATALOG_TEST 0
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
