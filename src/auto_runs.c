@@ -989,44 +989,27 @@ skip2:
 	coneTimeout = nPgmTime + 900;
 	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 8, 5));
 	coneTimeout = nPgmTime + 1200;
-	//moveToTargetSimpleAsync(23, 128, gPosition.y, gPosition.x, 70, 0, 0.5, 0, 0, 9, stopNone, mttSimple);
-	//sweepTurnToTargetAsync(23, 128, 0, 6, ccw, 80, true);
 	turnToTargetNewAlgAsync(23, 128, ccw, 0.27, 23, 12, true, 0);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 8, 6);
-	//moveToTargetDisSimpleAsync(gPosition.a, 1.5, gPosition.y, gPosition.x, 55, 0, 0.5, 0, 0, 0, stopNone, mttSimple);
 	moveToTargetSimpleAsync(23, 128, gPosition.y, gPosition.x, 55, 0, 0.5, 0, 0, 9, stopSoft, mttSimple);
 	stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 8, 7));
 	coneTimeout = nPgmTime + 900;
 	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 8, 8));
 	coneTimeout = nPgmTime + 1200;
-	//setDrive(15, 80);
-	//driveTimeout = nPgmTime + 1200;
-	//timeoutWhileGreaterThanF(VEL_NONE, 0, &gPosition.a, nearAngle(0, gPosition.a), driveTimeout, TID2(skills, 8, 9));
 	turnToTargetNewAlgAsync(24, 128, ccw, 0.25, 50, 10, true, 0);
 	driveTimeout = nPgmTime + 1200;
-	//stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(skills, 8, 9));
-	//stackSet(stackTiltPrep, sfNone);
 	DRIVE_AWAIT(skills, 8, 10);
-	//return;
 	moveToTargetSimpleAsync(24, 128, gPosition.y, gPosition.x, 127, 40, 0.5, 0, 0, 7, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 8, 11);
 	moveToTargetSimpleAsync(41, 128, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 3, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 8, 12);
-	//stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(skills, 8, 12));
-	//stackSet(stackTiltMobile, sfNone);
-	//coneTimeout = nPgmTime + 2000;
-	//stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(skills, 8, 13));
 	moveToTargetSimpleAsync(95, 120, gPosition.y, gPosition.x, 127, 127, 1, 0, 0, 0, stopSoft, mttSimple);
 	driveTimeout = nPgmTime + 3000;
 	stackSet(stackTiltPrep, sfNone);
 	timeoutWhileLessThanF(VEL_NONE, 0, &gPosition.y, 58, driveTimeout, TID2(skills, 8, 13));
-	//stackSet(stackDetachMobile, sfNone);
-	//return;
-	//while (autoSimpleState != autoSimpleNotRunning) sleep(10);
-	//return;
 	while (!gSensor[lsField].value)
 	{
 		if (TimedOut(driveTimeout, TID2(skills, 8, 14), false, VEL_NONE, 0, 0))
@@ -1068,14 +1051,6 @@ noLine3:
 	coneTimeout = nPgmTime + 2500;
 	driveAgainstStartingBar(55, 55, 15, 15, 2500);
 	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(stack, 9, 5));
-	//if (segment > -1)
-	//	return;
-	//if (!resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, 0.25 * PI, 300, 700, true)
-	//{
-	//	if (segment > -1)
-	//		return;
-	//	resetPositionFull(gPosition, gPosition.y, gPosition.x, 0.25 * PI);
-	//}
 	resetPositionFull(gPosition, gPosition.y, gPosition.x, 0.25 * PI);
 
 #endif
