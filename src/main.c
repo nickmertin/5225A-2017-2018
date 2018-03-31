@@ -1387,7 +1387,7 @@ void handleMacros()
 			if (gLoader)
 				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack | sfDetach);
 			else
-				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach);
+				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn | sfRaiseLift : sfStack | sfDetach | sfRaiseLift);
 			gStack = false;
 			gLoader = false;
 			gWall = false;
@@ -1413,7 +1413,7 @@ void handleMacros()
 			if (stackRunning())
 				gWall = true;
 			else
-				stackSet(stackWall, sfNone);
+				stackSet(stackWall, sfRaiseLift);
 		}
 
 		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
@@ -1425,7 +1425,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
 	{
-		stackSet(stackPickupGround, sfNone);
+		stackSet(stackPickupGround, sfRaiseLift);
 	}
 
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
