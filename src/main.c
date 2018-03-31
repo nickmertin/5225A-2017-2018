@@ -108,7 +108,8 @@ typedef enum _stackFlags {
 	sfNoResetLift = 128,
 	sfRapid = 256,
 	sfTiltAutoDrive = 512,
-	sfTilt = 1024
+	sfTilt = 1024,
+	sfRaiseLift = 2048
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -212,6 +213,7 @@ void setLift(word power,bool debug=true)
 #define LIFT_RETURN (LIFT_BOTTOM + 500)
 #define LIFT_PERIMETER (LIFT_BOTTOM + 350)
 #define LIFT_MOBILE_TILT (LIFT_BOTTOM + 200)
+#define LIFT_RAISE_PICKUP_THRESH (LIFT_BOTTOM + 400)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -916,28 +918,34 @@ case stackPickupGround:
 		//{
 		//	armSet(armToTarget, ARM_HORIZONTAL);
 		//}
+		if ((gSensor[liftPoti].value < LIFT_RAISE_PICKUP_THRESH) && (arg & sfRaiseLift))
+		{
+			liftRaiseSimpleAsync(LIFT_RAISE_PICKUP_THRESH, 127, -10);
+			liftTimeOut = nPgmTime + 1200;
+			timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_RAISE_PICKUP_THRESH, liftTimeOut, TID1(stackPickupGround, 1));
+		}
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
-		writeDebugStreamLine("stackPickupGround 1 %06d %d", npgmTime, gSensor[armPoti].value);
+		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[armPoti].value);
 
 		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 		liftTimeOut = nPgmTime + 1200;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackPickupGround, 2));
+		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackPickupGround, 3));
 
-		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
+		writeDebugStreamLine("stackPickupGround 3 %06d %d", npgmTime, gSensor[liftPoti].value);
 
 		//armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		//armTimeOut = nPgmTime + 1200;
-		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
+		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 4));
 		liftSet(liftHoldDown);
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
+		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 5));
 
-		writeDebugStreamLine("stackPickupGround 3 %06d %d", npgmTime, gSensor[armPoti].value);
+		writeDebugStreamLine("stackPickupGround 4 %06d %d", npgmTime, gSensor[armPoti].value);
 
 		armSet(armManaged);
 		setArm(127);
 		armTimeOut = nPgmTime + 500;
-		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackPickupGround, 5));
+		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackPickupGround, 6));
 		armSet(armToTarget, ARM_PRESTACK - 500);
 
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
