@@ -377,7 +377,7 @@ typedef enum _tArmStates {
 #define ARM_TOP (RL_ARM_TOP - 160)
 
 //Actual ARM_BOTTOM = 1020
-#define ARM_BOTTOM (RL_ARM_TOP - 1600)
+#define ARM_BOTTOM (RL_ARM_TOP - 1640)
 
 #define ARM_PRESTACK (RL_ARM_TOP - 640)
 #define ARM_RELEASE (RL_ARM_TOP - 740)
