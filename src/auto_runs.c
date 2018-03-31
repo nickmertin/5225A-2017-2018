@@ -997,7 +997,7 @@ skip2:
 	coneTimeout = nPgmTime + 900;
 	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 8, 8));
 	coneTimeout = nPgmTime + 1200;
-	turnToTargetNewAlgAsync(24, 128, ccw, 0.25, 50, 10, true, true, 0);
+	turnToTargetNewAlgAsync(24, 128, ccw, 0.25, 50, 10, true, false, 0);
 	driveTimeout = nPgmTime + 1200;
 	DRIVE_AWAIT(skills, 8, 10);
 	moveToTargetSimpleAsync(24, 128, gPosition.y, gPosition.x, 127, 40, 0.5, 0, 0, 7, stopNone, mttSimple);
@@ -1100,7 +1100,7 @@ noLine3:
 	coneTimeout = nPgmTime + 900;
 	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 11, 8));
 	coneTimeout = nPgmTime + 1200;
-	turnToTargetNewAlgAsync(119.5, 13.5, ccw, 0.25, 50, 10, true, true, 0);
+	turnToTargetNewAlgAsync(119.5, 13.5, ccw, 0.25, 50, 10, true, false, 0);
 	driveTimeout = nPgmTime + 1200;
 	DRIVE_AWAIT(skills, 11, 10);
 	moveToTargetSimpleAsync(119.5, 13.5, gPosition.y, gPosition.x, 127, 40, 0.5, 0, 0, 7, stopNone, mttSimple);

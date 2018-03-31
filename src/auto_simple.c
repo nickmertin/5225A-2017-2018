@@ -196,9 +196,9 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 		{
 			setDrive(-20, 20);
 			sleep(150);
-			setDrive(0, 0);
 			writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
+		setDrive(0, 0);
 		break;
 	case ccw:
 		a = gPosition.a - fmod(gPosition.a - a, PI * 2);
@@ -236,9 +236,9 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 		{
 			setDrive(20, -20);
 			sleep(150);
-			setDrive(0, 0);
 			writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
+		setDrive(0, 0);
 		break;
 	}
 	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
@@ -292,9 +292,9 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 		{
 			setDrive(-20, 20);
 			sleep(150);
-			setDrive(0, 0);
 			writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
+		setDrive(0, 0);
 		break;
 	case ccw:
 		target = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y), PI * 2);
@@ -333,9 +333,9 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 		{
 			setDrive(20, -20);
 			sleep(150);
-			setDrive(0, 0);
 			writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
+		setDrive(0, 0);
 		break;
 	}
 	writeDebugStreamLine("Turned to %f %f | %f %f %f", y, x, gPosition.y, gPosition.x, radToDeg(gPosition.a));
