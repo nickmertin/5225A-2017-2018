@@ -343,6 +343,7 @@ void autoSkills(int segment)
 	case 4:
 		goto skip4;
 	case 5:
+		mobileSet(mobileBottom, mfNone);
 		goto skip5;
 	}
 
@@ -730,9 +731,18 @@ skip5:
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 16, 3);
 	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 16, 4));
-	moveToTargetDisSimpleAsync(gPosition.a, -5, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple);
+
+	// 17
+	moveToTargetDisSimple(gPosition.a, -6, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1000;
-	DRIVE_AWAIT(skills, 16, 5);
+	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+	DRIVE_AWAIT(skills, 17, 1);
+	turnToTargetNewAlgAsync(107, 20, ccw, 0.5, 20, 15, false, false, PI);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(skills, 17, 2);
+	moveToTargetSimpleAsync(107, 20, gPosition.y, gPosition.x, -127, -45, 1, 0, 0, 0, stopNone, mttCascading);
+	driveTimeout = nPgmTime + 2500;
+	DRIVE_AWAIT(skills, 17, 3);
 
 #elif SKILLS_ROUTE == 2
 
