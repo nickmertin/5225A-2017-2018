@@ -501,16 +501,18 @@ skip2:
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
 	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 7, 6), false);
+	setDrive(-7, -7);
 	mobileSet(mobileTop, mfClear);
 	coneTimeout = nPgmTime + 2000;
+	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY, coneTimeout, TID2(skills, 7, 7));
 	moveToTargetSimpleAsync(129, 23, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttProportional);
 	driveTimeout = nPgmTime + 1300;
-	DRIVE_AWAIT(skills, 7, 7);
+	DRIVE_AWAIT(skills, 7, 8);
 	setDrive(-6, -6);
-	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP, coneTimeout, TID2(skills, 7, 8));
+	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP, coneTimeout, TID2(skills, 7, 9));
 	stackSet(stackPickupGround, sfStack | sfDetach, true);
 	coneTimeout = nPgmTime + 800;
-	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 7, 9), false);
+	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 7, 10), false);
 
 	// 8
 	moveToTargetSimpleAsync(127, 71, gPosition.y, gPosition.x, -127, 0, 0.5, 6, -90, 0, stopNone, mttProportional);
@@ -573,21 +575,23 @@ skip3:
 	setDrive(55, 55);
 	driveTimeout = nPgmTime + 700;
 	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 9, 6), false);
-	moveToTargetSimpleAsync(23, 129, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttProportional);
-	driveTimeout = nPgmTime + 1200;
+	setDrive(-7, -7);
 	mobileSet(mobileTop, mfNone);
 	coneTimeout = nPgmTime + 2000;
-	DRIVE_AWAIT(skills, 9, 7);
+	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY, coneTimeout, TID2(skills, 9, 7));
+	moveToTargetSimpleAsync(23, 129, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttProportional);
+	driveTimeout = nPgmTime + 1200;
+	DRIVE_AWAIT(skills, 9, 8);
 	setDrive(-6, -6);
-	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 9, 8));
+	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 9, 9));
 	stackSet(stackPickupGround, STACK_RAPID_CONFIG(sfClear, 2), true);
 	coneTimeout = nPgmTime + 800;
-	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 9, 9), false);
+	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 9, 10), false);
 	coneTimeout = nPgmTime + 1000;
 	moveToTargetSimpleAsync(13, 129, gPosition.y, gPosition.x, 55, 30, 0.5, 0, 0, 9, stopHarsh, mttProportional);
-	stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 9, 10), false);
+	stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 9, 11), false);
 	coneTimeout = nPgmTime + 800;
-	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 9, 11), false);
+	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 9, 12), false);
 
 	// 10
 	moveToTargetSimpleAsync(60, 125, gPosition.y, gPosition.x, -127, 0, 1, 12, -90, 0, stopNone, mttProportional);
