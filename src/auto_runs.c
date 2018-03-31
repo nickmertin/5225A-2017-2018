@@ -510,9 +510,14 @@ skip2:
 	DRIVE_AWAIT(skills, 7, 8);
 	setDrive(-6, -6);
 	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP, coneTimeout, TID2(skills, 7, 9));
-	stackSet(stackPickupGround, sfStack | sfDetach, true);
+	stackSet(stackPickupGround, STACK_RAPID_CONFIG(sfDetach, 2), true);
 	coneTimeout = nPgmTime + 800;
 	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 7, 10), false);
+	coneTimeout = nPgmTime + 1000;
+	moveToTargetSimpleAsync(129, 13, gPosition.y, gPosition.x, 55, 30, 0.5, 0, 0, 9, stopHarsh, mttProportional);
+	stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 7, 11), false);
+	coneTimeout = nPgmTime + 800;
+	stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 7, 12), false);
 
 	// 8
 	moveToTargetSimpleAsync(127, 71, gPosition.y, gPosition.x, -127, 0, 0.5, 6, -90, 0, stopNone, mttProportional);

@@ -28,7 +28,7 @@
 
 // Programming skills selector
 // 0 - No programming skills
-// 1 - Primary individual goal route (108 points)
+// 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
 #define SKILLS_ROUTE 1
 
