@@ -903,6 +903,7 @@ case stackNotRunning:
 	if (!(arg & sfNoResetArm))
 		armSet(armHold);
 	gDriveManual = true;
+	autoSimpleReset();
 	break;
 case stackPickupGround:
 	{
