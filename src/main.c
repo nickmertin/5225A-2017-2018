@@ -29,9 +29,9 @@
 
 // Programming skills selector
 // 0 - No programming skills
-// 1 - Backup individual goal route (108 points)
-// 2 - Primary double goal route (? points)
-#define SKILLS_ROUTE 2
+// 1 - Primary individual goal route (110 points)
+// 2 - Secondary double goal route (? points)
+#define SKILLS_ROUTE 1
 
 // Necessary definitions
 
@@ -90,7 +90,8 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 #define DATALOG_TURN -1
 #define DATALOG_TIMEOUT -1
 #define DATALOG_SWEEP -1
-#define DATALOG_BATTERY 0
+#define DATALOG_BATTERY -1
+#define DATALOG_TEST 0
 
 //#define LIFT_SLOW_DRIVE_THRESHOLD 1200
 
@@ -204,14 +205,13 @@ void setLift(word power,bool debug=true)
 }
 
 #define LIFT_BOTTOM 1010
-#define LIFT_TOP (LIFT_BOTTOM + 2150)
-#define LIFT_MID (LIFT_BOTTOM + 900)
+#define LIFT_TOP (LIFT_BOTTOM + 1820)
+#define LIFT_MID (LIFT_BOTTOM + 790)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
-#define LIFT_LOADER (LIFT_BOTTOM + 1400)
-#define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 680)
+#define LIFT_LOADER (LIFT_BOTTOM + 1100)
+#define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 650)
 #define LIFT_RETURN (LIFT_BOTTOM + 500)
-#define LIFT_PERIMETER (LIFT_BOTTOM + 350)
 #define LIFT_MOBILE_TILT (LIFT_BOTTOM + 200)
 #define LIFT_RAISE_PICKUP_THRESH (LIFT_BOTTOM + 400)
 
@@ -664,7 +664,7 @@ typedef enum _tMobileStates {
 #define MOBILE_DOWN_SLOW_POWER_2 6
 
 #define MOBILE_LIFT_CHECK_THRESHOLD 1900
-#define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 200)
+#define LIFT_MOBILE_THRESHOLD (LIFT_BOTTOM + 600)
 
 #define MOBILE_SLOW_HOLD_TIMEOUT 500
 #define MOBILE_AUTO_TIMEOUT 500
@@ -878,10 +878,10 @@ bool gLiftTargetReached;
 bool gKillDriveOnTimeout = false;
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
-const int gLiftRaiseTarget[11] = { 1300, 1400, 1600, 1800, 2000, 2150, 2300, 2450, 2600, 2850, LIFT_TOP };
-const int gLiftPlaceTarget[11] = { 1010, 1150, 1350, 1500, 1600, 2000, 2100, 2350, 2550, 2800, 2900 };
-const int gLiftRaiseTargetS[5] = { 2250, 2350, 2700, 2900, LIFT_TOP };
-const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 };
+const int gLiftRaiseTarget[11] = { 1300, 1400, 1550, 1650, 1800, 1900, 2000, 2150, 2300, 2450, LIFT_TOP };
+const int gLiftPlaceTarget[11] = { 1010, 1080, 1200, 1350, 1500, 1650, 1750, 1850, 1950, 2100, 2200 };
+const int gLiftRaiseTargetS[5] = { 2250, 2350, 2700, 2900, LIFT_TOP }; // UPDATE
+const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 }; // UPDATE
 
 bool gStack = false;
 bool gLoader = false;

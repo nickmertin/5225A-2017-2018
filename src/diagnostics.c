@@ -227,6 +227,14 @@ void testLift()
 				while (gSensor[liftPoti].value > LIFT_BOTTOM)
 				{
 					updateSensorInput(liftPoti);
+					if (DATALOG_TEST != -1)
+					{
+						tHog();
+						datalogDataGroupStart();
+						datalogAddValue(DATALOG_TEST, gSensor[liftPoti].rawValue);
+						datalogDataGroupEnd();
+						tRelease();
+					}
 					sleep(10);
 				}
 				setLift(-15);
@@ -239,6 +247,14 @@ void testLift()
 				while (gSensor[liftPoti].value < LIFT_TOP)
 				{
 					updateSensorInput(liftPoti);
+					if (DATALOG_TEST != -1)
+					{
+						tHog();
+						datalogDataGroupStart();
+						datalogAddValue(DATALOG_TEST, gSensor[liftPoti].rawValue);
+						datalogDataGroupEnd();
+						tRelease();
+					}
 					sleep(10);
 				}
 				setLift(15);
