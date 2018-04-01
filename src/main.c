@@ -133,6 +133,7 @@ DECLARE_MACHINE(stack, tStackStates)
 #define STACK_CLEAR_CONFIG(flags, mobileState, mobileFlags) ((flags) | sfClear | sfMobile | ((mobileState) << 16) | ((mobileFlags) << 24))
 #define STACK_RAPID_CONFIG(flags, maxCones) ((flags) | sfStack | sfRapid | ((maxCones) << 12))
 #define MAX_STACK 11
+#define MAX_STATIONARY 6
 
 sCycleData gMainCycle;
 int gNumCones = 0;
@@ -878,8 +879,8 @@ bool gKillDriveOnTimeout = false;
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10
 const int gLiftRaiseTarget[11] = { 1300, 1400, 1550, 1650, 1800, 1900, 2000, 2150, 2300, 2450, LIFT_TOP };
 const int gLiftPlaceTarget[11] = { 1010, 1080, 1200, 1350, 1500, 1650, 1750, 1850, 1950, 2100, 2200 };
-const int gLiftRaiseTargetS[5] = { 2250, 2350, 2700, 2900, LIFT_TOP }; // UPDATE
-const int gLiftPlaceTargetS[5] = { 1900, 2000, 2150, 2350, 2550 }; // UPDATE
+const int gLiftRaiseTargetS[6] = { 1900, 2000, 2100, 2250, 2450, LIFT_TOP }; // UPDATE
+const int gLiftPlaceTargetS[6] = { 1600, 1700, 1800, 1900, 2000, 2200 }; // UPDATE
 
 bool gStack = false;
 bool gLoader = false;
@@ -986,7 +987,7 @@ case stackStationary:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		if (gNumCones >= 5)
+		if (gNumCones >= MAX_STATIONARY)
 			NEXT_STATE(stackNotRunning)
 
 		armRaiseSimpleAsync(ARM_TOP, 127, 0);
@@ -1403,7 +1404,7 @@ void handleMacros()
 
 		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
 		{
-			if (gNumCones < ARR_LEN(gLiftRaiseTargetS))
+			if (gNumCones < MAX_STATIONARY)
 				stackSet((gSensor[liftPoti].value < gLiftRaiseTargetS[gNumCones] - 150) ? stackStationaryPrep : stackStationary, sfNone);
 		}
 	}
