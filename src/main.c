@@ -970,7 +970,7 @@ case stackStationaryPrep:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		if (gNumCones >= 5)
+		if (gNumCones >= MAX_STATIONARY)
 			NEXT_STATE(stackNotRunning)
 
 		armRaiseSimpleAsync(ARM_TOP, 127, 0);
