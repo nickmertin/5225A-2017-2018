@@ -1384,7 +1384,7 @@ void handleMacros()
 			if (gLoader)
 				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack | sfDetach);
 			else
-				stackSet(stackPickupGround, (gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach);
+				stackSet(stackPickupGround, ((gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach) | (gWall ? sfPull : sfNone));
 			gStack = false;
 			gLoader = false;
 			gWall = false;
@@ -1409,8 +1409,13 @@ void handleMacros()
 		{
 			if (stackRunning())
 				gWall = true;
-			else
+			else if (gSensor[liftPoti].value > LIFT_BOTTOM || gSensor[armPoti].value < ARM_RELEASE)
 				stackSet(stackWall, sfNone);
+			else
+			{
+				gStack = true;
+				gWall = true;
+			}
 		}
 
 		if (RISING(BTN_GAME_STATIONARY) && !stackRunning())
