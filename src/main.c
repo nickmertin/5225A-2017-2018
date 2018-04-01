@@ -1057,7 +1057,7 @@ case stackDetach:
 		if (gNumCones < 3 && !RAPID)
 			armLowerSimpleAsync((gNumCones == 3) ? ARM_RELEASE - 100 : ARM_RELEASE, -127, 45, 100, 80, armIdle);
 		else
-			armLowerSimpleAsync(ARM_RELEASE, -127, 0, 0, 0, armIdle);
+			armLowerSimpleAsync(RAPID ? ARM_BOTTOM : ARM_RELEASE, -127, 0, 0, 0, armIdle);
 		unsigned long armTimeOut = nPgmTime + 800;
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID0(stackDetach));
 		//TODO: Add lift timeout to make sure it lowers fully
