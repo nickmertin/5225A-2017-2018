@@ -381,7 +381,7 @@ typedef enum _tArmStates {
 //Actual ARM_BOTTOM = 1020
 #define ARM_BOTTOM (RL_ARM_TOP - 1550)
 
-#define ARM_PRESTACK (RL_ARM_TOP - 540)
+#define ARM_PRESTACK (RL_ARM_TOP - 700)
 #define ARM_RELEASE (RL_ARM_TOP - 640)
 #define ARM_CARRY (RL_ARM_TOP - 1040)
 #define ARM_STACK (RL_ARM_TOP - 160)
@@ -1049,7 +1049,7 @@ case stackDetach:
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[MIN(gNumCones, MAX_STACK - 1)])
 	{
 		if ((arg & sfReturn) && gNumCones > 3) {
-			liftLowerSimpleAsync((arg & sfLoader) ? MAX(MIN(LIFT_LOADER, gLiftPlaceTarget[MAX(0, gNumCones - 1)]), gNumCones > 5 ? LIFT_LOADER : LIFT_LOADER_PICKUP) + 200 : RAPID ? LIFT_BOTTOM : 1650, -50, 20);
+			liftLowerSimpleAsync((arg & sfLoader) ? MAX(MIN(LIFT_LOADER, gLiftPlaceTarget[MAX(0, gNumCones - 1)]), gNumCones > 5 ? LIFT_LOADER : LIFT_LOADER_PICKUP) + 200 : RAPID ? LIFT_BOTTOM : 1650, -50, (arg & sfLoader) || !RAPID ? 20 : 0);
 		}
 		else {
 			liftSet(liftManaged);
@@ -1342,16 +1342,12 @@ bool stackRunning()
 
 bool cancel()
 {
-	writeDebugStream("Cancel Stack: ");
-	if (stackState != stackNotRunning)
-	{
-		stackReset();
-		gDriveManual = true;
-		writeDebugStreamLine("True");
-		return true;
-	}
-	writeDebugStreamLine("False");
-	return false;
+	writeDebugStream("Cancel Stack");
+	bool wasRunning = stackState != stackNotRunning;
+	stackSet(stackNotRunning, sfNoResetArm);
+	armReset();
+	gDriveManual = true;
+	return wasRunning;
 }
 
 void handleMacros()
