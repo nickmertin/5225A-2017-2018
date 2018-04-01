@@ -114,7 +114,8 @@ typedef enum _stackFlags {
 	sfNoResetLift = 128,
 	sfRapid = 256,
 	sfTiltAutoDrive = 512,
-	sfTilt = 1024
+	sfTilt = 1024,
+	sfPull = 2048
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -927,8 +928,13 @@ case stackPickupGround:
 
 		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
 		armTimeOut = nPgmTime + 1200;
-		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupGround, 3));
 		liftSet(liftHoldDown);
+		if (arg & sfPull)
+		{
+			timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK - 500, armTimeOut, TID1(stackPickupGround, 3));
+			gDriveManual = false;
+			moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, -45, 0, 0, 0, 0, stopNone, mttCascading);
+		}
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_BOTTOM, armTimeOut, TID1(stackPickupGround, 4));
 
 		writeDebugStreamLine("stackPickupGround 3 %06d %d", npgmTime, gSensor[armPoti].value);
