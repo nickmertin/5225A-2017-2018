@@ -135,6 +135,7 @@ void handleLcd()
 				endCycle(gMainCycle);
 			} while (!LCD_RISING(btnCenter));
 
+			gTurnIgnoreJumper = true;
 			updateTurnLookup();
 		}
 		displayLCDCenteredString(0, "TurnCurvLimit");
@@ -175,6 +176,7 @@ void handleLcd()
 				endCycle(gMainCycle);
 			} while (!LCD_RISING(btnCenter));
 
+			gDriveIgnoreJumper = true;
 			updateDriveLookup();
 		}
 		displayLCDCenteredString(0, "Drive Curve");

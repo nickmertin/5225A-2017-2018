@@ -33,6 +33,11 @@
 // 2 - Secondary double goal route (? points)
 #define SKILLS_ROUTE 1
 
+#define DRIVE_WEIGHT_GAME 0
+#define DRIVE_WEIGHT_SKILLS 0
+#define TURN_WEIGHT_GAME 3
+#define TURN_WEIGHT_SKILLS 7
+
 // Necessary definitions
 
 #define TID0(routine) #routine, 0
@@ -1617,6 +1622,18 @@ void usercontrol()
 	gStack = false;
 	gLoader = false;
 
+	if (!gDriveIgnoreJumper)
+	{
+		gDriveCurvature = gSensor[jmpSkills].value ? DRIVE_WEIGHT_SKILLS : DRIVE_WEIGHT_GAME;
+		updateDriveLookup();
+	}
+
+	if (!gTurnIgnoreJumper)
+	{
+		gTurnCurvature = gSensor[jmpSkills].value ? TURN_WEIGHT_SKILLS : TURN_WEIGHT_GAME;
+		updateTurnLookup();
+	}
+
 	while (true)
 	{
 		updateSensorInputs();
@@ -1631,6 +1648,21 @@ void usercontrol()
 		handleMacros();
 
 		handleLcd();
+
+		if (gSensor[jmpSkills].value != gSensor[jmpSkills].lstValue)
+		{
+			if (!gDriveIgnoreJumper)
+			{
+				gDriveCurvature = gSensor[jmpSkills].value ? DRIVE_WEIGHT_SKILLS : DRIVE_WEIGHT_GAME;
+				updateDriveLookup();
+			}
+
+			if (!gTurnIgnoreJumper)
+			{
+				gTurnCurvature = gSensor[jmpSkills].value ? TURN_WEIGHT_SKILLS : TURN_WEIGHT_GAME;
+				updateTurnLookup();
+			}
+		}
 
 		updateSensorOutputs();
 		updateMotors();
