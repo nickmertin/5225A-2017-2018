@@ -903,14 +903,13 @@ case stackPickupGround:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		if (gSensor[liftPoti].value > LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
+		if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
 		{
 			armSet(armToTarget, ARM_RELEASE);
 		}
 		else
 		{
 			armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
-			armTimeOut = nPgmTime + 1200;
 		}
 		writeDebugStreamLine("stackPickupGround 1 %06d %d", npgmTime, gSensor[armPoti].value);
 
@@ -1411,7 +1410,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_PICKUP) && !stackRunning())
 	{
-		stackSet(stackPickupGround, sfNone);
+		stackSet(stackPickupGround, sfNoResetArm);
 	}
 
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
