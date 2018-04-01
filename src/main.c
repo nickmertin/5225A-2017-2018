@@ -1049,7 +1049,7 @@ case stackDetach:
 	if (gNumCones > 0 && gSensor[liftPoti].value < gLiftRaiseTarget[MIN(gNumCones, MAX_STACK - 1)])
 	{
 		if ((arg & sfReturn) && gNumCones > 3) {
-			liftLowerSimpleAsync((arg & sfLoader) ? MIN(2200, gLiftPlaceTarget[MAX(0, gNumCones - 1)]) : RAPID ? LIFT_BOTTOM : 1650, -50, 0);
+			liftLowerSimpleAsync((arg & sfLoader) ? MAX(MIN(LIFT_LOADER, gLiftPlaceTarget[MAX(0, gNumCones - 1)]), gNumCones > 5 ? LIFT_LOADER : LIFT_LOADER_PICKUP) + 200 : RAPID ? LIFT_BOTTOM : 1650, -50, 20);
 		}
 		else {
 			liftSet(liftManaged);
@@ -1063,7 +1063,10 @@ case stackDetach:
 		armTimeoutWhile(armLowerSimpleState, armTimeOut, TID0(stackDetach));
 		//TODO: Add lift timeout to make sure it lowers fully
 		writeDebugStreamLine("%06d Detached lift at height: %d", npgmTime, gSensor[liftPoti].value);
-		liftReset();
+		if (arg & sfLoader)
+			liftSet(liftHold);
+		else
+			liftReset();
 	}
 	if (RAPID) {
 		bool _gStack = gStack;
