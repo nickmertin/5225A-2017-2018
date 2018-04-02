@@ -908,7 +908,6 @@ case stackNotRunning:
 		setDrive(0, 0);
 	}
 	gDriveManual = true;
-	gWall = false;
 	break;
 case stackPickupGround:
 	{
@@ -1355,12 +1354,14 @@ void handleMacros()
 	{
 		gStack = true;
 		gLoader = false;
+		gWall = false;
 	}
 
 	if (RISING(BTN_MACRO_LOADER) && gNumCones < MAX_STACK)
 	{
 		gStack = true;
 		gLoader = true;
+		gWall = false;
 	}
 
 	if (gStack == true && gNumCones < MAX_STACK)
