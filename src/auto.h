@@ -26,12 +26,12 @@ typedef enum _turnDir
 /* Structures */
 typedef struct _pos
 {
-    float a;
-    float y;
-    float x;
-    int leftLst;
-    int rightLst;
-    int backLst;
+	float a;
+	float y;
+	float x;
+	int leftLst;
+	int rightLst;
+	int backLst;
 } sPos; // Position of the robot
 
 typedef struct _vel
