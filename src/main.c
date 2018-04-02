@@ -1558,8 +1558,8 @@ void autonomous()
 	//resetQuadratureEncoder(trackR);
 	//resetQuadratureEncoder(trackB);
 
-	autoMotorSensorUpdateTaskAsync();
-	trackPositionTaskAsync();
+	tStart(autoMotorSensorUpdateTask);
+	tStart(trackPositionTask);
 
 	runAuto();
 
@@ -1591,23 +1591,8 @@ void usercontrol()
 	updateSensorInput(jmpSkills);
 
 #ifdef TRACK_IN_DRIVER
-	trackPositionTaskAsync();
+	tStart(trackPositionTask);
 #endif
-
-	//if (gSensor[jmpSkills].value)
-	//{
-	//	autoMotorSensorUpdateTaskAsync();
-	//	trackPositionTaskAsync();
-
-	//	driverSkillsStart();
-
-	//	trackPositionTaskKill();
-	//	autoMotorSensorUpdateTaskKill();
-
-	//	mobileSet(mobileTop);
-
-	//	armSet(armHold);
-	//}
 
 	stackReset();
 	liftReset();

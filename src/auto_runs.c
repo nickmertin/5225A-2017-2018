@@ -325,10 +325,10 @@ void autoSkills(int segment)
 
 #if SKILLS_ROUTE == 1
 
-	trackPositionTaskKill();
+	tStop(trackPositionTask);
 	resetPositionFull(gPosition, 47, 14.25, 0);
 	resetVelocity(gVelocity, gPosition);
-	trackPositionTaskAsync();
+	tStart(trackPositionTask);
 
 	//segment = 5;
 
@@ -741,10 +741,10 @@ skip5:
 
 #elif SKILLS_ROUTE == 2
 
-	trackPositionTaskKill();
+	tStop(trackPositionTask);
 	resetPositionFull(gPosition, 40, 16, PI / 4);
 	resetVelocity(gVelocity, gPosition);
-	trackPositionTaskAsync();
+	tStart(trackPositionTask);
 
 	segment = 2;
 
@@ -1185,10 +1185,10 @@ void autoBlock()
 
 //	gMobileCheckLift = true;
 
-//	trackPositionTaskKill();
+//	tStop(trackPositionTask);
 //	resetPositionFull(gPosition, 40, 16, 45);
 //	resetVelocity(gVelocity, gPosition);
-//	trackPositionTaskAsync();
+//	tStart(trackPositionTask);
 
 //	coneTimeout = nPgmTime + 1400;
 
@@ -1268,10 +1268,10 @@ void autoBlock()
 
 //	gMobileCheckLift = true;
 
-//	trackPositionTaskKill();
+//	tStop(trackPositionTask);
 //	resetPositionFull(gPosition, 16, 40, 45);
 //	resetVelocity(gVelocity, gPosition);
-//	trackPositionTaskAsync();
+//	tStart(trackPositionTask);
 
 //	coneTimeout = nPgmTime + 1400;
 
@@ -1350,10 +1350,10 @@ void autoBlock()
 //	gNumCones = 0;
 //	gMobileCheckLift = true;
 
-//	trackPositionTaskKill();
+//	tStop(trackPositionTask);
 //	resetPositionFull(gPosition, 40, 16, 45);
 //	resetVelocity(gVelocity, gPosition);
-//	trackPositionTaskAsync();
+//	tStart(trackPositionTask);
 
 //	coneTimeout = nPgmTime + 1400;
 
@@ -1387,10 +1387,10 @@ void autoBlock()
 //	gNumCones = 0;
 //	gMobileCheckLift = true;
 
-//	trackPositionTaskKill();
+//	tStop(trackPositionTask);
 //	resetPositionFull(gPosition, 16, 40, 45);
 //	resetVelocity(gVelocity, gPosition);
-//	trackPositionTaskAsync();
+//	tStart(trackPositionTask);
 
 //	coneTimeout = nPgmTime + 1400;
 
@@ -1675,10 +1675,10 @@ void autoBlock()
 void autoTest ()
 {
 	//writeDebugStreamLine("%006d Start test: resetting", nPgmTime);
-	//trackPositionTaskKill();
+	//tStop(trackPositionTask);
 	//resetPositionFull(gPosition, 0, 0, PI);
 	//resetVelocity(gVelocity, gPosition);
-	//trackPositionTaskAsync();
+	//tStart(trackPositionTask);
 
 	////liftSet(liftHoldDown);
 	//moveToTargetSimple(48, 0, 0, 0, -127, 0, 0, 0, 0, stopNone, true);

@@ -343,13 +343,13 @@ void testSkills()
 			gSetTimedOut = true;
 			gTimedOut = false;
 
-			autoMotorSensorUpdateTaskAsync();
-			trackPositionTaskAsync();
+			tStart(autoMotorSensorUpdateTask);
+			tStart(trackPositionTask);
 
 			autoSkills(index);
 
-			autoMotorSensorUpdateTaskKill();
-			trackPositionTaskKill();
+			tStop(autoMotorSensorUpdateTask);
+			tStart(trackPositionTask);
 
 			writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 

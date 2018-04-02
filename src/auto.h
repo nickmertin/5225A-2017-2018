@@ -72,14 +72,10 @@ void vectorToPolar(sVector& vector, sPolar& polar); // Convert a cartesian vecto
 void polarToVector(sPolar& polar, sVector& vector); // Convert a polar vector to a cartesian vector
 float getAngleOfLine(sLine line);
 float getLengthOfLine(sLine line);
-void trackPositionTask();
-void autoMotorSensorUpdateTask(); // Update motors and sensors during auto
+task trackPositionTask();
+task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 void applyHarshStop();
 void resetPositionFull(sPos& position, float y, float x, float a); // Reset the position to a desired value and starts tracking
-
-/* Async Functions */
-NEW_ASYNC_VOID_0(trackPositionTask);
-NEW_ASYNC_VOID_0(autoMotorSensorUpdateTask);
 
 /* Variables */
 unsigned long gAutoTime = 0;
