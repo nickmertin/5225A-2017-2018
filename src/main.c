@@ -908,6 +908,7 @@ case stackNotRunning:
 		setDrive(0, 0);
 	}
 	gDriveManual = true;
+	gWall = false;
 	break;
 case stackPickupGround:
 	{
@@ -1373,7 +1374,6 @@ void handleMacros()
 				stackSet(stackPickupGround, ((gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach) | (gWall ? sfPull : sfNone));
 			gStack = false;
 			gLoader = false;
-			gWall = false;
 		}
 	}
 
