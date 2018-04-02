@@ -113,7 +113,7 @@ typedef enum _stackFlags {
 	sfNoResetArm = 64,
 	sfNoResetLift = 128,
 	sfRapid = 256,
-	sfTiltAutoDrive = 512,
+	sfNoResetAuto = 512,
 	sfTilt = 1024,
 	sfPull = 2048
 } tStackFlags;
@@ -902,8 +902,12 @@ case stackNotRunning:
 		liftSet(liftHold);
 	if (!(arg & sfNoResetArm))
 		armSet(armHold);
+	if (!(arg & sfNoResetAuto))
+	{
+		autoSimpleReset();
+		setDrive(0, 0);
+	}
 	gDriveManual = true;
-	autoSimpleReset();
 	break;
 case stackPickupGround:
 	{
@@ -1176,17 +1180,6 @@ case stackTiltPrep:
 		unsigned long liftTimeOut;
 		unsigned long driveTimeout;
 
-		if (arg & sfTiltAutoDrive)
-		{
-			gDriveManual = false;
-			setDrive(80, 80);
-
-			driveTimeout = nPgmTime + 1000;
-			timeoutWhileFalse((bool *)&gSensor[lsField].value, driveTimeout, TID1(stackTiltPrep, 1));
-
-			setDrive(7, 7);
-		}
-
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
 		//armSet(armToTarget, ARM_HORIZONTAL);
 		armTimeOut = nPgmTime + 1000;
@@ -1214,13 +1207,6 @@ case stackTiltMobile:
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackTiltMobile, 1));
 		writeDebugStreamLine("stackTiltMobile %d", gSensor[liftPoti].value);
 		liftSet(liftHoldDown);
-
-		if (arg & sfTiltAutoDrive)
-		{
-			moveToTargetDisSimpleAsync(gPosition.a, 9, gPosition.y, gPosition.x, 80, 0, 0, 0, 0, 0, stopNone, mttSimple);
-			driveTimeout = nPgmTime + 1500;
-			autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackTiltMobile, 2));
-		}
 
 		arg |= sfNoResetLift;
 
