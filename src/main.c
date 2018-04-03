@@ -1257,6 +1257,7 @@ task failTimeout()
 	gDriveManual = true;
 	if (competitionState == usercontrolState)
 		competitionSet(usercontrolState);
+	return_t;
 }
 
 bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float& out)
