@@ -381,17 +381,17 @@ typedef enum _tArmStates {
 	armHoldMobile
 } tArmStates;
 
-#define RL_ARM_TOP 2810
+#define RL_ARM_TOP 2880
 #define ARM_TOP (RL_ARM_TOP - 160)
 
 //Actual ARM_BOTTOM = 1020
-#define ARM_BOTTOM (RL_ARM_TOP - 1550)
+#define ARM_BOTTOM (RL_ARM_TOP - 1730)
 
-#define ARM_PRESTACK (RL_ARM_TOP - 700)
-#define ARM_RELEASE (RL_ARM_TOP - 640)
+#define ARM_PRESTACK (RL_ARM_TOP - 800)
+#define ARM_RELEASE (RL_ARM_TOP - 700)
 #define ARM_CARRY (RL_ARM_TOP - 1040)
 #define ARM_STACK (RL_ARM_TOP - 160)
-#define ARM_HORIZONTAL (RL_ARM_TOP - 1390)
+#define ARM_HORIZONTAL (RL_ARM_TOP - 1590)
 #define ARM_FOLLOW_TARGET (RL_ARM_TOP - 790)
 #define ARM_HOLD_DOWN_THRESHOLD (RL_ARM_TOP - 1450)
 #define ARM_MOBILE_TILT (RL_ARM_TOP - 630)
