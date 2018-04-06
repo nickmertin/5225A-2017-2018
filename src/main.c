@@ -331,7 +331,11 @@ case liftHold:
 			NEXT_STATE(liftHoldDown);
 		if (target > LIFT_HOLD_UP_THRESHOLD)
 			NEXT_STATE(liftHoldUp);
-		setLift(6 + (word)(3 * cos((MIN(target - LIFT_MID, 0)) * PI / 2700)));
+		while (true)
+		{
+			setLift(gSensor[liftPoti].value > LIFT_MID ? 12 : 10);
+			sleep(40);
+		}
 		break;
 	}
 case liftHoldDown:
