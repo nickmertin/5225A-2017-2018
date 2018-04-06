@@ -752,7 +752,7 @@ case mobileTop:
 			setMobile(MOBILE_UP_HOLD_POWER);
 
 		//if (gSensor[jmpSkills].value)
-		//	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		//	liftSet(liftToBottom, -127);
 		break;
 	}
 case mobileBottom:
@@ -950,17 +950,17 @@ case stackPickupGround:
 		}
 		else
 		{
-			armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+			armSet(armToBottom, -127);
 		}
 		writeDebugStreamLine("stackPickupGround 1 %06d %d", npgmTime, gSensor[armPoti].value);
 
-		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1200;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackPickupGround, 2));
 
 		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
 
-		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		armSet(armToBottom, -127);
 		armTimeOut = nPgmTime + 1200;
 		liftSet(liftHoldDown);
 		if (arg & sfPull)
@@ -1180,7 +1180,7 @@ case stackReturn:
 		}
 
 		if (arg & sfLoader)
-			armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+			armSet(armToBottom, -127);
 		else
 			armSet(armToTarget, ARM_HORIZONTAL);
 		armTimeOut = nPgmTime + 1500;
@@ -1236,9 +1236,9 @@ case stackTiltMobile:
 		unsigned long liftTimeOut;
 		unsigned long driveTimeout;
 
-		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
-		//armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		//armSet(armToBottom, -127);
 		armReset();
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackTiltMobile, 1));
 		writeDebugStreamLine("stackTiltMobile %d", gSensor[liftPoti].value);
@@ -1271,7 +1271,7 @@ case stackWall:
 		unsigned long liftTimeOut;
 
 		armSet(armToTarget, ARM_PRESTACK - 500);
-		liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM, liftTimeOut, TID1(stackWall, 1));
 		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
@@ -1457,7 +1457,7 @@ void handleMacros()
 	if (RISING(BTN_MACRO_PREP) && !stackRunning())
 	{
 		liftSet(liftToTarget, LIFT_LOADER);
-		armLowerSimpleAsync(ARM_BOTTOM, -127, 0);
+		armSet(armToBottom, -127);
 	}
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
