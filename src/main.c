@@ -10,6 +10,7 @@
 #pragma config(Sensor, dgtl3,  trackR,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  trackB,         sensorQuadEncoder)
 #pragma config(Sensor, dgtl7,  sonarL,         sensorSONAR_mm)
+#pragma config(Sensor, dgtl9,  limArm,         sensorTouch)
 #pragma config(Sensor, dgtl10, jmpSkills,      sensorDigitalIn)
 #pragma config(Sensor, dgtl11, sonarR,         sensorSONAR_mm)
 #pragma config(Motor,  port2,           liftL,         tmotorVex393HighSpeed_MC29, openLoop, reversed)
@@ -378,6 +379,7 @@ typedef enum _tArmStates {
 	armToTarget,
 	armRaiseSimpleState,
 	armLowerSimpleState,
+	armToBottom,
 	armFollowMobile,
 	armStopping,
 	armHold,
@@ -540,6 +542,13 @@ case armLowerSimpleState:
 		STATE_INVOKE_ASYNC(armLowerSimple);
 		NEXT_STATE(gArmSimpleNextState);
 	}
+case armToBottom:
+	{
+		word power = arg ? abs(arg) : -127;
+		setArm(power)
+		while (!gSensor[limArm].value) sleep(10);
+		NEXT_STATE(armHoldDown);
+	}
 case armFollowMobile:
 	{
 		velocityClear(armPoti);
@@ -608,7 +617,11 @@ case armHold:
 		break;
 	}
 case armHoldDown:
-	setArm(-15);
+	while (true)
+	{
+		setArm(gSensor[limArm].value ? -15 : -40);
+		sleep(40);
+	}
 	break;
 case armHoldMobile:
 	setArm(-15);
