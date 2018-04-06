@@ -2,7 +2,7 @@
 #pragma config(Sensor, in2,    mobilePoti,     sensorPotentiometer)
 #pragma config(Sensor, in3,    liftPoti,       sensorPotentiometer)
 #pragma config(Sensor, in4,    armPoti,        sensorPotentiometer)
-#pragma config(Sensor, in5,    lsField,        sensorReflection)
+#pragma config(Sensor, in5,    limLift,         sensorAnalog)
 #pragma config(Sensor, in6,    lsBarL,         sensorReflection)
 #pragma config(Sensor, in7,    lsBarR,         sensorReflection)
 #pragma config(Sensor, in8,    lsMobile,       sensorReflection)
@@ -198,6 +198,7 @@ typedef enum _tLiftStates {
 	liftManual,
 	liftRaiseSimpleState,
 	liftLowerSimpleState,
+	liftToBottom,
 	liftToTarget,
 	liftHold,
 	liftHoldDown,
@@ -270,6 +271,13 @@ case liftLowerSimpleState:
 		STATE_INVOKE_ASYNC(liftLowerSimple);
 		NEXT_STATE(liftHold);
 	}
+case liftToBottom:
+	{
+		word power = arg ? abs(arg) : -127;
+		setLift(power)
+		while (!gSensor[limLift].value) sleep(10);
+		NEXT_STATE(liftHoldDown);
+	}
 case liftToTarget:
 	{
 		int target = arg;
@@ -340,7 +348,11 @@ case liftHold:
 		break;
 	}
 case liftHoldDown:
-	setLift(-15);
+	while (true)
+	{
+		setLift(gSensor[limLift].value ? -15 : -40);
+		sleep(40);
+	}
 	break;
 case liftHoldUp:
 	setLift(15);
@@ -1496,7 +1508,7 @@ void startup()
 	autoSimpleSetup();
 
 	setupInvertedSen(jmpSkills);
-	setupDgtIn(lsField, 0, 1600);
+	setupDgtIn(limLift, 0, 100);
 	setupDgtIn(lsBarL, 0, 2500);
 	setupDgtIn(lsBarR, 0, 2500);
 	setupDgtIn(lsMobile, 0, 2100);
