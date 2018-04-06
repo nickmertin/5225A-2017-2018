@@ -954,6 +954,13 @@ case stackPickupGround:
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackPickupGround, 5));
 		armSet(armToTarget, ARM_PRESTACK - 500);
 
+		if ((arg & sfPull) && !(arg & sfNoResetAuto))
+		{
+			autoSimpleReset();
+			setDrive(0, 0);
+			gDriveManual = true;
+		}
+
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
 	}
 case stackPickupLoader:
