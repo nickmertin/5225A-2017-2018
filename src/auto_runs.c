@@ -1173,6 +1173,8 @@ noLine4:
 #endif
 }
 
+#if SKILLS_ROUTE == 0
+
 void autoBlock()
 {
 	setDrive(-127, -127);
@@ -1675,6 +1677,8 @@ void autoBlock()
 //	coneTimeout = nPgmTime + 1200;
 //	liftTimeoutWhile(liftLowerSimpleState, coneTimeout, TID2(rs+2, 4, 2));
 //}
+
+#endif
 
 void autoTest ()
 {
