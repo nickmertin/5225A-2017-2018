@@ -205,11 +205,10 @@ typedef enum _tLiftStates {
 	liftHoldUp,
 } tLiftStates;
 
-void setLift(word power,bool debug=true)
+void setLift(word power,bool debug=false)
 {
 	if( debug ) writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
-	writeDebugStreamLine("%d", power);
 }
 
 #define LIFT_BOTTOM 1010
