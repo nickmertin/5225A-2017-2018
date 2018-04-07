@@ -953,6 +953,12 @@ case stackPickupGround:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
+		if (arg & sfPull)
+		{
+			gDriveManual = false;
+			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -70, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
+		}
+
 		if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
 		{
 			armSet(armToTarget, ARM_RELEASE);
@@ -975,7 +981,6 @@ case stackPickupGround:
 		if (arg & sfPull)
 		{
 			timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK - 500, armTimeOut, TID1(stackPickupGround, 3));
-			gDriveManual = false;
 			moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, -45, 0, 0, 0, 0, stopNone, mttCascading);
 		}
 		timeoutWhileFalse((bool *)&gSensor[limArm].value, armTimeOut, TID1(stackPickupGround, 4));
