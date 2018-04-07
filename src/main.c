@@ -1257,7 +1257,7 @@ case stackTiltMobile:
 		liftTimeOut = nPgmTime + 1000;
 		//armSet(armToBottom, -127);
 		armReset();
-		timeoutWhileFalse((bool *) &gSensor[liftPoti].value, liftTimeOut, TID1(stackTiltMobile, 1));
+		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackTiltMobile, 1));
 		writeDebugStreamLine("stackTiltMobile %d", gSensor[liftPoti].value);
 		liftSet(liftHoldDown);
 
