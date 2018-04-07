@@ -200,7 +200,7 @@ void testLift()
 		gMotor[mtr].power = 0;
 	updateMotors();
 
-	displayLCDCenteredString(0, "8R:Test 8U:Exit");
+	displayLCDCenteredString(1, "Test ---- Exit");
 
 	unsigned long time = 0;
 
@@ -211,24 +211,35 @@ void testLift()
 		sleep(10);
 
 		updateSensorInput(liftPoti);
-		updateJoystick(Btn8R);
-		updateJoystick(Btn8U);
+		updateSensorInput(limLift);
+		tLcdButtons buttons = nLCDButtons;
 
-		clearLCDLine(1);
-		displayLCDNumber(1, 0, gSensor[liftPoti].value);
-		displayLCDNumber(1, 8, time);
+		clearLCDLine(0);
+		displayLCDNumber(0, 0, gSensor[liftPoti].value);
+		displayLCDNumber(0, 8, time);
 
-		if (RISING(Btn8R))
+		if (LCD_RISING(btnLeft))
 		{
 			time = nPgmTime;
+
+			unsigned long timeout = nPgmTime + 1100;
 
 			if (up)
 			{
 				setLift(-127);
 				updateMotors();
-				while (gSensor[liftPoti].value > LIFT_BOTTOM)
+				while (!gSensor[limLift].value)
 				{
+					if (TimedOut(timeout, TID0(testLift), false, VEL_NONE, 0, 0))
+					{
+						playSound(soundException);
+						setLift(0);
+						updateMotors();
+
+					}
+
 					updateSensorInput(liftPoti);
+					updateSensorInput(limLift);
 					if (DATALOG_TEST != -1)
 					{
 						tHog();
@@ -267,7 +278,7 @@ void testLift()
 			up = !up;
 		}
 
-		if (RISING(Btn8U))
+		if (LCD_RISING(btnRight))
 		{
 			if (DISABLED)
 				disabledAsync();
