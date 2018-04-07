@@ -976,7 +976,7 @@ case stackPickupGround:
 		writeDebugStreamLine("stackPickupGround 2 %06d %d", npgmTime, gSensor[liftPoti].value);
 
 		armSet(armToBottom, -127);
-		armTimeOut = nPgmTime + 1200;
+		armTimeOut = nPgmTime + 1500;
 		liftSet(liftHoldDown);
 		if (arg & sfPull)
 		{
