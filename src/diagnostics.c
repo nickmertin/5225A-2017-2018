@@ -259,6 +259,14 @@ void testLift()
 				updateMotors();
 				while (gSensor[liftPoti].value < LIFT_TOP)
 				{
+					if (TimedOut(timeout, TID0(testLift), false, VEL_NONE, 0, 0))
+					{
+						playSound(soundException);
+						setLift(0);
+						updateMotors();
+
+					}
+
 					updateSensorInput(liftPoti);
 					if (DATALOG_TEST != -1)
 					{
