@@ -272,7 +272,7 @@ case liftLowerSimpleState:
 	}
 case liftToBottom:
 	{
-		word power = arg ? abs(arg) : -127;
+		word power = arg ? -abs(arg) : -127;
 		setLift(power)
 		while (!gSensor[limLift].value) sleep(10);
 		NEXT_STATE(liftHoldDown);
@@ -555,7 +555,7 @@ case armLowerSimpleState:
 	}
 case armToBottom:
 	{
-		word power = arg ? abs(arg) : -127;
+		word power = arg ? -abs(arg) : -127;
 		setArm(power)
 		while (!gSensor[limArm].value) sleep(10);
 		NEXT_STATE(armHoldDown);
