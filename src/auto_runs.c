@@ -14,38 +14,46 @@ void selectAuto()
 
 void runAuto()
 {
-	//autoTest();
-	//return;
+#if SKILLS_ROUTE == 0
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 	if (gAlliance == allianceBlue)
 	{
 		switch (gCurAuto)
 		{
-			case 0: autoSkills(); break;
-			/*case 1: auto20Right(); break;
-			case 2: auto20Left(); break;
-			case 3: autoStationaryRightBlock(); break;
-			case 4: autoStationaryLeftBlock(); break;
-			case 5: autoStationaryRight5(); break;
-			case 6: autoStationaryLeft5(); break;
-			case 7: autoStationaryLeft2(); break;*/
+			case 0: /* No auto */ break;
+			case 1: /* 2 in 20 - autoloader */ break;
+			case 2: /* 2 in 20 - audience */ break;
+			case 3: /* 4 in 5 - autoloader */ break;
+			case 4: /* 4 in 5 - audience */ break;
+			case 5: /* 1s + 5 - autoloader */ break;
+			case 6: /* 1s + 5 - audience */ break;
+			case 7: /* 1s + block - autoloader */ break;
+			case 8: /* 1s + block - audience */ break;
+			case 9: /* 2s + block - audience */ break;
+			case 10: /* 3s - audience */ break;
 		}
 	}
 	else
 	{
 		switch (gCurAuto)
 		{
-			case 0: autoBlock(); break;
-			/*case 1: auto20Left(); break;
-			case 2: auto20Right(); break;
-			case 3: autoStationaryLeftBlock(); break;
-			case 4: autoStationaryRightBlock(); break;
-			case 5: autoStationaryLeft5(); break;
-			case 6: autoStationaryRight5(); break;
-			case 7: autoStationaryRight2(); break;*/
+			case 0: /* Dumb block */ autoBlock(); break;
+			case 1: /* 2 in 20 - autoloader */ break;
+			case 2: /* 2 in 20 - audience */ break;
+			case 3: /* 4 in 5 - autoloader */ break;
+			case 4: /* 4 in 5 - audience */ break;
+			case 5: /* 1s + 5 - autoloader */ break;
+			case 6: /* 1s + 5 - audience */ break;
+			case 7: /* 1s + block - autoloader */ break;
+			case 8: /* 1s + block - audience */ break;
+			case 9: /* 2s + block - audience */ break;
+			case 10: /* 3s - audience */ break;
 		}
 	}
+#else
+	autoSkills(-1);
+#endif
 }
 
 void normalize(float& x, float& y, float m, float b)
