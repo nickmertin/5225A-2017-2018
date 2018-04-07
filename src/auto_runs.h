@@ -24,3 +24,6 @@ void autoTest();
 /* Variables */
 int gCurAuto = 0;
 tAlliance gAlliance = allianceBlue;
+
+/* Defines */
+#define AUTO_OPTIONS_COUNT 10

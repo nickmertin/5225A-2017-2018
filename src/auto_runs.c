@@ -2,18 +2,14 @@ void selectAuto()
 {
 	updateSensorInput(autoPoti);
 	int autoVal = gSensor[autoPoti].value - 2048;
+	tAlliance oldAlliance = gAlliance;
 	if (autoVal < 0) gAlliance = allianceBlue;
 	else gAlliance = allianceRed;
 
 	autoVal = abs(autoVal);
-	if (autoVal < 275) gCurAuto = 0;
-	else if (autoVal < 550) gCurAuto = 1;
-	else if (autoVal < 825) gCurAuto = 2;
-	else if (autoVal < 1100) gCurAuto = 3;
-	else if (autoVal < 1375) gCurAuto = 4;
-	else if (autoVal < 1650) gCurAuto = 5;
-	else if (autoVal < 1925) gCurAuto = 6;
-	else gCurAuto = 7;
+	int selected = autoVal * AUTO_OPTIONS_COUNT / 2048;
+	if (oldAlliance != gAlliance || selected - gCurAuto != 1 || autoVal % (2048 / AUTO_OPTIONS_COUNT) > 100)
+		gCurAuto = selected;
 }
 
 void runAuto()
