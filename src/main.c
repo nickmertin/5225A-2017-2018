@@ -1004,14 +1004,21 @@ case stackPickupGround:
 		{
 			autoSimpleReset();
 			setDrive(0, 0);
-			gDriveManual = true;
 		}
 		gWallTurnCheck = false;
 
 		if (gWallTurnLeft)
-			turnToAngleNewAlg(pi/2, ccw, 0.27, 23, 12, true, false);
+		{
+			turnToAngleNewAlgAsync(pi/2, ccw, 0.27, 23, 12, true, false);
+			writeDebugStreamLine("%d Wall turn left to %d", nPgmTime, gSensor[liftPoti].value);
+		}
 		else
-			turnToAngleNewAlg(pi/2, cw, 0.27, 23, 12, true, false);
+		{
+			turnToAngleNewAlgAsync(pi/2, cw, 0.27, 23, 12, true, false);
+			writeDebugStreamLine("%d Wall turn right to %d", nPgmTime, gSensor[liftPoti].value);
+		}
+
+		gDriveManual = true;
 
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
 	}
