@@ -958,6 +958,12 @@ case stackPickupGround:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
+		if (arg & sfPull)
+		{
+			gDriveManual = false;
+			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -70, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
+		}
+
 		if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
 		{
 			armSet(armToTarget, ARM_RELEASE);
@@ -981,7 +987,6 @@ case stackPickupGround:
 		{
 			gWallTurnCheck = true;
 			timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK - 500, armTimeOut, TID1(stackPickupGround, 3));
-			gDriveManual = false;
 			moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, -45, 0, 0, 0, 0, stopNone, mttCascading);
 		}
 		timeoutWhileFalse((bool *)&gSensor[limArm].value, armTimeOut, TID1(stackPickupGround, 4));
@@ -1269,7 +1274,7 @@ case stackTiltMobile:
 		liftTimeOut = nPgmTime + 1000;
 		//armSet(armToBottom, -127);
 		armReset();
-		timeoutWhileFalse((bool *) &gSensor[liftPoti].value, liftTimeOut, TID1(stackTiltMobile, 1));
+		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackTiltMobile, 1));
 		writeDebugStreamLine("stackTiltMobile %d", gSensor[liftPoti].value);
 		liftSet(liftHoldDown);
 
@@ -1299,11 +1304,11 @@ case stackWall:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		armSet(armToTarget, ARM_PRESTACK - 500);
+		armSet(armToTarget, ARM_PRESTACK - 300);
 		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
-		timeoutWhileFalse((bool *) &gSensor[liftPoti].value, liftTimeOut, TID1(stackWall, 1));
-		armRaiseSimpleAsync(ARM_PRESTACK - 300, 80, 0);
+		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
+		armRaiseSimpleAsync(ARM_PRESTACK , 80, -20);
 		armTimeOut = nPgmTime + 1000;
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
 
@@ -1467,7 +1472,7 @@ void handleMacros()
 		{
 			if (stackRunning())
 				gWall = true;
-			else if (gSensor[liftPoti].value > LIFT_BOTTOM || gSensor[armPoti].value < ARM_RELEASE)
+			else if (gSensor[liftPoti].value > LIFT_BOTTOM || gSensor[armPoti].value < ARM_PRESTACK)
 				stackSet(stackWall, sfNone);
 			else
 			{
