@@ -28,6 +28,8 @@
 //#define FORCE_AUTO
 //#define IGNORE_DISABLE
 
+//#define SKILLS_CUTOFF 59500
+
 // Programming skills selector
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)

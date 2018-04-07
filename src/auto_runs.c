@@ -350,7 +350,9 @@ void autoSkills(int segment)
 		goto skip5;
 	}
 
-	//killAutoAsync(gAutoTime + 60000);
+#ifdef SKILLS_CUTOFF
+	killAutoAsync(gAutoTime + SKILLS_CUTOFF);
+#endif
 
 	// 1
 	moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
