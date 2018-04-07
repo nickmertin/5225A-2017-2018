@@ -211,8 +211,8 @@ void setLift(word power,bool debug=false)
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
 
-#define LIFT_BOTTOM 1010
-#define LIFT_TOP (LIFT_BOTTOM + 1820)
+#define LIFT_BOTTOM 1015
+#define LIFT_TOP (LIFT_BOTTOM + 1710)
 #define LIFT_MID (LIFT_BOTTOM + 790)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
