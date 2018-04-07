@@ -360,6 +360,11 @@ case liftHoldUp:
 
 void handleLift()
 {
+	if (gSensor[limLift].value && !gSensor[limLift].lstValue)
+		writeDebugStreamLine("%d LIFT LIMIT RISING", nPgmTime);
+	if (!gSensor[limLift].value && gSensor[limLift].lstValue)
+		writeDebugStreamLine("%d LIFT LIMIT FALLING", nPgmTime);
+
 	if (liftState == liftManaged || stackRunning()) return;
 
 	if (RISING(JOY_LIFT_DRIVER) || RISING(JOY_LIFT_PARTNER))
@@ -641,6 +646,11 @@ case armHoldMobile:
 
 void handleArm()
 {
+	if (gSensor[limArm].value && !gSensor[limArm].lstValue)
+		writeDebugStreamLine("%d ARM LIMIT RISING", nPgmTime);
+	if (!gSensor[limArm].value && gSensor[limArm].lstValue)
+		writeDebugStreamLine("%d ARM LIMIT FALLING", nPgmTime);
+
 	if (armState == armManaged || stackRunning()) return;
 
 	if (RISING(JOY_ARM_DRIVER) || RISING(JOY_ARM_PARTNER))
