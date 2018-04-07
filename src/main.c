@@ -940,6 +940,7 @@ MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
 	writeDebugStreamLine("%06d stackNotRunning %x %d", npgmTime, arg, gNumCones);
+	gWallTurnCheck = false;
 	if (!(arg & sfNoResetLift))
 		liftSet(liftHold);
 	if (!(arg & sfNoResetArm))
@@ -1443,9 +1444,9 @@ void handleMacros()
 		}
 	}
 
-	if (BTN_TURN_LEFT && gWallTurnCheck)
+	if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
 		gWallTurnLeft = true;
-	else if (BTN_TURN_LEFT && gWallTurnCheck)
+	else if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
 		gWallTurnLeft = false;
 
 	if (gSensor[jmpSkills].value)
