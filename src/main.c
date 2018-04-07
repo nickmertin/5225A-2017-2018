@@ -103,6 +103,9 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 
 bool stackRunning();
 
+bool gWallTurnCheck = false;
+bool gWallTurnLeft = true;
+
 typedef enum _stackFlags {
 	sfNone = 0,
 	sfStack = 1,
@@ -865,7 +868,7 @@ void handleMobile()
 	{
 		if (RISING(BTN_MOBILE_MIDDLE))
 			mobileSet(mobileTop, mfClear);
-		if (RISING(BTN_MOBILE_TOGGLE))
+		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
 			gMobileSlow = false;
 			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom, mfClear));
@@ -874,7 +877,7 @@ void handleMobile()
 	}
 	else
 	{
-		if (RISING(BTN_MOBILE_TOGGLE))
+		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
@@ -928,6 +931,7 @@ const int gLiftPlaceTargetS[6] = { 1600, 1700, 1800, 1900, 2000, 2200 }; // UPDA
 
 bool gStack = false;
 bool gLoader = false;
+
 unsigned long gPrepStart = 0;
 
 #define RAPID (gStack || ((arg & sfRapid) && gNumCones < ((arg >> 12) & 0xF)))
@@ -974,6 +978,7 @@ case stackPickupGround:
 		liftSet(liftHoldDown);
 		if (arg & sfPull)
 		{
+			gWallTurnCheck = true;
 			timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK - 500, armTimeOut, TID1(stackPickupGround, 3));
 			gDriveManual = false;
 			moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, -45, 0, 0, 0, 0, stopNone, mttCascading);
@@ -995,6 +1000,12 @@ case stackPickupGround:
 			setDrive(0, 0);
 			gDriveManual = true;
 		}
+		gWallTurnCheck = false;
+
+		if (gWallTurnLeft)
+			turnToAngleNewAlg(pi/2, ccw, 0.27, 23, 12, true, false);
+		else
+			turnToAngleNewAlg(pi/2, cw, 0.27, 23, 12, true, false);
 
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
 	}
@@ -1432,6 +1443,11 @@ void handleMacros()
 		}
 	}
 
+	if (BTN_TURN_LEFT && gWallTurnCheck)
+		gWallTurnLeft = true;
+	else if (BTN_TURN_LEFT && gWallTurnCheck)
+		gWallTurnLeft = false;
+
 	if (gSensor[jmpSkills].value)
 	{
 		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
@@ -1479,7 +1495,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
-	if (RISING(BTN_MACRO_INC) && gNumCones < 11) {
+	if (RISING(BTN_MACRO_INC) && gNumCones < 11 && !gWallTurnCheck) {
 		++gNumCones;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
 	}

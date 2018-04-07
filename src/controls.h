@@ -29,6 +29,10 @@
 #define BTN_MACRO_INC Btn5U
 #define BTN_MACRO_DEC Btn5D
 
+/* Direction turn toggle for wall pickup */
+#define BTN_TURN_LEFT Btn5U
+#define BTN_TURN_RIGHT Btn6U
+
 /* Game Macros */
 #define BTN_GAME_WALL Btn8L
 #define BTN_GAME_STATIONARY Btn8R
