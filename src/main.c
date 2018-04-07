@@ -1455,7 +1455,7 @@ void handleMacros()
 		{
 			if (stackRunning())
 				gWall = true;
-			else if (gSensor[liftPoti].value > LIFT_BOTTOM || gSensor[armPoti].value < ARM_RELEASE)
+			else if (gSensor[liftPoti].value > LIFT_BOTTOM || gSensor[armPoti].value < ARM_PRESTACK)
 				stackSet(stackWall, sfNone);
 			else
 			{
