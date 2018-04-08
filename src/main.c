@@ -963,6 +963,7 @@ case stackPickupGround:
 		if (arg & sfPull)
 		{
 			gDriveManual = false;
+			gWallTurnCheck = true;
 			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -70, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
 		}
 
@@ -987,7 +988,6 @@ case stackPickupGround:
 		liftSet(liftHoldDown);
 		if (arg & sfPull)
 		{
-			gWallTurnCheck = true;
 			timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK - 500, armTimeOut, TID1(stackPickupGround, 3));
 			moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, -45, 0, 0, 0, 0, stopNone, mttCascading);
 		}
@@ -1002,25 +1002,29 @@ case stackPickupGround:
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackPickupGround, 5));
 		armSet(armToTarget, ARM_PRESTACK - 500);
 
-		if ((arg & sfPull) && !(arg & sfNoResetAuto))
-		{
-			autoSimpleReset();
-			setDrive(0, 0);
-		}
 		gWallTurnCheck = false;
 
 		if (gWallTurnLeft)
 		{
-			turnToAngleNewAlgAsync(pi/2, ccw, 0.27, 23, 12, true, false);
-			writeDebugStreamLine("%d Wall turn left to %d", nPgmTime, gSensor[liftPoti].value);
+			writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
+			turnToAngleNewAlgAsync(pi * 0.5, ccw, 0.27, 23, 12, true, true);
 		}
 		else
 		{
-			turnToAngleNewAlgAsync(pi/2, cw, 0.27, 23, 12, true, false);
-			writeDebugStreamLine("%d Wall turn right to %d", nPgmTime, gSensor[liftPoti].value);
+			writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
+			turnToAngleNewAlgAsync(pi * 0.5, cw, 0.27, 23, 12, true, true);
 		}
 
-		gDriveManual = true;
+		unsigned long driveTimeout = nPgmTime + 1500;
+		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackPickupGround, 6));
+		writeDebugStreamLine("%d Wall turned to %d", nPgmTime, gPosition.a);
+
+		if ((arg & sfPull) && !(arg & sfNoResetAuto))
+		{
+			autoSimpleReset();
+			setDrive(0, 0);
+			gDriveManual = true;
+		}
 
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
 	}
@@ -1510,11 +1514,7 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_CANCEL)) cancel();
 
-<<<<<<< HEAD
-	if (RISING(BTN_MACRO_INC) && gNumCones < 11 && !gWallTurnCheck) {
-=======
-	if (RISING(BTN_MACRO_INC) && gNumCones < MAX_STACK) {
->>>>>>> master
+	if (RISING(BTN_MACRO_INC) && gNumCones < MAX_STACK && !gWallTurnCheck) {
 		++gNumCones;
 		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
 	}
