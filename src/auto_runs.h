@@ -30,7 +30,7 @@ tAlliance gAlliance = allianceBlue;
 #define AUTO_OPTIONS_COUNT 11
 #elif SKILLS_ROUTE == 1
 #define AUTO_OPTIONS_COUNT 1
-#define SKILLS_1_SAFE (gAlliance == allianceBlue)
+#define SKILLS_1_SAFE (gAlliance == allianceRed)
 #else
 #define AUTO_OPTIONS_COUNT 0
 #endif
