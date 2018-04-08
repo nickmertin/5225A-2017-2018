@@ -1171,7 +1171,7 @@ case stackClear:
 	{
 		writeDebugStreamLine("%06d stackClear %x %d", npgmTime, arg, gNumCones);
 		int target = gNumCones == MAX_STACK ? LIFT_TOP : gLiftRaiseTarget[gNumCones];
-		liftRaiseSimpleAsync(target, 127, gNumCones <= MAX_STACK ? -15 : 0);
+		liftRaiseSimpleAsync(target, 127, gNumCones < MAX_STACK ? -15 : 0);
 		unsigned long timeout = nPgmTime + 1500;
 		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, target, timeout, TID1(stackClear, 1));
 
