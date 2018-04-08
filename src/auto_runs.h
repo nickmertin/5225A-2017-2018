@@ -26,4 +26,11 @@ int gCurAuto = 0;
 tAlliance gAlliance = allianceBlue;
 
 /* Defines */
+#if SKILLS_ROUTE == 0
 #define AUTO_OPTIONS_COUNT 11
+#elif SKILLS_ROUTE == 1
+#define AUTO_OPTIONS_COUNT 1
+#define SKILLS_1_SAFE (gAlliance == allianceBlue)
+#else
+#define AUTO_OPTIONS_COUNT 0
+#endif
