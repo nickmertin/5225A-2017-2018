@@ -33,7 +33,7 @@ void handleLcd()
 #if SKILLS_ROUTE == 0
 		sprintf(line, "%c %c %c %s %02d  0", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? "Red  " : "Blue ", gCurAuto);
 #elif SKILLS_ROUTE == 1
-		sprintf(line, "%c %c %c - S1 (%d)", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? 110 : 108);
+		sprintf(line, "%c %c %c - S1 (%d)", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceBlue ? 110 : 108);
 #else
 		sprintf(line, "%c %c %c - Skills %d", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', SKILLS_ROUTE);
 #endif
