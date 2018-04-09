@@ -361,7 +361,7 @@ case liftHoldDown:
 case liftHoldUp:
 	while (true)
 	{
-		setLift(gSensor[liftPoti].value >= LIFT_TOP ? 15 : 40);
+		setLift(gSensor[liftPoti].value >= LIFT_TOP ? 15 : 127);
 		sleep(40);
 	}
 	break;
@@ -1051,7 +1051,7 @@ case stackPickupLoader:
 		armSet(armToBottom, -127);
 		armTimeOut = nPgmTime + 1500;
 		bool earlyLift;
-		if (earlyLIft = gSensor[liftPoti].value > LIFT_LOADER - 100 + 150)
+		if (earlyLift = gSensor[liftPoti].value > LIFT_LOADER - 100 + 150)
 		{
 			liftLowerSimpleAsync(LIFT_LOADER_PICKUP, -127, 0);
 			liftTimeOut = nPgmTime + 600;
@@ -1064,6 +1064,7 @@ case stackPickupLoader:
 		}
 		//liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackPickupLoader, 3));
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_LOADER_PICKUP, liftTimeOut, TID1(stackPickupLoader, 3));
+		sleep(50);
 
 		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
 	}
@@ -1139,7 +1140,7 @@ case stackStack:
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 100, liftTimeOut, TID1(stackStack, 2));
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_STACK - 100, armTimeOut, TID1(stackStack, 3));
 
-		if ((arg & sfLoader) && gNumCones == 5)
+		if ((arg & sfLoader) && (gNumCones == 5 || gNumCones == 6))
 			liftLowerSimpleAsync(gLiftPlaceTarget[gNumCones], -60, 20);
 		else
 			liftLowerSimpleAsync(gLiftPlaceTarget[gNumCones], -70, 0);
