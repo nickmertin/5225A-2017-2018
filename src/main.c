@@ -358,7 +358,7 @@ case liftHoldDown:
 case liftHoldUp:
 	while (true)
 	{
-		setLift(gSensor[liftPoti].value >= LIFT_TOP ? 15 : 40);
+		setLift(gSensor[liftPoti].value >= LIFT_TOP ? 15 : 127);
 		sleep(40);
 	}
 	break;
