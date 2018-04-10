@@ -4,6 +4,7 @@ typedef struct _sMotor
 	word power;
 	word curPower;
 	float powerScale;
+	bool logPower;
 } sMotor; // Represent a single motor
 
 /* Functions */
