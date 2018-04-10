@@ -18,8 +18,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FORCE_AUTO
+#if defined(FORCE_AUTO)
 #define AUTONOMOUS true
+#elif defined(IGNORE_AUTO)
+#define AUTONOMOUS false
 #else
 #define AUTONOMOUS bIfiAutonomousMode
 #endif

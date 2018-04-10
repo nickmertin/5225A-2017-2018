@@ -26,6 +26,7 @@
 #define CHECK_POTI_JUMPS
 
 //#define FORCE_AUTO
+//#define IGNORE_AUTO
 //#define IGNORE_DISABLE
 
 //#define SKILLS_CUTOFF 59500
