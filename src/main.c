@@ -1197,18 +1197,20 @@ case stackClear:
 		writeDebugStreamLine("%06d stackClear %x %d", nPgmTime, arg, gNumCones);
 		int target = gNumCones == MAX_STACK ? LIFT_TOP : gLiftRaiseTarget[gNumCones];
 		liftRaiseSimpleAsync(target, 127, gNumCones < MAX_STACK ? -15 : 0);
-		unsigned long timeout = nPgmTime + 1500;
-		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, target, timeout, TID1(stackClear, 1));
+		unsigned long liftTimeOut = nPgmTime + 1500;
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, target, liftTimeOut, TID1(stackClear, 1));
 
 		if (gSensor[armPoti].value < ARM_STACK)
 		{
 			armRaiseSimpleAsync(ARM_TOP, 127, 0);
-			timeout = nPgmTime + 1000;
-			armTimeoutWhile(armRaiseSimpleState, timeout, TID1(stackClear, 2));
+			unsigned long armTimeOut = nPgmTime + 1000;
+			armTimeoutWhile(armRaiseSimpleState, armTimeOut, TID1(stackClear, 2));
 		}
 
 		if (arg & sfMobile)
 			mobileSet((tMobileStates)((arg >> 16) & 0xFF), (long)(arg >> 24));
+
+		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackClear, 3));
 
 		NEXT_STATE(stackNotRunning)
 	}
