@@ -148,7 +148,6 @@ DECLARE_MACHINE(stack, tStackStates)
 
 sCycleData gMainCycle;
 int gNumCones = 0;
-bool gSetTimedOut = false;
 
 #define DRIVE_TURN_BRAKE 6
 
@@ -1640,8 +1639,6 @@ void autonomous()
 	autoSimpleReset();
 
 	gKillDriveOnTimeout = true;
-	gSetTimedOut = true;
-	gTimedOut = false;
 
 	//resetPosition(gPosition);
 	//resetQuadratureEncoder(trackL);
@@ -1668,9 +1665,6 @@ void autonomous()
 // This task gets started at the beginning of the usercontrol period
 void usercontrol()
 {
-	gSetTimedOut = false;
-	gTimedOut = false;
-
 	startSensors(); // Initilize the sensors
 #ifdef TRACK_IN_DRIVER
 	initCycle(gMainCycle, 15, "main");
