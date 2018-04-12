@@ -177,7 +177,7 @@ void setupSensors()
 		gSensor[i].lstVelocity = 0;
 		gSensor[i].velocity = 0;
 		gSensor[i].velGood = false;
-		gSensor[i].velCount = -1;
+		gSensor[i].velCount = 0;
 
 		gSensor[i].rawDatalog = -1;
 		gSensor[i].valueDatalog = -1;
