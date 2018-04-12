@@ -38,6 +38,20 @@ void updateSensorInput(tSensors sen)
 		break;
 	}
 
+	if (_sensorDoDatalog)
+	{
+		if (gSensor[sen].rawDatalog != -1)
+			datalogAddValue(gSensor[sen].rawDatalog, gSensor[sen].rawValue);
+		if (gSensor[sen].valueDatalog != -1)
+			datalogAddValue(gSensor[sen].valueDatalog, gSensor[sen].value);
+		if (gSensor[sen].velDatalog != -1)
+		{
+			velocityCheck(sen);
+			if (gSensor[sen].velGood)
+				datalogAddValue(gSensor[sen].velDatalog, gSensor[sen].velocity * 1000);
+		}
+	}
+
 #ifdef CHECK_POTI_JUMPS
 	if (SensorType[sen] == sensorPotentiometer && ++gSensor[sen].filterAcc < 10 && ( (abs(gSensor[sen].value - gSensor[sen].lstValue) > 400)/* || (gSensor[sen].velGood && gSensor[sen].potiCheckVel && sgn(gSensor[sen].velocity) == -sgn(gSensor[sen].lstVelocity))*/ ) )
 	{
@@ -52,11 +66,17 @@ void updateSensorInput(tSensors sen)
 
 void updateSensorInputs()
 {
+	tHog();
+	datalogDataGroupStart();
+	_sensorDoDatalog = true;
 	for (ubyte i = 0; i < kNumbOfTotalSensors; ++i)
 	{
 		if (gSensor[i].cls == snclsInput)
 			updateSensorInput(i);
 	}
+	_sensorDoDatalog = false;
+	datalogDataGroupEnd();
+	tRelease();
 }
 
 tSensorClass checkSenClass(tSensors sen)
@@ -157,7 +177,11 @@ void setupSensors()
 		gSensor[i].lstVelocity = 0;
 		gSensor[i].velocity = 0;
 		gSensor[i].velGood = false;
-		gSensor[i].velCount = 0;
+		gSensor[i].velCount = -1;
+
+		gSensor[i].rawDatalog = -1;
+		gSensor[i].valueDatalog = -1;
+		gSensor[i].velDatalog = -1;
 
 #ifdef CHECK_POTI_JUMPS
 		gSensor[i].filterAcc = 0;
@@ -166,4 +190,5 @@ void setupSensors()
 
 		startSensor(i);
 	}
+	_sensorDoDatalog = false;
 }

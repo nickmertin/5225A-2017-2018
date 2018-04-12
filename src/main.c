@@ -1567,7 +1567,14 @@ void startup()
 	updateDriveLookup();
 
 	gMotor[liftR].datalog = 0;
+	gSensor[liftPoti].valueDatalog = 1;
+	gSensor[liftPoti].velDatalog = 2;
 	gMotor[arm].datalog = 3;
+	gSensor[armPoti].valueDatalog = 4;
+	gSensor[armPoti].valueDatalog = 5;
+
+	velocityClear(liftPoti);
+	velocityClear(armPoti);
 
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
