@@ -1571,7 +1571,7 @@ void startup()
 	gSensor[liftPoti].velDatalog = 2;
 	gMotor[arm].datalog = 3;
 	gSensor[armPoti].valueDatalog = 4;
-	gSensor[armPoti].valueDatalog = 5;
+	gSensor[armPoti].velDatalog = 5;
 
 	velocityClear(liftPoti);
 	velocityClear(armPoti);
