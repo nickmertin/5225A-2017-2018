@@ -40,6 +40,9 @@ typedef struct _sSensor
 	bool potiCheckVel;
 	int dgtMin;
 	int dgtMax;
+	byte rawDatalog;
+	byte valueDatalog;
+	byte velDatalog;
 
 #ifdef CHECK_POTI_JUMPS
 	ubyte filterAcc;
@@ -64,3 +67,4 @@ void startSensors(); // Set all the sensors starting value
 
 /* Variables */
 sSensor gSensor[kNumbOfTotalSensors]; // The global sensor array
+bool _sensorDoDatalog = false;
