@@ -365,8 +365,6 @@ void testSkills()
 			autoSimpleReset();
 
 			gKillDriveOnTimeout = true;
-			gSetTimedOut = true;
-			gTimedOut = false;
 
 			tStart(autoMotorSensorUpdateTask);
 			tStart(trackPositionTask);
