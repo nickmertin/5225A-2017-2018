@@ -946,6 +946,7 @@ MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
 	writeDebugStreamLine("%06d stackNotRunning %x %d", npgmTime, arg, gNumCones);
+	writeDebugStreamLine("%d gWallTurnCheck false - stackNotRunning", nPgmTime);
 	gWallTurnCheck = false;
 	if (!(arg & sfNoResetLift))
 		liftSet(liftHold);
@@ -967,6 +968,7 @@ case stackPickupGround:
 		if (arg & sfPull)
 		{
 			gDriveManual = false;
+			writeDebugStreamLine("%d gWallTurnCheck true", nPgmTime);
 			gWallTurnCheck = true;
 			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -70, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
 		}
@@ -1006,19 +1008,22 @@ case stackPickupGround:
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackPickupGround, 5));
 		armSet(armToTarget, ARM_PRESTACK - 500);
 
+		writeDebugStreamLine("%d gWallTurnCheck false", nPgmTime);
 		gWallTurnCheck = false;
 
-		if (gWallTurnLeft)
+		if (arg & sfPull)
 		{
-			writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
-			turnToAngleNewAlgAsync(pi * 0.5, ccw, 0.27, 23, 12, true, true);
+			if (gWallTurnLeft)
+			{
+				writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
+				turnToAngleNewAlgAsync(pi * 0.5, ccw, 0.27, 23, 12, true, true);
+			}
+			else
+			{
+				writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
+				turnToAngleNewAlgAsync(pi * 0.5, cw, 0.27, 23, 12, true, true);
+			}
 		}
-		else
-		{
-			writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
-			turnToAngleNewAlgAsync(pi * 0.5, cw, 0.27, 23, 12, true, true);
-		}
-
 		unsigned long driveTimeout = nPgmTime + 1500;
 		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackPickupGround, 6));
 		writeDebugStreamLine("%d Wall turned to %d", nPgmTime, gPosition.a);
@@ -1342,6 +1347,9 @@ case stackWall:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
+		writeDebugStreamLine("%d gWallTurnCheck true", nPgmTime);
+		gWallTurnCheck = true;
+
 		armSet(armToTarget, ARM_PRESTACK - 300);
 		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
@@ -1351,6 +1359,9 @@ case stackWall:
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
 
 		gWall = false;
+
+		writeDebugStreamLine("%d gWallTurnCheck false", nPgmTime);
+		gWallTurnCheck = true;
 
 		NEXT_STATE(stackNotRunning)
 	}
@@ -1488,11 +1499,15 @@ void handleMacros()
 	}
 
 	if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
+	{
 		writeDebugStreamLine("Set wall turn: left");
 		gWallTurnLeft = true;
+	}
 	else if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
-		writeDebugStreamLine("Set wall turn: right");f
+	{
+		writeDebugStreamLine("Set wall turn: right");
 		gWallTurnLeft = false;
+	}
 
 	if (gSensor[jmpSkills].value)
 	{
@@ -1566,6 +1581,7 @@ void handleMacros()
 #include "custom_drive.c"
 #include "custom_turning.c"
 #include "diagnostics.c"
+
 
 // This function gets called 2 seconds after power on of the cortex and is the first bit of code that is run
 void startup()
