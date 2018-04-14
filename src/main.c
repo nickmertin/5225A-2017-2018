@@ -1488,8 +1488,10 @@ void handleMacros()
 	}
 
 	if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
+		writeDebugStreamLine("Set wall turn: left");
 		gWallTurnLeft = true;
 	else if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
+		writeDebugStreamLine("Set wall turn: right");f
 		gWallTurnLeft = false;
 
 	if (gSensor[jmpSkills].value)
