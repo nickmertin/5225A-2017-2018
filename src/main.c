@@ -933,6 +933,7 @@ const int gLiftRaiseTargetS[7] = { 1850, 1920, 2020, 2120, 2240, 2380, LIFT_TOP 
 const int gLiftPlaceTargetS[7] = { 1560, 1660, 1750, 1860, 1960, 2100, 2220 };
 
 bool gStack = false;
+bool gStackNoPickup = false;
 bool gLoader = false;
 unsigned long gPrepStart = 0;
 
@@ -1442,7 +1443,11 @@ void handleMacros()
 		gLoader = false;
 		gWall = false;
 	}
-
+	if (gStackNoPickup && !stackRunning())
+	{
+		stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
+		gStackNoPickup = false;
+	}
 	if (RISING(BTN_MACRO_LOADER) && gNumCones < MAX_STACK)
 	{
 		gStack = true;
@@ -1466,9 +1471,9 @@ void handleMacros()
 
 	if (gSensor[jmpSkills].value)
 	{
-		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
+		if (RISING(BTN_SKILLS_STACKONLY) && gNumCones < MAX_STACK)
 		{
-			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
+			gStackNoPickup = true;
 		}
 
 		if (RISING(BTN_SKILLS_TILT) && !stackRunning())
