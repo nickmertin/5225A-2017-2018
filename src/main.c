@@ -1024,12 +1024,12 @@ case stackPickupGround:
 			if (gWallTurn == wtLeft)
 			{
 				writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(pi * -0.5, ccw, 0.27, 23, 12, true, true);
+				turnToAngleNewAlgAsync(gPosition.a - 0.5 * pi, ccw, 0.27, 23, 12, true, true);
 			}
 			else if (gWallTurn == wtRight)
 			{
 				writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(pi * 0.5, cw, 0.27, 23, 12, true, true);
+				turnToAngleNewAlgAsync(gPosition.a + 0.5 * pi, cw, 0.27, 23, 12, true, true);
 			}
 		}
 		unsigned long driveTimeout = nPgmTime + 1500;
