@@ -876,6 +876,7 @@ void handleMobile()
 			mobileSet(mobileTop, mfClear);
 		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
+			writeDebugStreamLine("%d Button mobile toggle 1", nPgmTime);
 			gMobileSlow = false;
 			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom, mfClear));
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
@@ -885,6 +886,7 @@ void handleMobile()
 	{
 		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
+			writeDebugStreamLine("%d Button mobile toggle 2", nPgmTime);
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > 3)
@@ -1016,7 +1018,7 @@ case stackPickupGround:
 			if (gWallTurnLeft)
 			{
 				writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(pi * 0.5, ccw, 0.27, 23, 12, true, true);
+				turnToAngleNewAlgAsync(pi * -0.5, ccw, 0.27, 23, 12, true, true);
 			}
 			else
 			{
@@ -1503,7 +1505,7 @@ void handleMacros()
 		writeDebugStreamLine("Set wall turn: left");
 		gWallTurnLeft = true;
 	}
-	else if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
+	else if (RISING(BTN_TURN_RIGHT) && gWallTurnCheck)
 	{
 		writeDebugStreamLine("Set wall turn: right");
 		gWallTurnLeft = false;
