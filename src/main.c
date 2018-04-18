@@ -107,7 +107,7 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 bool stackRunning();
 
 bool gWallTurnCheck = false;
-bool gWallTurnLeft = true;
+short gWallTurn = 0;
 
 typedef enum _stackFlags {
 	sfNone = 0,
@@ -1015,12 +1015,12 @@ case stackPickupGround:
 
 		if (arg & sfPull)
 		{
-			if (gWallTurnLeft)
+			if (gWallTurn == 1)
 			{
 				writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
 				turnToAngleNewAlgAsync(pi * -0.5, ccw, 0.27, 23, 12, true, true);
 			}
-			else
+			else if (gWallTurn == 2)
 			{
 				writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
 				turnToAngleNewAlgAsync(pi * 0.5, cw, 0.27, 23, 12, true, true);
@@ -1350,6 +1350,7 @@ case stackWall:
 		unsigned long liftTimeOut;
 
 		writeDebugStreamLine("%d gWallTurnCheck true", nPgmTime);
+		gWallTurn = 0;
 		gWallTurnCheck = true;
 
 		armSet(armToTarget, ARM_PRESTACK - 300);
@@ -1503,12 +1504,12 @@ void handleMacros()
 	if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
 	{
 		writeDebugStreamLine("Set wall turn: left");
-		gWallTurnLeft = true;
+		gWallTurn = 1;
 	}
 	else if (RISING(BTN_TURN_RIGHT) && gWallTurnCheck)
 	{
 		writeDebugStreamLine("Set wall turn: right");
-		gWallTurnLeft = false;
+		gWallTurn = 2;
 	}
 
 	if (gSensor[jmpSkills].value)
