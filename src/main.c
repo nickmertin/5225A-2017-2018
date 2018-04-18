@@ -966,6 +966,7 @@ case stackNotRunning:
 		setDrive(0, 0);
 	}
 	gDriveManual = true;
+	gWallTurn = wtNone;
 	break;
 case stackPickupGround:
 	{
