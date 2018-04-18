@@ -1443,9 +1443,7 @@ void handleMacros()
 		gStack = true;
 		gLoader = false;
 		gWall = false;
-		writeDebugStreamLine("%d gStack True - Stack button pressed", nPgmTime);
-		if (gStackNoPickUp)
-			stackArg &= ~sfReturn;
+		writeDebugStreamLine("%d gStack True - Stack button pressed", nPgmTime)
 	}
 
 	if (RISING(BTN_MACRO_LOADER) && gNumCones < MAX_STACK)
