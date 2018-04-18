@@ -1168,6 +1168,7 @@ case stackDetach:
 			liftReset();
 	}
 	if (RAPID) {
+		arg |= sfStack;
 		bool _gStack = gStack;
 		gStack = false;
 		if (gNumCones < MAX_STACK) {
