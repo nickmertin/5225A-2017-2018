@@ -32,6 +32,7 @@
 //#define SKILLS_CUTOFF 59500
 
 // Programming skills selector
+// Negative = run autoTest
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)

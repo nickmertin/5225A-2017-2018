@@ -9,17 +9,16 @@ typedef enum _tAlliance
 void selectAuto();
 void runAuto();
 void autoSkills(int segment = -1);
-//void autoBlock();
-//void auto20Left();
-//void auto20Right();
-//void autoStationaryLeftBlock();
-//void autoStationaryRightBlock();
-//void autoStationaryLeft5();
-//void autoStationaryRight5();
-//void autoStationaryLeft2();
-//void autoStationaryRight2();
+
+#if SKILLS_ROUTE == 0
+
+void autoBlock();
+
+#elif SKILLS_ROUTE < 0
 
 void autoTest();
+
+#endif
 
 /* Variables */
 int gCurAuto = 0;
