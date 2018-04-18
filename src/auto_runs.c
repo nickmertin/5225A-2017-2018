@@ -22,8 +22,8 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: /* No auto */ break;
-			case 1: /* 2 in 20 - autoloader */ break;
-			case 2: /* 2 in 20 - audience */ break;
+			case 1: /* 2 in 20 - autoloader */ auto20Right(2); break;
+			case 2: /* 2 in 20 - audience */ auto20Left(2); break;
 			case 3: /* 4 in 5 - autoloader */ break;
 			case 4: /* 4 in 5 - audience */ break;
 			case 5: /* 1s + 5 - autoloader */ break;
@@ -39,8 +39,8 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: /* Dumb block */ autoBlock(); break;
-			case 1: /* 2 in 20 - autoloader */ break;
-			case 2: /* 2 in 20 - audience */ break;
+			case 1: /* 2 in 20 - autoloader */ auto20Left(2); break;
+			case 2: /* 2 in 20 - audience */ auto20Right(2); break;
 			case 3: /* 4 in 5 - autoloader */ break;
 			case 4: /* 4 in 5 - audience */ break;
 			case 5: /* 1s + 5 - autoloader */ break;
@@ -1198,6 +1198,130 @@ noLine4:
 
 #if SKILLS_ROUTE == 0
 
+void resetLeft()
+{
+	resetPositionFull(gPosition, 40, 16, 0.25 * PI);
+	resetVelocity(gVelocity, gPosition);
+	tStart(trackPositionTask);
+}
+
+void resetRight()
+{
+	resetPositionFull(gPosition, 16, 40, 0.25 * PI);
+	resetVelocity(gVelocity, gPosition);
+	tStart(trackPositionTask);
+}
+
+void pickupMobileLeft(int cones)
+{
+	resetLeft();
+}
+
+void pickupMobileRight(int cones)
+{
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+
+	resetRight();
+
+	// 1
+	moveToTargetDisSimpleAsync(0.25 * PI, 4, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1000;
+	mobileSet(mobileBottom, mfClear);
+	armSet(armHold);
+	DRIVE_AWAIT(pickupMobileRight, 1, 1);
+	turnToTargetNewAlgAsync(12, 71, cw, 0.27, 23, 12, false, true, 0);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(pickupMobileRight, 1, 2);
+	moveToTargetSimpleAsync(12, 71, gPosition.y, gPosition.x, 127, 50, 0.5, 0, 0, 8, stopNone, mttProportional);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(pickupMobileRight, 1, 3);
+	moveToTargetSimpleAsync(12, 106, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(pickupMobileRight, 1, 4);
+	driveTimeout = nPgmTime + 1000;
+	timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(pickupMobileRight, 1, 5), false);
+	mobileSet(mobileTop, mfNone);
+	coneTimeout = nPgmTime + 1500;
+	setDrive(-7, -7);
+
+	// 2
+	if (cones > 0) {
+		if (cones == 1) {
+			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 1));
+		} else {
+			if (cones > 4) cones = 4;
+			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY, coneTimeout, TID2(pickupMobileRight, 2, 2));
+			moveToTargetSimpleAsync(12, 119, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		}
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 3));
+		if (cones == 4) {
+			stackSet(stackStack, STACK_RAPID_CONFIG(sfReturn, 3), true);
+			gWall = true;
+		} else
+			stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach, cones), true);
+		coneTimeout = nPgmTime + 1500;
+		if (cones == 1) return;
+		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 4), false);
+		coneTimeout = nPgmTime + 1500;
+		if (cones == 2 || stackState != stackPickupGround) return;
+		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 5), false);
+		coneTimeout = nPgmTime + 1500;
+		if (stackState == stackNotRunning) return;
+		moveToTargetSimpleAsync(12, 129, gPosition.y, gPosition.x, 55, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 6), false);
+		coneTimeout = nPgmTime + 1500;
+		if (cones == 3 || stackState != stackPickupGround) return;
+		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileRight, 2, 7), false);
+		moveToTargetSimpleAsync(12, 128, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttSimple);
+		driveTimeout = nPgmTime + 1500;
+		DRIVE_AWAIT(pickupMobileRight, 2, 8);
+		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileRight, 2, 9), false);
+		stackSet(stackPickupGround, sfDetach | sfPull, true);
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 10), false);
+	} else {
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 1));
+	}
+}
+
+void score20()
+{
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+	float _x;
+	float _y;
+
+	// 1
+	turnToAngleNewAlgAsync(-0.75 * PI, ch, 0.35, 26, 12, true, true);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(score20, 1, 1);
+	_x = gPosition.x;
+	_y = gPosition.y;
+	normalize(_x, _y, -1, 56);
+	moveToTargetDisSimpleAsync(-0.75 * PI, 8, _y, _x, 60, 0, 0, 0, 0, 0, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(score20, 1, 2);
+	setDrive(45, 45);
+	driveTimeout = nPgmTime + 1500;
+	stackSet(stackClear, STACK_CLEAR_CONFIG(sfNoResetAuto, mobileDownToMiddle, mfNone));
+	coneTimeout = nPgmTime + 2500;
+	sleep(300);
+	timeoutWhileLessThanF(VEL_NONE, 0, &gVelocity.y, -0.05, driveTimeout, TID2(score20, 1, 3));
+	setDrive(15, 15);
+	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(score20, 1, 4));
+	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
+	sleep(300);
+
+	// 2
+	moveToTargetDisSimpleAsync(-0.75 * PI, -5, _y, _x, -60, 0, 0, 0, 0, 0, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 1500;
+	DRIVE_AWAIT(score20, 2, 1);
+	mobileSet(mobileBottom, mfNone);
+	coneTimeout = nPgmTime + 1500;
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(score20, 2, 2));
+}
+
 void autoBlock()
 {
 	setDrive(-127, -127);
@@ -1205,7 +1329,17 @@ void autoBlock()
 	setDrive(7, 7);
 }
 
+void auto20Left(int cones)
+{
+	pickupMobileLeft(cones);
+	score20();
+}
 
+void auto20Right(int cones)
+{
+	pickupMobileRight(cones);
+	score20();
+}
 
 #elif SKILLS_ROUTE < 0
 

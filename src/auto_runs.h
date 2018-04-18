@@ -12,6 +12,8 @@ void autoSkills(int segment = -1);
 
 #if SKILLS_ROUTE == 0
 
+void auto20Left(int cones);
+void auto20Right(int cones);
 void autoBlock();
 
 #elif SKILLS_ROUTE < 0
