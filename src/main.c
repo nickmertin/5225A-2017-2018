@@ -934,7 +934,6 @@ const int gLiftPlaceTargetS[7] = { 1560, 1660, 1750, 1860, 1960, 2100, 2220 };
 
 bool gStack = false;
 bool gLoader = false;
-bool gStackNoPickUp = false;
 unsigned long gPrepStart = 0;
 
 #define RAPID (gStack || ((arg & sfRapid) && gNumCones < ((arg >> 12) & 0xF)))
@@ -1168,10 +1167,9 @@ case stackDetach:
 		else
 			liftReset();
 	}
-	if (RAPID && !gStackNoPickup) {
+	if (RAPID) {
 		bool _gStack = gStack;
 		gStack = false;
-		writeDebugStreamLine("%d gStack false - if Rapid?", nPgmTime);
 		if (gNumCones < MAX_STACK) {
 			if (gNumCones == MAX_STACK - 1) {
 				arg &= ~sfReturn;
@@ -1443,7 +1441,6 @@ void handleMacros()
 		gStack = true;
 		gLoader = false;
 		gWall = false;
-		writeDebugStreamLine("%d gStack True - Stack button pressed", nPgmTime)
 	}
 
 	if (RISING(BTN_MACRO_LOADER) && gNumCones < MAX_STACK)
@@ -1451,7 +1448,6 @@ void handleMacros()
 		gStack = true;
 		gLoader = true;
 		gWall = false;
-		writeDebugStreamLine("%d gStack True - Loader button pressed", nPgmTime);
 	}
 
 	if (gStack == true && gNumCones < MAX_STACK)
@@ -1464,8 +1460,6 @@ void handleMacros()
 			else
 				stackSet(stackPickupGround, ((gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach) | (gWall ? sfPull : sfNone));
 			gStack = false;
-			writeDebugStreamLine("%d gStack false - Stack set in handleMacros", nPgmTime);
-			gStackNoPickup = false;
 			gLoader = false;
 		}
 	}
@@ -1474,9 +1468,7 @@ void handleMacros()
 	{
 		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
 		{
-			gStackNoPickup = true;
 			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
-			writeDebugStreamLine("%d StackOnly button pressed", nPgmTime);
 		}
 
 		if (RISING(BTN_SKILLS_TILT) && !stackRunning())
@@ -1495,7 +1487,6 @@ void handleMacros()
 			else
 			{
 				gStack = true;
-				writeDebugStreamLine("%d gStack true - Wall", nPgmTime);
 				gWall = true;
 			}
 		}
@@ -1701,7 +1692,6 @@ void usercontrol()
 	gMobileCheckLift = true;
 	gMobileAutoEnabled = true;
 	gStack = false;
-	writeDebugStreamLine("%d gStack false - userControl", nPgmTime);
 	gLoader = false;
 
 	if (!gDriveIgnoreJumper)
