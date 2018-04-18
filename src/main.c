@@ -29,14 +29,14 @@
 //#define IGNORE_AUTO
 //#define IGNORE_DISABLE
 
-//#define SKILLS_CUTOFF 59500
+#define SKILLS_CUTOFF 59500
 
 // Programming skills selector
 // Negative = run autoTest
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
-#define SKILLS_ROUTE 0
+#define SKILLS_ROUTE 1
 
 #define DRIVE_WEIGHT_GAME 0
 #define DRIVE_WEIGHT_SKILLS 0
