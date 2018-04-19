@@ -31,7 +31,7 @@
 //#define IGNORE_DISABLE
 
 //#define SKILLS_CUTOFF 59500
-#define AUTO_CUTOFF 14000
+#define AUTO_CUTOFF 14500
 
 // Programming skills selector
 // Negative = run autoTest

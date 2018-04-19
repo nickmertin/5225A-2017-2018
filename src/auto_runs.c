@@ -1203,14 +1203,14 @@ noLine4:
 
 void resetLeft()
 {
-	resetPositionFull(gPosition, 40, 16.75, 0.25 * PI);
+	resetPositionFull(gPosition, 40, 17.25, 0.25 * PI);
 	resetVelocity(gVelocity, gPosition);
 	tStart(trackPositionTask);
 }
 
 void resetRight()
 {
-	resetPositionFull(gPosition, 16.75, 40, 0.25 * PI);
+	resetPositionFull(gPosition, 17.25, 40, 0.25 * PI);
 	resetVelocity(gVelocity, gPosition);
 	tStart(trackPositionTask);
 }
@@ -1359,8 +1359,17 @@ void auto20Right(int cones)
 
 #elif SKILLS_ROUTE < 0
 
-void autoTest ()
+void autoTest()
 {
+	unsigned long coneTimeout;
+
+	mobileSet(mobileTop, mfClear);
+	coneTimeout = nPgmTime + 1500;
+	timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 100, coneTimeout, TID1(autoTest, 1));
+	stackSet(stackStack, STACK_RAPID_CONFIG(sfReturn | sfNoResetAuto, 3), true);
+	gWall = true;
+	coneTimeout = nPgmTime + 5000;
+	stackTimeoutUntil(stackNotRunning, coneTimeout, TID1(autoTest, 2));
 }
 
 #endif
