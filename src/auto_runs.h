@@ -9,6 +9,7 @@ typedef enum _tAlliance
 void selectAuto();
 void runAuto();
 void autoSkills(int segment = -1);
+void killAuto(unsigned long timeout);
 
 #if SKILLS_ROUTE == 0
 
@@ -21,6 +22,8 @@ void autoBlock();
 void autoTest();
 
 #endif
+
+NEW_ASYNC_VOID_1(killAuto, unsigned long);
 
 /* Variables */
 int gCurAuto = 0;
