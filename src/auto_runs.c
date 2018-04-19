@@ -1259,11 +1259,10 @@ void pickupMobileRight(int cones)
 			moveToTargetSimpleAsync(12, 119, gPosition.y, gPosition.x, 70, 70, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
 		}
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 3));
-		//if (cones == 4)
-		//	stackSet(stackStack, STACK_RAPID_CONFIG(sfReturn | sfNoResetAuto, 3), true);
-		//else
-		//	stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, cones), true);
-		stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, MIN(cones, 3)), true);
+		if (cones == 4)
+			stackSet(stackStack, STACK_RAPID_CONFIG(sfReturn | sfNoResetAuto, 3), true);
+		else
+			stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, cones), true);
 		coneTimeout = nPgmTime + 1500;
 		if (cones == 1) return;
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 4), false);
@@ -1278,18 +1277,15 @@ void pickupMobileRight(int cones)
 		if (cones == 3 || stackState != stackPickupGround) return;
 		gWall = true;
 		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileRight, 2, 7), false);
-		stackSet(stackWall, sfNoResetAuto, true);
-		coneTimeout = nPgmTime + 1500;
-		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileRight, 2, 8), false);
 		moveToTargetSimpleAsync(12, 138, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttSimple);
 		driveTimeout = nPgmTime + 1500;
-		DRIVE_AWAIT(pickupMobileRight, 2, 9);
-		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileRight, 2, 8), false);
+		DRIVE_AWAIT(pickupMobileRight, 2, 8);
+		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileRight, 2, 9), false);
 		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 10), false);
 	} else {
-		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 10));
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 11));
 	}
 }
 
