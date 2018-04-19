@@ -17,6 +17,11 @@ void runAuto()
 #if SKILLS_ROUTE == 0
 	selectAuto();
 	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
+
+#ifdef AUTO_CUTOFF
+	killAutoAsync(gAutoTime + AUTO_CUTOFF);
+#endif
+
 	if (gAlliance == allianceBlue)
 	{
 		switch (gCurAuto)
@@ -319,8 +324,6 @@ void killAuto(unsigned long timeout)
 		setDrive(0, 0);
 	}
 }
-
-NEW_ASYNC_VOID_1(killAuto, unsigned long);
 
 #define DRIVE_AWAIT(routine, major, minor) autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(routine, major, minor))
 
