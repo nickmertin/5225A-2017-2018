@@ -1326,10 +1326,12 @@ case stackWall:
 		armSet(armToTarget, ARM_PRESTACK - 300);
 		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
-		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
-		armRaiseSimpleAsync(ARM_PRESTACK , 80, -20);
+		//timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
+		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackWall, 1));
+		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+		//timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+		armTimeoutWhile(armRaiseSimpleState, armTimeOut, TID1(stackWall, 2));
 
 		gWall = false;
 
