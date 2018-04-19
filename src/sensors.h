@@ -40,9 +40,12 @@ typedef struct _sSensor
 	bool potiCheckVel;
 	int dgtMin;
 	int dgtMax;
+
+#ifdef MOTOR_SENSOR_LOGS
 	byte rawDatalog;
 	byte valueDatalog;
 	byte velDatalog;
+#endif
 
 #ifdef CHECK_POTI_JUMPS
 	ubyte filterAcc;
@@ -67,4 +70,7 @@ void startSensors(); // Set all the sensors starting value
 
 /* Variables */
 sSensor gSensor[kNumbOfTotalSensors]; // The global sensor array
+
+#ifdef MOTOR_SENSOR_LOGS
 bool _sensorDoDatalog = false;
+#endif
