@@ -412,7 +412,7 @@ void autoSkills(int segment)
 	moveToTargetDisSimpleAsync(-3.0 / 4 * PI, -7, _y, _x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
 	driveTimeout = nPgmTime + 1500;
 	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
-	sleep(700);
+	sleep(400);
 	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 3, 1);
 	turnToAngleNewAlgAsync(-0.25 * PI, cw, 0.27, 23, 12, false, true);
@@ -591,10 +591,10 @@ skip3:
 	moveToTargetDisSimpleAsync(0.25 * PI, -9, _y, _x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
 	driveTimeout = nPgmTime + 1700;
 	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
-	sleep(700);
+	sleep(400);
 	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 9, 1);
-	turnToTargetNewAlgAsync(60, 127, cw, 0.27, 23, 13, false, true, 0);
+	turnToTargetNewAlgAsync(60, 127, cw, 0.4, 23, 13, false, true, 0);
 	driveTimeout = nPgmTime + 2000;
 	liftSet(liftToBottom, -127);
 	DRIVE_AWAIT(skills, 9, 2);
@@ -739,7 +739,7 @@ skip5:
 	moveToTargetDisSimpleAsync(gPosition.a, -6, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 15, 1);
-	turnToTargetNewAlgAsync(12, 106, ccw, 0.27, 23, 11, false, true, 0);
+	turnToTargetNewAlgAsync(12, 106, ccw, 0.5, 23, 13, false, true, 0);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 15, 2);
 	moveToTargetSimpleAsync(12, 106, gPosition.y, gPosition.x, 127, 0, 0.5, 0, 0, 14, stopNone, mttSimple);
