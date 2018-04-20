@@ -1,15 +1,20 @@
 void selectAuto()
 {
-	updateSensorInput(autoPoti);
-	int autoVal = gSensor[autoPoti].value - 2048;
-	tAlliance oldAlliance = gAlliance;
-	if (autoVal < 0) gAlliance = allianceBlue;
-	else gAlliance = allianceRed;
+	tLcdButtons buttons = nLCDButtons;
+	if (LCD_RISING(btnCenter)) gAutoSelected = true;
+	if (!gAutoSelected)
+	{
+		updateSensorInput(autoPoti);
+		int autoVal = gSensor[autoPoti].value - 2048;
+		tAlliance oldAlliance = gAlliance;
+		if (autoVal < 0) gAlliance = allianceBlue;
+		else gAlliance = allianceRed;
 
-	autoVal = abs(autoVal);
-	int selected = autoVal * AUTO_OPTIONS_COUNT / 2048;
-	if (oldAlliance != gAlliance || selected - gCurAuto != 1 || autoVal % (2048 / AUTO_OPTIONS_COUNT) > 100)
-		gCurAuto = selected;
+		autoVal = abs(autoVal);
+		int selected = autoVal * AUTO_OPTIONS_COUNT / 2048;
+		if (oldAlliance != gAlliance || selected - gCurAuto != 1 || autoVal % (2048 / AUTO_OPTIONS_COUNT) > 100)
+			gCurAuto = selected;
+	}
 }
 
 void runAuto()
