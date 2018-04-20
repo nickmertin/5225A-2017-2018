@@ -1263,18 +1263,23 @@ void pickupMobileLeft(int cones)
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileLeft, 2, 4), false);
 		coneTimeout = nPgmTime + 1500;
 		if (stackState != stackPickupGround) {
-			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			if (gSensor[armPoti].value < ARM_RELEASE)
+				stackSet(stackStack, sfNoResetAuto | sfDetach, true);
 			return;
 		}
 		if (cones == 2) return;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileLeft, 2, 5), false);
 		coneTimeout = nPgmTime + 1500;
-		if (stackState == stackNotRunning) return;
+		if (stackState == stackNotRunning) {
+			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			return;
+		}
 		moveToTargetSimpleAsync(129, 12, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileLeft, 2, 6), false);
 		coneTimeout = nPgmTime + 1500;
 		if (stackState != stackPickupGround) {
-			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			if (gSensor[armPoti].value < ARM_RELEASE)
+				stackSet(stackStack, sfNoResetAuto | sfDetach, true);
 			return;
 		}
 		if (cones == 3) return;
@@ -1287,6 +1292,10 @@ void pickupMobileLeft(int cones)
 		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileLeft, 2, 10), false);
+		if (stackState == stackNotRunning) {
+			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			return;
+		}
 	} else {
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileLeft, 2, 11));
 	}
@@ -1340,18 +1349,23 @@ void pickupMobileRight(int cones)
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 4), false);
 		coneTimeout = nPgmTime + 1500;
 		if (stackState != stackPickupGround) {
-			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			if (gSensor[armPoti].value < ARM_RELEASE)
+				stackSet(stackStack, sfNoResetAuto | sfDetach, true);
 			return;
 		}
 		if (cones == 2) return;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 5), false);
 		coneTimeout = nPgmTime + 1500;
-		if (stackState == stackNotRunning) return;
+		if (stackState == stackNotRunning) {
+			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			return;
+		}
 		moveToTargetSimpleAsync(12, 129, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 6), false);
 		coneTimeout = nPgmTime + 1500;
 		if (stackState != stackPickupGround) {
-			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			if (gSensor[armPoti].value < ARM_RELEASE)
+				stackSet(stackStack, sfNoResetAuto | sfDetach, true);
 			return;
 		}
 		if (cones == 3) return;
@@ -1364,6 +1378,10 @@ void pickupMobileRight(int cones)
 		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 10), false);
+		if (stackState == stackNotRunning) {
+			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
+			return;
+		}
 	} else {
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 11));
 	}
