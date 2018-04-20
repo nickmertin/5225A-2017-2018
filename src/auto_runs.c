@@ -33,8 +33,8 @@ void runAuto()
 			case 4: /* 4 in 5 - audience */ auto5Left(3); break;
 			case 5: /* 1s + 5 - autoloader */ break;
 			case 6: /* 1s + 5 - audience */ break;
-			case 7: /* 1s + block - autoloader */ break;
-			case 8: /* 1s + block - audience */ break;
+			case 7: /* 1s + block - autoloader */ autoSBRight(1); break;
+			case 8: /* 1s + block - audience */ autoSBLeft(1); break;
 			case 9: /* 2s + block - audience */ break;
 			case 10: /* 3s - audience */ break;
 		}
@@ -1424,6 +1424,26 @@ void score20()
 	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(score20, 2, 2));
 }
 
+void stationaryLeft(int cones)
+{
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+
+	resetLeft();
+	mobileSet(mobileTop, mfNone);
+
+	// 1
+	stackSet(stackStationaryPrep, sfNoResetAuto);
+	moveToTargetSimpleAsync(48, 48, gPosition.y, gPosition.x, 70, 0, 0.5, 0, 0, 5, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 2000;
+	DRIVE_AWAIT(stationaryLeft, 1, 1);
+	setDrive(15, 15);
+	sleep(500);
+	stackSet(stackStationary, sfNoResetAuto);
+	coneTimeout = nPgmTime + 2000;
+	stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(stationaryLeft, 1, 2));
+}
+
 void autoBlock()
 {
 	setDrive(-127, -127);
@@ -1529,6 +1549,31 @@ void auto5Right(int cones)
 	sleep(700);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(auto5Right, 1, 6);
+}
+
+void autoSBLeft(int cones)
+{
+	unsigned long driveTimeout;
+	unsigned long coneTimeout;
+
+	stationaryLeft(cones);
+
+	// 1
+	turnToTargetNewAlgAsync(71, 23, cw, 0.4, 40, 5, true, true, PI);
+	driveTimeout = nPgmTime + 2000;
+	DRIVE_AWAIT(autoSBLeft, 1, 1);
+	moveToTargetSimpleAsync(71, 23, gPosition.y, gPosition.x, -50, 0, 0.5, 0, 0, 18, stopNone, mttSimple);
+	driveTimeout = nPgmTime + 2500;
+	sleep(500);
+	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
+	DRIVE_AWAIT(autoSBLeft, 1, 2);
+	moveToTargetSimpleAsync(131, 83, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, mttSimple);
+	driveTimeout = nPgmTime + 2000;
+	DRIVE_AWAIT(autoSBLeft, 1, 3);
+}
+
+void autoSBRight(int cones)
+{
 }
 
 #elif SKILLS_ROUTE < 0

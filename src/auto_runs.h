@@ -13,11 +13,13 @@ void killAuto(unsigned long timeout);
 
 #if SKILLS_ROUTE == 0
 
+void autoBlock();
 void auto20Left(int cones);
 void auto20Right(int cones);
 void auto5Left(int cones);
 void auto5Right(int cones);
-void autoBlock();
+void autoSBLeft(int cones);
+void autoSBRight(int cones);
 
 #elif SKILLS_ROUTE < 0
 
