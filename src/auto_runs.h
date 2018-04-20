@@ -18,8 +18,8 @@ void auto20Left(int cones);
 void auto20Right(int cones);
 void auto5Left(int cones);
 void auto5Right(int cones);
-void autoSBLeft(int cones);
-void autoSBRight(int cones);
+void autoSBLeft(bool secondCone, bool boomKapow);
+void autoSBRight(bool secondCone, bool boomKapow);
 
 #elif SKILLS_ROUTE < 0
 
