@@ -1567,8 +1567,8 @@ void autoSBLeft(int cones)
 	sleep(500);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(autoSBLeft, 1, 2);
-	moveToTargetSimpleAsync(131, 83, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, mttSimple);
-	driveTimeout = nPgmTime + 2000;
+	moveToTargetSimpleAsync(119, 71, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, mttSimple);
+	driveTimeout = nPgmTime + 3000;
 	DRIVE_AWAIT(autoSBLeft, 1, 3);
 }
 
