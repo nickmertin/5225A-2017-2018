@@ -145,7 +145,8 @@ typedef enum _stackStates {
 	stackTiltPrep,
 	stackTiltMobile,
 	stackDetachMobile,
-	stackWall
+	stackWall,
+	stackWallTurn
 } tStackStates;
 
 DECLARE_MACHINE(stack, tStackStates)
@@ -1022,7 +1023,7 @@ case stackPickupGround:
 		writeDebugStreamLine("%d gWallTurnCheck false", nPgmTime);
 		gWallTurnCheck = false;
 
-		NEXT_STATE((arg & sfStack) ? stackStack : stackNotRunning)
+		NEXT_STATE((arg & sfPull && gNumCones <= 5)? stackWallTurn : (arg & sfStack) ? stackStack : stackNotRunning)
 	}
 case stackPickupLoader:
 	{
@@ -1123,31 +1124,6 @@ case stackStack:
 		if (gNumCones >= MAX_STACK)
 			NEXT_STATE(stackNotRunning)
 
-		if (arg & sfPull && gNumCones <= 5)
-		{
-			if (gWallTurn == wtLeft)
-			{
-				writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(gPosition.a - 0.5 * pi, ccw, 0.27, 23, 12, true, true);
-			}
-			else if (gWallTurn == wtRight)
-			{
-				writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(gPosition.a + 0.5 * pi, cw, 0.27, 23, 12, true, true);
-			}
-
-			unsigned long driveTimeout = nPgmTime + 1500;
-			autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackPickupGround, 6));
-			writeDebugStreamLine("%d Wall turned to %d", nPgmTime, gPosition.a);
-
-			if (!(arg & sfNoResetAuto))
-			{
-				autoSimpleReset();
-				setDrive(0, 0);
-				gDriveManual = true;
-			}
-		}
-
 		liftRaiseSimpleAsync(gLiftRaiseTarget[gNumCones], 127, (gNumCones < MAX_STACK - 1) ? -25 : 0);
 		liftTimeOut = nPgmTime + 1500;
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, gLiftRaiseTarget[gNumCones] - 400, liftTimeOut, TID1(stackStack, 1));
@@ -1165,29 +1141,7 @@ case stackStack:
 		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackStack, 4));
 
 		if (arg & sfPull && gNumCones > 5)
-		{
-			if (gWallTurn == wtLeft)
-			{
-				writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(gPosition.a - 0.5 * pi, ccw, 0.27, 23, 12, true, true);
-			}
-			else if (gWallTurn == wtRight)
-			{
-				writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
-				turnToAngleNewAlgAsync(gPosition.a + 0.5 * pi, cw, 0.27, 23, 12, true, true);
-			}
-
-			unsigned long driveTimeout = nPgmTime + 1500;
-			autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackPickupGround, 6));
-			writeDebugStreamLine("%d Wall turned to %d", nPgmTime, gPosition.a);
-
-			if (!(arg & sfNoResetAuto))
-			{
-				autoSimpleReset();
-				setDrive(0, 0);
-				gDriveManual = true;
-			}
-		}
+			NEXT_STATE(stackWallTurn)
 
 		++gNumCones;
 
@@ -1403,6 +1357,40 @@ case stackWall:
 		gWallTurnCheck = true;
 
 		NEXT_STATE(stackNotRunning)
+	}
+case stackWallTurn:
+	{
+		if (gWallTurn == wtLeft)
+		{
+			writeDebugStreamLine("%d Start wall turn left. Pos %d", nPgmTime, gPosition.a);
+			turnToAngleNewAlgAsync(gPosition.a - 0.5 * pi, ccw, 0.27, 23, 12, true, true);
+		}
+		else if (gWallTurn == wtRight)
+		{
+			writeDebugStreamLine("%d Start wall turn right. Pos %d", nPgmTime, gPosition.a);
+			turnToAngleNewAlgAsync(gPosition.a + 0.5 * pi, cw, 0.27, 23, 12, true, true);
+		}
+
+		unsigned long driveTimeout = nPgmTime + 1500;
+		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackPickupGround, 6));
+		writeDebugStreamLine("%d Wall turned to %d", nPgmTime, gPosition.a);
+
+		if (!(arg & sfNoResetAuto))
+		{
+			autoSimpleReset();
+			setDrive(0, 0);
+			gDriveManual = true;
+		}
+
+		if (gNumCones <= 5)
+		{
+			NEXT_STATE(stackStack)
+		}
+		else
+		{
+			++gNumCones;
+			NEXT_STATE((arg & (sfDetach | sfClear | sfReturn | sfRapid)) ? stackDetach : stackNotRunning)
+		}
 	}
 })
 
