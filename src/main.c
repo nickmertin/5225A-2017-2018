@@ -937,7 +937,6 @@ const int gLiftPlaceTargetS[7] = { 1560, 1660, 1750, 1860, 1960, 2100, 2220 };
 
 bool gStack = false;
 bool gLoader = false;
-bool gStackNoPickUp = false;
 unsigned long gPrepStart = 0;
 
 #define RAPID (gStack || ((arg & sfRapid) && gNumCones < ((arg >> 12) & 0xF)))
@@ -1171,7 +1170,8 @@ case stackDetach:
 		else
 			liftReset();
 	}
-	if (RAPID && !gStackNoPickup) {
+	if (RAPID) {
+		arg |= sfStack;
 		bool _gStack = gStack;
 		gStack = false;
 		if (gNumCones < MAX_STACK) {
@@ -1447,8 +1447,6 @@ void handleMacros()
 		gStack = true;
 		gLoader = false;
 		gWall = false;
-		if (gStackNoPickUp)
-			stackArg &= ~sfReturn;
 	}
 
 	if (RISING(BTN_MACRO_LOADER) && gNumCones < MAX_STACK)
@@ -1468,7 +1466,6 @@ void handleMacros()
 			else
 				stackSet(stackPickupGround, ((gNumCones < MAX_STACK - 1) ? sfStack | sfReturn : sfStack | sfDetach) | (gWall ? sfPull : sfNone));
 			gStack = false;
-			gStackNoPickup = false;
 			gLoader = false;
 		}
 	}
@@ -1477,7 +1474,6 @@ void handleMacros()
 	{
 		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
 		{
-			gStackNoPickup = true;
 			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
 		}
 
