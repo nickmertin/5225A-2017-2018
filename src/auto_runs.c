@@ -1455,7 +1455,7 @@ void stationaryLeft(int cones)
 	moveToTargetSimpleAsync(71, 23, gPosition.y, gPosition.x, 127, 30, 0.5, 0, 0, 9.5, stopSoft, mttCascading);
 	driveTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(stationaryLeft, 2, 3);
-	stackSet(stackPickupGround, sfNoResetAuto, true);
+	stackSet(stackPickupGround, sfNoResetAuto | sfNoResetArm, true);
 	coneTimeout = nPgmTime + 1500;
 	stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(stationaryLeft, 2, 4));
 	armRaiseSimpleAsync(ARM_TOP, 127, 0);
