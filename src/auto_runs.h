@@ -15,6 +15,8 @@ void killAuto(unsigned long timeout);
 
 void auto20Left(int cones);
 void auto20Right(int cones);
+void auto5Left(int cones);
+void auto5Right(int cones);
 void autoBlock();
 
 #elif SKILLS_ROUTE < 0
