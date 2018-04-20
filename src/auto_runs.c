@@ -35,8 +35,8 @@ void runAuto()
 			case 6: /* 1s + 5 - audience */ break;
 			case 7: /* 1s + block - autoloader */ autoSBRight(false, false); break;
 			case 8: /* 1s + block - audience */ autoSBLeft(false, false); break;
-			case 9: /* 2s + block - audience */ autoSBLeft(true, false); break;
-			case 10: /* 3s - audience */ break;
+			case 9: /* 1s + BOOM KAPOW - autoloader */ autoSBRight(false, true); break;
+			case 10: /* 2s + block - audience */ autoSBLeft(true, false); break;
 		}
 	}
 	else
@@ -50,10 +50,10 @@ void runAuto()
 			case 4: /* 4 in 5 - audience */ auto5Right(3); break;
 			case 5: /* 1s + 5 - autoloader */ break;
 			case 6: /* 1s + 5 - audience */ break;
-			case 7: /* 1s + block - autoloader */ break;
-			case 8: /* 1s + block - audience */ break;
-			case 9: /* 2s + block - audience */ break;
-			case 10: /* 3s - audience */ break;
+			case 7: /* 1s + block - autoloader */ autoSBLeft(false, false); break;
+			case 8: /* 1s + block - audience */ autoSBRight(false, false); break;
+			case 9: /* 1s + BOOM KAPOW - autoloader */ autoSBLeft(false, true); break;
+			case 10: /* 2s + block - audience */ autoSBRight(true, false); break;
 		}
 	}
 #elif SKILLS_ROUTE < 0
@@ -1653,9 +1653,20 @@ void autoSBLeft(bool secondCone, bool boomKapow)
 	sleep(500);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(autoSBLeft, 1, 2);
-	moveToTargetSimpleAsync(119, 71, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, mttSimple);
+	moveToTargetSimpleAsync(119, 71, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, boomKapow ? mttCascading : mttSimple);
 	driveTimeout = nPgmTime + 3000;
 	DRIVE_AWAIT(autoSBLeft, 1, 3);
+
+	if (boomKapow)
+	{
+		// 2
+		turnToTargetNewAlgAsync(129, 35, ch, 0.27, 23, 12, false, true, PI);
+		driveTimeout = nPgmTime + 1500;
+		DRIVE_AWAIT(autoSBLeft, 2, 1);
+		moveToTargetSimpleAsync(129, 35, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopNone, mttCascading);
+		driveTimeout = nPgmTime + 2500;
+		DRIVE_AWAIT(autoSBLeft, 2, 2);
+	}
 }
 
 void autoSBRight(bool secondCone, bool boomKapow)
@@ -1674,9 +1685,20 @@ void autoSBRight(bool secondCone, bool boomKapow)
 	sleep(500);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
 	DRIVE_AWAIT(autoSBRight, 1, 2);
-	moveToTargetSimpleAsync(71, 119, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, mttSimple);
+	moveToTargetSimpleAsync(71, 119, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, boomKapow ? mttCascading : mttSimple);
 	driveTimeout = nPgmTime + 3000;
 	DRIVE_AWAIT(autoSBRight, 1, 3);
+
+	if (boomKapow)
+	{
+		// 2
+		turnToTargetNewAlgAsync(35, 129, ch, 0.27, 23, 12, false, true, PI);
+		driveTimeout = nPgmTime + 1500;
+		DRIVE_AWAIT(autoSBRight, 2, 1);
+		moveToTargetSimpleAsync(35, 129, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopNone, mttCascading);
+		driveTimeout = nPgmTime + 2500;
+		DRIVE_AWAIT(autoSBRight, 2, 2);
+	}
 }
 
 #elif SKILLS_ROUTE < 0
