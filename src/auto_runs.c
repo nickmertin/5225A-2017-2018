@@ -1531,7 +1531,7 @@ void auto5Left(int cones)
 	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(auto5Left, 1, 4));
 	DRIVE_AWAIT(auto5Left, 1, 5);
 	moveToTargetSimpleAsync(121, 71, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopSoft, mttCascading);
-	driveTimeout = nPgmTime + 1500;
+	driveTimeout = nPgmTime + 3000;
 	sleep(300);
 	mobileSet(mobileTop, mfNone);
 	sleep(700);
@@ -1563,7 +1563,7 @@ void auto5Right(int cones)
 	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(auto5Right, 1, 4));
 	DRIVE_AWAIT(auto5Right, 1, 5);
 	moveToTargetSimpleAsync(71, 121, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopSoft, mttCascading);
-	driveTimeout = nPgmTime + 1500;
+	driveTimeout = nPgmTime + 3000;
 	sleep(300);
 	mobileSet(mobileTop, mfNone);
 	sleep(700);
