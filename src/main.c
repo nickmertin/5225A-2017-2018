@@ -31,7 +31,7 @@
 //#define IGNORE_DISABLE
 
 #define SKILLS_CUTOFF 59500
-#define AUTO_CUTOFF 14000
+#define AUTO_CUTOFF 14500
 
 // Programming skills selector
 // Negative = run autoTest
@@ -931,7 +931,7 @@ bool gKillDriveOnTimeout = false;
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10    11
 const int gLiftRaiseTarget[12] = { 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2400, LIFT_TOP };
-const int gLiftPlaceTarget[12] = { 1100, 1100, 1200, 1310, 1450, 1550, 1640, 1750, 1820, 1950, 2070, 2200 };
+const int gLiftPlaceTarget[12] = { 1150, 1150, 1200, 1310, 1450, 1550, 1640, 1750, 1820, 1950, 2070, 2200 };
 const int gLiftRaiseTargetS[7] = { 1850, 1920, 2020, 2120, 2240, 2380, LIFT_TOP };
 const int gLiftPlaceTargetS[7] = { 1560, 1660, 1750, 1860, 1960, 2100, 2220 };
 
@@ -1326,10 +1326,12 @@ case stackWall:
 		armSet(armToTarget, ARM_PRESTACK - 300);
 		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
-		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
-		armRaiseSimpleAsync(ARM_PRESTACK , 80, -20);
+		//timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
+		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackWall, 1));
+		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+		//timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+		armTimeoutWhile(armRaiseSimpleState, armTimeOut, TID1(stackWall, 2));
 
 		gWall = false;
 
