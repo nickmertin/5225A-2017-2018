@@ -1674,6 +1674,8 @@ void autonomous()
 	return_t;
 }
 
+bool gAllowCustomSkills = true;
+
 // This task gets started at the beginning of the usercontrol period
 void usercontrol()
 {
@@ -1712,6 +1714,46 @@ void usercontrol()
 	{
 		gTurnCurvature = gSensor[jmpSkills].value ? TURN_WEIGHT_SKILLS : TURN_WEIGHT_GAME;
 		updateTurnLookup();
+	}
+
+	if (gSensor[jmpSkills].value && gAllowCustomSkills)
+	{
+		unsigned long driveTimeout;
+		unsigned long coneTimeout;
+
+		gAllowCustomSkills = false;
+
+		tStart(autoMotorSensorUpdateTask);
+
+		resetPositionFull(gPosition, 47, 14.25, 0);
+		resetVelocity(gVelocity, gPosition);
+
+		moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
+		driveTimeout = nPgmTime + 2000;
+		liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, -20);
+		sleep(300);
+		mobileSet(mobileBottom, mfNone);
+		DRIVE_AWAIT(skills, 1, 1);
+		setDrive(55, 55);
+		driveTimeout = nPgmTime + 700;
+		timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 1, 2), false);
+		setDrive(-7, -7);
+		mobileSet(mobileTop, mfNone);
+		coneTimeout = nPgmTime + 2000;
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY, coneTimeout, TID2(skills, 1, 3));
+		moveToTargetSimpleAsync(119, 12, gPosition.y, gPosition.x, 70, 70, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach, 3));
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 1, 4));
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 5));
+		coneTimeout = nPgmTime + 1500;
+		moveToTargetSimpleAsync(129, 12, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 1, 6));
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 7));
+
+		tStop(autoMotorSensorUpdateTask);
 	}
 
 	while (true)
