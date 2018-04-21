@@ -30,9 +30,11 @@
 //#define IGNORE_AUTO
 //#define IGNORE_DISABLE
 
-//#define SKILLS_CUTOFF 59500
+#define SKILLS_CUTOFF 59500
+#define AUTO_CUTOFF 14500
 
 // Programming skills selector
+// Negative = run autoTest
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
@@ -897,7 +899,7 @@ void handleMobile()
 			writeDebugStreamLine("%d Button mobile toggle 2", nPgmTime);
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				if (gNumCones > 3)
+				if (gNumCones > 2)
 #ifdef ENABLE_FOLLOW
 				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
 #else
@@ -941,7 +943,7 @@ bool gKillDriveOnTimeout = false;
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10    11
 const int gLiftRaiseTarget[12] = { 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2400, LIFT_TOP };
-const int gLiftPlaceTarget[12] = { 1100, 1100, 1200, 1310, 1450, 1550, 1640, 1750, 1820, 1950, 2070, 2200 };
+const int gLiftPlaceTarget[12] = { 1150, 1150, 1200, 1310, 1450, 1550, 1640, 1750, 1820, 1950, 2070, 2200 };
 const int gLiftRaiseTargetS[7] = { 1850, 1920, 2020, 2120, 2240, 2380, LIFT_TOP };
 const int gLiftPlaceTargetS[7] = { 1560, 1660, 1750, 1860, 1960, 2100, 2220 };
 
@@ -1346,10 +1348,12 @@ case stackWall:
 		armSet(armToTarget, ARM_PRESTACK - 300);
 		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
-		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
-		armRaiseSimpleAsync(ARM_PRESTACK , 80, -20);
+		//timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackWall, 1));
+		liftTimeoutWhile(liftRaiseSimpleState, liftTimeOut, TID1(stackWall, 1));
+		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+		//timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_PRESTACK, armTimeOut, TID1(stackWall, 2));
+		armTimeoutWhile(armRaiseSimpleState, armTimeOut, TID1(stackWall, 2));
 
 		gWall = false;
 
@@ -1602,6 +1606,17 @@ void handleMacros()
 	}
 }
 
+void waitForSkillsOverride(TVexJoysticks joy)
+{
+	do {
+		sleep(10);
+		updateJoystick(joy);
+	} while (!gJoy[joy].cur);
+	usercontrolAsync();
+}
+
+NEW_ASYNC_VOID_1(waitForSkillsOverride, TVexJoysticks);
+
 #include "auto.c"
 #include "auto_simple.c"
 #include "auto_runs.c"
@@ -1741,6 +1756,8 @@ void autonomous()
 	return_t;
 }
 
+bool gAllowCustomSkills = true;
+
 // This task gets started at the beginning of the usercontrol period
 void usercontrol()
 {
@@ -1780,6 +1797,51 @@ void usercontrol()
 		gTurnCurvature = gSensor[jmpSkills].value ? TURN_WEIGHT_SKILLS : TURN_WEIGHT_GAME;
 		updateTurnLookup();
 	}
+
+	if (gSensor[jmpSkills].value && gAllowCustomSkills)
+	{
+		unsigned long driveTimeout;
+		unsigned long coneTimeout;
+
+		gAllowCustomSkills = false;
+
+		tStart(autoMotorSensorUpdateTask);
+		waitForSkillsOverrideAsync(BTN_MACRO_CANCEL);
+
+		resetPositionFull(gPosition, 47, 14.25, 0);
+		resetVelocity(gVelocity, gPosition);
+
+		moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
+		driveTimeout = nPgmTime + 2000;
+		liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, -20);
+		sleep(300);
+		mobileSet(mobileBottom, mfNone);
+		DRIVE_AWAIT(skills, 1, 1);
+		setDrive(55, 55);
+		driveTimeout = nPgmTime + 700;
+		timeoutWhileFalse((bool *) &gSensor[lsMobile].value, driveTimeout, TID2(skills, 1, 2), false);
+		setDrive(-7, -7);
+		mobileSet(mobileTop, mfNone);
+		coneTimeout = nPgmTime + 2000;
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY, coneTimeout, TID2(skills, 1, 3));
+		moveToTargetSimpleAsync(119, 12, gPosition.y, gPosition.x, 70, 70, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach, 3));
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 1, 4));
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 5));
+		coneTimeout = nPgmTime + 1500;
+		moveToTargetSimpleAsync(129, 12, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 1, 6));
+		coneTimeout = nPgmTime + 1500;
+		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 7));
+
+		tStop(autoMotorSensorUpdateTask);
+		waitForSkillsOverrideKill();
+	} else if (gSensor[mobilePoti].value > MOBILE_TOP - 200)
+		mobileSet(mobileTop, mfNone);
+	else if (gSensor[mobilePoti].value < MOBILE_BOTTOM + 200)
+		mobileSet(mobileBottom, mfNone);
 
 	while (true)
 	{

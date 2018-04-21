@@ -9,17 +9,25 @@ typedef enum _tAlliance
 void selectAuto();
 void runAuto();
 void autoSkills(int segment = -1);
-//void autoBlock();
-//void auto20Left();
-//void auto20Right();
-//void autoStationaryLeftBlock();
-//void autoStationaryRightBlock();
-//void autoStationaryLeft5();
-//void autoStationaryRight5();
-//void autoStationaryLeft2();
-//void autoStationaryRight2();
+void killAuto(unsigned long timeout);
+
+#if SKILLS_ROUTE == 0
+
+void autoBlock();
+void auto20Left(int cones);
+void auto20Right(int cones);
+void auto5Left(int cones);
+void auto5Right(int cones);
+void autoSBLeft(bool secondCone, bool boomKapow);
+void autoSBRight(bool secondCone, bool boomKapow);
+
+#elif SKILLS_ROUTE < 0
 
 void autoTest();
+
+#endif
+
+NEW_ASYNC_VOID_1(killAuto, unsigned long);
 
 /* Variables */
 int gCurAuto = 0;
