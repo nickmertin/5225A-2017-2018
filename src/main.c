@@ -1536,6 +1536,17 @@ void handleMacros()
 	}
 }
 
+void waitForSkillsOverride(TVexJoysticks joy)
+{
+	do {
+		sleep(10);
+		updateJoystick(joy);
+	} while (!gJoy[joy].cur);
+	usercontrolAsync();
+}
+
+NEW_ASYNC_VOID_1(waitForSkillsOverride, TVexJoysticks);
+
 #include "auto.c"
 #include "auto_simple.c"
 #include "auto_runs.c"
@@ -1724,6 +1735,7 @@ void usercontrol()
 		gAllowCustomSkills = false;
 
 		tStart(autoMotorSensorUpdateTask);
+		waitForSkillsOverrideAsync(BTN_MACRO_CANCEL);
 
 		resetPositionFull(gPosition, 47, 14.25, 0);
 		resetVelocity(gVelocity, gPosition);
@@ -1754,6 +1766,7 @@ void usercontrol()
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 7));
 
 		tStop(autoMotorSensorUpdateTask);
+		waitForSkillsOverrideKill();
 	}
 
 	while (true)
