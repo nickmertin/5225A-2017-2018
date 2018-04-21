@@ -1527,9 +1527,9 @@ void handleMacros()
 			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
 		}
 
-		if (RISING(BTN_SKILLS_TILT) && !stackRunning())
+		if (RISING(BTN_SKILLS_LIFT) && !stackRunning())
 		{
-			stackSet(stackTiltMobile, sfNone);
+			liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
 		}
 	}
 	else
