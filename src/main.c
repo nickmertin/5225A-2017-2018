@@ -1767,7 +1767,10 @@ void usercontrol()
 
 		tStop(autoMotorSensorUpdateTask);
 		waitForSkillsOverrideKill();
-	}
+	} else if (gSensor[mobilePoti].value > MOBILE_TOP - 200)
+		mobileSet(mobileTop, mfNone);
+	else if (gSensor[mobilePoti].value < MOBILE_BOTTOM + 200)
+		mobileSet(mobileBottom, mfNone);
 
 	while (true)
 	{
