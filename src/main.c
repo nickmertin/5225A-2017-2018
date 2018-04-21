@@ -887,7 +887,7 @@ void handleMobile()
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				if (gNumCones > 3)
+				if (gNumCones > 2)
 #ifdef ENABLE_FOLLOW
 				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
 #else
