@@ -363,7 +363,7 @@ case liftHold:
 case liftHoldDown:
 	while (true)
 	{
-		setLift(gSensor[limLift].value ? -15 : -40);
+		setLift(gSensor[limLift].value ? -15 : -90);
 		sleep(40);
 	}
 	break;
