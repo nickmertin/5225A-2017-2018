@@ -1470,7 +1470,7 @@ bool stackRunning()
 
 bool cancel()
 {
-	writeDebugStream("Cancel Stack");
+	writeDebugStream("CANCEL");
 	bool wasRunning = stackState != stackNotRunning;
 	stackSet(stackNotRunning, sfNoResetArm);
 	armReset();
@@ -1502,7 +1502,6 @@ void handleMacros()
 	{
 		if (!stackRunning())
 		{
-			writeDebugStreamLine("Stacking");
 			if (gLoader)
 				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack | sfDetach);
 			else
@@ -1514,12 +1513,10 @@ void handleMacros()
 
 	if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
 	{
-		writeDebugStreamLine("Set wall turn: left");
 		gWallTurn = wtLeft;
 	}
 	else if (RISING(BTN_TURN_RIGHT) && gWallTurnCheck)
 	{
-		writeDebugStreamLine("Set wall turn: right");
 		gWallTurn = wtRight;
 	}
 
