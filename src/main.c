@@ -1811,7 +1811,7 @@ void usercontrol()
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 5));
 		coneTimeout = nPgmTime + 1500;
-		moveToTargetSimpleAsync(129, 12, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		moveToTargetSimpleAsync(129, 11.5, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 1, 6));
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 7));
