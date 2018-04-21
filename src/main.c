@@ -1476,6 +1476,9 @@ bool cancel()
 	armReset();
 	autoSimpleReset();
 	gDriveManual = true;
+	gStack = false;
+	gLoader = false;
+	gWall = false;
 	return wasRunning;
 }
 
