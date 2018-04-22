@@ -165,8 +165,6 @@ int gNumCones = 0;
 bool gDriveManual;
 bool gWall;
 
-bool gAutoSelected = false;
-
 bool isMobileSlow();
 
 /* Drive */
