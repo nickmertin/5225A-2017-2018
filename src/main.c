@@ -1791,7 +1791,7 @@ void usercontrol()
 		resetPositionFull(gPosition, 47, 14.25, 0);
 		resetVelocity(gVelocity, gPosition);
 
-		moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
+		moveToTargetSimpleAsync(107, 13, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
 		driveTimeout = nPgmTime + 2000;
 		liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, -20);
 		sleep(300);
