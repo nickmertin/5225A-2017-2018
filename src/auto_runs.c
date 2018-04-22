@@ -765,9 +765,9 @@ skip5:
 	driveTimeout = nPgmTime + 1500;
 	coneTimeout = nPgmTime + 2000;
 	DRIVE_AWAIT(skills, 16, 2);
-	moveToTargetDisSimpleAsync(gPosition.a, 2, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
+	moveToTargetDisSimpleAsync(gPosition.a, 5, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
 	driveTimeout = nPgmTime + 1500;
-	sleep(300);
+	sleep(500);
 	mobileSet(mobileBottom, mfNone);
 	DRIVE_AWAIT(skills, 16, 3);
 	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 16, 4));
