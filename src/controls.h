@@ -38,5 +38,5 @@
 #define BTN_GAME_STATIONARY Btn8R
 
 /* Skills Macros */
-#define BTN_SKILLS_TILT Btn8L
+#define BTN_SKILLS_LIFT Btn8L
 #define BTN_SKILLS_STACKONLY Btn8R

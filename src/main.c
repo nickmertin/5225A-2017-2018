@@ -1106,22 +1106,22 @@ case stackStationary:
 
 		armRaiseSimpleAsync(ARM_TOP, 127, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_TOP - 100, armTimeOut, TID1(stackStationary, 1));
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_TOP - 100, armTimeOut, TID1(stackStationary, 1));
 		armSet(armManaged);
 		setArm(-20);
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200, armHold);
 		armTimeOut = nPgmTime + 1500;
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
 		++gNumCones;
 
 		long target = (gNumCones >= 5) ? LIFT_TOP : gLiftRaiseTargetS[gNumCones];
 		liftRaiseSimpleAsync(target, 127, (gNumCones >= 4) ? 0 : -15);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
 
 		gDriveManual = true;
 
@@ -1472,12 +1472,15 @@ bool stackRunning()
 
 bool cancel()
 {
-	writeDebugStream("Cancel Stack");
+	writeDebugStream("CANCEL");
 	bool wasRunning = stackState != stackNotRunning;
 	stackSet(stackNotRunning, sfNoResetArm);
 	armReset();
 	autoSimpleReset();
 	gDriveManual = true;
+	gStack = false;
+	gLoader = false;
+	gWall = false;
 	return wasRunning;
 }
 
@@ -1501,7 +1504,6 @@ void handleMacros()
 	{
 		if (!stackRunning())
 		{
-			writeDebugStreamLine("Stacking");
 			if (gLoader)
 				stackSet(stackPickupLoader, (gNumCones < MAX_STACK - 1) ? (gNumCones >= 4) ? sfStack | sfReturn | sfLoader : sfNone : sfStack | sfDetach);
 			else
@@ -1513,12 +1515,10 @@ void handleMacros()
 
 	if (RISING(BTN_TURN_LEFT) && gWallTurnCheck)
 	{
-		writeDebugStreamLine("Set wall turn: left");
 		gWallTurn = wtLeft;
 	}
 	else if (RISING(BTN_TURN_RIGHT) && gWallTurnCheck)
 	{
-		writeDebugStreamLine("Set wall turn: right");
 		gWallTurn = wtRight;
 	}
 
@@ -1529,9 +1529,9 @@ void handleMacros()
 			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
 		}
 
-		if (RISING(BTN_SKILLS_TILT) && !stackRunning())
+		if (RISING(BTN_SKILLS_LIFT) && !stackRunning())
 		{
-			stackSet(stackTiltMobile, sfNone);
+			liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
 		}
 	}
 	else
@@ -1793,7 +1793,7 @@ void usercontrol()
 		resetPositionFull(gPosition, 47, 14.25, 0);
 		resetVelocity(gVelocity, gPosition);
 
-		moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
+		moveToTargetSimpleAsync(107, 13, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
 		driveTimeout = nPgmTime + 2000;
 		liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, -20);
 		sleep(300);
@@ -1813,7 +1813,7 @@ void usercontrol()
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 5));
 		coneTimeout = nPgmTime + 1500;
-		moveToTargetSimpleAsync(129, 12, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
+		moveToTargetSimpleAsync(129, 11.5, gPosition.y, gPosition.x, 70, 30, 0.5, 0, 0, 9.5, stopHarsh, mttCascading);
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(skills, 1, 6));
 		coneTimeout = nPgmTime + 1500;
 		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(skills, 1, 7));

@@ -129,12 +129,12 @@ void velocityCheck(tSensors sen)
 	if (!s.velCount || time - s.velData[s.velCount - 1].timestamp >= 20)
 	{
 		int sensor = s.value;
-		if (s.velCount == SENSOR_VEL_POINT_COUNT)
+		if (s.velCount >= SENSOR_VEL_POINT_COUNT)
 		{
 			s.velCount = SENSOR_VEL_POINT_COUNT - 1;
 			memmove(&s.velData[0], &s.velData[1], sizeof(sSensorVelPoint) * (SENSOR_VEL_POINT_COUNT - 1));
 		}
-		sSensorVelPoint& data = gSensor[sen].velData[gSensor[sen].velCount++];
+		sSensorVelPoint& data = gSensor[sen].velData[MIN(gSensor[sen].velCount++, SENSOR_VEL_POINT_COUNT - 1)];
 		data.value = sensor;
 		data.timestamp = time;
 		if (s.velCount > 1)

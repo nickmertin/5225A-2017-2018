@@ -66,11 +66,25 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 			switch (mode)
 			{
 			case mttProportional:
-				finalPower = round(-127.0 / 48.0 * currentPosVector.y) * sgn(power);
+				finalPower = round(-127.0 / 40.0 * currentPosVector.y) * sgn(power);
 				break;
 			case mttCascading:
+#if SKILLS_ROUTE == 0
 				const float kB = 2.8;
 				const float kP = 2.0;
+#else
+				float kB, kP;
+				if (nPgmTime - gAutoTime > 40000)
+				{
+					kB = 5.0;
+					kP = 3.2;
+				}
+				else
+				{
+					kB = 4.5;
+					kP = 2.5;
+				}
+#endif
 				float vTarget = 45 * (1 - exp(0.07 * (currentPosVector.y + dropEarly)));
 				finalPower = round(kB * vTarget + kP * (vTarget - vel)) * sgn(power);
 				break;
@@ -363,8 +377,8 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 
 	const float kR = 15.0;
 	const float kA = 5.0;
-	const float kB = 50.0;
-	const float kP = 20.0;
+	const float kB = 60.0;
+	const float kP = 30.0;
 	const float kD = 2000.0;
 
 	sCycleData cycle;
