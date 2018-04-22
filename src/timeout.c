@@ -17,7 +17,7 @@ void timeoutWhileLessThanL(tTimeoutVelSourceType velSourceType, unsigned long ve
 	if (velSourceType == velSensor)
 		velocityClear(velSourceData);
 	unsigned long startTime = nPgmTime;
-	while (*val < threshold && !TimedOut(timeout, routine, id, kill, velSourceType, velSourceData, vel, nPgmTime-startTime)) sleep(10);
+	while (*val < threshold && !TimedOut(timeout, routine, id, kill, velSourceType, velSourceData, vel, nPgmTime-startTime, velSafetyCounter)) sleep(10);
 	writeDebugStreamLine("Time left %d [%s - %d]", timeout - nPgmTime, routine, id);
 }
 

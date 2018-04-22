@@ -65,7 +65,7 @@
 
 // Timeout function
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tTimeoutVelSourceType velSourceType = velNone, unsigned long velSourceData = 0, float vel = 0, unsigned long elpsdTime = 0);
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill = true, tTimeoutVelSourceType velSourceType = velNone, unsigned long velSourceData = 0, float vel = 0, unsigned long elpsdTime = 0, int& velSafetyCount);
 
 // Year-independent libraries (source)
 
@@ -1415,11 +1415,16 @@ bool getVelocity(tTimeoutVelSourceType velSourceType, unsigned long velSourceDat
 	}
 }
 
-bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, unsigned long elpsdTime)
+bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned short id, bool kill, tTimeoutVelSourceType velSourceType, unsigned long velSourceData, float vel, unsigned long elpsdTime, int& velSafetyCount)
 {
 	float curVel;
 
-	if (nPgmTime > timeOut || ( (elpsdTime > 400 && getVelocity(velSourceType, velSourceData, curVel)) ? ( abs(curVel) < abs(vel) || sgn(vel) != sgn(curVel) ) : 0 ) )
+	if ( (elpsdTime > 400 && getVelocity(velSourceType, velSourceData, curVel)) && ( abs(curVel) < abs(vel) || sgn(vel) != sgn(curVel) ) )
+		velSafetyCount++;
+	else
+		velSafetyCount = 0;
+
+	if (nPgmTime > timeOut || velSafetyCount >= 10)
 	{
 		tHog();
 		char description[40];
