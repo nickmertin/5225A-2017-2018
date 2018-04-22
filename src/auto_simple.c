@@ -76,8 +76,8 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 				float kB, kP;
 				if (nPgmTime - gAutoTime > 40000)
 				{
-					kB = 6.0;
-					kP = 3.5;
+					kB = 5.0;
+					kP = 3.2;
 				}
 				else
 				{

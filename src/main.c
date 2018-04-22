@@ -1104,22 +1104,22 @@ case stackStationary:
 
 		armRaiseSimpleAsync(ARM_TOP, 127, 0);
 		armTimeOut = nPgmTime + 1000;
-		timeoutWhileLessThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_TOP - 100, armTimeOut, TID1(stackStationary, 1));
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_TOP - 100, armTimeOut, TID1(stackStationary, 1));
 		armSet(armManaged);
 		setArm(-20);
 		liftLowerSimpleAsync(gLiftPlaceTargetS[gNumCones], -127, 25);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileGreaterThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[liftPoti].value, gLiftPlaceTargetS[gNumCones], liftTimeOut, TID1(stackStationary, 2));
 		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 25, 35, 200, armHold);
 		armTimeOut = nPgmTime + 1500;
-		timeoutWhileGreaterThanL(VEL_SENSOR(armPoti), 0.5, &gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL + 300, armTimeOut, TID1(stackStationary, 3));
 
 		++gNumCones;
 
 		long target = (gNumCones >= 5) ? LIFT_TOP : gLiftRaiseTargetS[gNumCones];
 		liftRaiseSimpleAsync(target, 127, (gNumCones >= 4) ? 0 : -15);
 		liftTimeOut = nPgmTime + 2000;
-		timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
+		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, target, liftTimeOut, TID1(stackStationary, 4));
 
 		gDriveManual = true;
 
@@ -1796,7 +1796,7 @@ void usercontrol()
 		resetPositionFull(gPosition, 47, 14.25, 0);
 		resetVelocity(gVelocity, gPosition);
 
-		moveToTargetSimpleAsync(107, 14.25, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
+		moveToTargetSimpleAsync(107, 13, 47, 15, 70, 0, 0.5, 6, 55, 14, stopNone, mttProportional);
 		driveTimeout = nPgmTime + 2000;
 		liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, -20);
 		sleep(300);
