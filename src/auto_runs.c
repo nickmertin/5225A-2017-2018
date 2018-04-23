@@ -751,7 +751,6 @@ skip5:
 	setDrive(-7, -7);
 	mobileSet(mobileUpToMiddle, mfNone);
 	coneTimeout = nPgmTime + 2000;
-	//timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(skills, 15, 6));
 	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(skills, 15, 6));
 
 	// 16
