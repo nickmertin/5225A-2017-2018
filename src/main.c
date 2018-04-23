@@ -1137,7 +1137,7 @@ case stackReturn:
 		{
 			liftSet(liftToTarget, LIFT_RETURN);
 			liftTimeOut = nPgmTime + 1300;
-			timeoutWhileLessThanL(VEL_SENSOR(liftPoti), 0.5, &gSensor[liftPoti].value, LIFT_BOTTOM + 150, liftTimeOut, TID1(stackReturn, 1));
+			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_BOTTOM + 150, liftTimeOut, TID1(stackReturn, 1));
 		}
 
 		if (arg & sfLoader)
