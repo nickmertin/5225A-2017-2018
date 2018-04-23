@@ -42,6 +42,18 @@ void handleLcd()
 		clearLCDLine(1);
 		displayLCDString(1, 0, line);
 		break;
+	case lcdAutoCones:
+		if (LCD_RISING(btnCenter))
+		{
+			if (gAutoCones == 4)
+				gAutoCones = 0;
+			else
+				++gAutoCones;
+		}
+		displayLCDCenteredString(0, "AUTO CONES");
+		sprintf(line, "%d", gAutoCones);
+		displayLCDCenteredString(1, line);
+		break;
 	case lcdBattery:
 		sprintf(line, "Main:       %1.2f V", (float)nImmediateBatteryLevel / 1000.0);
 		displayLCDString(0, 0, line);

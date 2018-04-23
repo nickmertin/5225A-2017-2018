@@ -33,10 +33,11 @@ NEW_ASYNC_VOID_1(killAuto, unsigned long);
 int gCurAuto = 0;
 tAlliance gAlliance = allianceBlue;
 bool gAutoLocked = false;
+int gAutoCones = 3;
 
 /* Defines */
 #if SKILLS_ROUTE == 0
-#define AUTO_OPTIONS_COUNT 11
+#define AUTO_OPTIONS_COUNT 9
 #elif SKILLS_ROUTE == 1
 #define AUTO_OPTIONS_COUNT 1
 #define SKILLS_1_SAFE (gAlliance == allianceRed)
