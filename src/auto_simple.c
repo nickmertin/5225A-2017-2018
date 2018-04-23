@@ -199,7 +199,7 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 		}
 		setDrive(coastPower, -coastPower);
 		timeStart = nPgmTime;
-		while (gPosition.a < a - degToRad(stopOffsetDeg) && && (velSafety? NOT_SAFETY(turnToAngleNewAlg-coast) : 1 ))
+		while (gPosition.a < a - degToRad(stopOffsetDeg) && (velSafety? NOT_SAFETY(turnToAngleNewAlg-coast) : 1 ))
 		{
 			if (DATALOG_TURN != -1)
 			{
