@@ -33,7 +33,7 @@ void handleLcd()
 #if SKILLS_ROUTE == 0
 		if (LCD_RISING(btnCenter))
 			gAutoLocked = !gAutoLocked;
-		sprintf(line, "%c %c %c %s%02d  ", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? gAutoLocked ? "Red   " : "LOCK R" : gAutoLocked ? "LOCK B" : "Blue  ", gCurAuto);
+		sprintf(line, "%c %c %c %s%02d  ", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? gAutoLocked ? "LOCK R" : "Red   " : gAutoLocked ? "LOCK B" : "Blue  ", gCurAuto);
 #elif SKILLS_ROUTE == 1
 		sprintf(line, "%c %c %c - S1 (%d)", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceBlue ? 110 : 108);
 #else
