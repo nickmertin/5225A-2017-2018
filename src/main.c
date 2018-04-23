@@ -656,8 +656,9 @@ typedef enum _tMobileStates {
 #define MOBILE_SLOW_HOLD_TIMEOUT 500
 #define MOBILE_AUTO_TIMEOUT 500
 
-// NUMBER OF CONES          0  1  2  3  4  5  6  7  8  9  10 11 12
-int gMobileSlowDown[13]  = {0, 0, 0, 5, 7, 7, 7, 7, 8, 8, 8, 8, 8};
+// NUMBER OF CONES         0   1   2   3   4   5   6   7   8   9   10  11  12
+int gMobileSlowPeak[13] = {50, 50, 50, 50, 50, 50, 50, 50, 60, 60, 70, 70, 70};
+int gMobileSlowDown[13] = {0,  0,  0,  5,  7,  7,  7,  7,  8,  8,  8,  8,  8};
 
 bool gMobileCheckLift;
 bool gMobileSlow = false;
@@ -732,7 +733,7 @@ case mobileBottomSlow:
 		setMobile(-127);
 		unsigned long timeout = nPgmTime + 500;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, timeout, TID1(mobileBottomSlow, 1));
-		setMobile(-50);
+		setMobile(-gMobileSlowPeak[gNumCones]);
 		timeout = nPgmTime + 3500;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
 		setMobile(gMobileSlowDown[gNumCones]);
