@@ -30,7 +30,9 @@ void handleLcd()
 		velocityCheck(trackL);
 		velocityCheck(trackR);
 
-#if SKILLS_ROUTE == 0
+#if SKILLS_ROUTE < 0
+		sprintf(line, "%c %c %c AUTO TEST ", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ');
+#elif SKILLS_ROUTE == 0
 		if (LCD_RISING(btnCenter))
 			gAutoLocked = !gAutoLocked;
 		sprintf(line, "%c %c %c %s%02d  ", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? gAutoLocked ? "LOCK R" : "Red   " : gAutoLocked ? "LOCK B" : "Blue  ", gCurAuto);
