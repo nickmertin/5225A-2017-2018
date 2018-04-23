@@ -96,7 +96,6 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 
 #define DATALOG_LIFT -1
 #define DATALOG_ARM -1
-#define DATALOG_FOLLOW -1
 #define DATALOG_TURN -1
 #define DATALOG_TIMEOUT -1
 #define DATALOG_SWEEP -1
@@ -403,7 +402,6 @@ typedef enum _tArmStates {
 	armRaiseSimpleState,
 	armLowerSimpleState,
 	armToBottom,
-	armFollowMobile,
 	armStopping,
 	armHold,
 	armHoldDown,
@@ -421,11 +419,8 @@ typedef enum _tArmStates {
 #define ARM_CARRY (RL_ARM_TOP - 1040)
 #define ARM_STACK (RL_ARM_TOP - 100)
 #define ARM_HORIZONTAL (RL_ARM_TOP - 1590)
-#define ARM_FOLLOW_TARGET (RL_ARM_TOP - 790)
 #define ARM_HOLD_DOWN_THRESHOLD (RL_ARM_TOP - 1550)
 #define ARM_MOBILE_TILT (RL_ARM_TOP - 630)
-
-#define ARM_MOBILE_RATIO 0.371
 
 tArmStates gArmSimpleNextState = armIdle;
 
@@ -571,42 +566,6 @@ case armToBottom:
 		while (!gSensor[limArm].value) sleep(10);
 		NEXT_STATE(armHoldDown);
 	}
-case armFollowMobile:
-	{
-		velocityClear(armPoti);
-		velocityClear(mobilePoti);
-		while (isMobileSlow())
-		{
-			velocityCheck(armPoti);
-			velocityCheck(mobilePoti);
-			if (gSensor[mobilePoti].velGood && gSensor[armPoti].velGood)
-			{
-				const float kP_vel = 0.01;
-				const float kB = 5.0;
-				const float kP = 4.0;
-				tHog();
-				if (DATALOG_FOLLOW != -1)
-				{
-					datalogDataGroupStart();
-					datalogAddValue(DATALOG_FOLLOW + 0, gSensor[mobilePoti].velocity * 1000);
-				}
-				float vTarget = gSensor[mobilePoti].velocity * ARM_MOBILE_RATIO + kP_vel * (ARM_FOLLOW_TARGET + (gSensor[mobilePoti].value - 500) * ARM_MOBILE_RATIO - gSensor[armPoti].value);
-				float power = kB * vTarget + kP * (vTarget - gSensor[armPoti].velocity);
-				LIM_TO_VAL_SET(power, 127);
-				if (DATALOG_FOLLOW != -1)
-				{
-					datalogAddValue(DATALOG_FOLLOW + 1, gSensor[armPoti].velocity * 1000);
-					datalogAddValue(DATALOG_FOLLOW + 2, vTarget * 1000);
-					datalogAddValue(DATALOG_FOLLOW + 3, power * 10);
-					datalogDataGroupEnd();
-				}
-				tRelease();
-				setArm((word)power);
-			}
-			sleep(20);
-		}
-		NEXT_STATE(armHold);
-	}
 case armStopping:
 	velocityClear(armPoti);
 	do
@@ -669,8 +628,7 @@ void handleArm()
 
 typedef enum _tMobileFlags {
 	mfNone = 0,
-	mfClear = 1,
-	mfFollow = 2
+	mfClear = 1
 } tMobileFlags;
 
 typedef enum _tMobileStates {
@@ -777,8 +735,6 @@ case mobileBottomSlow:
 		if ((arg & mfClear) && gSensor[mobilePoti].value > MOBILE_LIFT_CHECK_THRESHOLD)
 			mobileClearLift();
 		writeDebugStreamLine("mobileBottomSlow %d", gNumCones);
-		if (arg & mfFollow)
-			armSet(armFollowMobile);
 		setMobile(-127);
 		unsigned long timeout = nPgmTime + 500;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, timeout, TID1(mobileBottomSlow, 1));
@@ -857,11 +813,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > 2)
-#ifdef ENABLE_FOLLOW
-				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNoResetArm, mobileBottomSlow, gNumCones > 9 ? mfClear | mfFollow : mfClear));
-#else
 				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
-#endif
 				else
 				{
 					gMobileSlow = false;
