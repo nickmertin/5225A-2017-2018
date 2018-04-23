@@ -1666,7 +1666,7 @@ void autoSBLeft(bool secondCone, bool boomKapow)
 		turnToTargetNewAlgAsync(129, 35, ch, 0.27, 23, 12, false, true, PI);
 		driveTimeout = nPgmTime + 1500;
 		DRIVE_AWAIT(autoSBLeft, 2, 1);
-		moveToTargetSimpleAsync(129, 35, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopNone, mttCascading);
+		moveToTargetSimpleAsync(129, 35, gPosition.y, gPosition.x, -127, -30, 0.5, 18, -127, 0, stopNone, mttCascading);
 		driveTimeout = nPgmTime + 2500;
 		DRIVE_AWAIT(autoSBLeft, 2, 2);
 	}
@@ -1698,7 +1698,7 @@ void autoSBRight(bool secondCone, bool boomKapow)
 		turnToTargetNewAlgAsync(35, 129, ch, 0.27, 23, 12, false, true, PI);
 		driveTimeout = nPgmTime + 1500;
 		DRIVE_AWAIT(autoSBRight, 2, 1);
-		moveToTargetSimpleAsync(35, 129, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopNone, mttCascading);
+		moveToTargetSimpleAsync(35, 129, gPosition.y, gPosition.x, -127, -30, 0.5, 18, -127, 0, stopNone, mttCascading);
 		driveTimeout = nPgmTime + 2500;
 		DRIVE_AWAIT(autoSBRight, 2, 2);
 	}
