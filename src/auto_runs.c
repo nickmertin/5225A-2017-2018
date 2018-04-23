@@ -1,5 +1,6 @@
 void selectAuto()
 {
+	if (gAutoLocked) return;
 	updateSensorInput(autoPoti);
 	int autoVal = gSensor[autoPoti].value - 2048;
 	tAlliance oldAlliance = gAlliance;

@@ -32,6 +32,7 @@ NEW_ASYNC_VOID_1(killAuto, unsigned long);
 /* Variables */
 int gCurAuto = 0;
 tAlliance gAlliance = allianceBlue;
+bool gAutoLocked = false;
 
 /* Defines */
 #if SKILLS_ROUTE == 0
