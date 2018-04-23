@@ -125,8 +125,7 @@ typedef enum _stackFlags {
 	sfNoResetLift = 128,
 	sfRapid = 256,
 	sfNoResetAuto = 512,
-	sfTilt = 1024,
-	sfPull = 2048
+	sfPull = 1024
 } tStackFlags;
 
 typedef enum _stackStates {
@@ -139,9 +138,6 @@ typedef enum _stackStates {
 	stackDetach,
 	stackClear,
 	stackReturn,
-	stackTiltPrep,
-	stackTiltMobile,
-	stackDetachMobile,
 	stackWall
 } tStackStates;
 
@@ -221,7 +217,6 @@ void setLift(word power,bool debug=false)
 #define LIFT_LOADER (LIFT_BOTTOM + 800)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 500)
 #define LIFT_RETURN (LIFT_BOTTOM + 400)
-#define LIFT_MOBILE_TILT (LIFT_BOTTOM + 200)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -420,7 +415,6 @@ typedef enum _tArmStates {
 #define ARM_STACK (RL_ARM_TOP - 100)
 #define ARM_HORIZONTAL (RL_ARM_TOP - 1590)
 #define ARM_HOLD_DOWN_THRESHOLD (RL_ARM_TOP - 1550)
-#define ARM_MOBILE_TILT (RL_ARM_TOP - 630)
 
 tArmStates gArmSimpleNextState = armIdle;
 
@@ -1171,58 +1165,6 @@ case stackReturn:
 		writeDebugStreamLine("Lift height %d vs %d", gSensor[liftPoti].value, (arg & sfLoader) ? LIFT_LOADER : LIFT_RETURN);
 
 		armTimeoutWhile(armToTarget, armTimeOut, TID1(stackReturn, 6));
-		NEXT_STATE(stackNotRunning)
-	}
-case stackTiltPrep:
-	{
-		writeDebugStreamLine("%06d stackTiltPrep %x %d", nPgmTime, arg, gNumCones);
-		unsigned long armTimeOut;
-		unsigned long liftTimeOut;
-		unsigned long driveTimeout;
-
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 15);
-		armTimeOut = nPgmTime + 1000;
-		if (gSensor[liftPoti].value < LIFT_MOBILE_TILT)
-		{
-			liftRaiseSimpleAsync(LIFT_MOBILE_TILT, 127, -15);
-			liftTimeOut = nPgmTime + 500;
-			timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_MOBILE_TILT, liftTimeOut, TID1(stackTiltPrep, 2));
-		}
-		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL + 200, armTimeOut, TID1(stackTiltPrep, 3));
-
-		NEXT_STATE((arg & sfTilt) ? stackTiltMobile : stackNotRunning)
-	}
-case stackTiltMobile:
-	{
-		writeDebugStreamLine("%06d stackTiltMobile %x %d", nPgmTime, arg, gNumCones);
-		unsigned long armTimeOut;
-		unsigned long liftTimeOut;
-		unsigned long driveTimeout;
-
-		liftSet(liftToBottom, -127);
-		liftTimeOut = nPgmTime + 1000;
-		armReset();
-		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackTiltMobile, 1));
-		liftSet(liftHoldDown);
-
-		arg |= sfNoResetLift;
-
-		NEXT_STATE((arg & sfDetach) ? stackDetachMobile : stackNotRunning)
-	}
-case stackDetachMobile:
-	{
-		writeDebugStreamLine("%06d stackDetachMobile %x %d", nPgmTime, arg, gNumCones);
-		unsigned long armTimeOut;
-		unsigned long liftTimeOut;
-
-		armLowerSimpleAsync(ARM_HORIZONTAL, -127, 0);
-		armTimeOut = nPgmTime + 800;
-		sleep(200);
-		liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, 0);
-		liftTimeOut = nPgmTime + 800;
-		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[liftPoti].value, LIFT_MOBILE_THRESHOLD, liftTimeOut, TID1(stackDetachMobile, 1));
-		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackDetachMobile, 2));
-
 		NEXT_STATE(stackNotRunning)
 	}
 case stackWall:
