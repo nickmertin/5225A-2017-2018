@@ -13,7 +13,6 @@ sbyte lookupDrive(sbyte joy);
 tDriveAlg gDriveAlg = driveRed;
 int gDriveCurvature = 0;
 sbyte gDriveLookup[256];
-int gDriveCurveLim = 0;
 bool gDriveIgnoreJumper = false;
 
 /* Defines */

@@ -374,8 +374,6 @@ void testSkills()
 			mobileReset();
 			autoSimpleReset();
 
-			gKillDriveOnTimeout = true;
-
 			tStart(autoMotorSensorUpdateTask);
 			tStart(trackPositionTask);
 

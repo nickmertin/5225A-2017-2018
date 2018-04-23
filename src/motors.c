@@ -33,7 +33,6 @@ void updateMotors()
 
 void updateMotor(tMotor mot)
 {
-	word oldPower = gMotor[mot].curPower;
 	motor[mot] = gMotor[mot].curPower = gMotor[mot].powerScale >= 0 ? round(gMotor[mot].power * gMotor[mot].powerScale) : gMotor[mot].power;
 #ifdef MOTOR_SENSOR_LOGS
 	if (_motorDoDatalog && gMotor[mot].datalog != -1)
