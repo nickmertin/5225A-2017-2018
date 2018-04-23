@@ -958,7 +958,6 @@ MAKE_MACHINE(stack, tStackStates, stackNotRunning,
 {
 case stackNotRunning:
 	writeDebugStreamLine("%06d stackNotRunning %x %d", npgmTime, arg, gNumCones);
-	writeDebugStreamLine("%d gWallTurnCheck false - stackNotRunning", nPgmTime);
 	gWallTurnCheck = false;
 	if (!(arg & sfNoResetLift))
 		liftSet(liftHold);
@@ -982,7 +981,6 @@ case stackPickupGround:
 		if (arg & sfPull)
 		{
 			gDriveManual = false;
-			writeDebugStreamLine("%d gWallTurnCheck true", nPgmTime);
 			gWallTurnCheck = true;
 			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple);
 			//driveTimeout = nPgmTime + 1500;
@@ -1028,7 +1026,6 @@ case stackPickupGround:
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[armPoti].value, ARM_HORIZONTAL, armTimeOut, TID1(stackPickupGround, 6));
 		armSet(armToTarget, ARM_PRESTACK - 500);
 
-		writeDebugStreamLine("%d gWallTurnCheck false", nPgmTime);
 		gWallTurnCheck = false;
 		gDriveManual = true;
 
@@ -1195,7 +1192,6 @@ case stackDetach:
 		armTimeoutWhile(state, armTimeOut, TID0(stackDetach));
 		if (!(arg & sfLoader))
 			armReset();
-		writeDebugStreamLine("%06d Detached lift at height: %d", nPgmTime, gSensor[liftPoti].value);
 		if (arg & sfLoader)
 			liftSet(liftHold);
 		else
@@ -1325,7 +1321,6 @@ case stackTiltMobile:
 		//armSet(armToBottom, -127);
 		armReset();
 		timeoutWhileFalse((bool *) &gSensor[limLift].value, liftTimeOut, TID1(stackTiltMobile, 1));
-		writeDebugStreamLine("stackTiltMobile %d", gSensor[liftPoti].value);
 		liftSet(liftHoldDown);
 
 		arg |= sfNoResetLift;
@@ -1354,7 +1349,6 @@ case stackWall:
 		unsigned long armTimeOut;
 		unsigned long liftTimeOut;
 
-		writeDebugStreamLine("%d gWallTurnCheck true", nPgmTime);
 		gWallTurn = wtNone;
 		gWallTurnCheck = true;
 
@@ -1569,20 +1563,18 @@ void handleMacros()
 
 	if (RISING(BTN_MACRO_INC) && gNumCones < MAX_STACK && !gWallTurnCheck) {
 		++gNumCones;
-		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+		writeDebugStreamLine("%06d CONES %d",nPgmTime,gNumCones);
 	}
 
 	if (RISING(BTN_MACRO_DEC) && gNumCones > 0) {
 		--gNumCones;
-		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+		writeDebugStreamLine("%06d CONES %d",nPgmTime,gNumCones);
 	}
-
-	if (FALLING(BTN_MACRO_ZERO))	writeDebugStreamLine("%06d MACRO_ZERO Released",nPgmTime,gNumCones);
 
 	if (RISING(BTN_MACRO_ZERO))
 	{
 		gNumCones = 0;
-		writeDebugStreamLine("%06d gNumCones= %d",nPgmTime,gNumCones);
+		writeDebugStreamLine("%06d CONES %d",nPgmTime,gNumCones);
 	}
 }
 
