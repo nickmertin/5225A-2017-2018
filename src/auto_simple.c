@@ -160,9 +160,9 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
+void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode, bool velSafety)
 {
-	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, mode);
+	moveToTargetSimple(ys + d * cos(a), xs + d * sin(a), ys, xs, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, mode, false);
 }
 
 void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo, bool harshStop, bool velSafety)
