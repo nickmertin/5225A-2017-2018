@@ -26,7 +26,6 @@ typedef enum _lcdButtons
 
 /* Functions */
 void handleLcd();
-float getExpanderVoltage(tSensors sen, bool isRevA2);
 
 /* Variables */
 tLcdScreen gLcdScreen = lcdMain;

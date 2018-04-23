@@ -210,12 +210,6 @@ void handleLcd()
 	gLastLcdButtons = buttons;
 }
 
-float getExpanderVoltage(tSensors sen, bool isRevA2)
-{
-	updateSensorInput(sen);
-	return (float)gSensor[sen].value / (isRevA2 ? 280 : 182.4);
-}
-
 void testLift()
 {
 	for (tMotor mtr = port1; mtr <= port10; ++mtr)
