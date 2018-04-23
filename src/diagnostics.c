@@ -30,8 +30,12 @@ void handleLcd()
 		velocityCheck(trackL);
 		velocityCheck(trackR);
 
-#if SKILLS_ROUTE == 0
-		sprintf(line, "%c %c %c %s %02d  0", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? "Red  " : "Blue ", gCurAuto);
+#if SKILLS_ROUTE < 0
+		sprintf(line, "%c %c %c AUTO TEST ", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ');
+#elif SKILLS_ROUTE == 0
+		if (LCD_RISING(btnCenter))
+			gAutoLocked = !gAutoLocked;
+		sprintf(line, "%c %c %c %s%02d  ", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceRed ? gAutoLocked ? "LOCK R" : "Red   " : gAutoLocked ? "LOCK B" : "Blue  ", gCurAuto);
 #elif SKILLS_ROUTE == 1
 		sprintf(line, "%c %c %c - S1 (%d)", gSensor[limArm].value ? 'A' : ' ', gSensor[limLift].value ? 'L' : ' ', gSensor[jmpSkills].value ? 'S' : ' ', gAlliance == allianceBlue ? 110 : 108);
 #else
@@ -39,6 +43,18 @@ void handleLcd()
 #endif
 		clearLCDLine(1);
 		displayLCDString(1, 0, line);
+		break;
+	case lcdAutoCones:
+		if (LCD_RISING(btnCenter))
+		{
+			if (gAutoCones == 4)
+				gAutoCones = 0;
+			else
+				++gAutoCones;
+		}
+		displayLCDCenteredString(0, "AUTO CONES");
+		sprintf(line, "%d", gAutoCones);
+		displayLCDCenteredString(1, line);
 		break;
 	case lcdBattery:
 		sprintf(line, "Main:       %1.2f V", (float)nImmediateBatteryLevel / 1000.0);

@@ -1,5 +1,6 @@
 void selectAuto()
 {
+	if (gAutoLocked) return;
 	updateSensorInput(autoPoti);
 	int autoVal = gSensor[autoPoti].value - 2048;
 	tAlliance oldAlliance = gAlliance;
@@ -27,16 +28,14 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: /* No auto */ break;
-			case 1: /* 2 in 20 - autoloader */ auto20Right(3); break;
-			case 2: /* 2 in 20 - audience */ auto20Left(3); break;
-			case 3: /* 4 in 5 - autoloader */ auto5Right(3); break;
-			case 4: /* 4 in 5 - audience */ auto5Left(3); break;
-			case 5: /* 1s + 5 - autoloader */ break;
-			case 6: /* 1s + 5 - audience */ break;
-			case 7: /* 1s + block - autoloader */ autoSBRight(false, false); break;
-			case 8: /* 1s + block - audience */ autoSBLeft(false, false); break;
-			case 9: /* 1s + BOOM KAPOW - autoloader */ autoSBRight(false, true); break;
-			case 10: /* 2s + block - audience */ autoSBLeft(true, false); break;
+			case 1: /* 20 - autoloader */ auto20Right(gAutoCones); break;
+			case 2: /* 20 - audience */ auto20Left(gAutoCones); break;
+			case 3: /* 5 - autoloader */ auto5Right(gAutoCones); break;
+			case 4: /* 5 - audience */ auto5Left(gAutoCones); break;
+			case 5: /* 1s + block - autoloader */ autoSBRight(false, false); break;
+			case 6: /* 1s + block - audience */ autoSBLeft(false, false); break;
+			case 7: /* 1s + BOOM KAPOW - autoloader */ autoSBRight(false, true); break;
+			case 8: /* 2s + block - audience */ autoSBLeft(true, false); break;
 		}
 	}
 	else
@@ -44,16 +43,14 @@ void runAuto()
 		switch (gCurAuto)
 		{
 			case 0: /* Dumb block */ autoBlock(); break;
-			case 1: /* 2 in 20 - autoloader */ auto20Left(3); break;
-			case 2: /* 2 in 20 - audience */ auto20Right(3); break;
-			case 3: /* 4 in 5 - autoloader */ auto5Left(3); break;
-			case 4: /* 4 in 5 - audience */ auto5Right(3); break;
-			case 5: /* 1s + 5 - autoloader */ break;
-			case 6: /* 1s + 5 - audience */ break;
-			case 7: /* 1s + block - autoloader */ autoSBLeft(false, false); break;
-			case 8: /* 1s + block - audience */ autoSBRight(false, false); break;
-			case 9: /* 1s + BOOM KAPOW - autoloader */ autoSBLeft(false, true); break;
-			case 10: /* 2s + block - audience */ autoSBRight(true, false); break;
+			case 1: /* 20 - autoloader */ auto20Left(gAutoCones); break;
+			case 2: /* 20 - audience */ auto20Right(gAutoCones); break;
+			case 3: /* 5 - autoloader */ auto5Left(gAutoCones); break;
+			case 4: /* 5 - audience */ auto5Right(gAutoCones); break;
+			case 5: /* 1s + block - autoloader */ autoSBLeft(false, false); break;
+			case 6: /* 1s + block - audience */ autoSBRight(false, false); break;
+			case 7: /* 1s + BOOM KAPOW - autoloader */ autoSBLeft(false, true); break;
+			case 8: /* 2s + block - audience */ autoSBRight(true, false); break;
 		}
 	}
 #elif SKILLS_ROUTE < 0
