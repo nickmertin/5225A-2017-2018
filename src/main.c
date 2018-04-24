@@ -805,7 +805,7 @@ void handleMobile()
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				if (gNumCones > 2)
+				if (gNumCones > (gSensor[jmpSkills].value ? 4 : 2))
 				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
 				else
 				{
