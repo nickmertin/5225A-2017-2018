@@ -794,7 +794,6 @@ void handleMobile()
 			mobileSet(mobileTop, mfClear);
 		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
-			writeDebugStreamLine("%d Button mobile toggle 1", nPgmTime);
 			gMobileSlow = false;
 			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom, mfClear));
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
@@ -804,7 +803,6 @@ void handleMobile()
 	{
 		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
-			writeDebugStreamLine("%d Button mobile toggle 2", nPgmTime);
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > 2)
