@@ -733,9 +733,16 @@ case mobileBottomSlow:
 		setMobile(-127);
 		unsigned long timeout = nPgmTime + 500;
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, timeout, TID1(mobileBottomSlow, 1));
-		setMobile(-gMobileSlowPeak[gNumCones]);
+		//setMobile(-gMobileSlowPeak[gNumCones]);
 		timeout = nPgmTime + 3500;
-		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
+		//timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
+		velocityClear(mobilePoti);
+		while (!TimedOut(timeout, TID1(mobileBottomSlow, 2), true, VEL_NONE, 0, 0, NULL))
+		{
+			velocityCheck(mobilePoti);
+			setMobile(gSensor[mobilePoti].velGood && gSensor[mobilePoti].velocity < 0.5 ? 90 : -gMobileSlowPeak[gNumCones]);
+			sleep(10);
+		}
 		setMobile(gMobileSlowDown[gNumCones]);
 		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, timeout, TID1(mobileBottomSlow, 3));
 		setMobile(0);
