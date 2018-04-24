@@ -801,7 +801,6 @@ void handleMobile()
 			mobileSet(mobileTop, mfClear);
 		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
-			writeDebugStreamLine("%d Button mobile toggle 1", nPgmTime);
 			gMobileSlow = false;
 			stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottom, mfClear));
 			mobileWaitForSlowHoldAsync(BTN_MOBILE_MIDDLE);
@@ -811,10 +810,9 @@ void handleMobile()
 	{
 		if (RISING(BTN_MOBILE_TOGGLE) && !gWallTurnCheck)
 		{
-			writeDebugStreamLine("%d Button mobile toggle 2", nPgmTime);
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				if (gNumCones > 2)
+				if (gNumCones > (gSensor[jmpSkills].value ? 4 : 2))
 				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
 				else
 				{
@@ -857,6 +855,7 @@ bool gLoader = false;
 bool gTurned = false;
 
 unsigned long gPrepStart = 0;
+unsigned long gSkillsSpinTimeout = 0;
 
 #define RAPID (gStack || ((arg & sfRapid) && gNumCones < ((arg >> 12) & 0xF)))
 
@@ -1305,6 +1304,7 @@ bool cancel()
 	gStack = false;
 	gLoader = false;
 	gWall = false;
+	gSkillsSpinTimeout = 0;
 	return wasRunning;
 }
 
@@ -1348,9 +1348,12 @@ void handleMacros()
 
 	if (gSensor[jmpSkills].value)
 	{
-		if (RISING(BTN_SKILLS_STACKONLY) && !stackRunning() && gNumCones < MAX_STACK)
+		if (RISING(BTN_SKILLS_SPIN))
 		{
-			stackSet(stackStack, (gNumCones < MAX_STACK - 1) ? sfReturn : sfNone);
+			gDriveManual = false;
+			gSkillsSpinTimeout = nPgmTime + 1500;
+			turnToAngleNewAlgAsync(gPosition.a + PI, cw, 0.55, 26, 11, false, true, false);
+			liftSet(liftToBottom, -127);
 		}
 
 		if (RISING(BTN_SKILLS_LIFT) && !stackRunning())
@@ -1407,6 +1410,13 @@ void handleMacros()
 	{
 		gNumCones = 0;
 		writeDebugStreamLine("%06d CONES %d",nPgmTime,gNumCones);
+	}
+
+	if (gSkillsSpinTimeout && (autoSimpleState == autoSimpleNotRunning || nPgmTime > gSkillsSpinTimeout))
+	{
+		autoSimpleReset();
+		gDriveManual = true;
+		gSkillsSpinTimeout = 0;
 	}
 }
 
