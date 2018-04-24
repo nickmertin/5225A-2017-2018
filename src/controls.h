@@ -39,4 +39,4 @@
 
 /* Skills Macros */
 #define BTN_SKILLS_LIFT Btn8L
-#define BTN_SKILLS_STACKONLY Btn8R
+#define BTN_SKILLS_SPIN Btn8R
