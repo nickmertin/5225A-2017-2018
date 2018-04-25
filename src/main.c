@@ -1418,6 +1418,15 @@ void handleMacros()
 		gDriveManual = true;
 		gSkillsSpinTimeout = 0;
 	}
+	if (gSkillsSpinTimeout && autoSimpleState != autoSimpleNotRunning)
+	{
+		if ( RISING(gJoy[JOY_THROTTLE]) || RISING(gJoy[JOY_TURN]) )
+		{
+			gDriveManual = true;
+			autoSimpleReset();
+			gSkillsSpinTimeout = 0;
+		}
+	}
 }
 
 void waitForSkillsOverride(TVexJoysticks joy)
