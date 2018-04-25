@@ -419,7 +419,7 @@ void autoSkills(int segment)
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, 1, 0);
-	sweepTurnToTargetAsync(_y + 23, _x, 35 * PI / 180, 16.5, cw, 127, true, false);
+	sweepTurnToTargetAsync(54, 30, 35 * PI / 180, 16.5, cw, 127, true, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 3, 3);
 	moveToTargetSimpleAsync(71, 47, gPosition.y, gPosition.x, 127, 127, 1, 0, 0, 13, stopNone, mttSimple, false);
@@ -485,7 +485,7 @@ skip1:
 	mobileSet(mobileBottom, mfClear);
 	coneTimeout = nPgmTime + 2000;
 	driveAgainstStartingBar(20, 20, 15, 15, 1500);
-	sleep(200);
+	sleep(500);
 	if (segment > -1)
 		return;
 skip2:
@@ -655,7 +655,7 @@ skip3:
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, 1, 0);
-	sweepTurnToTargetAsync(_y - 22, _x, 215 * PI / 180, 16, cw, 127, true, false);
+	sweepTurnToTargetAsync(92, 112, 215 * PI / 180, 16, cw, 127, true, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(skills, 11, 3);
 	moveToTargetSimpleAsync(72, 94, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 13, stopNone, mttSimple, false);
