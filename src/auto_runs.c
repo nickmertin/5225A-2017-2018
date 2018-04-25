@@ -447,11 +447,11 @@ void autoSkills(int segment)
 	mobileSet(mobileBottom, mfNone);
 	coneTimeout = nPgmTime + 2000;
 	driveAgainstStartingBar(25, 25, 15, 15, 1500);
-	sleep(200);
+	sleep(700);
 	if (segment > -1)
 		return;
 skip1:
-	if (!resetSonarYOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 600, 900, false) && !resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 130, 330, false))
+	if (!resetSonarXOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 130, 330, false) && !resetSonarYOnly(100, 500, START_BAR_RESET_INTERCEPT, -0.75 * PI, 600, 900, false))
 	{
 		if (segment > -1)
 			return;
@@ -509,7 +509,7 @@ skip2:
 	moveToTargetSimpleAsync(128, 71, gPosition.y, gPosition.x, 70, 0, 0.5, 0, 0, 16, stopNone, mttSimple, false);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 7, 3);
-	moveToTargetSimpleAsync(128, 35, gPosition.y, gPosition.x, 127, 70, 0.5, 8, 55, 14, stopNone, mttProportional, false);
+	moveToTargetSimpleAsync(130, 35, gPosition.y, gPosition.x, 127, 70, 0.5, 8, 55, 14, stopNone, mttProportional, false);
 	driveTimeout = nPgmTime + 2000;
 	timeoutWhileGreaterThanF(VEL_NONE, 0, &gPosition.x, 58, driveTimeout, TID2(skills, 7, 4));
 	liftRaiseSimpleAsync(gLiftRaiseTarget[1], 127, -20);
@@ -764,9 +764,12 @@ skip5:
 	moveToTargetDisSimpleAsync(gPosition.a, 5, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
 	driveTimeout = nPgmTime + 1500;
 	sleep(500);
-	mobileSet(mobileBottom, mfNone);
-	DRIVE_AWAIT(skills, 16, 3);
-	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 16, 4));
+	if (nPgmTime - gAutoTime < 59300)
+	{
+		mobileSet(mobileBottom, mfNone);
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 16, 3));
+	}
+	DRIVE_AWAIT(skills, 16, 4);
 	moveToTargetDisSimpleAsync(gPosition.a, -5, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
 	driveTimeout = nPgmTime + 1000;
 	DRIVE_AWAIT(skills, 16, 5);
