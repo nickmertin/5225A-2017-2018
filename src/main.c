@@ -1412,7 +1412,7 @@ void handleMacros()
 		writeDebugStreamLine("%06d CONES %d",nPgmTime,gNumCones);
 	}
 
-	if (gSkillsSpinTimeout && (autoSimpleState == autoSimpleNotRunning || nPgmTime > gSkillsSpinTimeout))
+	if (gSkillsSpinTimeout && (autoSimpleState == autoSimpleNotRunning || nPgmTime > gSkillsSpinTimeout || RISING(JOY_THROTTLE) || RISING(JOY_TURN)))
 	{
 		autoSimpleReset();
 		gDriveManual = true;
