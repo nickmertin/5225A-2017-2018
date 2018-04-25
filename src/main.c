@@ -1350,7 +1350,7 @@ void handleMacros()
 	{
 		if (RISING(BTN_SKILLS_SPIN))
 		{
-			gDriveManual = false;
+			gDriveManual = true;
 			gSkillsSpinTimeout = nPgmTime + 1500;
 			turnToAngleNewAlgAsync(gPosition.a + PI, cw, 0.55, 26, 11, false, true, false);
 			liftSet(liftToBottom, -127);
@@ -1417,15 +1417,6 @@ void handleMacros()
 		autoSimpleReset();
 		gDriveManual = true;
 		gSkillsSpinTimeout = 0;
-	}
-	if (gSkillsSpinTimeout && autoSimpleState != autoSimpleNotRunning)
-	{
-		if ( RISING(gJoy[JOY_THROTTLE]) || RISING(gJoy[JOY_TURN]) )
-		{
-			gDriveManual = true;
-			autoSimpleReset();
-			gSkillsSpinTimeout = 0;
-		}
 	}
 }
 
