@@ -1460,8 +1460,8 @@ void startup()
 
 	setupInvertedSen(jmpSkills);
 	setupDgtIn(limLift, 0, 100);
-	setupDgtIn(lsBarL, 0, 2500);
-	setupDgtIn(lsBarR, 0, 2500);
+	setupDgtIn(lsBarL, 0, 1500);
+	setupDgtIn(lsBarR, 0, 1500);
 	setupDgtIn(lsMobile, 0, 2100);
 	gSensor[liftPoti].potiCheckVel = true;
 
