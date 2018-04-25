@@ -886,7 +886,7 @@ case stackPickupGround:
 		if (arg & sfPull)
 		{
 			gDriveManual = false;
-			gWallTurnCheck = true;
+			//gWallTurnCheck = true;
 			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
 		}
 
