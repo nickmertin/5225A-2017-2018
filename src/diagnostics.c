@@ -74,6 +74,15 @@ void handleLcd()
 		clearLCDLine(1);
 		displayLCDString(1, 0, line);
 		break;
+	case lcdJumpCount:
+		clearLCDLine(0);
+		clearLCDLine(1);
+		sprintf(arm, "%d", gSensor[liftPoti].jumpCount);
+		sprintf(lift, "%d", gSensor[armPoti].jumpCount);
+
+		displayLCDString(0, 0, ( strcat("Arm jumps: ", arm) ) );
+		displayLCDString(0, 0, ( strcat("Lift jumps: ", lift) ) );
+		break;
 	case lcdLightSensors:
 		displayLCDCenteredString(0, "Light Sensors");
 		sprintf(line, "%04d    %04d    ", SensorValue[lsBarL], SensorValue[lsBarR]);

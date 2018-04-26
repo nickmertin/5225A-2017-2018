@@ -5,6 +5,7 @@ typedef enum _lcdScreen
 	lcdAutoCones,
 	lcdBattery,
 	lcdTracking,
+	lcdJumpCount,
 	lcdLightSensors,
 	lcdLiftTest,
 	lcdSkillsTest,
