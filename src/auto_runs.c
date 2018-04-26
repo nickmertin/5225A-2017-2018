@@ -1631,7 +1631,10 @@ void auto5Left(int cones)
 	mobileSet(mobileTop, mfNone);
 	sleep(700);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
-	DRIVE_AWAIT(auto5Left, 1, 6);
+	//DRIVE_AWAIT(auto5Left, 1, 6);
+	autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(auto5Left, 1, 6), false);
+	setDrive(-10, -10);
+	sleep(10000);
 }
 
 void auto5Right(int cones)
@@ -1663,7 +1666,10 @@ void auto5Right(int cones)
 	mobileSet(mobileTop, mfNone);
 	sleep(700);
 	liftLowerSimpleAsync(LIFT_BOTTOM, -127, 0);
-	DRIVE_AWAIT(auto5Right, 1, 6);
+	//DRIVE_AWAIT(auto5Right, 1, 6);
+	autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(auto5Right, 1, 6), false);
+	setDrive(-10, -10);
+	sleep(10000);
 }
 
 void autoSBLeft(bool secondCone, bool boomKapow)
@@ -1684,7 +1690,8 @@ void autoSBLeft(bool secondCone, bool boomKapow)
 	DRIVE_AWAIT(autoSBLeft, 1, 2);
 	moveToTargetSimpleAsync(119, 71, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, boomKapow ? mttCascading : mttSimple, true);
 	driveTimeout = nPgmTime + 5000;
-	DRIVE_AWAIT(autoSBLeft, 1, 3);
+	//DRIVE_AWAIT(autoSBLeft, 1, 3);
+	autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(autoSBLeft, 1, 3), boomKapow);
 
 	if (boomKapow)
 	{
@@ -1695,6 +1702,11 @@ void autoSBLeft(bool secondCone, bool boomKapow)
 		moveToTargetSimpleAsync(129, 35, gPosition.y, gPosition.x, -127, -30, 0.5, 18, -127, 0, stopNone, mttCascading, true);
 		driveTimeout = nPgmTime + 2500;
 		DRIVE_AWAIT(autoSBLeft, 2, 2);
+	}
+	else
+	{
+		setDrive(-10, -10);
+		sleep(10000);
 	}
 }
 
@@ -1716,7 +1728,8 @@ void autoSBRight(bool secondCone, bool boomKapow)
 	DRIVE_AWAIT(autoSBRight, 1, 2);
 	moveToTargetSimpleAsync(71, 119, gPosition.y, gPosition.x, -127, -70, 0.5, 0, 0, 0, stopSoft, boomKapow ? mttCascading : mttSimple, true);
 	driveTimeout = nPgmTime + 5000;
-	DRIVE_AWAIT(autoSBRight, 1, 3);
+	//DRIVE_AWAIT(autoSBRight, 1, 3);
+	autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(autoSBRight, 1, 3), boomKapow);
 
 	if (boomKapow)
 	{
@@ -1727,6 +1740,11 @@ void autoSBRight(bool secondCone, bool boomKapow)
 		moveToTargetSimpleAsync(35, 129, gPosition.y, gPosition.x, -127, -30, 0.5, 18, -127, 0, stopNone, mttCascading, true);
 		driveTimeout = nPgmTime + 2500;
 		DRIVE_AWAIT(autoSBRight, 2, 2);
+	}
+	else
+	{
+		setDrive(-10, -10);
+		sleep(10000);
 	}
 }
 
