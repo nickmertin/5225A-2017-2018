@@ -38,7 +38,7 @@
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
-#define SKILLS_ROUTE 1
+#define SKILLS_ROUTE 0
 
 #define DRIVE_WEIGHT_GAME 0
 #define DRIVE_WEIGHT_SKILLS 0

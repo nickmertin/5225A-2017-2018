@@ -3,6 +3,7 @@ typedef enum _lcdScreen
 {
 	lcdMain,
 	lcdAutoCones,
+	lcdAutoStart,
 	lcdBattery,
 	lcdTracking,
 	lcdLightSensors,

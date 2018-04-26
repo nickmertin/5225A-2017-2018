@@ -1208,14 +1208,20 @@ noLine4:
 
 void resetLeft()
 {
-	resetPositionFull(gPosition, 40, 17.25, 0.25 * PI);
+	if (gAutoStartSkills)
+		resetPositionFull(gPosition, 47, 14.25, 0);
+	else
+		resetPositionFull(gPosition, 40, 17.25, 0.25 * PI);
 	resetVelocity(gVelocity, gPosition);
 	tStart(trackPositionTask);
 }
 
 void resetRight()
 {
-	resetPositionFull(gPosition, 17.25, 40, 0.25 * PI);
+	if (gAutoStartSkills)
+		resetPositionFull(gPosition, 14.25, 47, 0.5 * PI);
+	else
+		resetPositionFull(gPosition, 17.25, 40, 0.25 * PI);
 	resetVelocity(gVelocity, gPosition);
 	tStart(trackPositionTask);
 }
@@ -1228,15 +1234,23 @@ void pickupMobileLeft(int cones)
 	resetLeft();
 
 	// 1
-	moveToTargetDisSimpleAsync(0.25 * PI, 4, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
-	driveTimeout = nPgmTime + 1000;
-	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, -20);
-	armSet(armHold);
-	DRIVE_AWAIT(pickupMobileLeft, 1, 1);
-	turnToTargetNewAlgAsync(71, 15, ccw, 0.27, 23, 12, false, true, 0, false);
-	driveTimeout = nPgmTime + 1500;
-	mobileSet(mobileBottom, mfNone);
-	DRIVE_AWAIT(pickupMobileLeft, 1, 2);
+	if (gAutoStartSkills)
+	{
+		stackSet(stackClear, STACK_CLEAR_CONFIG(sfNoResetAuto, mobileBottom, mfNone));
+		armSet(armHold);
+	}
+	else
+	{
+		moveToTargetDisSimpleAsync(0.25 * PI, 4, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
+		driveTimeout = nPgmTime + 1000;
+		liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, -20);
+		armSet(armHold);
+		DRIVE_AWAIT(pickupMobileLeft, 1, 1);
+		turnToTargetNewAlgAsync(71, 15, ccw, 0.27, 23, 12, false, true, 0, false);
+		driveTimeout = nPgmTime + 1500;
+		mobileSet(mobileBottom, mfNone);
+		DRIVE_AWAIT(pickupMobileLeft, 1, 2);
+	}
 	moveToTargetSimpleAsync(71, 15, gPosition.y, gPosition.x, 127, 50, 0.5, 0, 0, 14, stopNone, mttProportional, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(pickupMobileLeft, 1, 3);
@@ -1314,15 +1328,23 @@ void pickupMobileRight(int cones)
 	resetRight();
 
 	// 1
-	moveToTargetDisSimpleAsync(0.25 * PI, 4, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
-	driveTimeout = nPgmTime + 1000;
-	liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, -20);
-	armSet(armHold);
-	DRIVE_AWAIT(pickupMobileRight, 1, 1);
-	turnToTargetNewAlgAsync(15, 71, cw, 0.27, 23, 12, false, true, 0, false);
-	driveTimeout = nPgmTime + 1500;
-	mobileSet(mobileBottom, mfNone);
-	DRIVE_AWAIT(pickupMobileRight, 1, 2);
+	if (gAutoStartSkills)
+	{
+		stackSet(stackClear, STACK_CLEAR_CONFIG(sfNoResetAuto, mobileBottom, mfNone));
+		armSet(armHold);
+	}
+	else
+	{
+		moveToTargetDisSimpleAsync(0.25 * PI, 4, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
+		driveTimeout = nPgmTime + 1000;
+		liftRaiseSimpleAsync(LIFT_MOBILE_THRESHOLD, 127, -20);
+		armSet(armHold);
+		DRIVE_AWAIT(pickupMobileRight, 1, 1);
+		turnToTargetNewAlgAsync(15, 71, cw, 0.27, 23, 12, false, true, 0, false);
+		driveTimeout = nPgmTime + 1500;
+		mobileSet(mobileBottom, mfNone);
+		DRIVE_AWAIT(pickupMobileRight, 1, 2);
+	}
 	moveToTargetSimpleAsync(15, 71, gPosition.y, gPosition.x, 127, 50, 0.5, 0, 0, 14, stopNone, mttProportional, true);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(pickupMobileRight, 1, 3);
