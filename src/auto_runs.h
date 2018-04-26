@@ -34,6 +34,7 @@ int gCurAuto = 0;
 tAlliance gAlliance = allianceBlue;
 bool gAutoLocked = false;
 int gAutoCones = 3;
+bool gAutoStartSkills = false;
 
 /* Defines */
 #if SKILLS_ROUTE == 0

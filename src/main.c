@@ -38,7 +38,7 @@
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
-#define SKILLS_ROUTE 1
+#define SKILLS_ROUTE 0
 
 #define DRIVE_WEIGHT_GAME 0
 #define DRIVE_WEIGHT_SKILLS 0
@@ -657,7 +657,7 @@ typedef enum _tMobileStates {
 #define MOBILE_AUTO_TIMEOUT 500
 
 // NUMBER OF CONES         0   1   2   3   4   5   6   7   8   9   10  11  12
-int gMobileSlowPeak[13] = {50, 50, 50, 50, 50, 50, 50, 50, 60, 60, 60, 60, 60};
+int gMobileSlowPeak[13] = {60, 60, 60, 60, 60, 60, 60, 60, 70, 70, 70, 70, 70};
 int gMobileSlowDown[13] = {0,  0,  0,  5,  7,  7,  7,  7,  8,  8,  8,  8,  8};
 
 bool gMobileCheckLift;
@@ -740,7 +740,7 @@ case mobileBottomSlow:
 		while (gSensor[mobilePoti].value > MOBILE_HALFWAY + 200 && !TimedOut(timeout, TID1(mobileBottomSlow, 2), true, VEL_NONE, 0, 0, NULL))
 		{
 			velocityCheck(mobilePoti);
-			setMobile(gSensor[mobilePoti].velGood && gSensor[mobilePoti].velocity > -0.5 ? -60 : -gMobileSlowPeak[gNumCones]);
+			setMobile(gSensor[mobilePoti].velGood && gSensor[mobilePoti].velocity > -0.5 ? -70 : -gMobileSlowPeak[gNumCones]);
 			sleep(10);
 		}
 		setMobile(gMobileSlowDown[gNumCones]);

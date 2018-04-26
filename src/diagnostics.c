@@ -56,6 +56,12 @@ void handleLcd()
 		sprintf(line, "%d", gAutoCones);
 		displayLCDCenteredString(1, line);
 		break;
+	case lcdAutoStart:
+		if (LCD_RISING(btnCenter))
+			gAutoStartSkills = !gAutoStartSkills;
+		displayLCDCenteredString(0, "AUTO START");
+		displayLCDCenteredString(1, gAutoStartSkills ? "SKILLS" : "GAME");
+		break;
 	case lcdBattery:
 		sprintf(line, "Main:       %1.2f V", (float)nImmediateBatteryLevel / 1000.0);
 		displayLCDString(0, 0, line);
