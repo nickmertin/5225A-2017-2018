@@ -3,7 +3,7 @@
 void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode, bool velSafety)
 {
 	int velSafetyCounter = 0;
-	writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
+	if (LOGS) writeDebugStreamLine("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 
 	gTargetLast.y = y;
 	gTargetLast.x = x;
@@ -20,10 +20,10 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 	followLine.p2.x = x;
 
 	float lineLength = getLengthOfLine(followLine);
-	writeDebugStreamLine("Line length: %.2f", lineLength);
+	if (LOGS) writeDebugStreamLine("Line length: %.2f", lineLength);
 	float lineAngle = getAngleOfLine(followLine); // Get the angle of the line that we're following relative to the vertical
 	float pidAngle = nearAngle(lineAngle - (power < 0 ? PI : 0), gPosition.a);
-	writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
+	if (LOGS) writeDebugStreamLine("Line | Pid angle: %f | %f", radToDeg(lineAngle), radToDeg(pidAngle));
 
 	// Current position relative to the ending point
 	sVector currentPosVector;
@@ -117,7 +117,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 		endCycle(cycle);
 	} while (currentPosVector.y < -dropEarly - MAX((vel * ((stopType & stopSoft) ? 0.175 : 0.098)), decelEarly) && (velSafety? NOT_SAFETY(power, moveToTargetSimple) : 1 ) );
 
-	writeDebugStreamLine("%f %f", currentPosVector.y, vel);
+	if (LOGS) writeDebugStreamLine("%f %f", currentPosVector.y, vel);
 
 	setDrive(decelPower, decelPower);
 
@@ -156,7 +156,7 @@ void moveToTargetSimple(float y, float x, float ys, float xs, byte power, byte s
 	else
 		setDrive(0, 0);
 
-	writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+	if (LOGS) writeDebugStreamLine("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode, bool velSafety)
@@ -166,7 +166,7 @@ void moveToTargetDisSimple(float a, float d, float ys, float xs, byte power, byt
 
 void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo, bool harshStop, bool velSafety)
 {
-	writeDebugStreamLine("Turning to %f", radToDeg(a));
+	if (LOGS) writeDebugStreamLine("Turning to %f", radToDeg(a));
 
 	int velSafetyCounter = 0;
 
@@ -211,12 +211,12 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 			}
 			sleep(10);
 		}
-		writeDebugStreamLine("Turn done: %d",  gPosition.a);
+		if (LOGS) writeDebugStreamLine("Turn done: %d",  gPosition.a);
 		if (harshStop)
 		{
 			setDrive(-20, 20);
 			sleep(150);
-			writeDebugStreamLine("Break done: %d",  gPosition.a);
+			if (LOGS) writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
 		setDrive(0, 0);
 		break;
@@ -252,22 +252,22 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 			}
 			sleep(10);
 		}
-		writeDebugStreamLine("Turn done: %d",  gPosition.a);
+		if (LOGS) writeDebugStreamLine("Turn done: %d",  gPosition.a);
 		if (harshStop)
 		{
 			setDrive(20, -20);
 			sleep(150);
-			writeDebugStreamLine("Break done: %d",  gPosition.a);
+			if (LOGS) writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
 		setDrive(0, 0);
 		break;
 	}
-	writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
+	if (LOGS) writeDebugStreamLine("Turned to %f | %f %f %f", radToDeg(a), gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo, bool harshStop, float offset, bool velSafety)
 {
-	writeDebugStreamLine("Turning to %f %f", y, x);
+	if (LOGS) writeDebugStreamLine("Turning to %f %f", y, x);
 
 	if (turnDir == ch)
 		if (fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2) > PI) turnDir = ccw; else turnDir = cw;
@@ -282,7 +282,7 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 	case cw:
 		target = gPosition.a + fmod(atan2(x - gPosition.x, y - gPosition.y) + offset - gPosition.a, PI * 2);
 		endFull = gPosition.a * (1 - fullRatio) + target * fullRatio;
-		writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
+		if (LOGS) writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
 		setDrive(127, -127);
 		while (gPosition.a < endFull /*&& (velSafety? NOT_SAFETY(power, turnToTargetNewAlg) : 1 )*/)
 		{
@@ -312,19 +312,19 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 			}
 			sleep(10);
 		}
-		writeDebugStreamLine("Turn done: %d",  gPosition.a);
+		if (LOGS) writeDebugStreamLine("Turn done: %d",  gPosition.a);
 		if (harshStop)
 		{
 			setDrive(-20, 20);
 			sleep(150);
-			writeDebugStreamLine("Break done: %d",  gPosition.a);
+			if (LOGS) writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
 		setDrive(0, 0);
 		break;
 	case ccw:
 		target = gPosition.a - fmod(gPosition.a - atan2(x - gPosition.x, y - gPosition.y) - offset, PI * 2);
 		endFull = gPosition.a * (1 - fullRatio) + (target) * fullRatio;
-		writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
+		if (LOGS) writeDebugStreamLine("%f %f", radToDeg(target), radToDeg(endFull));
 		setDrive(-127, 127);
 		while (gPosition.a > endFull /*&& (velSafety? NOT_SAFETY(power, turnToTargetNewAlg) : 1 )*/)
 		{
@@ -354,17 +354,17 @@ void turnToTargetNewAlg(float y, float x, tTurnDir turnDir, float fullRatio, byt
 			}
 			sleep(10);
 		}
-		writeDebugStreamLine("Turn done: %d",  gPosition.a);
+		if (LOGS) writeDebugStreamLine("Turn done: %d",  gPosition.a);
 		if (harshStop)
 		{
 			setDrive(20, -20);
 			sleep(150);
-			writeDebugStreamLine("Break done: %d",  gPosition.a);
+			if (LOGS) writeDebugStreamLine("Break done: %d",  gPosition.a);
 		}
 		setDrive(0, 0);
 		break;
 	}
-	writeDebugStreamLine("Turned to %f %f | %f %f %f", y, x, gPosition.y, gPosition.x, radToDeg(gPosition.a));
+	if (LOGS) writeDebugStreamLine("Turned to %f %f | %f %f %f", y, x, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
 void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byte power, bool slow, bool velSafety)
@@ -413,7 +413,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 
 		a = nearAngle(a, power > 0 ? gPosition.a : (gPosition.a + PI));
 
-		writeDebugStreamLine("%d Sweep to %f around %f %f", nPgmTime, radToDeg(a), yOrigin, xOrigin);
+		if (LOGS) writeDebugStreamLine("%d Sweep to %f around %f %f", nPgmTime, radToDeg(a), yOrigin, xOrigin);
 
 		do
 		{
@@ -471,7 +471,7 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 
 		a = nearAngle(a, power > 0 ? gPosition.a : (gPosition.a + PI));
 
-		writeDebugStreamLine("%d Sweep to %f around %f %f", nPgmTime, radToDeg(a), yOrigin, xOrigin);
+		if (LOGS) writeDebugStreamLine("%d Sweep to %f around %f %f", nPgmTime, radToDeg(a), yOrigin, xOrigin);
 
 		do
 		{
@@ -518,5 +518,5 @@ void sweepTurnToTarget(float y, float x, float a, float r, tTurnDir turnDir, byt
 		break;
 	}
 	setDrive(0, 0);
-	writeDebugStreamLine("%d Done sweep turn", nPgmTime);
+	if (LOGS) writeDebugStreamLine("%d Done sweep turn", nPgmTime);
 }
