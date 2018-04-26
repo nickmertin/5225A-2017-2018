@@ -17,7 +17,7 @@ void runAuto()
 {
 #if SKILLS_ROUTE == 0
 	selectAuto();
-	writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
+	if (LOGS) writeDebugStreamLine("Selected auto: %s %d", gAlliance == allianceBlue ? "blue" : "red", gCurAuto);
 
 #ifdef AUTO_CUTOFF
 	killAutoAsync(gAutoTime + AUTO_CUTOFF);
@@ -144,7 +144,7 @@ bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long min
 			++rc;
 		}
 
-		writeDebugStreamLine("%d %d", l, r);
+		if (LOGS) writeDebugStreamLine("%d %d", l, r);
 
 		sleep(10);
 	}
@@ -154,7 +154,7 @@ bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long min
 	lu *= 0.0393701 / (float) lc;
 	ru *= 0.0393701 / (float) rc;
 
-	writeDebugStreamLine("Ultrasonic %f %f", lu, ru);
+	if (LOGS) writeDebugStreamLine("Ultrasonic %f %f", lu, ru);
 
 	if (crossField)
 		a += PI;
@@ -174,7 +174,7 @@ bool resetSonarFull(unsigned long time, unsigned long maxTime, float a, long min
 
 bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, float a, long min, long max, bool crossField)
 {
-	writeDebugStreamLine("%d Start reset Y", nPgmTime);
+	if (LOGS) writeDebugStreamLine("%d Start reset Y", nPgmTime);
 	unsigned long st = nPgmTime;
 	time += st;
 	maxTime += st;
@@ -187,7 +187,7 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 	{
 		if (nPgmTime > maxTime)
 		{
-			writeDebugStreamLine("%d MAX TIME %d", nPgmTime, maxTime);
+			if (LOGS) writeDebugStreamLine("%d MAX TIME %d", nPgmTime, maxTime);
 			return false;
 		}
 
@@ -198,7 +198,7 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 			++c;
 		}
 
-		writeDebugStreamLine("%d", l);
+		if (LOGS) writeDebugStreamLine("%d", l);
 
 		sleep(10);
 	}
@@ -207,7 +207,7 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 
 	u *= 0.0393701 / (float) c;
 
-	writeDebugStreamLine("Ultrasonic (L) %f", u);
+	if (LOGS) writeDebugStreamLine("Ultrasonic (L) %f", u);
 
 	if (crossField)
 		a += PI;
@@ -227,7 +227,7 @@ bool resetSonarYOnly(unsigned long time, unsigned long maxTime, float xInt, floa
 
 bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, float a, long min, long max, bool crossField)
 {
-	writeDebugStreamLine("%d Start reset X", nPgmTime);
+	if (LOGS) writeDebugStreamLine("%d Start reset X", nPgmTime);
 	unsigned long st = nPgmTime;
 	time += st;
 	maxTime += st;
@@ -240,7 +240,7 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 	{
 		if (nPgmTime > maxTime)
 		{
-			writeDebugStreamLine("%d MAX TIME %d", nPgmTime, maxTime);
+			if (LOGS) writeDebugStreamLine("%d MAX TIME %d", nPgmTime, maxTime);
 			return false;
 		}
 
@@ -251,7 +251,7 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 			++c;
 		}
 
-		writeDebugStreamLine("%d", r);
+		if (LOGS) writeDebugStreamLine("%d", r);
 
 		sleep(10);
 	}
@@ -260,7 +260,7 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 
 	u *= 0.0393701 / (float) c;
 
-	writeDebugStreamLine("Ultrasonic (R) %f", u);
+	if (LOGS) writeDebugStreamLine("Ultrasonic (R) %f", u);
 
 	if (crossField)
 		a += PI;
@@ -288,16 +288,16 @@ void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlo
 	byte val = 0;
 	while (val != 3 && (!timeout || nPgmTime < timeout))
 	{
-		writeDebugStreamLine("%d | %d %d | %d %d", nPgmTime, gSensor[lsBarL].value, SensorValue[lsBarL], gSensor[lsBarR].value, SensorValue[lsBarR]);
+		if (LOGS) writeDebugStreamLine("%d | %d %d | %d %d", nPgmTime, gSensor[lsBarL].value, SensorValue[lsBarL], gSensor[lsBarR].value, SensorValue[lsBarR]);
 		if (!(val & 1) && gSensor[lsBarL].value)
 		{
-			writeDebugStreamLine("%d Saw left", nPgmTime);
+			if (LOGS) writeDebugStreamLine("%d Saw left", nPgmTime);
 			left = leftSlow;
 			val |= 1;
 		}
 		if (!(val & 2) && gSensor[lsBarR].value)
 		{
-			writeDebugStreamLine("%d Saw right", nPgmTime);
+			if (LOGS) writeDebugStreamLine("%d Saw right", nPgmTime);
 			right = rightSlow;
 			val |= 2;
 		}
@@ -314,7 +314,7 @@ void killAuto(unsigned long timeout)
 	sleep(timeout - st);
 	if (competitionState == autonomousState)
 	{
-		writeDebugStreamLine("KILL AUTO");
+		if (LOGS) writeDebugStreamLine("KILL AUTO");
 		competitionSet(competitionNotRunning);
 		autoSimpleSet(autoSimpleNotRunning);
 		stackSet(stackNotRunning, sfNone);
@@ -830,7 +830,7 @@ skip5:
 			normalize(_x, _y, -1, 209);
 			goto noLine1;
 		}
-		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
+		if (LOGS) writeDebugStreamLine("%d", gSensor[lsField].rawValue);
 		sleep(10);
 	}
 	_y = gPosition.y;
@@ -935,7 +935,7 @@ skip1:
 			normalize(_x, _y, -1, 74);
 			goto noLine2;
 		}
-		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
+		if (LOGS) writeDebugStreamLine("%d", gSensor[lsField].rawValue);
 		sleep(10);
 	}
 	_y = gPosition.y;
@@ -1058,7 +1058,7 @@ skip2:
 	{
 		if (TimedOut(driveTimeout, TID2(skills, 8, 14), false, VEL_NONE, 0, 0))
 			goto noLine3;
-		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
+		if (LOGS) writeDebugStreamLine("%d", gSensor[lsField].rawValue);
 		sleep(10);
 	}
 	_y = gPosition.y;
@@ -1161,7 +1161,7 @@ noLine3:
 	{
 		if (TimedOut(driveTimeout, TID2(skills, 11, 14), false, VEL_NONE, 0, 0))
 			goto noLine4;
-		writeDebugStreamLine("%d", gSensor[lsField].rawValue);
+		if (LOGS) writeDebugStreamLine("%d", gSensor[lsField].rawValue);
 		sleep(10);
 	}
 	_y = gPosition.y;

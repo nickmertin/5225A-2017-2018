@@ -49,6 +49,7 @@ typedef struct _sSensor
 
 #ifdef CHECK_POTI_JUMPS
 	ubyte filterAcc;
+	ubyte jumpCount;
 #endif
 } sSensor; // Represent a single sensor
 

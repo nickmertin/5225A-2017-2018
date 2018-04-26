@@ -58,7 +58,10 @@ void updateSensorInput(tSensors sen)
 	if (SensorType[sen] == sensorPotentiometer && ++gSensor[sen].filterAcc < 10 && ( (abs(gSensor[sen].value - gSensor[sen].lstValue) > 400)/* || (gSensor[sen].velGood && gSensor[sen].potiCheckVel && sgn(gSensor[sen].velocity) == -sgn(gSensor[sen].lstVelocity))*/ ) )
 	{
 		if (gSensor[sen].filterAcc == 1)
+		{
 			writeDebugStreamLine("%d port %d jumped from %d to %d", nPgmTime, sen - port1 + 1, gSensor[sen].lstValue, gSensor[sen].value);
+			gSensor[sen].jumpCount ++;
+		}
 		gSensor[sen].value = gSensor[sen].lstValue;
 	}
 	else
@@ -120,12 +123,12 @@ void velocityCheck(tSensors sen)
 	sSensor& s = gSensor[sen];
 	for (ubyte i = 0; i < s.velCount; ++i)
 		if (s.velData[i].timestamp >= time)
-		{
-			if (i < SENSOR_VEL_POINT_COUNT - 1)
-				memmove(&s.velData[i], &s.velData[i + 1], sizeof(sSensorVelPoint) * (s.velCount - i - 1));
-			--i;
-			--s.velCount;
-		}
+	{
+		if (i < SENSOR_VEL_POINT_COUNT - 1)
+			memmove(&s.velData[i], &s.velData[i + 1], sizeof(sSensorVelPoint) * (s.velCount - i - 1));
+		--i;
+		--s.velCount;
+	}
 	if (!s.velCount || time - s.velData[s.velCount - 1].timestamp >= 20)
 	{
 		int sensor = s.value;
@@ -193,6 +196,7 @@ void setupSensors()
 
 #ifdef CHECK_POTI_JUMPS
 		gSensor[i].filterAcc = 0;
+		gSensor[i].jumpCount = 0;
 		gSensor[i].potiCheckVel = false;
 #endif
 
