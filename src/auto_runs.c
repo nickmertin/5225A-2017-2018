@@ -1306,7 +1306,8 @@ void pickupMobileLeft(int cones)
 		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pic, 2, 7), false);
 		moveToTargetSimpleAsync(138, 12, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttSimple, false);
 		driveTimeout = nPgmTime + 1500;
-		DRIVE_AWAIT(pickupMobileLeft, 2, 8);
+		//DRIVE_AWAIT(pickupMobileLeft, 2, 8);
+		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(pickupMobileLeft, 2, 8), false);
 		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileLeft, 2, 9), false);
 		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
 		coneTimeout = nPgmTime + 1500;
@@ -1400,7 +1401,8 @@ void pickupMobileRight(int cones)
 		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileRight, 2, 7), false);
 		moveToTargetSimpleAsync(12, 138, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttSimple, false);
 		driveTimeout = nPgmTime + 1500;
-		DRIVE_AWAIT(pickupMobileRight, 2, 8);
+		//DRIVE_AWAIT(pickupMobileRight, 2, 8);
+		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(pickupMobileRight, 2, 8), false);
 		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileRight, 2, 9), false);
 		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
 		coneTimeout = nPgmTime + 1500;
