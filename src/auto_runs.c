@@ -1240,7 +1240,7 @@ void pickupMobileLeft(int cones)
 	moveToTargetSimpleAsync(71, 15, gPosition.y, gPosition.x, 127, 50, 0.5, 0, 0, 14, stopNone, mttProportional, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(pickupMobileLeft, 1, 3);
-	moveToTargetSimpleAsync(106, 13, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttSimple, false);
+	moveToTargetSimpleAsync(106, 13, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 14, stopNone, mttSimple, true);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(pickupMobileLeft, 1, 4);
 	driveTimeout = nPgmTime + 1000;
@@ -1406,7 +1406,7 @@ void score20()
 	_x = gPosition.x;
 	_y = gPosition.y;
 	normalize(_x, _y, -1, 56);
-	moveToTargetDisSimpleAsync(-0.75 * PI, 8, _y, _x, 60, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
+	moveToTargetDisSimpleAsync(-0.75 * PI, 8, _y, _x, 60, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(score20, 1, 2);
 	setDrive(45, 45);
@@ -1421,7 +1421,7 @@ void score20()
 	sleep(300);
 
 	// 2
-	moveToTargetDisSimpleAsync(-0.75 * PI, -5, _y, _x, -60, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
+	moveToTargetDisSimpleAsync(-0.75 * PI, -5, _y, _x, -60, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(score20, 2, 1);
 	mobileSet(mobileBottom, mfNone);
@@ -1470,7 +1470,7 @@ void stationaryLeft(bool secondCone)
 		turnToTargetNewAlgAsync(48, 48, ch, 0.4, 26, 11, false, true, 0, false);
 		driveTimeout = nPgmTime + 2000;
 		DRIVE_AWAIT(stationaryLeft, 3, 1);
-		moveToTargetSimpleAsync(48, 48, gPosition.y, gPosition.x, 80, 0, 0.5, 0, 0, 5, stopNone, mttSimple, true);
+		moveToTargetSimpleAsync(48, 48, gPosition.y, gPosition.x, 80, 0, 0.5, 0, 0, 5, stopNone, mttSimple, false);
 		driveTimeout = nPgmTime + 2000;
 		stackSet(stackStationaryPrep, sfNoResetAuto);
 		DRIVE_AWAIT(stationaryLeft, 3, 2);
