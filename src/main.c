@@ -1450,6 +1450,11 @@ void handleMacros()
 		gDriveManual = true;
 		gSkillsSpinTimeout = 0;
 	}
+
+	if (((RISING(BTN_MACRO_INC) && gJoy[BTN_MACRO_DEC].cur) || (gJoy[BTN_MACRO_INC].cur && RISING(BTN_MACRO_DEC))) && !stackRunning())
+	{
+		stackSet(stackTip, sfNone);
+	}
 }
 
 void waitForSkillsOverride(TVexJoysticks joy)
