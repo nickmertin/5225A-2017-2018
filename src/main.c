@@ -218,6 +218,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_LOADER (LIFT_BOTTOM + 800)
 #define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 500)
 #define LIFT_RETURN (LIFT_BOTTOM + 400)
+#define LIFT_WALL (LIFT_BOTTOM + 450)
 
 DECLARE_MACHINE(lift, tLiftStates)
 
@@ -814,7 +815,7 @@ void handleMobile()
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
 				if (gNumCones > (gSensor[jmpSkills].value ? 4 : 2))
-				stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
+					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
 				else
 				{
 					gMobileSlow = false;
@@ -888,7 +889,16 @@ case stackPickupGround:
 		{
 			gDriveManual = false;
 			//gWallTurnCheck = true;
+			driveTimeout = nPgmTime +  2000;
 			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
+			autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID1(stackWall, 3));
+			gDriveManual = true;
+
+			liftTimeOut = nPgmTime + 2000;
+			liftSet(liftToTarget, LIFT_WALL-150);
+			//liftRaiseSimpleAsync(LIFT_WALL-100, 70, -20);
+			armSet(armToTarget, ARM_HORIZONTAL);
+			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackWall, 4));
 		}
 
 		if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
@@ -1181,7 +1191,6 @@ case stackWall:
 		unsigned long liftTimeOut;
 
 		gWallTurn = wtNone;
-		gWallTurnCheck = true;
 
 		armSet(armToTarget, ARM_PRESTACK - 300);
 		liftSet(liftToBottom, -127);
@@ -1190,8 +1199,6 @@ case stackWall:
 		armRaiseSimpleAsync(ARM_PRESTACK, 80, 0);
 		armTimeOut = nPgmTime + 1000;
 		armTimeoutWhile(armRaiseSimpleState, armTimeOut, TID1(stackWall, 2));
-
-		gWall = false;
 
 		if (LOGS) writeDebugStreamLine("%d gWallTurnCheck false", nPgmTime);
 		gWallTurnCheck = true;
