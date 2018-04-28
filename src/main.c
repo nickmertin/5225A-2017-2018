@@ -216,7 +216,7 @@ void setLift(word power,bool debug=false)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 800)
-#define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 500)
+#define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 480)
 #define LIFT_RETURN (LIFT_BOTTOM + 400)
 #define LIFT_WALL (LIFT_BOTTOM + 450)
 
@@ -890,12 +890,12 @@ case stackPickupGround:
 			gDriveManual = false;
 			//gWallTurnCheck = true;
 			driveTimeout = nPgmTime +  2000;
-			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
+			moveToTargetDisSimpleAsync(gPosition.a, -0.5, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
 			autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID1(stackWall, 3));
 			gDriveManual = true;
 
 			liftTimeOut = nPgmTime + 2000;
-			liftSet(liftToTarget, LIFT_WALL-150);
+			liftSet(liftToTarget, LIFT_WALL-200);
 			//liftRaiseSimpleAsync(LIFT_WALL-100, 70, -20);
 			armSet(armToTarget, ARM_HORIZONTAL);
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackWall, 4));
@@ -928,7 +928,7 @@ case stackPickupGround:
 
 		if (LOGS) writeDebugStreamLine("stackPickupGround 3 %06d %d", nPgmTime, gSensor[armPoti].value);
 
-		sleep(50);
+		sleep((arg & sfPull) ? 150 : 50);
 		armSet(armManaged);
 		setArm(127);
 		armTimeOut = nPgmTime + 500;
