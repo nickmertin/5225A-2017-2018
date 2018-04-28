@@ -888,7 +888,7 @@ case stackPickupGround:
 		{
 			gDriveManual = false;
 			//gWallTurnCheck = true;
-			moveToTargetDisSimpleAsync(gPosition.a, -0.25, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
+			moveToTargetDisSimpleAsync(gPosition.a, -0.3, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
 		}
 
 		if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
@@ -918,7 +918,7 @@ case stackPickupGround:
 
 		if (LOGS) writeDebugStreamLine("stackPickupGround 3 %06d %d", nPgmTime, gSensor[armPoti].value);
 
-		sleep(50);
+		sleep((arg & sfPull) ? 150 : 50);
 		armSet(armManaged);
 		setArm(127);
 		armTimeOut = nPgmTime + 500;
