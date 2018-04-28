@@ -889,19 +889,18 @@ case stackPickupGround:
 		{
 			gDriveManual = false;
 			//gWallTurnCheck = true;
-			driveTimeout = nPgmTime +  2000;
-			moveToTargetDisSimpleAsync(gPosition.a, -0.5, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
+			driveTimeout = nPgmTime + 2000;
+			moveToTargetDisSimpleAsync(gPosition.a, -1.5, gPosition.y, gPosition.x, -60, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
 			autoSimpleTimeoutWhile(moveToTargetDisSimpleState, driveTimeout, TID1(stackWall, 3));
 			gDriveManual = true;
 
 			liftTimeOut = nPgmTime + 2000;
 			liftSet(liftToTarget, LIFT_WALL-200);
 			//liftRaiseSimpleAsync(LIFT_WALL-100, 70, -20);
-			armSet(armToTarget, ARM_HORIZONTAL);
+			armSet(armToBottom, -127);
 			liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackWall, 4));
 		}
-
-		if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
+		else if (gSensor[liftPoti].value < LIFT_BOTTOM + 400 && gSensor[armPoti].value > ARM_HORIZONTAL)
 		{
 			armSet(armToTarget, ARM_RELEASE);
 		}
