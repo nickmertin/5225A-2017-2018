@@ -139,7 +139,8 @@ typedef enum _stackStates {
 	stackDetach,
 	stackClear,
 	stackReturn,
-	stackWall
+	stackWall,
+	stackTip
 } tStackStates;
 
 DECLARE_MACHINE(stack, tStackStates)
@@ -1195,6 +1196,30 @@ case stackWall:
 
 		if (LOGS) writeDebugStreamLine("%d gWallTurnCheck false", nPgmTime);
 		gWallTurnCheck = true;
+
+		NEXT_STATE(stackNotRunning)
+	}
+case stackTip:
+	{
+		if (LOGS) writeDebugStreamLine("%06d stackTip %x", nPgmTime, arg);
+		unsigned long armTimeOut;
+		unsigned long liftTimeOut;
+		unsigned long driveTimeout;
+
+		gDriveManual = false;
+
+		armSet(armToBottom, -127);
+		armTimeOut = nPgmTime + 1000;
+		liftTimeOut = liftLowerSimpleAsync(LIFT_BOTTOM + 100, -127, 0);
+		liftTimeOut = nPgmTime + 1200;
+		liftTimeoutWhile(liftLowerSimpleState, liftTimeOut, TID1(stackTip, 1));
+		liftSet(liftManaged);
+		setLift(-15);
+		armTimeoutWhile(armToBottom, armTimeOut, TID1(stackTip, 2));
+
+		moveToTargetDisSimpleAsync(gPosition.a, -12, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
+		driveTimeout = nPgmTime + 3000;
+		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackTip, 3));
 
 		NEXT_STATE(stackNotRunning)
 	}
