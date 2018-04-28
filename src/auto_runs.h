@@ -20,6 +20,8 @@ void auto5Left(int cones);
 void auto5Right(int cones);
 void autoSBLeft(bool secondCone, bool boomKapow);
 void autoSBRight(bool secondCone, bool boomKapow);
+void autoSideBlockLeft(int cones);
+void autoSideBlockRight(int cones);
 
 #elif SKILLS_ROUTE < 0
 
@@ -38,7 +40,7 @@ bool gAutoStartSkills = false;
 
 /* Defines */
 #if SKILLS_ROUTE == 0
-#define AUTO_OPTIONS_COUNT 9
+#define AUTO_OPTIONS_COUNT 11
 #elif SKILLS_ROUTE == 1
 #define AUTO_OPTIONS_COUNT 1
 #define SKILLS_1_SAFE (gAlliance == allianceRed)
