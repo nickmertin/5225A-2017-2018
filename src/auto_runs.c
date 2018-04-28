@@ -67,8 +67,6 @@ void normalize(float& x, float& y, float m, float b)
 	y = m * x + b;
 }
 
-#if SKILLS_ROUTE != 0
-
 #define START_BAR_INTERCEPT 43.7
 #define START_BAR_ROBOT_OFFSET 6.5
 #define START_BAR_RESET_INTERCEPT (START_BAR_INTERCEPT + START_BAR_ROBOT_OFFSET * sqrt(2))
@@ -277,6 +275,8 @@ bool resetSonarXOnly(unsigned long time, unsigned long maxTime, float yInt, floa
 	resetVelocity(gVelocity, gPosition);
 	return true;
 }
+
+#if SKILLS_ROUTE != 0
 
 void driveAgainstStartingBar(word left, word right, word leftSlow, word rightSlow, unsigned long timeout)
 {
@@ -1420,17 +1420,16 @@ void score20()
 	sleep(300);
 	timeoutWhileLessThanF(VEL_NONE, 0, &gVelocity.y, -0.05, driveTimeout, TID2(score20, 1, 3));
 	setDrive(15, 15);
+	sleep(400);
+	resetSonarFull(100, 300, -0.75 * PI, 180, 650, 180, 650, false);
 	mobileTimeoutUntil(mobileMiddle, coneTimeout, TID2(score20, 1, 4));
 	liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
 	sleep(300);
 
 	// 2
-	moveToTargetDisSimpleAsync(-0.75 * PI, -5, _y, _x, -60, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
+	moveToTargetDisSimpleAsync(-0.75 * PI, -5, _y, _x, -60, 0, 0, 0, 0, 0, stopSoft, mttSimple, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(score20, 2, 1);
-	mobileSet(mobileBottom, mfNone);
-	coneTimeout = nPgmTime + 1500;
-	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 100, coneTimeout, TID2(score20, 2, 2));
 }
 
 void stationaryLeft(bool secondCone)
@@ -1562,6 +1561,24 @@ void auto20Left(int cones)
 	DRIVE_AWAIT(auto20Left, 1, 2);
 
 	score20();
+
+	// 2
+	turnToAngleNewAlgAsync(-0.25 * PI, cw, 0.27, 23, 12, false, false, false);
+	driveTimeout = nPgmTime + 1500;
+	mobileSet(mobileTop, mfClear);
+	DRIVE_AWAIT(auto20Left, 2, 1);
+	moveToTargetDisSimpleAsync(gPosition.a, 2, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
+	driveTimeout = nPgmTime + 3000;
+	DRIVE_AWAIT(auto20Left, 2, 2);
+	moveToTargetSimpleAsync(71, 47, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 7, stopNone, mttCascading, true);
+	driveTimeout = nPgmTime + 5000;
+	liftRaiseSimpleAsync(LIFT_LOADER_PICKUP, 127, -10);
+	coneTimeout = nPgmTime + 1100;
+	DRIVE_AWAIT(auto20Left, 2, 3);
+	liftTimeoutWhile(liftRaiseSimpleState, coneTimeout, TID2(auto20Left, 2, 4));
+	stackSet(stackTip, sfNone);
+	coneTimeout = nPgmTime + 2000;
+	stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(auto20Left, 2, 5));
 }
 
 void auto20Right(int cones)
@@ -1580,6 +1597,24 @@ void auto20Right(int cones)
 	DRIVE_AWAIT(auto20Right, 1, 2);
 
 	score20();
+
+	// 2
+	turnToAngleNewAlgAsync(0.75 * PI, ccw, 0.27, 23, 12, false, false, false);
+	driveTimeout = nPgmTime + 1500;
+	mobileSet(mobileTop, mfClear);
+	DRIVE_AWAIT(auto20Right, 2, 1);
+	moveToTargetDisSimpleAsync(gPosition.a, 2, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
+	driveTimeout = nPgmTime + 3000;
+	DRIVE_AWAIT(auto20Right, 2, 2);
+	moveToTargetSimpleAsync(47, 71, gPosition.y, gPosition.x, 127, 127, 0.5, 0, 0, 7, stopNone, mttCascading, true);
+	driveTimeout = nPgmTime + 5000;
+	liftRaiseSimpleAsync(LIFT_LOADER_PICKUP, 127, -10);
+	coneTimeout = nPgmTime + 1100;
+	DRIVE_AWAIT(auto20Right, 2, 3);
+	liftTimeoutWhile(liftRaiseSimpleState, coneTimeout, TID2(auto20Right, 2, 4));
+	stackSet(stackTip, sfNone);
+	coneTimeout = nPgmTime + 2000;
+	stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(auto20Right, 2, 5));
 }
 
 void auto5Left(int cones)
