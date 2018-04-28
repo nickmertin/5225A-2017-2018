@@ -1300,7 +1300,7 @@ void pickupMobileLeft(int cones)
 		}
 		if (cones == 3) return;
 		sleep(400);
-		moveToTargetSimpleAsync(12, 138, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 11, stopHarsh, mttSimple, true);
+		moveToTargetSimpleAsync(138, 12, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 11, stopHarsh, mttSimple, true);
 		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileLeft, 2, 7), false);
 		if (stackState == stackNotRunning) {
 			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
