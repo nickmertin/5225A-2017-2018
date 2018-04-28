@@ -1273,10 +1273,7 @@ void pickupMobileLeft(int cones)
 			moveToTargetSimpleAsync(119, 12, gPosition.y, gPosition.x, 70, 70, 0.5, 0, 0, 9.5, stopHarsh, mttCascading, false);
 		}
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileLeft, 2, 3));
-		if (cones == 4)
-			stackSet(stackStack, STACK_RAPID_CONFIG(sfReturn | sfNoResetAuto, 3), true);
-		else
-			stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, cones), true);
+		stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, cones), true);
 		coneTimeout = nPgmTime + 1500;
 		if (cones == 1) return;
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileLeft, 2, 4), false);
@@ -1302,16 +1299,9 @@ void pickupMobileLeft(int cones)
 			return;
 		}
 		if (cones == 3) return;
-		gWall = true;
-		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pic, 2, 7), false);
-		moveToTargetSimpleAsync(138, 12, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttSimple, true);
-		driveTimeout = nPgmTime + 3500;
-		//DRIVE_AWAIT(pickupMobileLeft, 2, 8);
-		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(pickupMobileLeft, 2, 8), false);
-		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileLeft, 2, 9), false);
-		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
-		coneTimeout = nPgmTime + 1500;
-		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileLeft, 2, 10), false);
+		sleep(400);
+		moveToTargetSimpleAsync(12, 138, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 11, stopHarsh, mttSimple, true);
+		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileLeft, 2, 7), false);
 		if (stackState == stackNotRunning) {
 			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
 			return;
@@ -1368,10 +1358,7 @@ void pickupMobileRight(int cones)
 			moveToTargetSimpleAsync(12, 119, gPosition.y, gPosition.x, 70, 70, 0.5, 0, 0, 9.5, stopHarsh, mttCascading, false);
 		}
 		timeoutWhileLessThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, coneTimeout, TID2(pickupMobileRight, 2, 3));
-		if (cones == 4)
-			stackSet(stackStack, STACK_RAPID_CONFIG(sfReturn | sfNoResetAuto, 3), true);
-		else
-			stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, cones), true);
+		stackSet(stackStack, STACK_RAPID_CONFIG(sfDetach | sfNoResetAuto, cones), true);
 		coneTimeout = nPgmTime + 1500;
 		if (cones == 1) return;
 		stackTimeoutUntil(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 4), false);
@@ -1397,16 +1384,9 @@ void pickupMobileRight(int cones)
 			return;
 		}
 		if (cones == 3) return;
-		gWall = true;
+		sleep(400);
+		moveToTargetSimpleAsync(12, 138, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 11, stopHarsh, mttSimple, true);
 		stackTimeoutUntil(stackNotRunning, coneTimeout, TID2(pickupMobileRight, 2, 7), false);
-		moveToTargetSimpleAsync(12, 138, gPosition.y, gPosition.x, 55, 55, 0.5, 0, 0, 9, stopNone, mttSimple, true);
-		driveTimeout = nPgmTime + 3500;
-		//DRIVE_AWAIT(pickupMobileRight, 2, 8);
-		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID2(pickupMobileRight, 2, 8), false);
-		timeoutWhileGreaterThanF(VEL_NONE, 0, &gVelocity.x, 0, driveTimeout, TID2(pickupMobileRight, 2, 9), false);
-		stackSet(stackPickupGround, sfStack | sfDetach | sfPull, true);
-		coneTimeout = nPgmTime + 1500;
-		stackTimeoutWhile(stackPickupGround, coneTimeout, TID2(pickupMobileRight, 2, 10), false);
 		if (stackState == stackNotRunning) {
 			stackSet(stackStack, sfNoResetAuto | sfDetach, true);
 			return;

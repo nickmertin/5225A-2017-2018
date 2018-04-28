@@ -1586,7 +1586,7 @@ void disabled()
 void autonomous()
 {
 	gAutoTime = nPgmTime;
-	if (LOGS) writeDebugStreamLine("Auto start %d", gAutoTime);
+	writeDebugStreamLine("Auto start %d", gAutoTime);
 
 	startSensors();
 
@@ -1601,7 +1601,7 @@ void autonomous()
 
 	runAuto();
 
-	if (LOGS) writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
+	writeDebugStreamLine("Auto: %d ms", nPgmTime - gAutoTime);
 
 	setDrive(0, 0);
 	stackReset();
