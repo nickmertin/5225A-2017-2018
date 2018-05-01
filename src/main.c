@@ -1231,7 +1231,7 @@ case stackTip:
 		liftSet(liftToBottom, -127);
 		liftTimeOut = nPgmTime + 1000;
 		//sleep(300);
-		moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
+		moveToTargetDisSimpleAsync(gPosition.a, -8, gPosition.y, gPosition.x, -80, 0, 0, 0, 0, 0, stopNone, mttSimple, true);
 		driveTimeout = nPgmTime + 3000;
 		autoSimpleTimeoutUntil(autoSimpleNotRunning, driveTimeout, TID1(stackTip, 4));
 		liftTimeoutWhile(liftToBottom, liftTimeOut, TID1(stackTip, 5));
