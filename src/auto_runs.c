@@ -1780,7 +1780,7 @@ void autoSideBlockLeft(int cones)
 	turnToTargetNewAlgAsync(120, 60, ch, 0.45, 30, 12, true, false, PI, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(autoSideBlockLeft, 1, 1);
-	moveToTargetSimpleAsync(120, 60, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopNone, mttCascading, true);
+	moveToTargetSimpleAsync(120, 60, gPosition.y, gPosition.x, -127, -30, 0.5, 24, -127, 0, stopNone, mttCascading, true);
 	driveTimeout = nPgmTime + 6000;
 	stackSet(stackClear, STACK_CLEAR_CONFIG(sfNoResetAuto, mobileBottom, mfNone));
 	DRIVE_AWAIT(autoSideBlockLeft, 1, 2);
@@ -1821,7 +1821,7 @@ void autoSideBlockRight(int cones)
 	turnToTargetNewAlgAsync(60, 120, ch, 0.45, 30, 12, true, false, PI, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(autoSideBlockRight, 1, 1);
-	moveToTargetSimpleAsync(60, 120, gPosition.y, gPosition.x, -127, -30, 0.5, 0, 0, 0, stopNone, mttCascading, true);
+	moveToTargetSimpleAsync(60, 120, gPosition.y, gPosition.x, -127, -30, 0.5, 24, -127, 0, stopNone, mttCascading, true);
 	driveTimeout = nPgmTime + 6000;
 	stackSet(stackClear, STACK_CLEAR_CONFIG(sfNoResetAuto, mobileBottom, mfNone));
 	DRIVE_AWAIT(autoSideBlockRight, 1, 2);
