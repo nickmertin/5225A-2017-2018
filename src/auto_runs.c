@@ -1436,6 +1436,8 @@ void score20()
 	moveToTargetDisSimpleAsync(-0.75 * PI, -5, _y, _x, -60, 0, 0, 0, 0, 0, stopSoft, mttSimple, false);
 	driveTimeout = nPgmTime + 1500;
 	DRIVE_AWAIT(score20, 2, 1);
+
+	gNumCones = 0;
 }
 
 void stationaryLeft(bool secondCone)
