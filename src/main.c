@@ -1334,6 +1334,14 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	}
 }
 
+void waitForKiddieStart(unsigned long holdTime)
+{
+	sleep(holdTime);
+	gKiddieControl = true;
+}
+
+NEW_ASYNC_VOID_1(waitForKiddieStart, unsigned long);
+
 bool stackRunning()
 {
 	return stackState != stackNotRunning;
@@ -1441,7 +1449,16 @@ void handleMacros()
 		armSet(armToBottom, -127);
 	}
 
-	if (RISING(BTN_MACRO_CANCEL)) cancel();
+	if (RISING(BTN_MACRO_CANCEL))
+	{
+		cancel();
+		waitForKiddieStartAsync(1000);
+	}
+
+	if (FALLING(BTN_MACRO_CANCEL))
+	{
+		waitForKiddieStartKill();
+	}
 
 	if (RISING(BTN_MACRO_INC) && gNumCones < MAX_STACK && !gWallTurnCheck) {
 		++gNumCones;
@@ -1537,22 +1554,22 @@ void startup()
 	gJoy[JOY_LIFT_DRIVER].deadzone = DZ_LIFT;
 	gJoy[JOY_ARM_DRIVER].deadzone = DZ_ARM;
 
-	enableJoystick(JOY_TURN);
-	enableJoystick(JOY_THROTTLE);
-	enableJoystick(JOY_LIFT_DRIVER);
-	enableJoystick(JOY_ARM_DRIVER);
-	enableJoystick(BTN_MOBILE_TOGGLE);
-	enableJoystick(BTN_MOBILE_MIDDLE);
-	enableJoystick(BTN_MACRO_ZERO);
-	enableJoystick(BTN_MACRO_STACK);
-	enableJoystick(BTN_MACRO_LOADER);
-	enableJoystick(BTN_MACRO_PREP);
-	enableJoystick(BTN_GAME_STATIONARY);
-	enableJoystick(BTN_GAME_WALL);
-	enableJoystick(BTN_MACRO_PICKUP);
-	enableJoystick(BTN_MACRO_CANCEL);
-	enableJoystick(BTN_MACRO_INC);
-	enableJoystick(BTN_MACRO_DEC);
+	ENABLE(JOY_TURN);
+	ENABLE(JOY_THROTTLE);
+	ENABLE(JOY_LIFT_DRIVER);
+	ENABLE(JOY_ARM_DRIVER);
+	ENABLE(BTN_MOBILE_TOGGLE);
+	ENABLE(BTN_MOBILE_MIDDLE);
+	ENABLE(BTN_MACRO_ZERO);
+	ENABLE(BTN_MACRO_STACK);
+	ENABLE(BTN_MACRO_LOADER);
+	ENABLE(BTN_MACRO_PREP);
+	ENABLE(BTN_GAME_STATIONARY);
+	ENABLE(BTN_GAME_WALL);
+	ENABLE(BTN_MACRO_PICKUP);
+	ENABLE(BTN_MACRO_CANCEL);
+	ENABLE(BTN_MACRO_INC);
+	ENABLE(BTN_MACRO_DEC);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)
