@@ -371,18 +371,18 @@ void handleLift()
 
 	if (liftState == liftManaged || stackRunning()) return;
 
-	if (RISING(JOY_LIFT_DRIVER) || RISING(JOY_LIFT_PARTNER))
+	if (RISING(JOY_LIFT_DRIVER))
 	{
 		liftSet(liftManual);
 	}
-	if (liftState == liftManual && !gJoy[JOY_LIFT_DRIVER].cur && !gJoy[JOY_LIFT_PARTNER].cur)
+	if (liftState == liftManual && !gJoy[JOY_LIFT_DRIVER].cur)
 	{
 		liftSet(liftHold, -1);
 	}
 
 	if (liftState == liftManual)
 	{
-		word value = gJoy[JOY_LIFT_DRIVER].cur ? gJoy[JOY_LIFT_DRIVER].cur : gJoy[JOY_LIFT_PARTNER].cur;
+		word value = gJoy[JOY_LIFT_DRIVER].cur;
 		value = value * 2 - 128 * sgn(value);
 		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -15) value = -15;
 		if (gSensor[liftPoti].value >= LIFT_TOP && value > 15) value = 15;
@@ -601,18 +601,18 @@ void handleArm()
 
 	if (armState == armManaged || stackRunning()) return;
 
-	if (RISING(JOY_ARM_DRIVER) || RISING(JOY_ARM_PARTNER))
+	if (RISING(JOY_ARM_DRIVER))
 	{
 		armSet(armManual);
 	}
-	if (armState == armManual && !gJoy[JOY_ARM_DRIVER].cur && !gJoy[JOY_ARM_PARTNER].cur)
+	if (armState == armManual && !gJoy[JOY_ARM_DRIVER].cur)
 	{
 		armSet(armHold, -1);
 	}
 
 	if (armState == armManual)
 	{
-		word value = gJoy[JOY_ARM_DRIVER].cur ? gJoy[JOY_ARM_DRIVER].cur : gJoy[JOY_ARM_PARTNER].cur;
+		word value = gJoy[JOY_ARM_DRIVER].cur;
 		value = value * 2 - 128 * sgn(value);
 		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
 		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
@@ -1535,16 +1535,12 @@ void startup()
 	gJoy[JOY_TURN].deadzone = DZ_TURN;
 	gJoy[JOY_THROTTLE].deadzone = DZ_THROTTLE;
 	gJoy[JOY_LIFT_DRIVER].deadzone = DZ_LIFT;
-	gJoy[JOY_LIFT_PARTNER].deadzone = DZ_LIFT;
 	gJoy[JOY_ARM_DRIVER].deadzone = DZ_ARM;
-	gJoy[JOY_ARM_PARTNER].deadzone = DZ_ARM;
 
 	enableJoystick(JOY_TURN);
 	enableJoystick(JOY_THROTTLE);
 	enableJoystick(JOY_LIFT_DRIVER);
-	enableJoystick(JOY_LIFT_PARTNER);
 	enableJoystick(JOY_ARM_DRIVER);
-	enableJoystick(JOY_ARM_PARTNER);
 	enableJoystick(BTN_MOBILE_TOGGLE);
 	enableJoystick(BTN_MOBILE_MIDDLE);
 	enableJoystick(BTN_MACRO_ZERO);
@@ -1557,16 +1553,6 @@ void startup()
 	enableJoystick(BTN_MACRO_CANCEL);
 	enableJoystick(BTN_MACRO_INC);
 	enableJoystick(BTN_MACRO_DEC);
-	MIRROR(BTN_MOBILE_TOGGLE);
-	MIRROR(BTN_MOBILE_MIDDLE);
-	MIRROR(BTN_MACRO_STACK);
-	MIRROR(BTN_MACRO_PREP);
-	MIRROR(BTN_MACRO_CANCEL);
-	MIRROR(BTN_MACRO_INC);
-	MIRROR(BTN_MACRO_DEC);
-	MIRROR(Btn7L);
-	MIRROR(Btn8R);
-	mirrorJoystick(BTN_MACRO_ZERO, BTN_MACRO_ZERO_PARTNER);
 }
 
 // This function gets called every 25ms during disabled (DO NOT PUT BLOCKING CODE IN HERE)

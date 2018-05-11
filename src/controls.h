@@ -6,12 +6,10 @@
 
 /* Lift */
 #define JOY_LIFT_DRIVER Ch2
-#define JOY_LIFT_PARTNER Ch2Xmtr2
 #define DZ_LIFT 70
 
 /* Arm */
 #define JOY_ARM_DRIVER Ch1
-#define JOY_ARM_PARTNER Ch1Xmtr2
 #define DZ_ARM 70
 
 /* Mobile */
@@ -20,7 +18,6 @@
 
 /* Universal Macros */
 #define BTN_MACRO_ZERO Btn7U
-#define BTN_MACRO_ZERO_PARTNER Btn7UXmtr2
 #define BTN_MACRO_STACK Btn8D
 #define BTN_MACRO_LOADER Btn7D
 #define BTN_MACRO_PICKUP Btn7L
