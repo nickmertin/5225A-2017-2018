@@ -6,6 +6,7 @@ typedef struct _sJoy
 	short deadzone;
 	bool enabled;
 	TVexJoysticks partner;
+	bool ignore;
 } sJoy; // Represent a single item on the joystick
 
 /* Functions */

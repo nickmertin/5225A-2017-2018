@@ -62,6 +62,15 @@ void handleLcd()
 		displayLCDCenteredString(0, "AUTO START");
 		displayLCDCenteredString(1, gAutoStartSkills ? "SKILLS" : "GAME");
 		break;
+	case lcdAutoOverride:
+		if (LCD_RISING(btnCenter))
+		{
+			sleep(5000);
+			autonomousAsync();
+		}
+		displayLCDCenteredString(0, "AUTO OVERRIDE");
+		clearLCDLine(1);
+		break;
 	case lcdBattery:
 		sprintf(line, "Main:       %1.2f V", (float)nImmediateBatteryLevel / 1000.0);
 		displayLCDString(0, 0, line);

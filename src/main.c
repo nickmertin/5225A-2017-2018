@@ -39,7 +39,7 @@
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
-#define SKILLS_ROUTE 0
+#define SKILLS_ROUTE 1
 
 #define DRIVE_WEIGHT_GAME 0
 #define DRIVE_WEIGHT_SKILLS 0
@@ -1334,13 +1334,15 @@ bool TimedOut(unsigned long timeOut, const unsigned char *routine, unsigned shor
 	}
 }
 
-void waitForKiddieStart(unsigned long holdTime)
+void waitForKiddieStart(TVexJoysticks joy, unsigned long holdTime)
 {
 	sleep(holdTime);
+	gJoy[joy].ignore = true;
 	gKiddieControl = true;
+	writeDebugStreamLine("KC BEGIN");
 }
 
-NEW_ASYNC_VOID_1(waitForKiddieStart, unsigned long);
+NEW_ASYNC_VOID_2(waitForKiddieStart, TVexJoysticks, unsigned long);
 
 bool stackRunning()
 {
@@ -1452,7 +1454,7 @@ void handleMacros()
 	if (RISING(BTN_MACRO_CANCEL))
 	{
 		cancel();
-		waitForKiddieStartAsync(1000);
+		waitForKiddieStartAsync(BTN_MACRO_CANCEL, 1000);
 	}
 
 	if (FALLING(BTN_MACRO_CANCEL))

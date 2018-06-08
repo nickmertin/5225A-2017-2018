@@ -768,11 +768,8 @@ skip5:
 	moveToTargetDisSimpleAsync(gPosition.a, 5, gPosition.y, gPosition.x, 127, 0, 0, 0, 0, 0, stopHarsh, mttSimple, false);
 	driveTimeout = nPgmTime + 1500;
 	sleep(500);
-	if (nPgmTime - gAutoTime < 59300)
-	{
-		mobileSet(mobileBottom, mfNone);
-		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 16, 3));
-	}
+	mobileSet(mobileBottom, mfNone);
+	timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_BOTTOM + 200, coneTimeout, TID2(skills, 16, 3));
 	DRIVE_AWAIT(skills, 16, 4);
 	moveToTargetDisSimpleAsync(gPosition.a, -5, gPosition.y, gPosition.x, -127, 0, 0, 0, 0, 0, stopNone, mttSimple, false);
 	driveTimeout = nPgmTime + 1000;

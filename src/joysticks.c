@@ -6,6 +6,7 @@ void setupJoysticks()
 		gJoy[i].deadzone = -1;
 		gJoy[i].enabled = false;
 		gJoy[i].partner = -1;
+		gJoy[i].ignore = false;
 	}
 }
 
@@ -20,12 +21,19 @@ void updateJoystick(TVexJoysticks joy)
 {
 	gJoy[joy].lst = gJoy[joy].cur;
 	short val = vexRT[joy];
-	if (gJoy[joy].partner != -1)
+	if (gJoy[joy].partner != -1 && gKiddieControl)
 	{
-		if (abs(val) > gJoy[joy].deadzone && !gJoy[joy].lst)
+		if (!gJoy[joy].ignore && val && abs(val) > gJoy[joy].deadzone)
+		{
 			gKiddieControl = false;
-		if (gKiddieControl)
+			writeDebugStreamLine("KC END");
+		}
+		else
+		{
+			if (!val)
+				gJoy[joy].ignore = false;
 			val = vexRT[gJoy[joy].partner];
+		}
 	}
 	gJoy[joy].cur = abs(val) > gJoy[joy].deadzone ? val : 0;
 }
