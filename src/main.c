@@ -210,8 +210,8 @@ void setLift(word power,bool debug=false)
 	if( debug ) if (LOGS) writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
-
-#define LIFT_BOTTOM 1100
+//real lift bottom = 770
+#define LIFT_BOTTOM 950 //1100
 #define LIFT_TOP (LIFT_BOTTOM + 1650)
 #define LIFT_MID (LIFT_BOTTOM + 620)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
@@ -406,11 +406,11 @@ typedef enum _tArmStates {
 	armHoldMobile
 } tArmStates;
 
-#define RL_ARM_TOP 2880
+#define RL_ARM_TOP 2700
 #define ARM_TOP (RL_ARM_TOP - 100)
 
 //Actual ARM_BOTTOM = 1020
-#define ARM_BOTTOM (RL_ARM_TOP - 1630)
+#define ARM_BOTTOM (RL_ARM_TOP - 1530)
 
 #define ARM_PRESTACK (RL_ARM_TOP - 800)
 #define ARM_RELEASE (RL_ARM_TOP - 700)
