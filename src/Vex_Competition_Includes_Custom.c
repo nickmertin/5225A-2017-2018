@@ -36,39 +36,32 @@ void allMotorsOff();
 void allTasksStop();
 void disabled();
 void startup();
-void autonomous();
-void usercontrol();
-void testLift();
-void testSkills();
-
-MAKE_ASYNC_ONLY_MACHINE_5(competition, ;,
-0, (disabled), ;,
-0, (autonomous), ;,
-0, (usercontrol), ;,
-0, (testLift), ;,
-0, (testSkills), ;
-)
+task autonomous();
+task usercontrol();
 
 bool bStopTasksBetweenModes = true;
+word gMainTask = 255;
 
 task main()
 {
 	// Master CPU will not let competition start until powered on for at least 2-seconds
 	clearLCDLine(0);
 	clearLCDLine(1);
-	displayLCDString(0, 0, "Startup");
-	sleep(2000);
+	displayLCDPos(0, 0);
+	displayNextLCDString("Startup");
+	wait1Msec(2000);
 
 	startup();
 
+	//wait1Msec(500);
+
 	while (true)
 	{
-		disabledAsync();
-		while (DISABLED) sleep(10);
+		while (DISABLED) { disabled(); wait1Msec(25); }
 
 		if (AUTONOMOUS)
 		{
-			autonomousAsync();
+			startTask(autonomous);
 
 			// Waiting for autonomous phase to end
 			while (AUTONOMOUS && !DISABLED)
@@ -89,7 +82,7 @@ task main()
 
 		else
 		{
-			usercontrolAsync();
+			startTask(usercontrol);
 
 			// Here we repeat loop waiting for user control to end and (optionally) start
 			// of a new competition run
