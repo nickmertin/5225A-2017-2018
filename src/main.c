@@ -58,10 +58,13 @@ void handleDrive()
 	velocityCheck(trackL);
 	velocityCheck(trackR);
 	//writeDebugStreamLine("L: %d, r: %d", gSensor[trackL].velocity, gSensor[trackR].velocity);
-	if (gSensor[trackL].velocity > 0.3)
-		gMotor[driveL1].power = gMotor[driveL2].power  = LIM_TO_VAL(sgn(gSensor[trackL].velocity) * -8, 15);
-	if (gSensor[trackR].velocity > 0.3)
-		gMotor[driveR1].power = gMotor[driveR2].power  = LIM_TO_VAL(sgn(gSensor[trackR].velocity) * -8, 15);
+	if (gSensor[trackL].velGood && gSensor[trackL].velGood)
+	{
+		if (gSensor[trackL].velocity > 0.3)
+			gMotor[driveL1].power = gMotor[driveL2].power  = LIM_TO_VAL(sgn(gSensor[trackL].velocity) * -8, 15);
+		if (gSensor[trackR].velocity > 0.3)
+			gMotor[driveR1].power = gMotor[driveR2].power  = LIM_TO_VAL(sgn(gSensor[trackR].velocity) * -8, 15);
+	}
 }
 }
 
@@ -133,11 +136,133 @@ void handleLift() //Decide which state to put machine in
 	}
 }
 
+/* Arm Controls */
+#define RL_ARM_TOP 2700
+#define ARM_TOP (RL_ARM_TOP - 100)
+
+//Actual ARM_BOTTOM = 1020
+#define ARM_BOTTOM (RL_ARM_TOP - 1450)
+
+#define ARM_PRESTACK (RL_ARM_TOP - 800)
+#define ARM_RELEASE (RL_ARM_TOP - 700)
+#define ARM_CARRY (RL_ARM_TOP - 1040)
+#define ARM_STACK (RL_ARM_TOP - 100)
+//#define ARM_HORIZONTAL (RL_ARM_TOP - 1590)
+#define ARM_HOLD_DOWN_THRESHOLD (ARM_BOTTOM + 50)
+
+void setArm(word val)
+{
+	gMotor[arm].power = LIM_TO_VAL(val, 127);
+}
+
+typedef enum _tArmStates
+{
+	idle,
+	hold,
+	move,
+	manual
+} tArmStates;
+
+tArmStates gArmState = idle;
+int gArmTarget;
+int gArmPower
+
+#define ARM_STATE(state, target, power) gArmState = state; \
+gArmTarget = target; \
+gArmPower = power; \
+writeDebugStreamLine ("%d Arm State:%d, loc: %d, %d, %d, %d", npgmTime, gArmState, gSensor[armPoti].value, gArmTarget, gArmPower);
+
+task setArmState()
+{
+	sCycleData arm;
+	initCycle(arm, 10, "arm");
+	while(true)
+	{
+		//writeDebugStreamLine("Arm Task");
+		switch (gArmState)
+		{
+		case 0: //idle
+			{
+				setArm(0);
+				break;
+			}
+		case 1: //hold
+			{
+				if (gSensor[armPoti].value < ARM_HOLD_DOWN_THRESHOLD) //Arm is at bottom
+					setArm(gSensor[limArm].value ? -15 : -40);
+				else
+					setArm(7);
+				break;
+			}
+		case 2: //move
+			{
+				if (gArmTarget == -1)
+				{
+					ARM_STATE(hold, -1, -1);
+				}
+				else
+				{
+					int dir = (gArmTarget < gSensor[armPoti].value)? -1 : 1;
+					/*
+					gArmPower = abs(gArmPower) * dir;
+					writeDebugStreamLine ("move: set power %d, dir %d, poti %d", gArmPower, dir, gSensor[armPoti].value);
+					setArm(gArmPower);
+					while ( (dir == 1)? (gSensor[armPoti].value < gArmTarget) : (gSensor[armPoti].value > gArmTarget) )
+						sleep(10);
+					*/
+					const int kP = 0.15;
+					while ( (dir == 1)? (gSensor[armPoti].value < gArmTarget) : (gSensor[armPoti].value > gArmTarget) )
+					{
+						int error = target - gSensor[armPoti].value;
+						setArm(error * kP
+						sleep(10);
+					}
+
+					ARM_STATE(hold, -1, -1);
+				}
+				break;
+			}
+		case 3: //manual
+			{
+				word joy = gJoy[JOY_ARM].cur;
+
+				setArm(joy);
+
+				if (	(sgn(joy) == -1 && gSensor[armPoti].value < (ARM_BOTTOM + 20)) || (sgn(joy) == 1 && gSensor[armPoti].value > (ARM_TOP - 20)) )
+					ARM_STATE(hold, -1, -1);
+
+				break;
+			}
+		}
+		endCycle(arm);
+	}
+}
+
+
+void handleArm() //Decide which state to put machine in
+{
+	word joy = gJoy[JOY_ARM].cur;
+	if (RISING(JOY_ARM))
+	{
+		ARM_STATE(manual, -1, -1);
+	}
+	else if (!joy && gArmState == manual)//|| abs(gJoy[JOY_ARM].cur) < abs(gJoy[JOY_ARM].lst))
+	{
+		ARM_STATE(hold, -1, -1);
+	}
+
+	if (RISING(BTN_STACK) && gArmState != move)
+	{
+		writeDebugStreamLine("Stack button");
+		ARM_STATE(move, ARM_CARRY, 80);
+	}
+}
+
 /* Mobile Goal Controls */
-#define MOBILE_TOP 2440
-#define MOBILE_BOTTOM 950
+#define MOBILE_TOP 2430
+#define MOBILE_BOTTOM 900
 #define MOBILE_MIDDLE_UP 1150
-#define MOBILE_MIDDLE_DOWN 1550
+#define MOBILE_MIDDLE_DOWN 1650
 #define MOBILE_MIDDLE_THRESHOLD 2250
 #define MOBILE_HALFWAY 1550
 
@@ -173,7 +298,7 @@ void setMobileState()
 		}
 		case 1: //hold
 		{
-			setMobile(gSensor[mobilePoti].value < MOBILE_HALFWAY? -15 : 12);
+			setMobile(gSensor[mobilePoti].value < MOBILE_HALFWAY? -5 : 5);
 			break;
 		}
 		case 2: //moveTop
@@ -204,9 +329,12 @@ void setMobileState()
 				gMobileState = holdMid;
 			break;
 		}
-		case 5: //holdMid
+		case 6: //holdMid
 		{
-			setMobile(10);
+			if (gSensor[mobilePoti].value > MOBILE_MIDDLE_DOWN-100)
+				setMobile(0);
+			else
+				setMobile(15);
 			break;
 		}
 	}
@@ -222,40 +350,51 @@ void handleMobile()
 			gMobileState = (gSensor[mobilePoti].value < MOBILE_HALFWAY)? moveTop : moveBottom;
 			writeDebugStreamLine("Mobile state: %d", gMobileState);
 		}
+		else
+		{
+			gMobileState = moveTop;
+		}
 	}
 	if (RISING(BTN_MOBILE_MIDDLE))
 	{
-		gMobileState = (gSensor[mobilePoti].value < MOBILE_HALFWAY)? moveUpToMid : moveDownToMid;
+		if (gMobileState != holdMid)
+			gMobileState = (gSensor[mobilePoti].value < MOBILE_HALFWAY)? moveUpToMid : moveDownToMid;
+		else
+			gMobileState = moveBottom;
 	}
 }
 
 void startup()
 {
-clearDebugStream();
-setupSensors();
-setupMotors();
-setupJoysticks();
-tInit();
+	clearDebugStream();
+	setupSensors();
+	setupMotors();
+	setupJoysticks();
+	tInit();
 
-//Setup Joysticks.Buttons
-enableJoystick(JOY_THROTTLE);
-enableJoystick(JOY_TURN);
-enableJoystick(JOY_LIFT);
-enableJoystick(BTN_MOBILE_TOGGLE);
-enableJoystick(BTN_MOBILE_MIDDLE);
-MIRROR(BTN_MOBILE_TOGGLE);
-MIRROR(BTN_MOBILE_MIDDLE);
+	//Setup Joysticks & Buttons
+	enableJoystick(JOY_THROTTLE);
+	enableJoystick(JOY_TURN);
+	enableJoystick(JOY_LIFT);
+	enableJoystick(JOY_ARM);
+	enableJoystick(BTN_MOBILE_TOGGLE);
+	enableJoystick(BTN_MOBILE_MIDDLE);
+	enableJoystick(BTN_STACK);
+	MIRROR(BTN_MOBILE_TOGGLE);
+	MIRROR(BTN_MOBILE_MIDDLE);
+	MIRROR(BTN_STACK);
 
-gJoy[JOY_THROTTLE].deadzone = 15;
-gJoy[JOY_TURN].deadzone = 15;
-gJoy[JOY_LIFT].deadzone = 5;
+	gJoy[JOY_THROTTLE].deadzone = 15;
+	gJoy[JOY_TURN].deadzone = 15;
+	gJoy[JOY_LIFT].deadzone = 25;
+	gJoy[JOY_ARM].deadzone = 25;
 }
 
 void disabled()
 {
-updateSensorInputs();
-//selectAuto();
-//handleLcd();
+	updateSensorInputs();
+	//selectAuto();
+	//handleLcd();
 }
 
 task autonomous()
@@ -271,22 +410,27 @@ initCycle(cycle, 10, "autonomous");
 
 task usercontrol()
 {
-sCycleData cycle;
-initCycle(cycle, 10, "usercontrol");
+	sCycleData cycle;
+	initCycle(cycle, 10, "usercontrol");
 
-while (true)
-{
-	updateJoysticks();
-	updateMotors();
-	updateSensorInputs();
-	updateSensorOutputs();
+	tStart(setArmState);
 
-	handleDrive();
-	handleLift();
-	handleMobile();
+	while (true)
+	{
+		updateJoysticks();
+		updateMotors();
+		updateSensorInputs();
+		updateSensorOutputs();
 
-	setMobileState();
+		handleDrive();
+		handleLift();
+		handleArm();
+		handleMobile();
 
-	endCycle(cycle);
-}
+		setMobileState();
+
+		endCycle(cycle);
+	}
+
+	tStop(setArmState);
 }
