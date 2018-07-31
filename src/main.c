@@ -210,9 +210,9 @@ void setLift(word power,bool debug=false)
 	if( debug ) if (LOGS) writeDebugStreamLine("%06d Lift %4d", nPgmTime,power );
 	gMotor[liftL].power = gMotor[liftR].power = power;
 }
-
-#define LIFT_BOTTOM 1100
-#define LIFT_TOP (LIFT_BOTTOM + 1650)
+//real lift bottom = 770
+#define LIFT_BOTTOM 800 //1100
+#define LIFT_TOP (LIFT_BOTTOM + 1930)
 #define LIFT_MID (LIFT_BOTTOM + 620)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
@@ -406,11 +406,11 @@ typedef enum _tArmStates {
 	armHoldMobile
 } tArmStates;
 
-#define RL_ARM_TOP 2880
+#define RL_ARM_TOP 2700
 #define ARM_TOP (RL_ARM_TOP - 100)
 
 //Actual ARM_BOTTOM = 1020
-#define ARM_BOTTOM (RL_ARM_TOP - 1630)
+#define ARM_BOTTOM (RL_ARM_TOP - 1530)
 
 #define ARM_PRESTACK (RL_ARM_TOP - 800)
 #define ARM_RELEASE (RL_ARM_TOP - 700)
@@ -639,12 +639,12 @@ typedef enum _tMobileStates {
 	mobileMiddle
 } tMobileStates;
 
-#define MOBILE_TOP 2450
-#define MOBILE_BOTTOM 800
-#define MOBILE_MIDDLE_UP 1000
-#define MOBILE_MIDDLE_DOWN 1400
-#define MOBILE_MIDDLE_THRESHOLD 2100
-#define MOBILE_HALFWAY 1400
+#define MOBILE_TOP 2550
+#define MOBILE_BOTTOM 950
+#define MOBILE_MIDDLE_UP 1150
+#define MOBILE_MIDDLE_DOWN 1550
+#define MOBILE_MIDDLE_THRESHOLD 2250
+#define MOBILE_HALFWAY 1550
 
 #define MOBILE_UP_POWER 127
 #define MOBILE_DOWN_POWER -127
@@ -848,8 +848,8 @@ bool isMobileSlow()
 /* Macros + Autonomous */
 
 // STACKING ON                     0     1     2     3     4     5     6     7     8     9     10    11
-const int gLiftRaiseTarget[12] = { 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2400, LIFT_TOP };
-const int gLiftPlaceTarget[12] = { 1150, 1150, 1200, 1310, 1450, 1550, 1640, 1750, 1820, 1950, 2070, 2200 };
+const int gLiftRaiseTarget[12] = { 1000, 1100, 1200, 1300, 1400, 1600, 1650, 1900, 2100, 2300, 2650, LIFT_TOP};
+const int gLiftPlaceTarget[12] = { 850,  850,  900,  1010, 1150, 1250, 1440, 1500, 1600, 1750, 1950, 1950 };
 const int gLiftRaiseTargetS[7] = { 1850, 1920, 2020, 2120, 2240, 2380, LIFT_TOP };
 const int gLiftPlaceTargetS[7] = { 1560, 1660, 1750, 1860, 1960, 2100, 2220 };
 
