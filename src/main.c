@@ -87,7 +87,8 @@ typedef enum _tLiftStates
 idle = 0,
 hold,
 manual,
-move
+move,
+moveSimple
 } tLiftStates;
 
 tLiftStates gLiftState = idle;
