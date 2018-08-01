@@ -47,6 +47,7 @@
 // Other includes
 #include "Vex_Competition_Includes_Custom.c"
 
+#include "state.h"
 #include "controls.h"
 
 /* Drive Controls */
@@ -82,31 +83,13 @@ void setLift(word val)
 gMotor[liftR].power = gMotor[liftL].power = LIM_TO_VAL(val, 127);
 }
 
-typedef enum _tLiftStates
-{
-idle = 0,
-hold,
-manual,
-move,
-moveSimple
-} tLiftStates;
-
-tLiftStates gLiftState = idle;
-int gLiftTarget, gLiftPower;
-
-#define LIFT_STATE(state, target, power) gLiftState = state; \
-gLiftTarget = target; \
-gLiftPower = power; \
-writeDebugStreamLine ("%d Lift State:%d, loc: %d, %d, %d, %d", npgmTime, gLiftState, gSensor[liftPoti].value, gLiftTarget, gLiftPower);
-
-
-task setLiftState()
+CREATE_MACHINE(lift, Idle, Hold, Manual, Move, MoveSimple, int, Target, int, Power)
 {
 	sCycleData lift;
 	initCycle(lift, 10, "lift");
 	while (true)
 	{
-		switch (gLiftState)
+		switch (liftState)
 		{
 		case 0: //idle
 			{
@@ -133,20 +116,20 @@ task setLiftState()
 					writeDebugStreamLine("power:%d, vel: %f", joy, gSensor[liftPoti].velocity);
 
 				if ((sgn(joy) == -1 && gSensor[liftPoti].value < LIFT_HOLD_DOWN_THRESHOLD) || (sgn(joy) == 1 && gSensor[liftPoti].value > LIFT_HOLD_UP_THRESHOLD))
-					LIFT_STATE(hold, -1, -1);
+					liftStateChange(liftHold);
 				break;
 			}
 		case 3: //move
 			{
-				if (gLiftTarget == -1)
+				if (liftTarget == -1)
 			{
-				LIFT_STATE(hold, -1, -1);
+				liftStateChange(liftHold);
 			}
 			else
 			{
-				int dir = (gLiftTarget < gSensor[liftPoti].value)? -1 : 1;
+				int dir = (liftTarget < gSensor[liftPoti].value)? -1 : 1;
 				//abs velocity of arm is 0.3-2.5
-				int firstTarg = gLiftTarget + (dir == 1? -150 : 150);
+				int firstTarg = liftTarget + (dir == 1? -150 : 150);
 				float pB = (dir == 1)? 25 : 30; //base power
 				float vKP = 0.006; //kP for targVel
 				float pKP = 30.0; //kP for power
@@ -154,7 +137,7 @@ task setLiftState()
 
 				while ( (dir == 1)? (gSensor[liftPoti].value < firstTarg) : (gSensor[liftPoti].value > firstTarg) )
 				{
-					targVel = vKP * (gLiftTarget - gSensor[liftPoti].value);
+					targVel = vKP * (liftTarget - gSensor[liftPoti].value);
 					velocityCheck(liftPoti);
 					if (gSensor[liftPoti].velGood)
 					{
@@ -178,11 +161,11 @@ task setLiftState()
 				}
 
 				setLift(0);
-				writeDebugStreamLine("targ: %d", gLiftTarget);
+				writeDebugStreamLine("targ: %d", liftTarget);
 				velocityCheck(liftPoti);
 				if (gSensor[liftPoti].velGood)
 				{
-					while ( abs(gSensor[liftPoti].velocity) > 0.75  && ( (dir == 1)? (gSensor[liftPoti].value < gLIFTTarget) : (gSensor[liftPoti].value > gLiftTarget) ) )
+					while ( abs(gSensor[liftPoti].velocity) > 0.75  && ( (dir == 1)? (gSensor[liftPoti].value < liftTarget) : (gSensor[liftPoti].value > liftTarget) ) )
 					{
 						velocityCheck(liftPoti);
 						writeDebugStreamLine("loc: %d, abs-vel: %f", gSensor[liftPoti].value, abs(gSensor[liftPoti].velocity));
@@ -190,7 +173,7 @@ task setLiftState()
 						sleep(10);
 					}
 				}
-				LIFT_STATE(hold, -1, -1);
+				liftStateChange(liftHold);
 			}
 				break;
 			}
@@ -202,20 +185,21 @@ task setLiftState()
 
 void handleLift() //Decide which state to put machine in
 {
-	//writeDebugStreamLine("State = %d, Lift loc = %d, Lift Power = %d", gLiftState, gSensor[liftPoti].value, gMotor[liftR].power);
+	//writeDebugStreamLine("State = %d, Lift loc = %d, Lift Power = %d", liftState, gSensor[liftPoti].value, gMotor[liftR].power);
 
 	short joy = gJoy[JOY_LIFT].cur;
-	if (RISING(JOY_LIFT) && gLiftState != manual)
+	if (RISING(JOY_LIFT) && liftState != liftManual)
 		{
-			LIFT_STATE(manual, -1, -1);
+			liftStateChange(liftManual);
 		}
-	else if (!joy && gLiftState == manual)//|| abs(gJoy[JOY_ARM].cur) < abs(gJoy[JOY_ARM].lst))
+	else if (!joy && liftState == liftManual)//|| abs(gJoy[JOY_ARM].cur) < abs(gJoy[JOY_ARM].lst))
 		{
-			LIFT_STATE(hold, -1, -1);
+			liftStateChange(liftHold);
 		}
-	if (RISING(BTN_LIFT_TEST) && gLiftState != move)
+	if (RISING(BTN_LIFT_TEST) && liftState != liftMove)
 	{
-		LIFT_STATE(move, LIFT_MID+300, -1);
+		liftStateChange(liftMove, 1200, LIFT_MID+300, -1);
+		//LIFT_STATE(move, LIFT_MID+300, -1);
 	}
 }
 
@@ -553,7 +537,7 @@ task usercontrol()
 sCycleData cycle;
 initCycle(cycle, 10, "usercontrol");
 
-tStart(setLiftState);
+tStart(liftSet);
 tStart(setArmState);
 tStart(setMobileState);
 
@@ -573,7 +557,7 @@ while (true)
 
 	endCycle(cycle);
 }
-tStop(setLiftState);
+tStop(liftSet);
 tStop(setArmState);
 tStop(setMobileState);
 }
