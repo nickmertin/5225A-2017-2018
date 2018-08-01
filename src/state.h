@@ -1,3 +1,4 @@
+/* /////////////// State Machine Macros ////////////////// */
 /* Create machine using:
 	CREATE_MACHINE (-----)
 	{
@@ -49,3 +50,31 @@ CREATE_MACHINE(thing, Idle, Hold, Manual, Move, MoveSimple, int, A, int, B)
 	}
 }
 */
+
+/* /////////////// Macros to Convert Functions to States ////////////////// */
+
+//Add other funcs to a machine starting at __ val
+#define ADD_FUNCS_TO_MACHINE(machine, start, func0, func1, func2, func3, func4, func5) \
+typedef enum _tFuncStates##machine \
+{ \
+	machine##func0 = start, \
+	machine##func1, \
+	machine##func2, \
+	machine##func3, \
+	machine##func4, \
+	machine##func5 \
+}tFuncStates##machine;
+
+//Create global variables for all args of a func
+#define PREP_FUNC_STATE(func, type1, arg1, type2, arg2, type3, arg3, type4, arg4) \
+type1 func##arg1; \
+type1 func##arg2; \
+type1 func##arg3; \
+type1 func##arg4;
+
+//Assign to all func args
+#define ASSIGN_FUNC_STATE(func, arg1, arg2, arg3, arg4) \
+func##arg1 = arg1; \
+func##arg2 = arg2; \
+func##arg3 = arg3; \
+func##arg4 = arg4;
