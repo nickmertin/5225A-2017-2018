@@ -13,4 +13,5 @@
 #define BTN_MOBILE_MIDDLE Btn6D
 
 /* Macros */
-#define BTN_STACK Btn7U
+#define BTN_STACK Btn8D
+#define BTN_LIFT_TEST Btn7U
