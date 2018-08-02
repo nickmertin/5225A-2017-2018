@@ -26,7 +26,7 @@
 #define CHECK_POTI_JUMPS 1
 #define DRIVE_TURN (gJoy[JOY_TURN].cur - gJoy[JOY_TURN].deadzone * sgn(gJoy[JOY_TURN].cur))
 
-#include "state.h"
+#include "StateTest.h"
 
 // Year-independent libraries (headers)
 #include "task.h"
