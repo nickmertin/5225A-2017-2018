@@ -23,7 +23,7 @@ void updateJoystick(TVexJoysticks joy)
 	short val = vexRT[joy];
 	if (gJoy[joy].partner != -1 && gKiddieControl)
 	{
-		if (!gJoy[joy].ignore && val && abs(val) > gJoy[joy].deadzone)
+		if (!gJoy[joy].ignore && (joy == Ch3 || joy == Ch4) && val && abs(val) > gJoy[joy].deadzone)
 		{
 			gKiddieControl = false;
 			writeDebugStreamLine("KC END");
@@ -32,7 +32,7 @@ void updateJoystick(TVexJoysticks joy)
 		{
 			if (!val)
 				gJoy[joy].ignore = false;
-			val = vexRT[gJoy[joy].partner];
+			val += vexRT[gJoy[joy].partner];
 		}
 	}
 	gJoy[joy].cur = abs(val) > gJoy[joy].deadzone ? val : 0;
