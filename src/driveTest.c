@@ -4,9 +4,7 @@ void driveFuncTest(int targ, unsigned long time, int a, int b)
 	targ += gSensor[trackR].value;
 	setDriveLeft(67);
 	setDriveRight(67);
-	WHILE(drive) gSensor[trackR].value < targ)
-	{
-		driveSafetyCheck();
+	while ( gSensor[trackR].value < targ && SAFETY_CHECK(drive)
 		sleep(10);
 	}
 	setDriveLeft(20);
