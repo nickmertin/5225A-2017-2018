@@ -1,33 +1,33 @@
-/* Universal State Macros */
-#define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) )
+/* Universal State Macros */ 
+#define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) ) 
+ 
+#define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 && 
+ 
+#define SAFETY_CHECK(machineIn) (NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10) ) \ 
+{ \ 
+	machineIn##VelSafetyCheck(); 
+ 
+#define LOG(machineIn) if(machineIn##Logs) writeDebugStreamLine 
+ 
+#define END_STATE(machineIn) \ 
+machine##StateCycCount++; \ 
+break 
+ 
+typedef enum _tVelDir 
+{ 
+	either = -1, 
+	up = 0, 
+	down = 1 
+}tVelDir; 
+/* /////////////// State Machine Macros (For X States) ////////////////// */ 
+/* Create machine using: 
+	CREATE_MACHINE (-----) 
+	{ 
+		--- 
+	} 
+*/ 
 
-#define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 &&
-
-#define SAFETY_CHECK(machineIn) (NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10) ) \
-{ \
-	machineIn##VelSafetyCheck();
-
-#define LOG(machineIn) if(machineIn##Logs) writeDebugStreamLine
-
-#define END_STATE(machineIn) \
-machine##StateCycCount++; \
-break
-
-typedef enum _tVelDir
-{
-	either = -1,
-	up = 0,
-	down = 1
-}tVelDir;
-/* /////////////// State Machine Macros (For X Params) ////////////////// */
-/* Create machine using:
-	CREATE_MACHINE (-----)
-	{
-		---
-	}
-*/
-
-/*	Macro for Machine w/ 3 Params	*/
+/*	Macro for Machine w/ 3 States	*/
 #define CREATE_MACHINE_3(machine, sensor, state0, state1, state2, type1, arg1Name, type2, arg2Name) \
 const int machine##StateCount = 3; \
 typedef enum _tStates##machine \
@@ -118,9 +118,9 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
 			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
 		} \
-}
+}  
 
-/*	Macro for Machine w/ 4 Params	*/
+/*	Macro for Machine w/ 4 States	*/
 #define CREATE_MACHINE_4(machine, sensor, state0, state1, state2, state3, type1, arg1Name, type2, arg2Name) \
 const int machine##StateCount = 4; \
 typedef enum _tStates##machine \
@@ -211,9 +211,9 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
 			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
 		} \
-}
+}  
 
-/*	Macro for Machine w/ 5 Params	*/
+/*	Macro for Machine w/ 5 States	*/
 #define CREATE_MACHINE_5(machine, sensor, state0, state1, state2, state3, state4, type1, arg1Name, type2, arg2Name) \
 const int machine##StateCount = 5; \
 typedef enum _tStates##machine \
@@ -304,9 +304,9 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
 			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
 		} \
-}
+}  
 
-/*	Macro for Machine w/ 6 Params	*/
+/*	Macro for Machine w/ 6 States	*/
 #define CREATE_MACHINE_6(machine, sensor, state0, state1, state2, state3, state4, state5, type1, arg1Name, type2, arg2Name) \
 const int machine##StateCount = 6; \
 typedef enum _tStates##machine \
@@ -397,9 +397,9 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
 			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
 		} \
-}
+}  
 
-/*	Macro for Machine w/ 7 Params	*/
+/*	Macro for Machine w/ 7 States	*/
 #define CREATE_MACHINE_7(machine, sensor, state0, state1, state2, state3, state4, state5, state6, type1, arg1Name, type2, arg2Name) \
 const int machine##StateCount = 7; \
 typedef enum _tStates##machine \
@@ -490,9 +490,9 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
 			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
 		} \
-}
+}  
 
-/*	Macro for Machine w/ 8 Params	*/
+/*	Macro for Machine w/ 8 States	*/
 #define CREATE_MACHINE_8(machine, sensor, state0, state1, state2, state3, state4, state5, state6, state7, type1, arg1Name, type2, arg2Name) \
 const int machine##StateCount = 8; \
 typedef enum _tStates##machine \
@@ -583,4 +583,4 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
 			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
 		} \
-}
+}  

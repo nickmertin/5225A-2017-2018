@@ -25,7 +25,7 @@ f.write("	up = 0, \n")
 f.write("	down = 1 \n")
 f.write("}tVelDir; \n")
 
-f.write("/* /////////////// State Machine Macros (For X Params) ////////////////// */ \n")
+f.write("/* /////////////// State Machine Macros (For X States) ////////////////// */ \n")
 f.write("/* Create machine using: \n")
 f.write("	CREATE_MACHINE (-----) \n")
 f.write("	{ \n")
@@ -34,7 +34,7 @@ f.write("	} \n")
 f.write("*/ \n")
 
 for cnt in range (minPNum, maxPNum+1):
-	f.write("\n/*\tMacro for Machine w/ %d Params\t*/" %cnt + "\n")
+	f.write("\n/*\tMacro for Machine w/ %d States\t*/" %cnt + "\n")
 	f.write("#define CREATE_MACHINE_%d(machine, sensor, " %cnt)
 	for st in range (0, cnt):
 		f.write("state%d, " %st)
