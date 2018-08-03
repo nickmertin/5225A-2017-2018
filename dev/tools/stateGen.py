@@ -1,95 +1,138 @@
-f = open('..\src\state.h', 'w')
+f = open('..\..\src\state.h', 'w')
+minPNum = 3
+maxPNum = 8
 
-'''
-#define CREATE_MACHINE_(machine, sensor, state0, state1, state2, state3, state4, type1, arg1Name, type2, arg2Name) \
-const int machine##StateCount = 5; \
-typedef enum _tStates##machine \
-{ \
-	machine##state0, \
-	machine##state1, \
-	machine##state2, \
-	machine##state3, \
-	machine##state4 \
-}tStates##machine; \
-\
-tStates##machine machine##State = machine##state0; \
-float machine##VelSafetyThresh = -1; \
-tVelDir machine##VelSafetyDir = -1; \
-unsigned long machine##Timeout; \
-type1 machine##arg1Name; \
-type2 machine##arg2Name; \
-int machine##VelSafetyCount = 0; \
-unsigned long machine##StateCycCount = 0; \
-bool machine##Logs = 0; \
-void machine##StateChange(int stateIn, long timeout = -1, float velSafetyThresh = -1, tVelDir velDir = -1, type1 arg1In = -1, type2 arg2In = -1) \
-{ \
-	if (machine##State != stateIn) \
-	{ \
-		if (timeout <= 0) \
-		{ \
-			machine##Timeout = 0; \
-		} \
-		else \
-		{ \
-			unsigned long t = npgmtime; \
-			machine##Timeout = ( timeout + t ); \
-			writeDebugStreamLine("Add timeout %d with %d= %d, acc=%d", timeout, t, timeout+t, machine##Timeout); \
-		} \
-		\
-		machine##VelSafetyCount = 0; \
-		machine##StateCycCount = 0; \
-		machine##VelSafetyThresh = velSafetyThresh; \
-		machine##VelSafetyDir = velDir; \
-		machine##State = stateIn; \
-		machine##arg1Name = arg1In; \
-		machine##arg2Name = arg2In;  \
-		writeDebugStreamLine ("%d" #machine "State:%d, TO:%d velS:%f, %d, %d", npgmTime, machine##State, machine##timeout, machine##VelSafetyThresh, machine##arg1Name, machine##arg2Name); \
-	} \
-} \
-\
-void machine##VelSafetyCheck (bool useTracking = false) \
-{ \
-	if (machine##VelSafetyThresh != -1 && machine##VelSafetyThresh != 0) \
-	{ \
-		if (machine##VelSafetyDir == either || machine##VelSafetyDir == up) \
-			machine##VelSafetyThresh = abs(machine##VelSafetyThresh); \
-		else if (machine##VelSafetyDir == down) \
-			machine##VelSafetyThresh = -1 * abs(machine##VelSafetyThresh); \
-		if (!useTracking) \
-		{ \
-			velocityCheck(sensor); \
-			if (gSensor[sensor].velGood) \
-			{ \
-				if (machine##VelSafetyDir == either) \
-				{ \
-					if ( gSensor[sensor].velocity < abs(machine##VelSafetyThresh) ) \
-						machine##VelSafetyCount ++; \
-				} \
-				else \
-				{ \
-					if ( (sgn(machine##VelSafetyThresh) == 1)? (gSensor[sensor].velocity < machine##VelSafetyThresh) :  (gSensor[sensor].velocity > machine##VelSafetyThresh) ) \
-					{ \
-						machine##VelSafetyCount ++; \
-					} \
-				} \
-			} \
-		} \
-	} \
-} \
-\
-void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##arg1Name = -1, type2 machine##arg2Name = -1) \
-{ \
-		bool timedOut = false; \
-		bool velSafety = false; \
-		if (!NOT_T_O(machine)) \
-			timedOut = true; \
-		if (machine##VelSafetyCount >= 10) \
-			velSafety = true; \
-		\
-		if (velSafety || timedOut) \
-		{ \
-			writeDebugStreamLine("%d" #machine "safety: Timedout? %d at %d VelSafety? %d", npgmTime, timedout, machine##Timeout, velSafety); \
-			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \
-		} \
-} 
-'''
+f.write("/* Universal State Macros */ \n")
+f.write("#define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) ) \n")
+f.write(" \n")
+f.write("#define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 && \n")
+f.write(" \n")
+f.write("#define SAFETY_CHECK(machineIn) (NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10) ) \ \n")
+f.write("{ \ \n")
+f.write("	machineIn##VelSafetyCheck(); \n")
+f.write(" \n")
+f.write("#define LOG(machineIn) if(machineIn##Logs) writeDebugStreamLine \n")
+f.write(" \n")
+f.write("#define END_STATE(machineIn) \ \n")
+f.write("machine##StateCycCount++; \ \n")
+f.write("break \n")
+f.write(" \n")
+
+f.write("typedef enum _tVelDir \n")
+f.write("{ \n")
+f.write("	either = -1, \n")
+f.write("	up = 0, \n")
+f.write("	down = 1 \n")
+f.write("}tVelDir; \n")
+
+f.write("/* /////////////// State Machine Macros (For X Params) ////////////////// */ \n")
+f.write("/* Create machine using: \n")
+f.write("	CREATE_MACHINE (-----) \n")
+f.write("	{ \n")
+f.write("		--- \n")
+f.write("	} \n")
+f.write("*/ \n")
+
+for cnt in range (minPNum, maxPNum+1):
+	f.write("\n/*\tMacro for Machine w/ %d Params\t*/" %cnt + "\n")
+	f.write("#define CREATE_MACHINE_%d(machine, sensor, " %cnt)
+	for st in range (0, cnt):
+		f.write("state%d, " %st)
+	f.write("type1, arg1Name, type2, arg2Name) \\" + "\n") 
+	
+	f.write("const int machine##StateCount = %d; \\" %cnt + "\n" )
+	
+	f.write("typedef enum _tStates##machine \\" + "\n" )
+	f.write("{ \\" + "\n" )
+	f.write("	machine##state0, \\" + "\n" )
+	f.write("	machine##state1, \\" + "\n" )
+	f.write("	machine##state2, \\" + "\n" )
+	f.write("	machine##state3, \\" + "\n" )
+	f.write("	machine##state4 \\" + "\n" )
+	f.write("}tStates##machine; \\" + "\n" )
+	f.write("\\" + "\n" )
+	
+	f.write("tStates##machine machine##State = machine##state0; \\" + "\n" )
+	f.write("float machine##VelSafetyThresh = -1; \\" + "\n" )
+	f.write("tVelDir machine##VelSafetyDir = -1; \\" + "\n" )
+	f.write("unsigned long machine##Timeout; \\" + "\n" )
+	f.write("type1 machine##arg1Name; \\" + "\n" )
+	f.write("type2 machine##arg2Name; \\" + "\n" )
+	f.write("int machine##VelSafetyCount = 0; \\" + "\n" )
+	f.write("unsigned long machine##StateCycCount = 0; \\" + "\n" )
+	f.write("bool machine##Logs = 0; \\" + "\n" )
+	
+	f.write("void machine##StateChange(int stateIn, long timeout = -1, float velSafetyThresh = -1, tVelDir velDir = -1, type1 arg1In = -1, type2 arg2In = -1) \\" + "\n" )
+	f.write("{ \\" + "\n" )
+	f.write("	if (machine##State != stateIn) \\" + "\n" ) 
+	f.write("	{ \\" + "\n" )
+	f.write("		if (timeout <= 0) \\" + "\n" )
+	f.write("		{ \\" + "\n" )
+	f.write("			machine##Timeout = 0; \\" + "\n" )
+	f.write("		} \\" + "\n" )
+	f.write("		else \\" + "\n" )
+	f.write("		{ \\" + "\n" )
+	f.write("			unsigned long t = npgmtime; \\" + "\n" )
+	f.write("			machine##Timeout = ( timeout + t ); \\" + "\n" ) 
+	f.write("			writeDebugStreamLine(\"Add timeout %d with %d= %d, acc=%d\", timeout, t, timeout+t, machine##Timeout); \\" + "\n" )
+	f.write("		} \\" + "\n" )
+	f.write("		\\" + "\n" )
+	f.write("		machine##VelSafetyCount = 0; \\" + "\n" )
+	f.write("		machine##StateCycCount = 0; \\" + "\n" )
+	f.write("		machine##VelSafetyThresh = velSafetyThresh; \\" + "\n" )
+	f.write("		machine##VelSafetyDir = velDir; \\" + "\n" )
+	f.write("		machine##State = stateIn; \\" + "\n" )
+	f.write("		machine##arg1Name = arg1In; \\" + "\n" )
+	f.write("		machine##arg2Name = arg2In;  \\" + "\n" )
+	f.write("		writeDebugStreamLine (\"%d\" #machine \"State:%d, TO:%d velS:%f, %d, %d\", npgmTime, machine##State, machine##timeout, machine##VelSafetyThresh, machine##arg1Name, machine##arg2Name); \\" + "\n" )
+	f.write("	} \\" + "\n" )
+	f.write("} \\" + "\n" )
+	f.write("\\" + "\n" )
+	f.write("void machine##VelSafetyCheck (bool useTracking = false) \\" + "\n" )
+	f.write("{ \\" + "\n" )
+	f.write("	if (machine##VelSafetyThresh != -1 && machine##VelSafetyThresh != 0) \\" + "\n" )
+	f.write("	{ \\" + "\n" )
+	f.write("		if (machine##VelSafetyDir == either || machine##VelSafetyDir == up) \\" + "\n" )
+	f.write("			machine##VelSafetyThresh = abs(machine##VelSafetyThresh); \\" + "\n" )
+	f.write("		else if (machine##VelSafetyDir == down) \\" + "\n" )
+	f.write("			machine##VelSafetyThresh = -1 * abs(machine##VelSafetyThresh); \\" + "\n" )
+	f.write("		if (!useTracking) \\" + "\n" )
+	f.write("		{ \\" + "\n" )
+	f.write("			velocityCheck(sensor); \\" + "\n" )
+	f.write("			if (gSensor[sensor].velGood) \\" + "\n" )
+	f.write("			{ \\" + "\n" )
+	f.write("				if (machine##VelSafetyDir == either) \\" + "\n" )
+	f.write("				{ \\" + "\n" )
+	f.write("					if ( gSensor[sensor].velocity < abs(machine##VelSafetyThresh) ) \\" + "\n" )
+	f.write("						machine##VelSafetyCount ++; \\" + "\n" )
+	f.write("				} \\" + "\n" )
+	f.write("				else \\" + "\n" )
+	f.write("				{ \\" + "\n" )
+	f.write("					if ( (sgn(machine##VelSafetyThresh) == 1)? (gSensor[sensor].velocity < machine##VelSafetyThresh) :  (gSensor[sensor].velocity > machine##VelSafetyThresh) ) \\" + "\n" )
+	f.write("					{ \\" + "\n" )
+	f.write("						machine##VelSafetyCount ++; \\" + "\n" )
+	f.write("					} \\" + "\n" )
+	f.write("				} \\" + "\n" )
+	f.write("			} \\" + "\n" )
+	f.write("		} \\" + "\n" )
+	f.write("	} \\" + "\n" )
+	f.write("} \\" + "\n" )
+	f.write("\\" + "\n" )
+	
+	f.write("void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##arg1Name = -1, type2 machine##arg2Name = -1) \\" + "\n" )
+	f.write("{ \\" + "\n" )
+	f.write("		bool timedOut = false; \\" + "\n" )
+	f.write("		bool velSafety = false; \\" + "\n" )
+	f.write("		if (!NOT_T_O(machine)) \\" + "\n" )
+	f.write("			timedOut = true; \\" + "\n" )
+	f.write("		if (machine##VelSafetyCount >= 10) \\" + "\n" )
+	f.write("			velSafety = true; \\" + "\n" )
+	f.write("		\\" + "\n" )
+	f.write("		if (velSafety || timedOut) \\" + "\n" )
+	f.write("		{ \\" + "\n" )
+	f.write("			writeDebugStreamLine(\"%d\" #machine \"safety: Timedout? %d at %d VelSafety? %d\", npgmTime, timedout, machine##Timeout, velSafety); \\" + "\n" )
+	f.write("			machine##StateChange(timedOutState, machine##arg1Name, machine##arg2Name); \\" + "\n" )
+	f.write("		} \\" + "\n" )
+	f.write("}  " + "\n" )
+
+f.close

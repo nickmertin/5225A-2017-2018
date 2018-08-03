@@ -5,7 +5,7 @@ typedef enum _tVelDir
 	down = 1
 }tVelDir;
 
-/* /////////////// State Machine Macros ////////////////// */
+/* /////////////// State Machine Macros (For X Params) ////////////////// */
 /* Create machine using:
 	CREATE_MACHINE (-----)
 	{
@@ -105,6 +105,7 @@ void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##ar
 } /*\
 task machine##Set () \ */
 
+/* Universal State Macros */
 #define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) )
 
 #define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 &&
@@ -163,16 +164,16 @@ const int func5##Loc = machine##StateCount + 5
 #define PREP_FUNC_STATE_4(func, type1, type2, type3, type4) \
 const int func##ArgCount = 4; \
 type1 func##Arg1 = -1; \
-type1 func##Arg2 = -1; \
-type1 func##Arg3 = -1; \
-type1 func##Arg4 = -1
+type2 func##Arg2 = -1; \
+type3 func##Arg3 = -1; \
+type4 func##Arg4 = -1;
 
 //Assign to all func args - call before putting machine into the func state
 #define ASSIGN_FUNC_STATE_4(func, arg1In, arg2In, arg3In, arg4In) \
 func##Arg1 = arg1In; \
 func##Arg2 = arg2In; \
 func##Arg3 = arg3In; \
-func##Arg4 = arg4In
+func##Arg4 = arg4In;
 
 //Add function to the machine - call when defining switch statement
 #define CALL_FUNC_STATE_4(func) func(func##Arg1, func##Arg2, func##Arg3, func##Arg4)
