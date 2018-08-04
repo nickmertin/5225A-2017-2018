@@ -27,8 +27,9 @@
 #define CHECK_POTI_JUMPS 1
 #define DRIVE_TURN (gJoy[JOY_TURN].cur - gJoy[JOY_TURN].deadzone * sgn(gJoy[JOY_TURN].cur))
 
-#include "state.h"
-#include "FuncToState.h"
+#include "StateTest.h"
+//#include "state.h"
+//#include "FuncToState.h"
 
 // Year-independent libraries (headers)
 #include "task.h"
@@ -63,13 +64,13 @@ void setDrive(word left, word right)
 #include "auto.c"
 
 CREATE_MACHINE_5(drive, trackL, Idle, Break, Manual, Move, MoveSimple, float, Vel, int, Power)
-//#include "driveTest.c"
-#include "auto_simple.h"
-#include "auto_simple.c"
+#include "driveTest.c"
+//#include "auto_simple.h"
+//#include "auto_simple.c"
 
 task driveSet()
 {
-	//driveLogs = 1;
+	driveLogs = 1;
 
 	sCycleData drive;
 	initCycle(drive, 10, "drive");
@@ -131,12 +132,12 @@ task driveSet()
 			{
 				break;
 			}
-			//ADD_FUNC_TO_SWITCH_4(driveFuncTest, drive, driveBreak, driveIdle)
-			ADD_FUNC_TO_SWITCH_12(moveToTargetSimple, drive, driveBreak, driveIdle)
-			ADD_FUNC_TO_SWITCH_12(moveToTargetDisSimple, drive, driveBreak, driveIdle)
-			ADD_FUNC_TO_SWITCH_7(turnToAngleNewAlg, drive, driveBreak, driveIdle)
-			ADD_FUNC_TO_SWITCH_9(turnToTargetNewAlg, drive, driveBreak, driveIdle)
-			ADD_FUNC_TO_SWITCH_7(sweepTurnToTarget, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_4(driveFuncTest, drive, driveBreak, driveIdle)
+			//ADD_FUNC_TO_SWITCH_12(moveToTargetSimple, drive, driveBreak, driveIdle)
+			//ADD_FUNC_TO_SWITCH_12(moveToTargetDisSimple, drive, driveBreak, driveIdle)
+			//ADD_FUNC_TO_SWITCH_7(turnToAngleNewAlg, drive, driveBreak, driveIdle)
+			//ADD_FUNC_TO_SWITCH_9(turnToTargetNewAlg, drive, driveBreak, driveIdle)
+			//ADD_FUNC_TO_SWITCH_7(sweepTurnToTarget, drive, driveBreak, driveIdle)
 		}
 		endCycle(drive);
 	}
@@ -146,10 +147,10 @@ void handleDrive()
 	if (RISING(BTN_DRIVE_TEST))
 	{
 		LOG(drive)("Btn_Drive_Test Pressed");
-		//ASSIGN_FUNC_STATE_4(driveFuncTest, 200, nPgmTime, -1, -1);
-		//driveStateChange(drivedriveFuncTest, 400, 0.005, up);
-		ASSIGN_FUNC_STATE_12(moveToTargetSimple, 10, 0, 0, 0, 127, 0, 5, 10, 50, 0, stopSoft | stopHarsh, mttProportional);
-		driveStateChange(drivemoveToTargetSimple);
+		ASSIGN_FUNC_STATE_4(driveFuncTest, 200, nPgmTime, -1, -1);
+		driveStateChange(drivedriveFuncTest, 400, 0.01, velUp);
+		//ASSIGN_FUNC_STATE_12(moveToTargetSimple, 10, 0, 0, 0, 127, 0, 5, 10, 50, 0, stopSoft | stopHarsh, mttProportional);
+		//driveStateChange(drivemoveToTargetSimple);
 	}
 	else if (!gJoy[JOY_THROTTLE}.cur && !gJoy[JOY_TURN].cur && driveState == driveManual)
 	{
@@ -323,7 +324,6 @@ while(true)
 {
 	armLogs = 1;
 
-	LOG(arm)("Arm Task");
 	switch (armState)
 	{
 	case 0: //idle
@@ -449,7 +449,7 @@ else if (!joy && armState == armManual)//|| abs(gJoy[JOY_ARM].cur) < abs(gJoy[JO
 if (RISING(BTN_STACK))
 {
 	LOG(arm)("Stack button");
-	armStateChange(armMove, 1500, 2, either, ARM_TOP - 800, 80);
+	armStateChange(armMove, 1500, 2, velEither, ARM_TOP - 800, 80);
 }
 }
 

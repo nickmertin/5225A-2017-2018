@@ -1,9 +1,17 @@
 typedef enum _tVelDir
 {
-	either = -1,
-	up = 0,
-	down = 1
+	velEither = -1,
+	velUp = 0,
+	velDown = 1
 }tVelDir;
+/// new
+typedef enum _tVelType
+{
+	velSensor,
+	velLocalY,
+	velAngle
+} tVelType;
+///
 
 /* /////////////// State Machine Macros (For X Params) ////////////////// */
 /* Create machine using:
@@ -30,24 +38,25 @@ unsigned long machine##Timeout; \
 type1 machine##arg1Name; \
 type2 machine##arg2Name; \
 int machine##VelSafetyCount = 0; \
+unsigned long machine##StateStartTime = 0; \
 unsigned long machine##StateCycCount = 0; \
 bool machine##Logs = 0; \
 void machine##StateChange(int stateIn, long timeout = -1, float velSafetyThresh = -1, tVelDir velDir = -1, type1 arg1In = -1, type2 arg2In = -1) \
 { \
 	if (machine##State != stateIn) \
 	{ \
+		unsigned long curTime = npgmtime; \
 		if (timeout <= 0) \
 		{ \
 			machine##Timeout = 0; \
 		} \
 		else \
 		{ \
-			unsigned long t = npgmtime; \
-			machine##Timeout = ( timeout + t ); \
-			writeDebugStreamLine("Add timeout %d with %d= %d, acc=%d", timeout, t, timeout+t, machine##Timeout); \
+			machine##Timeout = ( timeout + curTime ); \
 		} \
 		\
 		machine##VelSafetyCount = 0; \
+		machine##StateStartTime = curTime; \
 		machine##StateCycCount = 0; \
 		machine##VelSafetyThresh = velSafetyThresh; \
 		machine##VelSafetyDir = velDir; \
@@ -58,34 +67,68 @@ void machine##StateChange(int stateIn, long timeout = -1, float velSafetyThresh 
 	} \
 } \
 \
-void machine##VelSafetyCheck (bool useTracking = false) \
+void machine##VelSafetyCheck (tVelType velType = velSensor) \
 { \
 	if (machine##VelSafetyThresh != -1 && machine##VelSafetyThresh != 0) \
 	{ \
-		if (machine##VelSafetyDir == either || machine##VelSafetyDir == up) \
+		if (machine##VelSafetyDir == velEither || machine##VelSafetyDir == velUp) \
 			machine##VelSafetyThresh = abs(machine##VelSafetyThresh); \
-		else if (machine##VelSafetyDir == down) \
+		else if (machine##VelSafetyDir == velDown) \
 			machine##VelSafetyThresh = -1 * abs(machine##VelSafetyThresh); \
-		if (!useTracking) \
+	\
+	tHog(); \
+		float out = 0; \
+		bool goodVel = false; \
+		switch (velType) \
 		{ \
-			velocityCheck(sensor); \
-			if (gSensor[sensor].velGood) \
+			case velSensor: \
 			{ \
-				if (machine##VelSafetyDir == either) \
+				if (machine##StateCycCount == 0) \
+					velocityClear(sensor); \
+				velocityCheck(sensor); \
+				if (gSensor[sensor].velGood) \
 				{ \
-					if ( gSensor[sensor].velocity < abs(machine##VelSafetyThresh) ) \
-						machine##VelSafetyCount ++; \
+					out = gSensor[sensor].velocity; \
+					goodVel = true; \
+				} \
+				break; \
+			} \
+			case velLocalY: \
+			{ \
+				out = gVelocity.x * sin(gPosition.a) + gVelocity.y * cos(gPosition.a); \
+				goodVel = true; \
+				break; \
+			} \
+			case velAngle: \
+			{ \
+				out = gVelocity.a; \
+				goodVel = true; \
+				break; \
+			} \
+		} \
+		unsigned long curTime = npgmTime; \
+		if (goodVel && curTime-machine##StateStartTime > 100) \
+		{ \
+				if (machine##VelSafetyDir == velEither) \
+				{ \
+					if ( out < abs(machine##VelSafetyThresh) ) \
+					{ \
+						machine##VelSafetyCount++; \
+						if(machine##Logs) writeDebugStreamLine("%d:"#machine"velSafety %f", npgmtime, out); \
+					} \
 				} \
 				else \
 				{ \
-					if ( (sgn(machine##VelSafetyThresh) == 1)? (gSensor[sensor].velocity < machine##VelSafetyThresh) :  (gSensor[sensor].velocity > machine##VelSafetyThresh) ) \
+					if ( (sgn(machine##VelSafetyThresh) == 1)? (out < machine##VelSafetyThresh) :  (out > machine##VelSafetyThresh) ) \
 					{ \
-						machine##VelSafetyCount ++; \
+						machine##VelSafetyCount++; \
+						if(machine##Logs) writeDebugStreamLine("%d:"#machine"velSafety %f", npgmtime, out); \
 					} \
 				} \
-			} \
 		} \
+		tRelease(); \
 	} \
+	machine##StateCycCount++; \
 } \
 \
 void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##arg1Name = -1, type2 machine##arg2Name = -1) \
@@ -108,7 +151,7 @@ task machine##Set () \ */
 /* Universal State Macros */
 #define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) )
 
-#define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 &&
+#define WHILE(machineIn, condition) while( NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 && (condition) )
 
 #define SAFETY_CHECK(machineIn) (NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10) ) \
 { \

@@ -75,7 +75,7 @@ float getLengthOfLine(sLine line);
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 void applyHarshStop();
-void resetPositionFull(sPos& position, float y, float x, float a); // Reset the position to a desired value and starts tracking
+void resetPositionFull(sPos& position, float x, float y, float a); // Reset the position to a desired value and starts tracking
 
 /* Variables */
 unsigned long gAutoTime = 0;

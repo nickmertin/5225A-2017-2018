@@ -1,9 +1,11 @@
 void driveFuncTest(int targ, unsigned long time, int a, int b)
 {
-	writeDebugStreamLine("driveFuncTest %d, %d, %d, %d TO: %d", targ, time, a, b, driveTimeout);
+	LOG(drive)("driveFuncTest %d, %d, %d, %d TO: %d", targ, time, a, b, driveTimeout);
 	targ += gSensor[trackR].value;
 	setDrive(67, 67);
-	while ( gSensor[trackR].value < targ && SAFETY_CHECK(drive)
+	WHILE(drive, gSensor[trackR].value < targ)
+	{
+		driveVelSafetyCheck(velLocalY);
 		sleep(10);
 	}
 	setDrive(20, 20);
