@@ -5,7 +5,7 @@ maxPNum = 8
 f.write("/* Universal State Macros */ \n")
 f.write("#define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) ) \n")
 f.write(" \n")
-f.write("#define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 && \n")
+f.write("#define WHILE(machineIn, condition) while( NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 && (condition) ) \n")
 f.write(" \n")
 f.write("#define SAFETY_CHECK(machineIn) (NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10) ) \ \n")
 f.write("{ \ \n")
@@ -38,10 +38,10 @@ for cnt in range (minPNum, maxPNum+1):
 	f.write("#define CREATE_MACHINE_%d(machine, sensor, " %cnt)
 	for st in range (0, cnt):
 		f.write("state%d, " %st)
-	f.write("type1, arg1Name, type2, arg2Name) \\" + "\n") 
-	
+	f.write("type1, arg1Name, type2, arg2Name) \\" + "\n")
+
 	f.write("const int machine##StateCount = %d; \\" %cnt + "\n" )
-	
+
 	f.write("typedef enum _tStates##machine \\" + "\n" )
 	f.write("{ \\" + "\n" )
 	f.write("	machine##state0, \\" + "\n" )
@@ -51,7 +51,7 @@ for cnt in range (minPNum, maxPNum+1):
 	f.write("	machine##state4 \\" + "\n" )
 	f.write("}tStates##machine; \\" + "\n" )
 	f.write("\\" + "\n" )
-	
+
 	f.write("tStates##machine machine##State = machine##state0; \\" + "\n" )
 	f.write("float machine##VelSafetyThresh = -1; \\" + "\n" )
 	f.write("tVelDir machine##VelSafetyDir = -1; \\" + "\n" )
@@ -61,10 +61,10 @@ for cnt in range (minPNum, maxPNum+1):
 	f.write("int machine##VelSafetyCount = 0; \\" + "\n" )
 	f.write("unsigned long machine##StateCycCount = 0; \\" + "\n" )
 	f.write("bool machine##Logs = 0; \\" + "\n" )
-	
+
 	f.write("void machine##StateChange(int stateIn, long timeout = -1, float velSafetyThresh = -1, tVelDir velDir = -1, type1 arg1In = -1, type2 arg2In = -1) \\" + "\n" )
 	f.write("{ \\" + "\n" )
-	f.write("	if (machine##State != stateIn) \\" + "\n" ) 
+	f.write("	if (machine##State != stateIn) \\" + "\n" )
 	f.write("	{ \\" + "\n" )
 	f.write("		if (timeout <= 0) \\" + "\n" )
 	f.write("		{ \\" + "\n" )
@@ -73,7 +73,7 @@ for cnt in range (minPNum, maxPNum+1):
 	f.write("		else \\" + "\n" )
 	f.write("		{ \\" + "\n" )
 	f.write("			unsigned long t = npgmtime; \\" + "\n" )
-	f.write("			machine##Timeout = ( timeout + t ); \\" + "\n" ) 
+	f.write("			machine##Timeout = ( timeout + t ); \\" + "\n" )
 	f.write("			writeDebugStreamLine(\"Add timeout %d with %d= %d, acc=%d\", timeout, t, timeout+t, machine##Timeout); \\" + "\n" )
 	f.write("		} \\" + "\n" )
 	f.write("		\\" + "\n" )
@@ -118,7 +118,7 @@ for cnt in range (minPNum, maxPNum+1):
 	f.write("	} \\" + "\n" )
 	f.write("} \\" + "\n" )
 	f.write("\\" + "\n" )
-	
+
 	f.write("void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##arg1Name = -1, type2 machine##arg2Name = -1) \\" + "\n" )
 	f.write("{ \\" + "\n" )
 	f.write("		bool timedOut = false; \\" + "\n" )

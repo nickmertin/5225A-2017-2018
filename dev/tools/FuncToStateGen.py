@@ -25,11 +25,11 @@ for func in range (1, maxFuncNum+1):
 	f.write("}tFuncStates##machine; \\" + "\n")
 	
 	for i in range (1, func+1):
-		f.write("const int func%d##Loc = machine##StateCount + %d;" %(i, (i-1)) )
+		f.write("const int func%d##Loc = machine##StateCount + %d" %(i, (i-1)) )
 		if i is func:
 			f.write("\n")
 		else:
-			f.write(" \\ \n")
+			f.write("; \\ \n")
 	f.write("" + "\n")
 
 f.write("/* /t ///////////////////// /t */" + "\n")
@@ -46,11 +46,11 @@ for pNum in range (0, maxParamNum+1):
 
 		f.write("const int func##ArgCount = %d; \\" %pNum + "\n")
 		for i in range(1, pNum+1):
-			f.write("type%d func##Arg%d = -1;" %(i, i) )
+			f.write("type%d func##Arg%d = -1" %(i, i) )
 			if i is pNum:
 				f.write("\n")
 			else:
-				f.write(" \\ \n")
+				f.write("; \\ \n")
 		f.write("" + "\n")
 		
 		f.write("//Assign to all func args - TO BE CALLED RIGHT BEFORE PUTTING MACHINE INTO STATE" + "\n")
@@ -60,11 +60,11 @@ for pNum in range (0, maxParamNum+1):
 		f.write(") \\" + "\n") 
 
 		for i in range(1, pNum+1):
-			f.write("func##Arg%d = arg%dIn;" %(i, i) )
+			f.write("func##Arg%d = arg%dIn" %(i, i) )
 			if i is pNum:
 				f.write("\n")
 			else:
-				f.write(" \\ \n")
+				f.write("; \\ \n")
 		f.write("" + "\n")
 
 	f.write("//Add function to the machine - TO BE CALLED IN STATE MACHINE SWITCH" + "\n")

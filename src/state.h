@@ -1,7 +1,7 @@
 /* Universal State Macros */
 #define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) )
 
-#define WHILE(machineIn) while(NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 &&
+#define WHILE(machineIn, condition) while( NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10 && (condition) )
 
 #define SAFETY_CHECK(machineIn) (NOT_T_O(machineIn) && machineIn##VelSafetyCount < 10) ) \
 { \
