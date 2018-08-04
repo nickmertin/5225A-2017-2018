@@ -186,7 +186,7 @@ void applyHarshStop()
 	updateMotors();
 }
 
-void resetPositionFull(sPos& position, float y, float x, float a)
+void resetPositionFull(sPos& position, float x, float y, float a)
 {
 	tStop(trackPositionTask);
 	writeDebugStreamLine("Resetting position %f %f %f | %f %f %f", position.y, position.x, radToDeg(fmod(gPosition.a, PI * 2)), y, x, radToDeg(fmod(a, PI * 2)));
