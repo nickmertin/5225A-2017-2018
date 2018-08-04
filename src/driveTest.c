@@ -5,7 +5,7 @@ void driveFuncTest(int targ, unsigned long time, int a, int b)
 	setDrive(67, 67);
 	WHILE(drive, gSensor[trackR].value < targ)
 	{
-		driveVelSafetyCheck(velLocalY);
+		VEL_CHECK_INC(drive, velSensor);
 		sleep(10);
 	}
 	setDrive(20, 20);

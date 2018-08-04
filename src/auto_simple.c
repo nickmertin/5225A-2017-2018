@@ -45,7 +45,7 @@ void moveToTargetSimple(float x, float y, float xs, float ys, byte power, byte s
 	unsigned long timeStart = nPgmTime;
 	do
 	{
-		driveVelSafetyCheck();
+		VEL_CHECK_INC(drive, velLocalY);
 
 		currentPosVector.x = gPosition.x - x;
 		currentPosVector.y = gPosition.y - y;
@@ -192,7 +192,7 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 			driveVelSafetyCheck()
 			if (DATALOG_TURN != -1)
 			{
-				driveVelSafetyCheck();
+				VEL_CHECK_INC(drive, velAngle);
 				tHog();
 				datalogDataGroupStart();
 				datalogAddValue(DATALOG_TURN + 0, radToDeg(gPosition.a));
@@ -232,7 +232,7 @@ void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPow
 		setDrive(-127, 127);
 		WHILE(drive, (gPosition.a > endFull))
 		{
-			driveVelSafetyCheck();
+			VEL_CHECK_INC(drive, velAngle);
 			if (DATALOG_TURN != -1)
 			{
 				tHog();
@@ -293,7 +293,7 @@ void turnToTargetNewAlg(float x, float y, tTurnDir turnDir, float fullRatio, byt
 		setDrive(127, -127);
 		WHILE(drive, (gPosition.a < endFull ))
 		{
-			driveVelSafetyCheck();
+			VEL_CHECK_INC(drive, velAngle);
 			if (DATALOG_TURN != -1)
 			{
 				tHog();
@@ -336,7 +336,7 @@ void turnToTargetNewAlg(float x, float y, tTurnDir turnDir, float fullRatio, byt
 		setDrive(-127, 127);
 		WHILE(drive, (gPosition.a > endFull))
 		{
-			driveVelSafetyCheck();
+			VEL_CHECK_INC(drive, velAngle);
 			if (DATALOG_TURN != -1)
 			{
 				tHog();
@@ -426,7 +426,7 @@ void sweepTurnToTarget(float x, float y, float a, float r, tTurnDir turnDir, byt
 
 		do
 		{
-			driveVelSafetyCheck();
+			VEL_CHECK_INC(drive, velAngle);
 			float aGlobal = gPosition.a;
 			if (power < 0)
 				aGlobal += PI;
@@ -485,7 +485,7 @@ void sweepTurnToTarget(float x, float y, float a, float r, tTurnDir turnDir, byt
 
 		do
 		{
-			driveVelSafetyCheck();
+			VEL_CHECK_INC(drive, velAngle);
 			float aGlobal = gPosition.a;
 			if (power < 0)
 				aGlobal += PI;

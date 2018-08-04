@@ -27,9 +27,9 @@
 #define CHECK_POTI_JUMPS 1
 #define DRIVE_TURN (gJoy[JOY_TURN].cur - gJoy[JOY_TURN].deadzone * sgn(gJoy[JOY_TURN].cur))
 
-#include "StateTest.h"
-//#include "state.h"
-//#include "FuncToState.h"
+//#include "StateTest.h"
+#include "state.h"
+#include "FuncToState.h"
 
 // Year-independent libraries (headers)
 #include "task.h"
@@ -369,8 +369,9 @@ while(true)
 				float pKP = 30.0; //kP for power
 				float targVel, power;
 
-				while ( ((dir == 1)? (gSensor[armPoti].value < firstTarg) : (gSensor[armPoti].value > firstTarg)) && SAFETY_CHECK(arm)
-					targVel = vKP * (armTarget - gSensor[armPoti].value);
+				WHILE(drive, ((dir == 1)? (gSensor[armPoti].value < firstTarg) : (gSensor[armPoti].value > firstTarg)) )
+				{
+				targVel = vKP * (armTarget - gSensor[armPoti].value);
 					velocityCheck(armPoti);
 					if (gSensor[armPoti].velGood)
 					{

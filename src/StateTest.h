@@ -128,7 +128,6 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 		} \
 		tRelease(); \
 	} \
-	machine##StateCycCount++; \
 } \
 \
 void machine##SafetyCheck(int timedOutState = machine##state0, type1 machine##arg1Name = -1, type2 machine##arg2Name = -1) \
