@@ -1,5 +1,5 @@
 /* Defines */
-#define SENSOR_VEL_POINT_COUNT 10
+#define SENSOR_DATA_POINT_COUNT 10
 
 /* Enumerations */
 typedef enum _tSensorClass
@@ -18,11 +18,11 @@ typedef enum _tSensorMode
 } tSensorMode;
 
 /* Structures */
-typedef struct _sSensorVelPoint
+typedef struct _sSensorDataPoint
 {
 	int value;
 	unsigned long timestamp;
-} sSensorVelPoint;
+} sSensorDataPoint;
 
 typedef struct _sSensor
 {
@@ -33,8 +33,10 @@ typedef struct _sSensor
 	tSensors port;
 	float velocity;
 	float lstVelocity;
-	sSensorVelPoint velData[SENSOR_VEL_POINT_COUNT];
-	ubyte velCount;
+	sSensorDataPoint dataPointArr[SENSOR_DATA_POINT_COUNT];
+	ubyte arrHead;
+	ubyte arrTail;
+	ubyte dataCount;
 	bool velGood;
 	tSensorMode mode;
 	bool potiCheckVel;
@@ -57,7 +59,7 @@ typedef struct _sSensor
 void setupSensors(); // Initilize all the sensors
 void updateSensorOutput(tSensors sen); // Update the output for a single sensor
 void updateSensorOutputs(); // Update all the output sensors
-void updateSensorInput(tSensors sen); // Update the input for a signle sensor
+void updateSensorInput(tSensors sen); // Update the input for a singe sensor
 void updateSensorInputs(); // Update all the input sensors
 tSensorClass checkSenClass(tSensors sen); // Check the sensor class of a motor
 bool correctBtnIn(tSensors sen); // Call this function to interpret a sensor set up using setupDgtIn
@@ -65,7 +67,7 @@ void setupDgtIn(tSensors sen, int min, int max); // Setup a sensor to be interpr
 void setupInvertedSen(tSensors sen); // Setup a sensor to be interpreted as a boolean and inverted
 void resetQuadratureEncoder(tSensors sen); // Reset a quadrature encoder
 void velocityCheck(tSensors sen); // Check the velocity of a sensor
-void velocityClear(tSensors sen); // Clear the velocity of a sensor
+/* void velocityClear(tSensors sen); // Clear the velocity of a sensor */
 void startSensor(tSensors sen); // Set a sensors starting value
 void startSensors(); // Set all the sensors starting value
 
