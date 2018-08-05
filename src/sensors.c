@@ -144,9 +144,9 @@ void velocityCheck(tSensors sen)
 
 	if (SensorType[sen] == sensorPotentiometer || SensorType[sen] == sensorQuadEncoder)
 	{
-		if(s.dataCount > 2)
+		if(s.dataCount > 1)
 		{
-			if(s.dataPointArr[s.arrHead].timestamp == s.dataPointArr[s.arrHead].timestamp)
+			if(s.dataPointArr[s.arrHead].timestamp == s.dataPointArr[s.arrTail].timestamp)
 			{
 				s.velGood = false;
 				writeDebugStreamLine("%d SENSOR %d VEL ERROR - SAME TIMESTAMP - head:%d, tail:%d", nPgmTime, sen, s.arrHead, s.arrTail);
@@ -154,7 +154,7 @@ void velocityCheck(tSensors sen)
 			else
 			{
 				s.lstVelocity = s.velocity;
-				s.velocity = (s.dataPointArr[s.arrHead].value - s.dataPointArr[s.arrTail].value) / (s.dataPointArr[s.arrHead].timestamp - s.dataPointArr[s.arrTail].timestamp)
+				s.velocity = (float)(s.dataPointArr[s.arrHead].value - s.dataPointArr[s.arrTail].value) / (float)(s.dataPointArr[s.arrHead].timestamp - s.dataPointArr[s.arrTail].timestamp)
 				s.velGood = true;
 			}
 		}
