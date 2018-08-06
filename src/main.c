@@ -92,8 +92,6 @@ task driveSet()
 				const float velThresh = 0.01;
 				velocityCheck(trackL);
 				velocityCheck(trackR);
-				if (gSensor[trackL].velGood && gSensor[trackR].velGood)
-				{
 					float left = gSensor[trackL].velocity;
 					float right = gSensor[trackR].velocity;
 					if (driveStateCycCount == 0)
@@ -112,9 +110,8 @@ task driveSet()
 					{
 						setDrive((abs(left) > velThresh? (LIM_TO_VAL(sgn(left) * -70, 15)) : 0), (abs(right) > velThresh? (LIM_TO_VAL(sgn(right) * -70, 15)) : 0) );
 					}
-
 					driveStateCycCount++;
-				}
+
 				driveSafetyCheck(driveIdle);
 				break;
 			}
@@ -204,8 +201,7 @@ task liftSet()
 				setLift(joy);
 
 				velocityCheck(liftPoti);
-				if(gSensor[liftPoti].velGood)
-					//LOG(lift)("power:%d, vel: %f", joy, gSensor[liftPoti].velocity);
+				//LOG(lift)("power:%d, vel: %f", joy, gSensor[liftPoti].velocity);
 
 				if ((sgn(joy) == -1 && gSensor[liftPoti].value < LIFT_HOLD_DOWN_THRESHOLD) || (sgn(joy) == 1 && gSensor[liftPoti].value > LIFT_HOLD_UP_THRESHOLD))
 					liftStateChange(liftHold);
@@ -231,8 +227,6 @@ task liftSet()
 				{
 					targVel = vKP * (liftTarget - gSensor[liftPoti].value);
 					velocityCheck(liftPoti);
-					if (gSensor[liftPoti].velGood)
-					{
 						power = LIM_TO_VAL( (pB + (pKP * (targVel - gSensor[liftPoti].velocity))), 127);
 
 						if (abs(gSensor[liftPoti].velocity) < 1.0) // if stalled, apply enough power to move
@@ -248,15 +242,12 @@ task liftSet()
 
 						LOG(lift)("Power: %d in dir: %d. vel:%f, velTarg:%f, Loc: %d, Targ: %d", power, dir, gSensor[liftPoti].velocity, targVel, gSensor[liftPoti].value, firstTarg);
 						setLift(power);
-					}
 					sleep(10);
 				}
 
 				setLift(0);
 				//LOG(lift)("targ: %d", liftTarget);
 				velocityCheck(liftPoti);
-				if (gSensor[liftPoti].velGood)
-				{
 					while ( abs(gSensor[liftPoti].velocity) > 0.75  && ( (dir == 1)? (gSensor[liftPoti].value < liftTarget) : (gSensor[liftPoti].value > liftTarget) ) )
 					{
 						velocityCheck(liftPoti);
@@ -264,7 +255,6 @@ task liftSet()
 						LOG(lift)("Power: 0 in dir: %d. Loc: %d, Targ: %d", gMotor[lift].power , dir, gSensor[liftPoti].value, liftTarget);
 						sleep(10);
 					}
-				}
 				liftStateChange(liftHold);
 			}
 				break;
@@ -278,7 +268,7 @@ task liftSet()
 void handleLift() //Decide which state to put machine in
 {
 	LOG(lift)("State = %d, Lift loc = %d, Lift Power = %d", liftState, gSensor[liftPoti].value, gMotor[liftR].power);
-
+/*
 	short joy = gJoy[JOY_LIFT].cur;
 	if (RISING(JOY_LIFT) && liftState != liftManual)
 		{
@@ -293,6 +283,9 @@ void handleLift() //Decide which state to put machine in
 		liftStateChange(liftMove, 1200, -1, -1, LIFT_MID+300, -1);
 		//LIFT_STATE(move, LIFT_MID+300, -1);
 	}
+	*/
+	velocityCheck(liftPoti);
+	writeDebugStreamLine("lift vel:%f, lstVel:%f", gSensor[liftPoti].velocity, gSensor[liftPoti].lstVelocity);
 }
 
 
@@ -343,8 +336,7 @@ while(true)
 		{
 			short joy = -1 * (gJoy[JOY_ARM].cur);
 			velocityCheck(armPoti);
-			if (gSensor[armPoti].velGood)
-				LOG(arm)("power: %d, vel: %f", joy, gSensor[armPoti].velocity);
+			LOG(arm)("power: %d, vel: %f", joy, gSensor[armPoti].velocity);
 
 			setArm(joy);
 
@@ -373,8 +365,6 @@ while(true)
 				{
 				targVel = vKP * (armTarget - gSensor[armPoti].value);
 					velocityCheck(armPoti);
-					if (gSensor[armPoti].velGood)
-					{
 						power = LIM_TO_VAL( (pB + (pKP * (targVel - gSensor[armPoti].velocity))), 127);
 
 						if (abs(gSensor[armPoti].velocity) < 2.6) // if stalled, apply enough power to move
@@ -383,7 +373,6 @@ while(true)
 								power = 26;
 							else if (dir == -1 && power > -7)
 								power = -7;
-						}
 
 						if ( sgn(power) != sgn(dir) )
 							LIM_TO_VAL_SET(power, (dir == 1)? 4 : 8);
@@ -397,8 +386,6 @@ while(true)
 				setArm(0);
 				LOG(arm)("targ: %d", armTarget);
 				velocityCheck(armPoti);
-				if (gSensor[armPoti].velGood)
-				{
 					while ( abs(gSensor[armPoti].velocity) > 0.75  && ( (dir == 1)? (gSensor[armPoti].value < armTarget) : (gSensor[armPoti].value > armTarget) ) )
 					{
 						velocityCheck(armPoti);
@@ -406,7 +393,6 @@ while(true)
 						LOG(arm)("Power: 0 in dir: %d. Loc: %d, Targ: %d", gMotor[arm].power , dir, gSensor[armPoti].value, armTarget);
 						sleep(10);
 					}
-				}
 				armStateChange(armHold);
 			}
 			break;

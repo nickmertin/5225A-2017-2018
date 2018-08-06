@@ -1,7 +1,7 @@
 f = open('..\..\src\state.h', 'w')
 minPNum = 3
 maxPNum = 8
-f.write("#define ACCEL_TIME 75 \\\\amnt of MS that must elapse before starting to check vel safety \n \n")
+f.write("#define ACCEL_TIME 75 //amnt of MS that must elapse before starting to check vel safety \n \n")
 
 f.write("/* Universal State Macros */ \n")
 f.write("#define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) ) \n")
@@ -120,11 +120,11 @@ for cnt in range (minPNum, maxPNum+1):
 	#f.write("				if (machine##StateCycCount == 0) \\ \n")
 	#f.write("					velocityClear(sensor); \\ \n")
 	f.write("				velocityCheck(sensor); \\ \n")
-	f.write("				if (gSensor[sensor].velGood) \\ \n")
-	f.write("				{ \\ \n")
+	#f.write("				if (gSensor[sensor].velGood) \\ \n")
+	#f.write("				{ \\ \n")
 	f.write("					out = gSensor[sensor].velocity; \\ \n")
 	f.write("					goodVel = true; \\ \n")
-	f.write("				} \\ \n")
+	#f.write("				} \\ \n")
 	f.write("				break; \\ \n")
 	f.write("			} \\ \n")
 	f.write("			case velLocalY: \\ \n")

@@ -1,5 +1,5 @@
 /* Defines */
-#define SENSOR_DATA_POINT_COUNT 10
+#define SENSOR_DATA_POINT_COUNT 50
 
 /* Enumerations */
 typedef enum _tSensorClass
@@ -37,7 +37,7 @@ typedef struct _sSensor
 	ubyte arrHead;
 	ubyte arrTail;
 	ubyte dataCount;
-	bool velGood;
+	//bool velGood;
 	tSensorMode mode;
 	bool potiCheckVel;
 	int dgtMin;
@@ -67,7 +67,6 @@ void setupDgtIn(tSensors sen, int min, int max); // Setup a sensor to be interpr
 void setupInvertedSen(tSensors sen); // Setup a sensor to be interpreted as a boolean and inverted
 void resetQuadratureEncoder(tSensors sen); // Reset a quadrature encoder
 void velocityCheck(tSensors sen); // Check the velocity of a sensor
-/* void velocityClear(tSensors sen); // Clear the velocity of a sensor */
 void startSensor(tSensors sen); // Set a sensors starting value
 void startSensors(); // Set all the sensors starting value
 

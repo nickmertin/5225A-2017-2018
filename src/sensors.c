@@ -45,14 +45,16 @@ void updateSensorInput(tSensors sen)
 		unsigned long t = nPgmTime;
 		if (t > s.dataPointArr[s.arrHead].timestamp)
 		{
-			if (s.dataPointArr <= SENSOR_DATA_POINT_COUNT+1)
+			if (s.dataCount <= SENSOR_DATA_POINT_COUNT)
+			{
 				s.dataCount++;
+			}
 
-			s.arrHead = ( (s.arrTail+1) % SENSOR_DATA_POINT_COUNT );
+			s.arrHead = ( (s.arrHead+1) % SENSOR_DATA_POINT_COUNT );
 			s.dataPointArr[s.arrHead].value = s.value;
 			s.dataPointArr[s.arrHead].timestamp = t;
 
-			if (s.dataCount > SENSOR_DATA_POINT_COUNT)
+			if (s.dataCount >= SENSOR_DATA_POINT_COUNT)
 				s.arrTail = ( (s.arrTail+1) % SENSOR_DATA_POINT_COUNT );
 		}
 	}
@@ -68,8 +70,7 @@ void updateSensorInput(tSensors sen)
 		if (gSensor[sen].velDatalog != -1)
 		{
 			velocityCheck(sen);
-			if (gSensor[sen].velGood)
-				datalogAddValue(gSensor[sen].velDatalog, gSensor[sen].velocity * 1000);
+			datalogAddValue(gSensor[sen].velDatalog, gSensor[sen].velocity * 1000);
 		}
 	}
 #endif
@@ -144,18 +145,24 @@ void velocityCheck(tSensors sen)
 
 	if (SensorType[sen] == sensorPotentiometer || SensorType[sen] == sensorQuadEncoder)
 	{
-		if(s.dataCount > 1)
+		if(s.dataCount > 5)
 		{
-			if(s.dataPointArr[s.arrHead].timestamp == s.dataPointArr[s.arrTail].timestamp)
+			unsigned long tDif = (s.dataPointArr[s.arrHead].timestamp - s.dataPointArr[s.arrTail].timestamp);
+			if( tDif <= 0 )
 			{
-				s.velGood = false;
-				writeDebugStreamLine("%d SENSOR %d VEL ERROR - SAME TIMESTAMP - head:%d, tail:%d", nPgmTime, sen, s.arrHead, s.arrTail);
+				writeDebugStreamLine("%d SENSOR PORT%d VEL TIMESTAMP ERROR - head:%d t=%d, tail:%d t=%d", nPgmTime, sen - port1 + 1, s.arrHead, s.dataPointArr[s.arrHead].timestamp, s.arrTail, s.dataPointArr[s.arrTail].timestamp);
 			}
 			else
 			{
-				s.lstVelocity = s.velocity;
-				s.velocity = (float)(s.dataPointArr[s.arrHead].value - s.dataPointArr[s.arrTail].value) / (float)(s.dataPointArr[s.arrHead].timestamp - s.dataPointArr[s.arrTail].timestamp)
-				s.velGood = true;
+				//Calc lst velocity
+				ubyte lstVelHead = ((s.arrHead)==0? (SENSOR_DATA_POINT_COUNT - 1):(s.arrHead-1));
+				s.lstVelocity = (float)(s.dataPointArr[lstVelHead].value - s.dataPointArr[s.arrTail].value) / (float)(s.dataPointArr[lstVelHead].timestamp - s.dataPointArr[s.arrTail].timestamp);
+				if (abs(s.lstVelocity) < 0.0035)
+					s.lstVelocity = 0;
+				//Calc velocity
+				s.velocity = (float)(s.dataPointArr[s.arrHead].value - s.dataPointArr[s.arrTail].value) / (float)(tDif)
+				if (abs(s.velocity) < 0.0035)
+					s.velocity = 0;
 			}
 		}
 	}
@@ -198,7 +205,7 @@ void setupSensors()
 
 		gSensor[i].lstVelocity = 0;
 		gSensor[i].velocity = 0;
-		gSensor[i].velGood = false;
+		//gSensor[i].velGood = false;
 
 		for (ubyte j = 0; j < SENSOR_DATA_POINT_COUNT; ++j)
 		{

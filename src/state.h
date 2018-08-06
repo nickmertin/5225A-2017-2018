@@ -1,4 +1,4 @@
-#define ACCEL_TIME 75 \\amnt of MS that must elapse before starting to check vel safety 
+#define ACCEL_TIME 75 //amnt of MS that must elapse before starting to check vel safety 
  
 /* Universal State Macros */ 
 #define NOT_T_O(machineIn) ( (machineIn##Timeout <= 0)? 1 : (npgmTime < machineIn##Timeout) ) 
@@ -95,11 +95,8 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 			case velSensor: \ 
 			{ \ 
 				velocityCheck(sensor); \ 
-				if (gSensor[sensor].velGood) \ 
-				{ \ 
 					out = gSensor[sensor].velocity; \ 
 					goodVel = true; \ 
-				} \ 
 				break; \ 
 			} \ 
 			case velLocalY: \ 
@@ -219,11 +216,8 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 			case velSensor: \ 
 			{ \ 
 				velocityCheck(sensor); \ 
-				if (gSensor[sensor].velGood) \ 
-				{ \ 
 					out = gSensor[sensor].velocity; \ 
 					goodVel = true; \ 
-				} \ 
 				break; \ 
 			} \ 
 			case velLocalY: \ 
@@ -343,11 +337,8 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 			case velSensor: \ 
 			{ \ 
 				velocityCheck(sensor); \ 
-				if (gSensor[sensor].velGood) \ 
-				{ \ 
 					out = gSensor[sensor].velocity; \ 
 					goodVel = true; \ 
-				} \ 
 				break; \ 
 			} \ 
 			case velLocalY: \ 
@@ -467,11 +458,8 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 			case velSensor: \ 
 			{ \ 
 				velocityCheck(sensor); \ 
-				if (gSensor[sensor].velGood) \ 
-				{ \ 
 					out = gSensor[sensor].velocity; \ 
 					goodVel = true; \ 
-				} \ 
 				break; \ 
 			} \ 
 			case velLocalY: \ 
@@ -591,11 +579,8 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 			case velSensor: \ 
 			{ \ 
 				velocityCheck(sensor); \ 
-				if (gSensor[sensor].velGood) \ 
-				{ \ 
 					out = gSensor[sensor].velocity; \ 
 					goodVel = true; \ 
-				} \ 
 				break; \ 
 			} \ 
 			case velLocalY: \ 
@@ -715,11 +700,8 @@ void machine##VelSafetyCheck (tVelType velType = velSensor) \
 			case velSensor: \ 
 			{ \ 
 				velocityCheck(sensor); \ 
-				if (gSensor[sensor].velGood) \ 
-				{ \ 
 					out = gSensor[sensor].velocity; \ 
 					goodVel = true; \ 
-				} \ 
 				break; \ 
 			} \ 
 			case velLocalY: \ 
