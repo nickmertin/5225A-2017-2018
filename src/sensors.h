@@ -1,5 +1,5 @@
 /* Defines */
-#define SENSOR_DATA_POINT_COUNT 50
+#define SENSOR_DATA_POINT_COUNT 30
 
 /* Enumerations */
 typedef enum _tSensorClass
