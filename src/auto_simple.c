@@ -14,12 +14,21 @@ void moveToTargetSimple(float x, float y, float xs, float ys, byte power, byte b
 	followLine.p2.y = y;
 
 	setDrive(power, power);
+	bool rightDir = true;
 	do
 	{
 		currentLocalVector.x = gPosition.x - x;
 		currentLocalVector.y = gPosition.y - y;
+		float gAngleTo = aTan2(currentLocalVector.x, currentLocalVector.y);
+		//If the robot is not within +-45 deg of target, drop out
+		if ( gPosition.a < (gAngleTo - pi/4) || gPosition.a > (gAngleTo - pi/4) )
+		{
+			writeDebugStreamLine("Exit moveToTargetSimple. RobotPos%f, PosTo%f", gPosition.a, gAngleTo);
+			rightDir = false;
+		}
+
 		sleep(10);
-	} WHILE(drive, (abs(currentLocalVector.y) > 2) );
+	} WHILE(drive, (abs(currentLocalVector.y) > 2 && rightDir) );
 	setDrive(breakPower, breakPower);
 
 }
@@ -190,7 +199,7 @@ void moveToTarget(float x, float y, float xs, float ys, byte power, byte startPo
 
 void moveToTargetDisSimple(float a, float d, float xs, float ys, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
 {
-	moveToTargetSimple(xs + d * sin(a), ys + d * cos(a), xs, ys, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, mode);
+	moveToTarget(xs + d * sin(a), ys + d * cos(a), xs, ys, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, mode);
 }
 
 void turnToAngleNewAlg(float a, tTurnDir turnDir, float fullRatio, byte coastPower, float stopOffsetDeg, bool mogo, bool harshStop)

@@ -145,8 +145,8 @@ void handleDrive()
 	if (RISING(BTN_DRIVE_TEST))
 	{
 		LOG(drive)("Btn_Drive_Test Pressed");
-		ASSIGN_FUNC_STATE_6(drivemoveToTargetSimple, 0, 10, 0, 0, 100, 0);
-		driveStateChange(drivemoveToTargetSimple);
+		ASSIGN_FUNC_STATE_6(moveToTargetSimple, 0, 10, 0, 0, 100, 0);
+		driveStateChange(drivemoveToTargetSimple, 400);
 		//ASSIGN_FUNC_STATE_4(driveFuncTest, 200, nPgmTime, -1, -1);
 		//driveStateChange(drivedriveFuncTest, 400, 0.01, velUp);
 		//ASSIGN_FUNC_STATE_12(moveToTarget, 10, 0, 0, 0, 127, 0, 5, 10, 50, 0, stopSoft | stopHarsh, mttProportional);
@@ -271,7 +271,7 @@ task liftSet()
 void handleLift() //Decide which state to put machine in
 {
 	LOG(lift)("State = %d, Lift loc = %d, Lift Power = %d", liftState, gSensor[liftPoti].value, gMotor[liftR].power);
-/*
+
 	short joy = gJoy[JOY_LIFT].cur;
 	if (RISING(JOY_LIFT) && liftState != liftManual)
 		{
@@ -286,9 +286,7 @@ void handleLift() //Decide which state to put machine in
 		liftStateChange(liftMove, 1200, -1, -1, LIFT_MID+300, -1);
 		//LIFT_STATE(move, LIFT_MID+300, -1);
 	}
-	*/
-	velocityCheck(liftPoti);
-	writeDebugStreamLine("lift vel:%f, lstVel:%f", gSensor[liftPoti].velocity, gSensor[liftPoti].lstVelocity);
+
 }
 
 
