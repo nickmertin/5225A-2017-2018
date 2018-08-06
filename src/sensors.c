@@ -170,18 +170,6 @@ void velocityCheck(tSensors sen)
 	tRelease();
 }
 
-/*
-void velocityClear(tSensors sen)
-{
-	tHog();
-	writeDebugStreamLine("%d velocityClear %d", nPgmTime, sen);
-	gSensor[sen].velocity = gSensor[sen].lstVelocity = 0;
-	gSensor[sen].velGood = false;
-	velocityCheck(sen);
-	tRelease();
-}
-*/
-
 void startSensor(tSensors sen)
 {
 	if (gSensor[sen].cls == snclsInput)
