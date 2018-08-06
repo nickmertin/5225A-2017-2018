@@ -64,9 +64,9 @@ void setDrive(word left, word right)
 #include "auto.c"
 
 CREATE_MACHINE_5(drive, trackL, Idle, Break, Manual, Move, MoveSimple, float, Vel, int, Power)
-#include "driveTest.c"
-//#include "auto_simple.h"
-//#include "auto_simple.c"
+//#include "driveTest.c"
+#include "auto_simple.h"
+#include "auto_simple.c"
 
 task driveSet()
 {
@@ -129,12 +129,13 @@ task driveSet()
 			{
 				break;
 			}
-			ADD_FUNC_TO_SWITCH_4(driveFuncTest, drive, driveBreak, driveIdle)
-			//ADD_FUNC_TO_SWITCH_12(moveToTargetSimple, drive, driveBreak, driveIdle)
-			//ADD_FUNC_TO_SWITCH_12(moveToTargetDisSimple, drive, driveBreak, driveIdle)
-			//ADD_FUNC_TO_SWITCH_7(turnToAngleNewAlg, drive, driveBreak, driveIdle)
-			//ADD_FUNC_TO_SWITCH_9(turnToTargetNewAlg, drive, driveBreak, driveIdle)
-			//ADD_FUNC_TO_SWITCH_7(sweepTurnToTarget, drive, driveBreak, driveIdle)
+			//ADD_FUNC_TO_SWITCH_4(driveFuncTest, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_6(moveToTargetSimple, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_12(moveToTarget, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_12(moveToTargetDisSimple, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_7(turnToAngleNewAlg, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_9(turnToTargetNewAlg, drive, driveBreak, driveIdle)
+			ADD_FUNC_TO_SWITCH_7(sweepTurnToTarget, drive, driveBreak, driveIdle)
 		}
 		endCycle(drive);
 	}
@@ -144,10 +145,12 @@ void handleDrive()
 	if (RISING(BTN_DRIVE_TEST))
 	{
 		LOG(drive)("Btn_Drive_Test Pressed");
-		ASSIGN_FUNC_STATE_4(driveFuncTest, 200, nPgmTime, -1, -1);
-		driveStateChange(drivedriveFuncTest, 400, 0.01, velUp);
-		//ASSIGN_FUNC_STATE_12(moveToTargetSimple, 10, 0, 0, 0, 127, 0, 5, 10, 50, 0, stopSoft | stopHarsh, mttProportional);
-		//driveStateChange(drivemoveToTargetSimple);
+		ASSIGN_FUNC_STATE_6(drivemoveToTargetSimple, 0, 10, 0, 0, 100, 0);
+		driveStateChange(drivemoveToTargetSimple);
+		//ASSIGN_FUNC_STATE_4(driveFuncTest, 200, nPgmTime, -1, -1);
+		//driveStateChange(drivedriveFuncTest, 400, 0.01, velUp);
+		//ASSIGN_FUNC_STATE_12(moveToTarget, 10, 0, 0, 0, 127, 0, 5, 10, 50, 0, stopSoft | stopHarsh, mttProportional);
+		//driveStateChange(drivemoveToTarget);
 	}
 	else if (!gJoy[JOY_THROTTLE}.cur && !gJoy[JOY_TURN].cur && driveState == driveManual)
 	{

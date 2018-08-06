@@ -1,5 +1,30 @@
 /* Functions */
-void moveToTargetSimple(float x, float y, float xs, float ys, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
+void moveToTargetSimple(float x, float y, float xs, float ys, byte power, byte breakPower)
+{
+	sVector currentLocalVector;
+	sPolar currentLocalPolar;
+
+	sVector projectedPosVector;
+	sPolar projectedPosPolar;
+
+	sLine followLine;
+	followLine.p1.x = xs;
+	followLine.p1.y = ys;
+	followLine.p2.x = x;
+	followLine.p2.y = y;
+
+	setDrive(power, power);
+	do
+	{
+		currentLocalVector.x = gPosition.x - x;
+		currentLocalVector.y = gPosition.y - y;
+		sleep(10);
+	} WHILE(drive, (abs(currentLocalVector.y) > 2) );
+	setDrive(breakPower, breakPower);
+
+}
+
+void moveToTarget(float x, float y, float xs, float ys, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
 {
 	LOG(drive)("Moving to %f %f from %f %f at %d", y, x, ys, xs, power);
 

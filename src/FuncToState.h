@@ -1,4 +1,4 @@
-/*/t Auto-Generated Macros to Add X Funcs to a Machine /t*/
+/*/t Auto-Generated Macros to Add Up to 7 Funcs to a Machine /t*/
 /*/t TO BE CALLED IN HEADER /t*/
 
 #define ADD_FUNCS_TO_MACHINE_1(machine, func1) \
@@ -56,8 +56,44 @@ const int func3##Loc = machine##StateCount + 2; \
 const int func4##Loc = machine##StateCount + 3; \ 
 const int func5##Loc = machine##StateCount + 4
 
+#define ADD_FUNCS_TO_MACHINE_6(machine, func1, func2, func3, func4, func5, func6) \
+typedef enum _tFuncStates##machine \
+{ \
+	machine##func1 = machine##StateCount, \ 
+	machine##func2, \ 
+	machine##func3, \ 
+	machine##func4, \ 
+	machine##func5, \ 
+	machine##func6 \
+}tFuncStates##machine; \
+const int func1##Loc = machine##StateCount + 0; \ 
+const int func2##Loc = machine##StateCount + 1; \ 
+const int func3##Loc = machine##StateCount + 2; \ 
+const int func4##Loc = machine##StateCount + 3; \ 
+const int func5##Loc = machine##StateCount + 4; \ 
+const int func6##Loc = machine##StateCount + 5
+
+#define ADD_FUNCS_TO_MACHINE_7(machine, func1, func2, func3, func4, func5, func6, func7) \
+typedef enum _tFuncStates##machine \
+{ \
+	machine##func1 = machine##StateCount, \ 
+	machine##func2, \ 
+	machine##func3, \ 
+	machine##func4, \ 
+	machine##func5, \ 
+	machine##func6, \ 
+	machine##func7 \
+}tFuncStates##machine; \
+const int func1##Loc = machine##StateCount + 0; \ 
+const int func2##Loc = machine##StateCount + 1; \ 
+const int func3##Loc = machine##StateCount + 2; \ 
+const int func4##Loc = machine##StateCount + 3; \ 
+const int func5##Loc = machine##StateCount + 4; \ 
+const int func6##Loc = machine##StateCount + 5; \ 
+const int func7##Loc = machine##StateCount + 6
+
 /* /t ///////////////////// /t */
-/*/t Auto-Generated Macros to Use Funcs w/ X Paramaters /t*/
+/*/t Auto-Generated Macros to Use Funcs w/ up to 13 Paramaters /t*/
 
 /* Macros for 0 Param Functions */
 //Add function to the machine - TO BE CALLED IN STATE MACHINE SWITCH

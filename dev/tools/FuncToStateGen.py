@@ -1,9 +1,9 @@
 f = open('..\..\src\FuncToState.h', 'w')
-maxFuncNum = 5
+maxFuncNum = 7
 maxParamNum = 13
 
 
-f.write("/*/t Auto-Generated Macros to Add X Funcs to a Machine /t*/" + "\n")
+f.write("/*/t Auto-Generated Macros to Add Up to %d Funcs to a Machine /t*/" %maxFuncNum + "\n")
 f.write("/*/t TO BE CALLED IN HEADER /t*/" + "\n")
 f.write("" + "\n")
 for func in range (1, maxFuncNum+1):
@@ -33,7 +33,7 @@ for func in range (1, maxFuncNum+1):
 	f.write("" + "\n")
 
 f.write("/* /t ///////////////////// /t */" + "\n")
-f.write("/*/t Auto-Generated Macros to Use Funcs w/ X Paramaters /t*/" + "\n")
+f.write("/*/t Auto-Generated Macros to Use Funcs w/ up to %d Paramaters /t*/" %maxParamNum + "\n")
 f.write("" + "\n")
 for pNum in range (0, maxParamNum+1):
 	f.write("/* Macros for %d Param Functions */" %pNum + "\n")
