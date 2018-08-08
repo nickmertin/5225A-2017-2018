@@ -15,6 +15,9 @@
 #define SPIN_TO_IN_LR (WHEEL_DIAMETER_IN_LR * PI / TICKS_PER_ROTATION)
 #define SPIN_TO_IN_S (WHEEL_DIAMETER_IN_S * PI / TICKS_PER_ROTATION)
 
+// Translate gPosition.a to normal angle (in radians)
+#define TRANS_ANG(a) (-a + (pi/2))
+
 /* Enumerations */
 typedef enum _turnDir
 {
@@ -73,6 +76,7 @@ void polarToVector(sPolar& polar, sVector& vector); // Convert a polar vector to
 float getAngleOfLine(sLine line);
 float getLengthOfLine(sLine line);
 void offsetPos(float& x, float& y, float offset);
+bool facing(float targX, float targY); //Check to see if robot is facing target
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 void applyHarshStop();

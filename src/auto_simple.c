@@ -1,85 +1,72 @@
 /* Functions */
-void moveToTargetSimple(float x, float y, float xs, float ys, byte power, byte breakPower)
+void moveToTargetSimple(float x, float y, byte power, bool harshStop)
 {
-	float offset = 3.0;
-
-	const float base = 1.8;
-	const float kP = -5.0;
-	word throttle, turn, left, right;
-	byte dir;
-
-	sVector currentLocalVector;
-	sPolar currentLocalPolar;
-
-	sVector turnGlobalVector;
-	sVector turnLocalVector;
-	sPolar turnLocalPolar;
-
-	sLine followLine;
-	followLine.p1.x = xs;
-	followLine.p1.y = ys;
-	followLine.p2.x = x;
-	followLine.p2.y = y;
-
-	bool rightDir = true;
-	do
+	if (facing(x,y))
 	{
-		VEL_CHECK_INC(drive, velLocalY);
+		float offset = 3.0;
 
-		currentLocalVector.x = gPosition.x - x;
-		currentLocalVector.y = gPosition.y - y;
+		const float base = 1.8;
+		const float kP = -5.0;
+		word throttle, turn, left, right;
+		byte dir;
 
-		if (currentLocalVector.y <= offset)
-			offset = currentLocalVector.y - 0.2;
+		sVector currentLocalVector;
+		sPolar currentLocalPolar;
 
-		offsetPos(turnGlobalVector.x, turnGlobalVector.y, offset);
+		sVector turnGlobalVector;
+		sVector turnLocalVector;
+		sPolar turnLocalPolar;
 
-		turnLocalVector.x = turnGlobalVector.x - x;
-		//turnLocalVector.y = turnGlobalVector.y - y;
-		LOG(drive)("gTurn:%f, lTurn:%f", turnGlobalVector.x, turnLocalVector.x);
-		throttle = power;
-		turn = LIM_TO_VAL(pow(base, fabs(turnLocalVector.x)), 127);
-
-		//if (driveStateCycCount == 1)
-		dir = sgn(turnLocalVector.x);
-
-		//if (abs(turnLocalVector.x) < 2) //when within two inches of target, go straight
-			//dir = 0;
-
-		switch(dir)
+		do
 		{
-			case (1): //right
-			{
-				left = throttle;
-				right = throttle+turn;
-			}
-			case(-1): //left
-			{
-				right = throttle;
-				left = throttle+turn;
-			}
-			case(0): //straight
-			{
-				right = left = throttle;
-			}
-		}
-		setDrive(left,right);
+			VEL_CHECK_INC(drive, velLocalY);
 
-		LOG(drive)("offset:%f, l:%d r:%d, throttle:%d, turn:%d", turnLocalVector.x, left, right, throttle, turn);
-		//float gAngleTo = aTan(currentLocalVector.x/currentLocalVector.y);
-		//if (currentLocalVector.y >= 0)
-		//	gAngleTo += (pi/2);
-		//writeDebugStreamLine("(%f,%f)RobotPos%f, PosTo%f", gPosition.x, gPosition.y, gPosition.a, gAngleTo);
-		////If the robot is not within +-45 deg of target, drop out
-		//if ( abs(gPosition.a-gAngleTo) > (pi/4) ) //< (gAngleTo - pi/4) || gPosition.a > (gAngleTo + pi/4) )
-		//{
-		//	writeDebugStreamLine("Exit moveToTargetSimple. RobotPos%f, PosTo%f", gPosition.a, gAngleTo);
-		//	rightDir = false;
-		//}
+			currentLocalVector.x = gPosition.x - x;
+			currentLocalVector.y = gPosition.y - y;
 
-		sleep(10);
-	} WHILE(drive, (abs(currentLocalVector.y) > 2 && rightDir) );
-	setDrive(breakPower, breakPower);
+			if (currentLocalVector.y <= offset)
+				offset = currentLocalVector.y - 0.2;
+
+			offsetPos(turnGlobalVector.x, turnGlobalVector.y, offset);
+
+			turnLocalVector.x = turnGlobalVector.x - x;
+			//turnLocalVector.y = turnGlobalVector.y - y;
+			LOG(drive)("gTurn:%f, lTurn:%f", turnGlobalVector.x, turnLocalVector.x);
+			throttle = power;
+			turn = LIM_TO_VAL(pow(base, fabs(turnLocalVector.x)), 127);
+
+			//if (driveStateCycCount == 1)
+			dir = sgn(turnLocalVector.x);
+
+			//if (abs(turnLocalVector.x) < 2) //when within two inches of target, go straight
+				//dir = 0;
+
+			switch(dir)
+			{
+				case (1): //right
+				{
+					left = throttle;
+					right = throttle+turn;
+				}
+				case(-1): //left
+				{
+					right = throttle;
+					left = throttle+turn;
+				}
+				case(0): //straight
+				{
+					right = left = throttle;
+				}
+			}
+			setDrive(left,right);
+
+			LOG(drive)("offset:%f, l:%d r:%d, throttle:%d, turn:%d", turnLocalVector.x, left, right, throttle, turn);
+
+			sleep(10);
+		} WHILE(drive, (abs(currentLocalVector.y) > 2) );
+		if (harshStop)
+			applyHarshStop();
+	}
 
 }
 
@@ -247,7 +234,7 @@ void moveToTarget(float x, float y, float xs, float ys, byte power, byte startPo
 	LOG(drive)("Moved to %f %f from %f %f | %f %f %f", y, x, ys, xs, gPosition.y, gPosition.x, radToDeg(gPosition.a));
 }
 
-void moveToTargetDisSimple(float a, float d, float xs, float ys, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
+void moveToTargetDis(float a, float d, float xs, float ys, byte power, byte startPower, float maxErrX, float decelEarly, byte decelPower, float dropEarly, tStopType stopType, tMttMode mode)
 {
 	moveToTarget(xs + d * sin(a), ys + d * cos(a), xs, ys, power, startPower, maxErrX, decelEarly, decelPower, dropEarly, stopType, mode);
 }
