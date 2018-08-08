@@ -553,6 +553,27 @@ if (RISING(BTN_MOBILE_MIDDLE))
 }
 }
 
+void startTasks()
+{
+	resetPositionFull(gPosition, 0, 0, 0);
+
+	tStart(driveSet);
+	tStart(liftSet);
+	tStart(armSet);
+	tStart(setMobileState);
+
+}
+
+void stopTasks()
+{
+	tStop(trackPositionTask);
+
+	tStop(driveSet);
+	tStop(liftSet);
+	tStop(armSet);
+	tStop(setMobileState);
+}
+
 void startup()
 {
 clearDebugStream();
@@ -587,13 +608,19 @@ updateSensorInputs();
 
 task autonomous()
 {
-sCycleData cycle;
-initCycle(cycle, 10, "autonomous");
+	sCycleData cycle;
+	initCycle(cycle, 10, "autonomous");
+	startTasks();
 
-while(true)
-{
-	endCycle(cycle);
-}
+	while(true)
+	{
+		updateJoysticks();
+		updateMotors();
+		updateSensorInputs();
+		updateSensorOutputs();
+		endCycle(cycle);
+	}
+	stopTasks();
 }
 
 task usercontrol()
@@ -601,12 +628,7 @@ task usercontrol()
 sCycleData cycle;
 initCycle(cycle, 10, "usercontrol");
 
-resetPositionFull(gPosition, 0, 0, 0);
-
-tStart(driveSet);
-tStart(liftSet);
-tStart(armSet);
-tStart(setMobileState);
+startTasks();
 
 while (true)
 {
@@ -624,8 +646,5 @@ while (true)
 
 	endCycle(cycle);
 }
-tStop(driveSet);
-tStop(liftSet);
-tStop(armSet);
-tStop(setMobileState);
+stopTasks();
 }
