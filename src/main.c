@@ -614,7 +614,7 @@ task autonomous()
 
 	while(true)
 	{
-		updateJoysticks();
+		//updateJoysticks();
 		updateMotors();
 		updateSensorInputs();
 		updateSensorOutputs();
@@ -625,26 +625,26 @@ task autonomous()
 
 task usercontrol()
 {
-sCycleData cycle;
-initCycle(cycle, 10, "usercontrol");
+	sCycleData cycle;
+	initCycle(cycle, 10, "usercontrol");
 
-startTasks();
+	startTasks();
 
-while (true)
-{
-	updateJoysticks();
-	updateMotors();
-	updateSensorInputs();
-	updateSensorOutputs();
+	while (true)
+	{
+		updateJoysticks();
+		updateMotors();
+		updateSensorInputs();
+		updateSensorOutputs();
 
-	handleDrive();
-	handleLift();
-	handleArm();
-	handleMobile();
+		handleDrive();
+		handleLift();
+		handleArm();
+		handleMobile();
 
-	//setMobileState();
+		//setMobileState();
 
-	endCycle(cycle);
-}
-stopTasks();
+		endCycle(cycle);
+	}
+	stopTasks();
 }
