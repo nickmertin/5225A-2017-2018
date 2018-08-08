@@ -72,6 +72,7 @@ void vectorToPolar(sVector& vector, sPolar& polar); // Convert a cartesian vecto
 void polarToVector(sPolar& polar, sVector& vector); // Convert a polar vector to a cartesian vector
 float getAngleOfLine(sLine line);
 float getLengthOfLine(sLine line);
+void offsetPos(float& x, float& y, float offset);
 task trackPositionTask();
 task autoMotorSensorUpdateTask(); // Update motors and sensors during auto
 void applyHarshStop();

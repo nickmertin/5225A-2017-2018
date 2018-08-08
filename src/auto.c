@@ -116,6 +116,15 @@ float getLengthOfLine(sLine line)
 	return sqrt(x * x + y * y);
 }
 
+void offsetPos(float& x, float& y, float offset)
+{
+	x = offset * sin(gPosition.a);
+	y = offset * cos(gPosition.a);
+
+	x += gPosition.x;
+	y += gPosition.y;
+}
+
 task trackPositionTask()
 {
 	while (true)

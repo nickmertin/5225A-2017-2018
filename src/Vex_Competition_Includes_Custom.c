@@ -39,7 +39,7 @@ void startup();
 task autonomous();
 task usercontrol();
 
-bool bStopTasksBetweenModes = true;
+bool bStopTasksBetweenModes = false;
 word gMainTask = 255;
 
 task main()

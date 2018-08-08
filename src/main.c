@@ -57,19 +57,21 @@
 /* Drive Controls */
 void setDrive(word left, word right)
 {
+	//writeDebugStreamLine("%d l:%d, r:%d", npgmtime, left, right);
 	gMotor[driveL1].power = gMotor[driveL2].power = LIM_TO_VAL(left, 127);
 	gMotor[driveR1].power = gMotor[driveR2].power = LIM_TO_VAL(right, 127);
 }
 
 #include "auto.c"
 
-CREATE_MACHINE_5(drive, trackL, Idle, Break, Manual, Move, MoveSimple, float, Vel, int, Power)
+CREATE_MACHINE_3(drive, trackL, Idle, Break, Manual, float, Vel, int, Power)
 //#include "driveTest.c"
 #include "auto_simple.h"
 #include "auto_simple.c"
 
 task driveSet()
 {
+	bool autoLogs = 1;
 	driveLogs = 1;
 
 	sCycleData drive;
@@ -78,14 +80,14 @@ task driveSet()
 	{
 		switch(driveState)
 		{
-			case 0:
+			case driveIdle: //0:
 			{
 				setDrive(0,0);
 
 				driveStateCycCount++
 				break;
 			}
-			case 1:
+			case driveBreak: //1:
 			{
 				float startVelL, startVelR;
 
@@ -115,18 +117,16 @@ task driveSet()
 				driveSafetyCheck(driveIdle);
 				break;
 			}
-			case 2:
+			case driveManual: //2:
 			{
+				//float angleToTen = atan2( (gPosition.x - 0), (gPosition.y - 10) );
 				setDrive((LIM_TO_VAL((gJoy[JOY_THROTTLE].cur + DRIVE_TURN), 127)), (LIM_TO_VAL((gJoy[JOY_THROTTLE].cur - DRIVE_TURN), 127)));
 				driveStateCycCount++;
-				break;
-			}
-			case 3:
-			{
-				break;
-			}
-			case 4:
-			{
+				sVector newVector;
+				newVector.x = gPosition.x;
+				newVector.y = gPosition.y;
+				LOG(auto)("%d (%f,%f) a:%f", npgmtime, gPosition.x, gPosition.y, gPosition.a);
+
 				break;
 			}
 			//ADD_FUNC_TO_SWITCH_4(driveFuncTest, drive, driveBreak, driveIdle)
@@ -145,8 +145,8 @@ void handleDrive()
 	if (RISING(BTN_DRIVE_TEST))
 	{
 		LOG(drive)("Btn_Drive_Test Pressed");
-		ASSIGN_FUNC_STATE_6(moveToTargetSimple, 0, 10, 0, 0, 100, 0);
-		driveStateChange(drivemoveToTargetSimple, 400);
+		ASSIGN_FUNC_STATE_6(moveToTargetSimple, 0, 10, gPosition.x, gPosition.y, 60, 0);
+		driveStateChange(drivemoveToTargetSimple, 2000);
 		//ASSIGN_FUNC_STATE_4(driveFuncTest, 200, nPgmTime, -1, -1);
 		//driveStateChange(drivedriveFuncTest, 400, 0.01, velUp);
 		//ASSIGN_FUNC_STATE_12(moveToTarget, 10, 0, 0, 0, 127, 0, 5, 10, 50, 0, stopSoft | stopHarsh, mttProportional);
