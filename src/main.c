@@ -39,7 +39,7 @@
 // 0 - No programming skills
 // 1 - Primary individual goal route (110 points)
 // 2 - Secondary double goal route (? points)
-#define SKILLS_ROUTE 1
+#define SKILLS_ROUTE 0
 
 #define DRIVE_WEIGHT_GAME 0
 #define DRIVE_WEIGHT_SKILLS 0
@@ -217,8 +217,8 @@ void setLift(word power,bool debug=false)
 #define LIFT_HOLD_DOWN_THRESHOLD (LIFT_BOTTOM + 50)
 #define LIFT_HOLD_UP_THRESHOLD (LIFT_TOP - 100)
 #define LIFT_LOADER (LIFT_BOTTOM + 800)
-#define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 480)
-#define LIFT_RETURN (LIFT_BOTTOM + 400)
+#define LIFT_LOADER_PICKUP (LIFT_BOTTOM + 600)
+#define LIFT_RETURN (LIFT_BOTTOM + 600)
 #define LIFT_WALL (LIFT_BOTTOM + 450)
 
 DECLARE_MACHINE(lift, tLiftStates)
@@ -384,7 +384,7 @@ void handleLift()
 	{
 		word value = gJoy[JOY_LIFT_DRIVER].cur;
 		value = value * 2 - 128 * sgn(value);
-		if (gSensor[liftPoti].value <= LIFT_BOTTOM && value < -15) value = -15;
+		if ((gSensor[liftPoti].value <= LIFT_BOTTOM || gSensor[limLift].value) && value < -15) value = -15;
 		if (gSensor[liftPoti].value >= LIFT_TOP && value > 15) value = 15;
 		setLift(value);
 	}
@@ -615,7 +615,7 @@ void handleArm()
 		word value = gJoy[JOY_ARM_DRIVER].cur;
 		value = value * 2 - 128 * sgn(value);
 		if (gSensor[armPoti].value >= ARM_TOP && value > 10) value = 10;
-		if (gSensor[armPoti].value <= ARM_BOTTOM && value < -10) value = -10;
+		if ((gSensor[armPoti].value <= ARM_BOTTOM || gSensor[limArm].value) && value < -10) value = -10;
 		setArm(value);
 	}
 }
@@ -639,7 +639,7 @@ typedef enum _tMobileStates {
 	mobileMiddle
 } tMobileStates;
 
-#define MOBILE_TOP 2550
+#define MOBILE_TOP 2400
 #define MOBILE_BOTTOM 950
 #define MOBILE_MIDDLE_UP 1150
 #define MOBILE_MIDDLE_DOWN 1550
@@ -661,7 +661,7 @@ typedef enum _tMobileStates {
 
 // NUMBER OF CONES         0   1   2   3   4   5   6   7   8   9   10  11  12
 int gMobileSlowPeak[13] = {60, 60, 60, 60, 60, 60, 60, 60, 70, 70, 70, 70, 70};
-int gMobileSlowDown[13] = {0,  0,  0,  5,  7,  7,  7,  7,  8,  8,  8,  8,  8};
+int gMobileSlowDown[13] = {0,  0,  0,  0,  5,  7,  7,  7,  8,  8,  8,  8,  8};
 
 bool gMobileCheckLift;
 bool gMobileSlow = false;
@@ -734,8 +734,8 @@ case mobileBottomSlow:
 			mobileClearLift();
 		if (LOGS) writeDebugStreamLine("mobileBottomSlow %d", gNumCones);
 		setMobile(-127);
-		unsigned long timeout = nPgmTime + 500;
-		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 200, timeout, TID1(mobileBottomSlow, 1));
+		unsigned long timeout = nPgmTime + 1200;
+		timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_TOP - 300, timeout, TID1(mobileBottomSlow, 1));
 		//setMobile(-gMobileSlowPeak[gNumCones]);
 		timeout = nPgmTime + 3500;
 		//timeoutWhileGreaterThanL(VEL_NONE, 0, &gSensor[mobilePoti].value, MOBILE_HALFWAY + 200, timeout, TID1(mobileBottomSlow, 2));
@@ -815,7 +815,7 @@ void handleMobile()
 		{
 			if (gSensor[mobilePoti].value > MOBILE_HALFWAY)
 			{
-				if (gNumCones > (gSensor[jmpSkills].value ? 4 : 2))
+				if (gNumCones > (gSensor[jmpSkills].value ? 4 : 3))
 					stackSet(stackDetach, STACK_CLEAR_CONFIG(sfNone, mobileBottomSlow, mfClear));
 				else
 				{
@@ -1217,7 +1217,7 @@ case stackTip:
 		armSet(armToBottom, -127);
 		armTimeOut = nPgmTime + 1000;
 		//liftLowerSimpleAsync(LIFT_BOTTOM + 200, -127, 0);
-		liftSet(liftToTarget, LIFT_BOTTOM + 200);
+		liftSet(liftToTarget, LIFT_BOTTOM + 350);
 		liftTimeOut = nPgmTime + 1200;
 		liftTimeoutWhile(liftToTarget, liftTimeOut, TID1(stackTip, 1));
 		liftSet(liftManaged);
@@ -1454,7 +1454,7 @@ void handleMacros()
 	if (RISING(BTN_MACRO_CANCEL))
 	{
 		cancel();
-		waitForKiddieStartAsync(BTN_MACRO_CANCEL, 1000);
+		waitForKiddieStartAsync(BTN_MACRO_CANCEL, 500);
 	}
 
 	if (FALLING(BTN_MACRO_CANCEL))
