@@ -2,6 +2,10 @@
 
 This is the code used by team 5225A during the 2017-2018 VEX Robotics Competition: In The Zone season.
 
+There are a few things that I'd like to make clear about this code. In particular, there are a lot of things not great about the way this code is structured. Some of these are workarounds for ROBOTC's
+limitations, some are due to us not realizing there was a better way, and some are me not commenting anything for no apparent reason. Feel free to take inspiration from our code but don't take this
+release as us endorsing bad code practices :)
+
 Here are descriptions for the useful files in the repository:
  - `dev/tools/async.py`: Python script to generate `src/async.h`
  - `dev/tools/state.py`: Python script to generate `src/state.h`
